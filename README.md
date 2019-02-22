@@ -1,5 +1,5 @@
 # Welcome
-This is a project I'm using for an automated system of organizing my porn. You can look at the ```_class.php``` to figure out what db you need to create, otherwise I will create 
+This is a project I'm using for an automated system of organizing my porn. You can look at the ```_class.php``` to figure out what db you need to create, otherwise I will create a SQL-file to automatically create the database in a few days.
 
 ## Some information about the system
 - The program is built on **HTML, PHP, MySQL & JavaScript**, so to use it you either have to run a local server or if you have another computer you could run the server from there
