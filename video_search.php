@@ -96,6 +96,7 @@ global $pdo;
 					$query->execute();
 					if ($query->rowCount()) {
 						print '<div id="categories">';
+                        print "<div class='input-wrapper'><input type='checkbox' name='category_NULL'><label for='category_NULL'>NULL</label></div>";
 						foreach ($query->fetchAll() as $data) {
 							print '<div class="input-wrapper">';
 							print "<input type='checkbox' name='category_$data[name]'>";

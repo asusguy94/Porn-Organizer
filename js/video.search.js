@@ -167,8 +167,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         let category_arr = video[j].getAttribute('data-category-name').slice(2, -2).split(',');
 
                         for (let k = 0, len = category_arr.length; k < len; k++) {
-                            if (this.checked && (category_arr[k] === category)) {
-                                video[j].classList.add('tmp');
+                            if (this.checked) {
+                                if (category === 'NULL' && len === 1 && category_arr[k] === '0') {
+                                    video[j].classList.add('tmp');
+                                } else if (category_arr[k] === category) {
+                                    video[j].classList.add('tmp');
+                                }
                             }
                         }
                     }
