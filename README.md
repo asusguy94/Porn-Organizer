@@ -1,5 +1,5 @@
 # Welcome
-This is a project I'm using for an automated system of organizing my porn. You can look at the ```_class.php``` to figure out what db you need to create, otherwise I will create a SQL-file to automatically create the database in a few days.
+This is a project I'm using for an automated system of organizing my porn. Import **database.sql** with phpmyadmin to create the database and tables.
 
 ## Some information about the system
 - The program is built on **HTML, PHP, MySQL & JavaScript**, so to use it you either have to run a local server or if you have another computer you could run the server from there
@@ -22,10 +22,10 @@ This is a project I'm using for an automated system of organizing my porn. You c
 - **Database name**: insert it into ```_class.php``` (or use default)
 - **Database username**: insert into ```_class.php``` (or use default)
 - **Database password**: insert into ```_class.php``` (or use default)
-- if you want the DB-link in the navbar to work, you need to install phpmyadmin move the phpmyadmin folder to the project folder
+- If you want the DB-link in the navbar to work, you need to install phpmyadmin move its install folder to phpMyAdmin inside the project folder
 
 ## TODO
 - [ ] Implement Bootstap 4
 - [ ] Other coding stuff currently not implemented
 - [ ] Video-page bookmark-visuals are broken on smaller devices
-- [ ] Upload .SQL file for project
+- [x] Upload .SQL file for project
