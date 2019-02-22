@@ -1,0 +1,398 @@
+@import "variables";
+@import "functions";
+
+/* Navigation */
+ul li {
+  list-style-type: none;
+}
+
+.main-menu {
+  background-color: green;
+
+  padding: 0;
+
+  width: auto;
+  display: block;
+
+  & > li {
+    display: inline-block;
+    min-width: 60px;
+    text-align: center;
+    transition-duration: 300ms;
+
+    &:nth-last-of-type(-n+#{$navElementsRight}) {
+      float: right;
+    }
+  }
+}
+
+ul > li:not(.active):hover {
+  background-color: forestgreen;
+}
+
+nav li.active {
+  background-color: rgba(85, 85, 85, 0.5);
+
+  & > a {
+    font-weight: bold;
+  }
+}
+
+.main-menu > li > a,
+.sub-menu > li > a {
+  display: inline-block;
+
+  color: white;
+  text-decoration: none;
+  padding: 12px;
+}
+
+.sub-menu {
+  display: none;
+  position: absolute;
+  background-color: green;
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  padding-left: 0;
+
+  & > li {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+.main-menu li:hover .sub-menu {
+  display: block;
+}
+
+/* Stars */
+#stars {
+  text-align: center
+}
+
+.star {
+  display: inline-block;
+  margin: 0 5px 10px;
+}
+
+.star.no-image .image, div.image {
+  background-color: #C4C4C4;
+}
+
+.star .image, .star-image {
+  max-height: 275px;
+  max-width: 200px;
+}
+
+.star .name {
+  display: block;
+  text-align: center;
+}
+
+/* Star */
+#star > img,
+#star > #dropbox {
+  width: 200px;
+}
+
+#star #next {
+  position: absolute;
+  left: 25%;
+  margin-top: 100px;
+}
+
+/* Category */
+#categories {
+  margin-bottom: 20px;
+}
+
+.category {
+  display: block;
+  width: 90px;
+}
+
+/* Videos */
+#videos {
+  float: left;
+}
+
+a.video {
+  text-decoration: none !important;
+  color: black;
+}
+
+.video {
+  float: left;
+  display: inline-block;
+  margin: 5px;
+
+  /*width: 320px;*/
+
+  span {
+    text-align: center;
+  }
+
+  .info, .title {
+    display: block;
+  }
+
+  .info {
+    .wsite {
+      color: green;
+    }
+    .site {
+      color: red;
+    }
+  }
+
+  .divider {
+    &::before, &::after {
+      content: ' ';
+    }
+  }
+
+  img, video {
+    display: block;
+    height: $thumbnailHeight + px;
+    width: $thumbnailWidth + px;
+  }
+}
+
+/* Other */
+h3 {
+  margin-bottom: 0
+}
+
+.btn {
+  margin: 5px;
+  cursor: default !important;
+}
+
+/* Form */
+form {
+  margin-bottom: 7px
+}
+
+label {
+  margin-right: 5px;
+
+  &[for="eye"], &[for="hair"]{
+    font-weight: bold
+  }
+}
+
+/* Dialog */
+.ui-dialog {
+  width: 100%;
+
+  .ui-dialog-title {
+    text-align: center
+  }
+}
+
+#dialog {
+  cursor: default;
+  #dropbox {
+    width: 100%;
+    height: 275px;
+  }
+
+  input {
+    width: 95%;
+  }
+}
+
+/* Dropbox */
+#dropbox {
+  width: 275px;
+  height: 275px;
+  border: 2px dashed red;
+  text-align: center;
+
+  & > span {
+    position: relative;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Ribbon */
+.star, .ribbon-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ribbon-green {
+  background-color: green !important;
+
+  &:before, &:after {
+    background-color: green !important;
+  }
+}
+
+.ribbon {
+  background: red;
+  color: white;
+  padding: 7px 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateX(30%) translateY(0%) rotate(45deg);
+  transform-origin: top left;
+
+  font-weight: bold;
+  min-width: 16px;
+
+  &:before, &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    margin: 0 -1px; /* tweak */
+    width: 200%;
+    height: 100%;
+    background: red;
+  }
+
+  &:before {
+    right: 100%
+  }
+
+  &:after {
+    left: 100%
+  }
+}
+
+/* Attribute */
+.attribute {
+  display: inline-block;
+}
+
+/* Other */
+.star {
+  border: 3px solid transparent
+}
+
+.active {
+  border-color: black
+}
+
+.selected {
+  border-color: green
+}
+
+.bookmark-info, .star-info {
+  display: none;
+  position: fixed;
+
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 10px;
+  background-color: #eeeeee;
+}
+
+.bookmark-info.active {
+  display: block;
+  z-index: 1;
+}
+
+.star-info {
+  min-width: 300px;
+
+  .btn {
+    display: inline-block;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.inline {
+  display: inline-block;
+
+  &:nth-of-type(2n) {
+    margin-left: 1%;
+  }
+}
+
+small {
+  margin-left: 10px;
+  color: blue;
+}
+
+input.xdsoft_input {
+  text-transform: capitalize;
+  &[name="breast"] {
+    text-transform: uppercase;
+  }
+}
+
+.no-match { /* Video-Page Search */
+  display: none;
+}
+
+.search {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+
+  .inner {
+    display: inherit;
+    padding: 2px 4px;
+    &:not(:empty) {
+      background-color: orange;
+    }
+  }
+}
+
+.invisible-submit {
+  position: absolute;
+  left: -99999px;
+}
+
+.symbol {
+  display: none;
+  position: absolute;
+  z-index: 10;
+
+  @include center(54%, 50%);
+
+  background-color: #858585;
+  border-radius: 30px;
+  padding: 0 10px;
+}
+
+.flag {
+  margin-bottom: -7px;
+}
+
+[data-badge]:after {
+  content: attr(data-badge);
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  background: green;
+  color: white;
+  text-align: center;
+  border-radius: 50%;
+  box-shadow: 0 0 1px #333;
+
+  @include circle(23px);
+}
+
+/* Video Count */
+@for $i from 1 through 6 {
+  h#{$i} .count {
+    color: green;
+  }
+}
+
+
+.unselectable {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+// TODO remove unused code

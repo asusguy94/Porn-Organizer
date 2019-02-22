@@ -1,0 +1,191 @@
+@import "variables";
+
+section {
+  width: 75%;
+  float: left;
+}
+
+aside {
+  width: 25%;
+  margin-top: 3.5%;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  float: right;
+
+  #stars {
+    margin-top: 10px;
+  }
+
+  .star img {
+    width: 100%;
+  }
+
+  #up-next {
+    display: block;
+    height: 75px;
+
+    margin: 0 15%;
+    padding: 5px 10px;
+
+    background-color: grey;
+    text-decoration: none;
+
+    border-radius: 4px;
+  }
+
+  #up-next * {
+    color: white;
+  }
+
+  #up-next:hover {
+    background-color: darkgrey;
+  }
+
+  #up-next > div {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+#video {
+  & > h2,
+  & > h3 {
+    display: block;
+    width: 90%;
+    float: left;
+
+    margin: 0;
+  }
+
+  & > h3 {
+    font-size: medium;
+    color: green;
+    margin-bottom: 1%;
+    margin-top: 1px;
+  }
+
+  & > #next {
+    float: right;
+    margin-top: -1.5%;
+  }
+}
+
+video {
+  width: inherit;
+  max-height: 550px;
+  float: left;
+}
+
+/* Video Details */
+#videoDetails {
+  margin-top: 5px
+}
+
+/* Timeline */
+@mixin bookmarkPosition() {
+  $levelSelector: 1;
+  $margin: 0;
+  $margin-offset: 35;
+
+  @for $i from 1 through $totalBookmarkRows {
+    $margin: ($levelSelector - 1) * $margin-offset;
+
+    .bookmark[data-level="#{$i}"] {
+      margin-top: $margin + px;
+    }
+
+    $levelSelector: $levelSelector+1;
+    @if $levelSelector > $bookmarkRows {
+      $levelSelector: 1;
+    }
+  }
+}
+
+#timeline {
+  position: relative;
+  left: 135px;
+  margin-right: 12.5%;
+
+  .bookmark {
+    position: absolute;
+    white-space: nowrap;
+
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding-left: 5px;
+    padding-right: 10px;
+  }
+
+  @include bookmarkPosition();
+}
+
+form[autocomplete] {
+  display: inline-block;
+  opacity: .15;
+  transition: .5s;
+
+  &:hover, &.active {
+    opacity: 1;
+  }
+}
+
+.btn {
+  border: 1px solid dodgerblue;
+  border-radius: 20px;
+
+  color: black;
+  text-decoration: none;
+  text-align: center;
+
+  padding: 4px 15px;
+  margin: 5px;
+
+  cursor: default;
+  transition-duration: 200ms;
+
+  background-color: white;
+
+  &[disabled], &-cancel {
+    border-color: grey;
+
+    &:not(.no-hover):hover, &:not(.no-hover):focus {
+      color: white !important;
+      background-color: grey !important;
+    }
+  }
+
+
+  &:not(.no-hover):hover, &:not(.no-hover):focus {
+    color: white;
+    background-color: dodgerblue;
+  }
+
+  &[disabled]:not(.no-hover):hover, &[disabled]:not(.no-hover):focus {
+    color: white;
+    background-color: grey;
+  }
+}
+
+/*.btn.category {
+  display: block;
+  width: auto;
+}*/
+
+/* FIXES */
+.plyr--video.plyr--menu-open { // settings menu breaks this
+  overflow: hidden;
+}
+
+.plyr__time {
+  margin-left: 0 !important;
+  width: 85px;
+}
+
+.plyr__progress {
+  margin-right: 20px !important;
+}
+
+// TODO remove unused code

@@ -1,0 +1,11 @@
+@mixin center($x, $y){
+  left: $x;
+  top: $y;
+  transform: translate($x * -1, $y * -1);
+}
+
+@mixin circle($size){
+  width: $size;
+  height: $size;
+  line-height: $size;
+}

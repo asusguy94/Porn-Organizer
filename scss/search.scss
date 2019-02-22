@@ -1,0 +1,71 @@
+@import "variables";
+
+h2 {
+  margin-bottom: 0;
+}
+
+.video {
+  width: $thumbnailWidth + px;
+  height: 230px;
+
+  img {
+    width: inherit;
+    height: $thumbnailHeight + px;
+  }
+}
+
+.input-wrapper {
+  margin-bottom: 4%;
+
+  & > input[type="text"] {
+    width: 100%;
+    padding: 10px;
+  }
+
+  & > input[type="checkbox"], & > input[type="radio"] {
+    transform: scale(1.5);
+  }
+
+  & > label {
+    margin-left: 5px;
+  }
+
+}
+
+[class^="hidden-"], [class*="hidden-"] {
+  display: none !important;
+}
+
+.selected label {
+  font-weight: bold;
+}
+
+// TODO Write selector for any checkbox AND radio-button
+
+#loader {
+  border: 16px solid #F3F3F3;
+  border-top-color: $spinnerBlue;
+  border-bottom-color: $spinnerBlue;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg)
+  }
+
+  100% {
+    transform: rotate(360deg)
+  }
+}
+
+.flag {
+  margin-right: 5px;
+}
+
+// TODO remove unused code

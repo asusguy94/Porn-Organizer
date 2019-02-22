@@ -1,0 +1,44 @@
+aside {
+  border: 1px solid red;
+
+  #similar {
+    text-align: center;
+
+    a.similar-star {
+      display: inline-block;
+      width: 200px;
+
+      margin: 10px;
+      text-decoration: none;
+      color: inherit;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      img {
+        width: inherit;
+      }
+    }
+  }
+}
+
+.ignored {
+  color: red;
+
+  /*position: relative;
+
+  &:before {
+    border-bottom: 2px solid red;
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 50%;
+  }*/
+}
+
+.flag {
+  margin-left: 10px;
+}
+
+// TODO remove unused code
