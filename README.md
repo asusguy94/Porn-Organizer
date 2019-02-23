@@ -5,7 +5,7 @@ This is a project I'm using for an automated system of organizing my porn. Impor
 - The program is built on **HTML, PHP, MySQL & JavaScript**, so to use it you either have to run a local server or if you have another computer you could run the server from there
   - I'm running the server on a NAS...so any computer should be able to outperform my setup.
 - The program is dependent on some libraries/files, but all of them should be within this repository
-- The program is heavily dependent on the structure of the files/folders, for more info check the [Wiki](../../wiki/videos)
+- The program is heavily dependent on the structure of the files/folders, for more info check the [Wiki](../../wiki)
 - This project is **early in development**
 - If anyone needs help with anything reguarding the project, don't hesitate to ask!
 - This project is loosely based on a Windows app, if you want to try that one here [Pornganizer](https://pornganizer.org)
