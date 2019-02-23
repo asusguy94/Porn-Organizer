@@ -26,6 +26,5 @@ This is a project I'm using for an automated system of organizing my porn. Impor
 
 ## TODO
 - [ ] Implement Bootstap 4
-- [ ] Other coding stuff currently not implemented
 - [ ] Video-page bookmark-visuals are broken on smaller devices
 - [x] Upload .SQL file for project
