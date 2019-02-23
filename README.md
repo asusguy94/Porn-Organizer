@@ -11,7 +11,7 @@ This is a project I'm using for an automated system of organizing my porn. Impor
 - This project is loosely based on a Windows app, if you want to try that one here [Pornganizer](https://pornganizer.org)
   - This project uses some of the functionality similar to that program, but with a lot of folder/file automation.
 - I also have another version of this project for a hentai-version of this organizer, if that is somthing that anyone wants to use as well, I can upload that too.
-- Any help is appreciated...also with GitHub, as I'm quite new to the site
+- Any help is appreciated...also with GitHub, as I'm quite new to the platform
 
 ## Requirements
 - Server
@@ -26,6 +26,5 @@ This is a project I'm using for an automated system of organizing my porn. Impor
 
 ## TODO
 - [ ] Implement Bootstap 4
-- [ ] Other coding stuff currently not implemented
 - [ ] Video-page bookmark-visuals are broken on smaller devices
 - [x] Upload .SQL file for project
