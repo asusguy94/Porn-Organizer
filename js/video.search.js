@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const existing_checkbox = document.querySelector('input[name="existing"]');
 
     const loader = document.getElementById('loader');
+    const updBtn = document.getElementById('update');
 
     function daysToYears(days) {
         return Math.floor(days / 365);
@@ -23,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
         hoverIntent: 1000
     });
 
-    (function () {
+    const loadData =  function () {
         fetch('json/video.search.php').then(function (jsonData) {
             return jsonData.json();
         }).then(function (data) {
@@ -289,5 +290,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 threshold: 300
             });
         });
-    })();
+    };
+    loadData();
+
+    updBtn.addEventListener('click', function () {
+        resetData();
+        loadData();
+    });
 });
+
+function resetData(){
+    $('.video').remove();
+}

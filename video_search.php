@@ -125,6 +125,7 @@ global $pdo;
                 </aside>
 
                 <section id="videos" class="col-10">
+                    <div id="update" class="col btn btn-outline-primary d-none">Update Data</div>
                     <div id="loader"></div>
                 </section>
             </div>
