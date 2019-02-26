@@ -2383,9 +2383,14 @@ class Video
 			$query->bindValue(1, $star);
 			$query->execute();
 			if (!$query->rowCount()) {
-				$query = $pdo->prepare("INSERT INTO stars(name) VALUES(?)");
+				$query = $pdo->prepare("SELECT id FROM staralias WHERE name = ?");
 				$query->bindValue(1, $star);
 				$query->execute();
+				if(!$query->rowCount()) { // add star
+					$query = $pdo->prepare("INSERT INTO stars(name) VALUES(?)");
+					$query->bindValue(1, $star);
+					$query->execute();
+				}
 			}
 
 			$query = $pdo->prepare("SELECT id FROM stars WHERE stars.name = ? LIMIT 1");

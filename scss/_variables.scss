@@ -1,5 +1,5 @@
-$bookmarkRows: 6;
-$totalBookmarkRows: 14;
+$bookmarkRows: 7; // number of rows of bookmarks
+$totalBookmarkRows: $bookmarkRows * 3;
 $navElementsRight: 2;
 
 $aspectRatio: (16/9);
