@@ -6,18 +6,6 @@ define('DB_STR', 'mysql:host=127.0.0.1:' . DB_PORT . ';dbname=' . DB);
 define('DB_USER', 'porn.web_user'); // SQL username
 define('DB_PASS', 'Qnn3ANukory20UAQ'); // SQL password
 
-define('SIMILAR_DEF', 8);
-define('SIMILAR_MAX', 60);
-define('SIMILAR_TEXT', false);
-
-define('CDN_MAX', 2);
-define('THUMBNAIL_RES', 290); // Thumbnail height
-define('THUMBNAIL_START', 100); // Thumbnail start time
-
-define('PARSER', true); // Enable FreeOnes
-define('enableWEBM', false); // Enable compression lvl-1
-define('enableMKV', false); // Enable compression lvl-2
-define('enableFA', true); // Enable FontAwesome
 try {
 	$pdo = new PDO(DB_STR, DB_USER, DB_PASS);
 } catch (PDOException $e) {
@@ -25,6 +13,22 @@ try {
 	print 'Please contact the system administrator if the problem persists';
 	die();
 }
+
+/* Get settings from DB */
+$opt = Settings::getSettings();
+
+define('SIMILAR_DEF', $opt['similar_def']);
+define('SIMILAR_MAX', $opt['similar_max']);
+define('SIMILAR_TEXT', $opt['similar_text']);
+
+define('CDN_MAX', $opt['cdn_max']);
+define('THUMBNAIL_RES', $opt['thumbnail_res']); // Thumbnail height
+define('THUMBNAIL_START', $opt['thumbnail_start']); // Thumbnail start time
+
+define('PARSER', $opt['parser']); // Enable FreeOnes
+define('enableWEBM', $opt['enable_webm']); // Enable compression lvl-1
+define('enableMKV', $opt['enable_mkv']); // Enable compression lvl-2
+define('enableFA', $opt['enable_fa']); // Enable FontAwesome
 
 /* Initialize Header */
 ob_start();
@@ -762,7 +766,7 @@ class Star
 	public $sqlMethod = '';
 	public $orderStr = ' ORDER BY name';
 	public $groupStr = '';
-	public $havingStr = ' HAVING image IS NULL';
+	public $havingStr = ' HAVING image IS NULL AND name NOT LIKE "% %" AND autotaggerignore = 0';
 
 	function sql($order = 1)
 	{
@@ -1318,6 +1322,13 @@ class Star
 				}
 
 				if ($height != '' && $height != '_NULL') {
+					if(strpos($height, "'")){
+						$height_feet = trim(explode($height, "'")[0]);
+						$height_inches = trim(explode($height, "'")[1]);
+
+						$height = round(($height_feet * 30.48) + ($height_inches * 2.54));
+					}
+
 					$query = $pdo->prepare("UPDATE stars SET height = ? WHERE id = ?");
 					$query->bindValue(1, $height);
 					$query->bindValue(2, $starID);
@@ -1329,6 +1340,11 @@ class Star
 				}
 
 				if ($weight != '' && $weight != '_NULL') {
+					if(strpos($weight, 'lbs')){
+						$weight_lbs = trim(explode($height, 'lbs')[0]);
+						$weight = round($weight_lbs * 2.20462);
+					}
+
 					$query = $pdo->prepare("UPDATE stars SET weight = ? WHERE id = ?");
 					$query->bindValue(1, $weight);
 					$query->bindValue(2, $starID);
@@ -2555,19 +2571,18 @@ class FFMPEG
 	}
 }
 
-class Performance
-{
-	public $start;
-
-	function start()
-	{
-		$this->start = microtime(true);
+class Settings{
+	static function getSettings(){
+		global $pdo;
+		$query = $pdo->prepare("SELECT * FROM settings LIMIT 1");
+		$query->execute();
+		return $query->fetch();
 	}
 
-	function end()
-	{
-		$end = microtime(true);
-
-		return round(($end - $this->start), 2) . " seconds";
+	 static function getSetting($name){
+		global $pdo;
+		$query = $pdo->prepare("SELECT $name FROM settings LIMIT 1");
+		$query->execute();
+		return $query->fetch()[$name];
 	}
 }

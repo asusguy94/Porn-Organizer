@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: 22. Feb, 2019 12:31 PM
+-- Generation Time: 27. Feb, 2019 22:07 PM
 -- Tjener-versjon: 10.3.7-MariaDB
 -- PHP Version: 5.6.39
 
@@ -30,9 +30,11 @@ USE `porn`;
 -- Tabellstruktur for tabell `attributes`
 --
 
-CREATE TABLE `attributes` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL
+CREATE TABLE IF NOT EXISTS `attributes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -41,11 +43,15 @@ CREATE TABLE `attributes` (
 -- Tabellstruktur for tabell `bookmarks`
 --
 
-CREATE TABLE `bookmarks` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `bookmarks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `videoID` int(11) NOT NULL,
   `categoryID` int(11) NOT NULL,
-  `start` int(11) NOT NULL DEFAULT 0
+  `start` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `videoID` (`videoID`),
+  KEY `start` (`start`),
+  KEY `categoryID` (`categoryID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -54,9 +60,11 @@ CREATE TABLE `bookmarks` (
 -- Tabellstruktur for tabell `categories`
 --
 
-CREATE TABLE `categories` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL
+CREATE TABLE IF NOT EXISTS `categories` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -65,11 +73,36 @@ CREATE TABLE `categories` (
 -- Tabellstruktur for tabell `country`
 --
 
-CREATE TABLE `country` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `country` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  `code` char(2) NOT NULL
+  `code` char(2) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  UNIQUE KEY `code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellstruktur for tabell `settings`
+--
+
+CREATE TABLE IF NOT EXISTS `settings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `similar_def` int(11) NOT NULL DEFAULT 8,
+  `similar_max` int(11) NOT NULL DEFAULT 60,
+  `similar_text` tinyint(1) NOT NULL DEFAULT 0,
+  `cdn_max` tinyint(1) NOT NULL DEFAULT 2,
+  `thumbnail_res` int(11) NOT NULL DEFAULT 290,
+  `thumbnail_start` int(11) NOT NULL DEFAULT 100,
+  `parser` tinyint(1) NOT NULL DEFAULT 0,
+  `enable_webm` tinyint(1) NOT NULL DEFAULT 0,
+  `enable_mkv` tinyint(1) NOT NULL DEFAULT 0,
+  `enable_fa` tinyint(1) NOT NULL DEFAULT 0,
+  `video_sql` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -77,10 +110,13 @@ CREATE TABLE `country` (
 -- Tabellstruktur for tabell `sites`
 --
 
-CREATE TABLE `sites` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `sites` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  `websiteID` int(11) DEFAULT NULL
+  `websiteID` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `websiteID` (`websiteID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -89,10 +125,13 @@ CREATE TABLE `sites` (
 -- Tabellstruktur for tabell `staralias`
 --
 
-CREATE TABLE `staralias` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `staralias` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `starID` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `name` (`name`),
+  KEY `starID` (`starID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -101,8 +140,8 @@ CREATE TABLE `staralias` (
 -- Tabellstruktur for tabell `stars`
 --
 
-CREATE TABLE `stars` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `stars` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `image` varchar(255) DEFAULT NULL,
   `haircolor` varchar(255) DEFAULT NULL,
@@ -115,7 +154,21 @@ CREATE TABLE `stars` (
   `weight` int(11) DEFAULT NULL,
   `start` year(4) DEFAULT NULL,
   `end` year(4) DEFAULT NULL,
-  `autoTaggerIgnore` tinyint(1) NOT NULL DEFAULT 0
+  `autoTaggerIgnore` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`) USING BTREE,
+  UNIQUE KEY `image` (`image`),
+  KEY `breast` (`breast`),
+  KEY `haircolor` (`haircolor`) USING BTREE,
+  KEY `eyecolor` (`eyecolor`) USING BTREE,
+  KEY `ethnicity` (`ethnicity`),
+  KEY `country` (`country`),
+  KEY `birthdate` (`birthdate`),
+  KEY `height` (`height`),
+  KEY `weight` (`weight`),
+  KEY `start` (`start`),
+  KEY `end` (`end`),
+  KEY `autoTaggerIgnore` (`autoTaggerIgnore`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -124,10 +177,13 @@ CREATE TABLE `stars` (
 -- Tabellstruktur for tabell `videoattributes`
 --
 
-CREATE TABLE `videoattributes` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `videoattributes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `videoID` int(11) NOT NULL,
-  `attributeID` int(11) NOT NULL
+  `attributeID` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `videoID` (`videoID`),
+  KEY `attributeID` (`attributeID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -136,10 +192,13 @@ CREATE TABLE `videoattributes` (
 -- Tabellstruktur for tabell `videocategories`
 --
 
-CREATE TABLE `videocategories` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `videocategories` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `videoID` int(11) NOT NULL,
-  `categoryID` int(11) NOT NULL
+  `categoryID` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `videoID` (`videoID`),
+  KEY `categoryID` (`categoryID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -148,13 +207,19 @@ CREATE TABLE `videocategories` (
 -- Tabellstruktur for tabell `videos`
 --
 
-CREATE TABLE `videos` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `videos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `path` varchar(255) NOT NULL,
   `date` date DEFAULT NULL,
   `duration` int(11) NOT NULL DEFAULT 0,
-  `starAge` int(11) DEFAULT NULL
+  `starAge` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `path` (`path`),
+  KEY `name` (`name`),
+  KEY `date` (`date`),
+  KEY `duration` (`duration`),
+  KEY `starAge` (`starAge`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -163,10 +228,13 @@ CREATE TABLE `videos` (
 -- Tabellstruktur for tabell `videosites`
 --
 
-CREATE TABLE `videosites` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `videosites` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `videoID` int(11) NOT NULL,
-  `siteID` int(11) NOT NULL
+  `siteID` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `siteID` (`siteID`),
+  KEY `videoID` (`videoID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -175,10 +243,13 @@ CREATE TABLE `videosites` (
 -- Tabellstruktur for tabell `videostars`
 --
 
-CREATE TABLE `videostars` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `videostars` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `starID` int(11) NOT NULL,
-  `videoID` int(11) NOT NULL
+  `videoID` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `starID` (`starID`),
+  KEY `videoID` (`videoID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -187,10 +258,13 @@ CREATE TABLE `videostars` (
 -- Tabellstruktur for tabell `videowebsites`
 --
 
-CREATE TABLE `videowebsites` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `videowebsites` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `videoID` int(11) NOT NULL,
-  `websiteID` int(11) NOT NULL
+  `websiteID` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `websiteID` (`websiteID`),
+  KEY `videoID` (`videoID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -199,9 +273,11 @@ CREATE TABLE `videowebsites` (
 -- Tabellstruktur for tabell `websites`
 --
 
-CREATE TABLE `websites` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL
+CREATE TABLE IF NOT EXISTS `websites` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -210,241 +286,14 @@ CREATE TABLE `websites` (
 -- Tabellstruktur for tabell `websitesites`
 --
 
-CREATE TABLE `websitesites` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `websitesites` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `websiteID` int(11) NOT NULL,
-  `siteID` int(11) NOT NULL
+  `siteID` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `websiteID` (`websiteID`),
+  KEY `siteID` (`siteID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `attributes`
---
-ALTER TABLE `attributes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `name` (`name`);
-
---
--- Indexes for table `bookmarks`
---
-ALTER TABLE `bookmarks`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `videoID` (`videoID`),
-  ADD KEY `start` (`start`),
-  ADD KEY `categoryID` (`categoryID`);
-
---
--- Indexes for table `categories`
---
-ALTER TABLE `categories`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
-
---
--- Indexes for table `country`
---
-ALTER TABLE `country`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD UNIQUE KEY `code` (`code`);
-
---
--- Indexes for table `sites`
---
-ALTER TABLE `sites`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD KEY `websiteID` (`websiteID`);
-
---
--- Indexes for table `staralias`
---
-ALTER TABLE `staralias`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `name` (`name`),
-  ADD KEY `starID` (`starID`);
-
---
--- Indexes for table `stars`
---
-ALTER TABLE `stars`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`) USING BTREE,
-  ADD UNIQUE KEY `image` (`image`),
-  ADD KEY `breast` (`breast`),
-  ADD KEY `haircolor` (`haircolor`) USING BTREE,
-  ADD KEY `eyecolor` (`eyecolor`) USING BTREE,
-  ADD KEY `ethnicity` (`ethnicity`),
-  ADD KEY `country` (`country`),
-  ADD KEY `birthdate` (`birthdate`),
-  ADD KEY `height` (`height`),
-  ADD KEY `weight` (`weight`),
-  ADD KEY `start` (`start`),
-  ADD KEY `end` (`end`),
-  ADD KEY `autoTaggerIgnore` (`autoTaggerIgnore`);
-
---
--- Indexes for table `videoattributes`
---
-ALTER TABLE `videoattributes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `videoID` (`videoID`),
-  ADD KEY `attributeID` (`attributeID`);
-
---
--- Indexes for table `videocategories`
---
-ALTER TABLE `videocategories`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `videoID` (`videoID`),
-  ADD KEY `categoryID` (`categoryID`);
-
---
--- Indexes for table `videos`
---
-ALTER TABLE `videos`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `path` (`path`),
-  ADD KEY `name` (`name`),
-  ADD KEY `date` (`date`),
-  ADD KEY `duration` (`duration`),
-  ADD KEY `starAge` (`starAge`);
-
---
--- Indexes for table `videosites`
---
-ALTER TABLE `videosites`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `siteID` (`siteID`),
-  ADD KEY `videoID` (`videoID`) USING BTREE;
-
---
--- Indexes for table `videostars`
---
-ALTER TABLE `videostars`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `starID` (`starID`),
-  ADD KEY `videoID` (`videoID`);
-
---
--- Indexes for table `videowebsites`
---
-ALTER TABLE `videowebsites`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `websiteID` (`websiteID`),
-  ADD KEY `videoID` (`videoID`) USING BTREE;
-
---
--- Indexes for table `websites`
---
-ALTER TABLE `websites`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
-
---
--- Indexes for table `websitesites`
---
-ALTER TABLE `websitesites`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `websiteID` (`websiteID`),
-  ADD KEY `siteID` (`siteID`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `attributes`
---
-ALTER TABLE `attributes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `bookmarks`
---
-ALTER TABLE `bookmarks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `categories`
---
-ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `country`
---
-ALTER TABLE `country`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `sites`
---
-ALTER TABLE `sites`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `staralias`
---
-ALTER TABLE `staralias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `stars`
---
-ALTER TABLE `stars`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `videoattributes`
---
-ALTER TABLE `videoattributes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `videocategories`
---
-ALTER TABLE `videocategories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `videos`
---
-ALTER TABLE `videos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `videosites`
---
-ALTER TABLE `videosites`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `videostars`
---
-ALTER TABLE `videostars`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `videowebsites`
---
-ALTER TABLE `videowebsites`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `websites`
---
-ALTER TABLE `websites`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `websitesites`
---
-ALTER TABLE `websitesites`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
