@@ -766,7 +766,7 @@ class Star
 	public $sqlMethod = '';
 	public $orderStr = ' ORDER BY name';
 	public $groupStr = '';
-	public $havingStr = ' HAVING image IS NULL AND name NOT LIKE "% %" AND autotaggerignore = 0';
+	public $havingStr = ' HAVING image IS NULL';
 
 	function sql($order = 1)
 	{
@@ -1324,7 +1324,7 @@ class Star
 				if ($height != '' && $height != '_NULL') {
 					if(strpos($height, "'")){
 						$height_feet = trim(explode($height, "'")[0]);
-						$height_inches = trim(explode($height, "'")[1]);
+						$height_inches = trim(explode(explode($height, "'")[1], '"')[0]);
 
 						$height = round(($height_feet * 30.48) + ($height_inches * 2.54));
 					}
@@ -1341,7 +1341,7 @@ class Star
 
 				if ($weight != '' && $weight != '_NULL') {
 					if(strpos($weight, 'lbs')){
-						$weight_lbs = trim(explode($height, 'lbs')[0]);
+						$weight_lbs = trim(explode($weight, 'lbs')[0]);
 						$weight = round($weight_lbs * 2.20462);
 					}
 
