@@ -1,5 +1,5 @@
 <?php
-include('_class.php');
+include('../_class.php');
 $basic = new Basic();
 $stars = new Star();
 
@@ -18,7 +18,7 @@ if (isset($_GET['id']) && isset($_GET['image'])) {
 			$query->execute();
 
 			$ext = $basic->getExtension($image);
-			echo md5_file("images/stars/$id.$ext");
+			echo md5_file("../images/stars/$id.$ext");
 		}
 	}
 }

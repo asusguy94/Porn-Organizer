@@ -1,24 +1,13 @@
 <?php
-include('_class.php');
+include('../_class.php');
 
-if (isset($_GET['videoID']) && isset($_GET['categoryID']) && isset($_GET['seconds'])) {
-	if (!empty($_GET['videoID']) && !empty($_GET['categoryID']) && !empty($_GET['seconds'])) {
-		$videoID = $_GET['videoID'];
-		$categoryID = $_GET['categoryID'];
+if (isset($_GET['seconds']) && isset($_GET['categoryID']) && isset($_GET['videoID'])) {
+	if (!empty($_GET['seconds']) && !empty($_GET['categoryID']) && !empty($_GET['videoID'])) {
 		$seconds = $_GET['seconds'];
+		$categoryID = $_GET['categoryID'];
+		$videoID = $_GET['videoID'];
 
 		global $pdo;
-		$query = $pdo->prepare("SELECT id FROM videocategories WHERE videoID = ? AND categoryID = ? LIMIT 1");
-		$query->bindValue(1, $videoID);
-		$query->bindValue(2, $categoryID);
-		$query->execute();
-		if (!$query->rowCount()) {
-			$query = $pdo->prepare("INSERT INTO videocategories(videoID, categoryID) VALUES(?, ?)");
-			$query->bindValue(1, $videoID);
-			$query->bindValue(2, $categoryID);
-			$query->execute();
-		}
-
 		$query = $pdo->prepare("SELECT id FROM bookmarks WHERE videoID = ? AND categoryID = ? AND start = ? LIMIT 1");
 		$query->bindValue(1, $videoID);
 		$query->bindValue(2, $categoryID);

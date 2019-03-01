@@ -1,5 +1,5 @@
 <?php
-include('_class.php');
+include('../_class.php');
 
 if (isset($_GET['starID'])) {
 	if (!empty($_GET['starID'])) {
@@ -27,10 +27,6 @@ if (isset($_GET['starID'])) {
 			$query->bindValue(1, $id);
 			$query->execute();
 		}
-
-		$query = $pdo->prepare("DELETE FROM starattributes WHERE starID = ?");
-		$query->bindValue(1, $id);
-		$query->execute();
 
 		$query = $pdo->prepare("DELETE FROM staralias WHERE starID = ?");
 		$query->bindValue(1, $id);

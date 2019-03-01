@@ -1,5 +1,5 @@
 <?php
-include('_class.php');
+include('../_class.php');
 
 if (isset($_GET['starID']) && isset($_GET['aliasName'])) {
 	if (!empty($_GET['starID']) && !empty($_GET['aliasName'])) {

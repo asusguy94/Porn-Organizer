@@ -1,5 +1,5 @@
 <?php
-include('_class.php');
+include('../_class.php');
 
 $ffmpeg = new FFMPEG();
 

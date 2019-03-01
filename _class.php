@@ -820,7 +820,7 @@ class Star
 			}
 
 			for ($i = 0; $i < count($missingStars_arr); $i++) {
-				print "<p class='missing'>$missingStarsID_arr[$i]: <span class='name'>$missingStars_arr[$i]</span></p>";
+				print "<p class='missing'><a href='video.php?id=$missingStarsID_arr[$i]'>$missingStarsID_arr[$i]</a>: <span class='name'>$missingStars_arr[$i]</span></p>";
 			}
 		}
 
@@ -1322,7 +1322,7 @@ class Star
 				}
 
 				if ($height != '' && $height != '_NULL') {
-					if(strpos($height, "'")){
+					if (strpos($height, "'")) {
 						$height_feet = trim(explode($height, "'")[0]);
 						$height_inches = trim(explode(explode($height, "'")[1], '"')[0]);
 
@@ -1340,7 +1340,7 @@ class Star
 				}
 
 				if ($weight != '' && $weight != '_NULL') {
-					if(strpos($weight, 'lbs')){
+					if (strpos($weight, 'lbs')) {
 						$weight_lbs = trim(explode($weight, 'lbs')[0]);
 						$weight = round($weight_lbs * 2.20462);
 					}
@@ -1479,7 +1479,7 @@ class Star
 	{
 		$basic = new Basic();
 		$ext = $basic->getExtension($url);
-		$localPath = "images/stars/$name.$ext";
+		$localPath = "../images/stars/$name.$ext";
 
 		$url = str_replace(' ', '%20', $url);
 
@@ -2571,15 +2571,18 @@ class FFMPEG
 	}
 }
 
-class Settings{
-	static function getSettings(){
+class Settings
+{
+	static function getSettings()
+	{
 		global $pdo;
 		$query = $pdo->prepare("SELECT * FROM settings LIMIT 1");
 		$query->execute();
 		return $query->fetch();
 	}
 
-	 static function getSetting($name){
+	static function getSetting($name)
+	{
 		global $pdo;
 		$query = $pdo->prepare("SELECT $name FROM settings LIMIT 1");
 		$query->execute();

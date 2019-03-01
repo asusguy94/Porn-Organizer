@@ -1,5 +1,5 @@
 <?php
-include('_class.php');
+include('../_class.php');
 
 if (isset($_GET['videoID']) && isset($_GET['videoName'])) {
 	if (!empty($_GET['videoID']) && !empty($_GET['videoName'])) {

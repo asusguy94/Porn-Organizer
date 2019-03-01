@@ -149,22 +149,22 @@ function playFrom(seconds) {
 
 function addAttribute(attributeID) {
     let arguments = 'videoID=' + videoID + '&attributeID=' + attributeID;
-    ajax('add_videoattribute.php', arguments);
+    ajax('ajax/add_videoattribute.php', arguments);
 }
 
 function removeAttribute(attributeID) {
     let arguments = 'videoID=' + videoID + '&attributeID=' + attributeID;
-    ajax('remove_videoattribute.php', arguments);
+    ajax('ajax/remove_videoattribute.php', arguments);
 }
 
 function renameVideo(videoName) {
     let arguments = 'videoID=' + videoID + '&videoName=' + videoName;
-    ajax('rename_video.php', arguments);
+    ajax('ajax/rename_video.php', arguments);
 }
 
 function renameFile(videoPath) {
     let arguments = 'videoID=' + videoID + '&videoPath=' + videoPath;
-    ajax('rename_file.php', arguments);
+    ajax('ajax/rename_file.php', arguments);
 }
 
 function addBookmark(categoryID, categoryName) {
@@ -172,7 +172,7 @@ function addBookmark(categoryID, categoryName) {
     localStorage.bookmark = seconds;
 
     let arguments = 'seconds=' + seconds + '&categoryID=' + categoryID + '&videoID=' + videoID;
-    ajax('add_bookmark.php', arguments, function (data) {
+    ajax('ajax/add_bookmark.php', arguments, function (data) {
         if (!$('#timeline').length) {
             let div = document.createElement('div');
             div.setAttribute('id', 'timeline');
@@ -208,7 +208,7 @@ function addBookmark(categoryID, categoryName) {
 
 function bookmark_editCategory(bookmarkID, categoryID) {
     let arguments = 'bookmarkID=' + bookmarkID + '&categoryID=' + categoryID;
-    ajax('bookmark_editCategory.php', arguments);
+    ajax('ajax/bookmark_editCategory.php', arguments);
 }
 
 function bookmark_editTime(bookmarkID) {
@@ -216,7 +216,7 @@ function bookmark_editTime(bookmarkID) {
     localStorage.bookmark = seconds;
 
     let arguments = 'bookmarkID=' + bookmarkID + '&seconds=' + seconds;
-    ajax('bookmark_editTime.php', arguments, function () {
+    ajax('ajax/bookmark_editTime.php', arguments, function () {
         let btn = document.querySelector('.bookmark[data-bookmark-id="' + bookmarkID + '"]');
         btn.setAttribute('style', 'margin-left: ' + getOffset(seconds) + '%');
         btn.setAttribute('data-bookmark-time', seconds.toString());
@@ -229,22 +229,22 @@ function bookmark_editTime(bookmarkID) {
 
 function removeBookmark(id) {
     let arguments = 'id=' + id;
-    ajax('remove_bookmark.php', arguments);
+    ajax('ajax/remove_bookmark.php', arguments);
 }
 
 function removeBookmarks() {
     let arguments = 'videoID=' + videoID;
-    ajax('remove_bookmarks.php', arguments);
+    ajax('ajax/remove_bookmarks.php', arguments);
 }
 
 function removeVideoCategory(videoID, categoryID) {
     let arguments = 'videoID=' + videoID + '&categoryID=' + categoryID;
-    ajax('remove_videocategory.php', arguments);
+    ajax('ajax/remove_videocategory.php', arguments);
 }
 
 function removeVideoStar(videoID, starID) {
     let arguments = 'videoID=' + videoID + '&starID=' + starID;
-    ajax('remove_videostar.php', arguments);
+    ajax('ajax/remove_videostar.php', arguments);
 }
 
 function addCategory_and_bookmark(categoryID, categoryName) {
@@ -254,7 +254,7 @@ function addCategory_and_bookmark(categoryID, categoryName) {
     localStorage.bookmark = seconds;
 
     let arguments = 'videoID=' + videoID + '&categoryID=' + categoryID + '&seconds=' + seconds;
-    ajax('add_category_and_bookmark.php', arguments, function (data) {
+    ajax('ajax/add_category_and_bookmark.php', arguments, function (data) {
         if (!$('#timeline').length) {
             let div = document.createElement('div');
             div.setAttribute('id', 'timeline');
@@ -308,17 +308,17 @@ function addCategory_and_bookmark(categoryID, categoryName) {
 
 function generateThumbnail() {
     let arguments = 'videoID=' + videoID;
-    ajax('video_generatethumbnail.php', arguments);
+    ajax('ajax/video_generatethumbnail.php', arguments);
 }
 
 function removeVideo() {
     let arguments = 'videoID=' + videoID;
-    ajax('remove_video.php', arguments);
+    ajax('ajax/remove_video.php', arguments);
 }
 
 function setAge(age) {
     let arguments = 'videoID=' + videoID + '&age=' + age;
-    ajax('video_age.php', arguments);
+    ajax('ajax/video_age.php', arguments);
 }
 
 function ajax(page, params, callback = function () {

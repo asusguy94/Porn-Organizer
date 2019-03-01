@@ -38,12 +38,12 @@ function isIgnored() {
 
 function ignoreStar() {
     let arguments = 'starID=' + starID;
-    ajax('ignoreStar.php', arguments);
+    ajax('ajax/ignoreStar.php', arguments);
 }
 
 function enableStar() {
     let arguments = 'starID=' + starID;
-    ajax('enableStar.php', arguments);
+    ajax('ajax/enableStar.php', arguments);
 }
 
 function addStarImage(id, url) {
@@ -51,8 +51,9 @@ function addStarImage(id, url) {
 
     let ext = getExtension(pathToFname(url));
     let fname = starID + '.' + ext;
-    console.log('fname: ' + fname);
-    ajax('add_star_image.php', arguments, function (data) {
+    console.log('url: ' + fname);
+    console.log('url: ' + url);
+    ajax('ajax/add_star_image.php', arguments, function (data) {
         let dropbox = document.getElementById('dropbox');
 
         let img = document.createElement('img');
@@ -66,37 +67,37 @@ function addStarImage(id, url) {
 
 function removeStarImage(id) {
     let arguments = 'id=' + id;
-    ajax('remove_star_image.php', arguments);
+    ajax('ajax/remove_star_image.php', arguments);
 }
 
 function deleteStar(starID) {
     let arguments = 'starID=' + starID;
-    ajax('remove_star.php', arguments);
+    ajax('ajax/remove_star.php', arguments);
 }
 
 function renameStar(starID, starName) {
     let arguments = 'starID=' + starID + '&starName=' + starName;
-    ajax('rename_star.php', arguments);
+    ajax('ajax/rename_star.php', arguments);
 }
 
 function addStarAlias(alias) {
     let arguments = 'starID=' + starID + '&aliasName=' + alias;
-    ajax('addStarAlias.php', arguments);
+    ajax('ajax/addStarAlias.php', arguments);
 }
 
 function removeStarAlias(id) {
     let arguments = 'aliasID=' + id;
-    ajax('removeStarAlias.php', arguments);
+    ajax('ajax/removeStarAlias.php', arguments);
 }
 
 function removeVideoStar(videoID) {
     let arguments = 'videoID=' + videoID + '&starID=' + starID;
-    ajax('remove_videostar.php', arguments);
+    ajax('ajax/remove_videostar.php', arguments);
 }
 
 function aliasSwapTitle(aliasID) {
     let arguments = 'aliasID=' + aliasID + '&starID=' + starID;
-    ajax('alias_swap_title.php', arguments);
+    ajax('ajax/alias_swap_title.php', arguments);
 }
 
 

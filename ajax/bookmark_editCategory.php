@@ -1,5 +1,5 @@
 <?php
-include('_class.php');
+include('../_class.php');
 
 if (isset($_GET['bookmarkID']) && isset($_GET['categoryID'])) {
 	if (!empty($_GET['bookmarkID']) && !empty($_GET['categoryID'])) {

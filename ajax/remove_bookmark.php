@@ -1,5 +1,5 @@
 <?php
-include('_class.php');
+include('../_class.php');
 
 if (isset($_GET['id'])) {
 	if (!empty($_GET['id'])) {
@@ -14,14 +14,6 @@ if (isset($_GET['id'])) {
 		$videoID = $result['videoID'];
 
 		$query = $pdo->prepare("DELETE FROM bookmarks WHERE id = ?");
-		$query->bindValue(1, $id);
-		$query->execute();
-
-		$query = $pdo->prepare("DELETE FROM bookmarkstars WHERE bookmarkID = ?");
-		$query->bindValue(1, $id);
-		$query->execute();
-
-		$query = $pdo->prepare("DELETE FROM bookmarkattributes WHERE bookmarkID = ?");
 		$query->bindValue(1, $id);
 		$query->execute();
 

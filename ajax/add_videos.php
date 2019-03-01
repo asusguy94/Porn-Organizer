@@ -1,5 +1,5 @@
 <?php
-include('_class.php');
+include('../_class.php');
 $basic = new Basic();
 $db = new DB();
 $file_class = new File();
