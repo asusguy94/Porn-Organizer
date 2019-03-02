@@ -102,7 +102,11 @@ class Basic
 
 		), array(
 			"name" => "Generate Thumbnails",
-			"link" => 'video_generatethumbnails.php'
+			"link" => 'video_generatethumbnails.php',
+			array(
+				"name" => 'Generate WebVTT',
+				'link' => 'vtt.php'
+			)
 		)
 
 	);
@@ -959,33 +963,40 @@ class Star
 
 	function fetchStar($id)
 	{
-		$nextID = function ($id) {
+		$nextID = function ($id = -1) {
 			global $pdo;
-			if ($this->havingStr === '') {
-				$this->havingStr = ' HAVING id = :starID';
-			} else {
-				$this->havingStr .= ' OR id = :starID';
-			}
-			$query = $pdo->prepare($this->sql());
-			$query->bindParam(':starID', $id);
-			$query->execute();
-
-			$i = 0;
-			$return = [];
-			$idFound = false;
-			foreach ($query->fetchAll() as $data) {
-				if (!$idFound) {
-					if ($data['id'] == $id) {
-						$idFound = true;
-					}
-					continue;
-				} else if ($idFound && !count($return)) {
-					$return[0] = $data['id'];
-					$return[1] = ++$i;
+			if ($id !== -1) {
+				if ($this->havingStr === '') {
+					$this->havingStr = ' HAVING id = :starID';
 				} else {
-					$return[1] = ++$i;
+					$this->havingStr .= ' OR id = :starID';
 				}
+				$query = $pdo->prepare($this->sql());
+				$query->bindParam(':starID', $id);
+				$query->execute();
+
+				$i = 0;
+				$return = [];
+				$idFound = false;
+				foreach ($query->fetchAll() as $data) {
+					if (!$idFound) {
+						if ($data['id'] == $id) {
+							$idFound = true;
+						}
+						continue;
+					} else if ($idFound && !count($return)) {
+						$return[0] = $data['id'];
+						$return[1] = ++$i;
+					} else {
+						$return[1] = ++$i;
+					}
+				}
+			} else {
+				$query = $pdo->prepare($this->sql());
+				$query->execute();
+				$return = $query->fetch()['id'];
 			}
+
 			return $return;
 		};
 
@@ -994,7 +1005,8 @@ class Star
 		$query->bindValue(1, $id);
 		$query->execute();
 		if (!$query->rowCount()) {
-			header('Location: stars.php');
+			if ($id) header("Location: ?id={$nextID()}");
+			else header("Location: stars.php");
 		} else {
 			$result = $query->fetch();
 
@@ -1461,7 +1473,7 @@ class Star
 			if (isset($_POST['image']) && !empty($_POST['image'])) {
 				$image = $_POST['image'];
 				$id = $_GET['id'];
-				$ext = $basic->getExtension($image);
+				$ext = strtolower($basic->getExtension($image));
 
 				if ($this->downloadImage($image, $id)) {
 					$query = $pdo->prepare("UPDATE stars SET image = ? WHERE id = ?");
@@ -1478,7 +1490,9 @@ class Star
 	function downloadImage($url, $name)
 	{
 		$basic = new Basic();
-		$ext = $basic->getExtension($url);
+		$ext = strtolower($basic->getExtension($url));
+		if($ext === 'jpe' || $ext === 'jpeg') $ext = 'jpg';
+
 		$localPath = "../images/stars/$name.$ext";
 
 		$url = str_replace(' ', '%20', $url);
@@ -2568,6 +2582,91 @@ class FFMPEG
 		} else {
 			return false;
 		}
+	}
+
+	function getVideoWidth($fname)
+	{
+		$input = "videos/$fname";
+
+		$width = shell_exec("$this->ffprobe -v quiet -show_streams \"$input\" | grep coded_width | cut -d '=' -f 2");
+
+		if (!is_null($width)) {
+			return $width;
+		} else {
+			return false;
+		}
+	}
+}
+
+class VTT extends FFMPEG
+{
+	public $im_identify = '/volume1/@appstore/imagemagick/bin/identify';
+	public $im_montage = '/volume1/@appstore/imagemagick/bin/montage';
+
+	function generateVtt($fname, $videoID, $width = 360)
+	{
+		/* Variables */
+		$input = "videos/$fname";
+		$output = "images/thumbnails/tmp/$videoID-%03d.jpg";
+
+		/* Get Duration */
+		$duration = $this->getDuration($fname);
+
+		/* Calculate Size */
+		if ($duration > (60 * 60)) {
+			$delay = 30;
+		} else if ($duration >= (30 * 60)) {
+			$delay = 20;
+		} else if ($duration >= (10 * 60)) {
+			$delay = 10;
+		} else if ($duration >= (2 * 60)) {
+			$delay = 5;
+		} else {
+			$delay = 2;
+		}
+
+		$size_val = ceil(sqrt($duration / $delay));
+		$size = "{$size_val}x{$size_val}";
+
+		/* Create thumbnails */
+		$cmd = "$this->ffmpeg -i \"$input\" -f image2 -bt 20M -vf \"fps=1/$delay,scale=$width:-1\" \"$output\"";
+		shell_exec($cmd);
+
+		/* ImageCount */
+		$imageCount = 0;
+		foreach (glob("images/thumbnails/tmp/$videoID-*.jpg") AS $file) {
+			if ($file !== false) $imageCount++;
+		}
+
+		/* Get Width & Height */
+		$cmd = "$this->im_identify -format \"%g - %f\" \"images/thumbnails/tmp/$videoID-001.jpg\"";
+		$info = explode(' ', shell_exec($cmd))[0];
+		$height = explode('+', explode('x', $info)[1])[0];
+
+		/* Merge Thumbnails */
+		$cmd = "$this->im_montage images/thumbnails/tmp/$videoID-*.jpg -tile $size -geometry $info \"images/thumbnails/$videoID.jpg\"";
+		shell_exec($cmd);
+
+		/* Remove Source Files */
+		foreach (glob("images/thumbnails/tmp/$videoID-*.jpg") AS $file) {
+			if ($file !== false) unlink($file);
+		}
+
+		/* Make File */
+		$vtt = fopen("vtt/$videoID.vtt", 'w');
+		$data = 'WEBVTT';
+		for ($col = 0, $counter = 0; $col < $size_val; $col++) {
+			for ($row = 0; $row < $size_val; $row++) {
+				if ($counter >= $imageCount) break;
+
+				$data .= "\n";
+				$data .= "\n" . ($counter + 1);
+				$data .= "\n" . gmdate("H:i:s", $counter * $delay) . ".000 --> " . gmdate("H:i:s", ($counter + 1) * $delay) . '.000';
+				$data .= "\n" . "../images/thumbnails/$videoID.jpg#xywh=" . ($row * $width) . "," . ($col * $height) . ",$width,$height";
+				$counter++;
+			}
+		}
+		fwrite($vtt, $data);
 	}
 }
 

@@ -14,11 +14,11 @@ if (isset($_GET['videoID'])) {
 			$query->bindParam(':videoID', $videoID);
 			$query->execute();
 			if(!$query->rowCount()) { // check if the video has some stars
-				if (file_exists('videos/' . $data['path'])) {
-					if (unlink('videos/' . $data['path'])) {
+				if (file_exists('../videos/' . $data['path'])) {
+					if (unlink('../videos/' . $data['path'])) {
 						$webmPath = str_replace('.mp4', '.webm', str_replace('.m4v', '.webm', $data['path']));
-						if(file_exists('videos/' . $webmPath)){
-							unlink('videos/' . $webmPath);
+						if(file_exists('../videos/' . $webmPath)){
+							unlink('../videos/' . $webmPath);
 						}
 						removeFromDB($videoID);
 						removeThumbnails($videoID);
@@ -57,6 +57,9 @@ function removeFromDB($videoID){
 }
 
 function removeThumbnails($videoID){ // DOES NOT WORK --fixed? --needtesting
-	unlink("images/videos/$videoID.jpg");
-	unlink("images/videos/$videoID-" . THUMBNAIL_RES . ".jpg");
+	unlink("../images/videos/$videoID.jpg");
+	unlink("../images/videos/$videoID-" . THUMBNAIL_RES . ".jpg");
+
+	unlink("../images/thumbnails/$videoID.jpg");
+	unlink("../images/vtt/$videoID.vtt");
 }

@@ -12,7 +12,7 @@ if (isset($_GET['starID'])) {
 		$query->execute();
 		if ($query->rowCount()) {
 			$image = $query->fetch()['image'];
-			unlink('images/stars/' . $image);
+			unlink('../images/stars/' . $image);
 
 			$query = $pdo->prepare("UPDATE stars SET image = NULL WHERE id = ?");
 			$query->bindValue(1, $id);

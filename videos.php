@@ -24,3 +24,5 @@ $videos = new Video();
         </main>
     </body>
 </html>
+
+<script>window.close()</script>

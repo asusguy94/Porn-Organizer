@@ -23,15 +23,15 @@ if (isset($_GET['videoID']) && isset($_GET['videoPath'])) {
 				$query->bindValue(1, $newPath);
 				$query->bindValue(2, $videoID);
 				if ($query->execute()) {
-					if (file_exists("videos/$path") && !file_exists("videos/$newPath")) {
-						rename("videos/$path", "videos/$newPath");
+					if (file_exists("../videos/$path") && !file_exists("videos/$newPath")) {
+						rename("../videos/$path", "videos/$newPath");
 					}
 
 					$path_webm = "$wsite/" . $basic->removeExtension($path) . ".webm";
 					$newPath_webm = "$wsite/" . $basic->removeExtension($newPath) . ".webm";
 
-					if (file_exists("videos/$path_webm") && !file_exists("videos/$newPath_webm")) {
-						rename("videos/$path_webm", "videos/$newPath_webm");
+					if (file_exists("../videos/$path_webm") && !file_exists("videos/$newPath_webm")) {
+						rename("../videos/$path_webm", "videos/$newPath_webm");
 					}
 				}
 			}

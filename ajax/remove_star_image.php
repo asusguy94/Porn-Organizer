@@ -16,6 +16,6 @@ if (isset($_GET['id'])) {
 		$query->bindValue(1, $id);
 		$query->execute();
 
-		unlink('images/stars/' . $image);
+		unlink('../images/stars/' . $image);
 	}
 }
