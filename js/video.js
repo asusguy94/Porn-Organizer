@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
         "seekTime": window.seekTime,
         "volume": 1, // reset volume
         "muted": false,
+        "previewThumbnails": {enabled: false, src: 'vtt/' + videoID + '.vtt'},
         "hideControls": false // never hide controls
     });
     /* PLYR */
@@ -608,7 +609,8 @@ $(function () {
                 icon: "delete",
                 callback: function () {
                     removeBookmarks();
-                }
+                },
+                disabled: hasNoBookmarks()
             },
             "remove_video": {
                 name: "Remove Video",

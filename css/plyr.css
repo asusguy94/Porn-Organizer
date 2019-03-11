@@ -513,10 +513,10 @@ a.plyr__control::after, a.plyr__control::before {
     -webkit-appearance: none;
     background: 0 0;
     border: 0;
-    border-radius: 28px;
+    border-radius: 26px;
     color: #1aafff;
     display: block;
-    height: 20px;
+    height: 19px;
     margin: 0;
     padding: 0;
     transition: box-shadow .3s ease;
@@ -526,8 +526,8 @@ a.plyr__control::after, a.plyr__control::before {
 .plyr--full-ui input[type=range]::-webkit-slider-runnable-track {
     background: 0 0;
     border: 0;
-    border-radius: 2px;
-    height: 4px;
+    border-radius: 2.5px;
+    height: 5px;
     transition: box-shadow .3s ease;
     -webkit-user-select: none;
     user-select: none;
@@ -539,19 +539,19 @@ a.plyr__control::after, a.plyr__control::before {
     border: 0;
     border-radius: 100%;
     box-shadow: 0 1px 1px rgba(0, 0, 0, .15), 0 0 0 1px rgba(47, 52, 61, .2);
-    height: 14px;
+    height: 13px;
     position: relative;
     transition: all .2s ease;
-    width: 14px;
+    width: 13px;
     -webkit-appearance: none;
-    margin-top: -5px
+    margin-top: -4px
 }
 
 .plyr--full-ui input[type=range]::-moz-range-track {
     background: 0 0;
     border: 0;
-    border-radius: 2px;
-    height: 4px;
+    border-radius: 2.5px;
+    height: 5px;
     transition: box-shadow .3s ease;
     -moz-user-select: none;
     user-select: none
@@ -562,23 +562,23 @@ a.plyr__control::after, a.plyr__control::before {
     border: 0;
     border-radius: 100%;
     box-shadow: 0 1px 1px rgba(0, 0, 0, .15), 0 0 0 1px rgba(47, 52, 61, .2);
-    height: 14px;
+    height: 13px;
     position: relative;
     transition: all .2s ease;
-    width: 14px
+    width: 13px
 }
 
 .plyr--full-ui input[type=range]::-moz-range-progress {
     background: currentColor;
-    border-radius: 2px;
-    height: 4px
+    border-radius: 2.5px;
+    height: 5px
 }
 
 .plyr--full-ui input[type=range]::-ms-track {
     background: 0 0;
     border: 0;
-    border-radius: 2px;
-    height: 4px;
+    border-radius: 2.5px;
+    height: 5px;
     transition: box-shadow .3s ease;
     -ms-user-select: none;
     user-select: none;
@@ -588,8 +588,8 @@ a.plyr__control::after, a.plyr__control::before {
 .plyr--full-ui input[type=range]::-ms-fill-upper {
     background: 0 0;
     border: 0;
-    border-radius: 2px;
-    height: 4px;
+    border-radius: 2.5px;
+    height: 5px;
     transition: box-shadow .3s ease;
     -ms-user-select: none;
     user-select: none
@@ -598,8 +598,8 @@ a.plyr__control::after, a.plyr__control::before {
 .plyr--full-ui input[type=range]::-ms-fill-lower {
     background: 0 0;
     border: 0;
-    border-radius: 2px;
-    height: 4px;
+    border-radius: 2.5px;
+    height: 5px;
     transition: box-shadow .3s ease;
     -ms-user-select: none;
     user-select: none;
@@ -611,10 +611,10 @@ a.plyr__control::after, a.plyr__control::before {
     border: 0;
     border-radius: 100%;
     box-shadow: 0 1px 1px rgba(0, 0, 0, .15), 0 0 0 1px rgba(47, 52, 61, .2);
-    height: 14px;
+    height: 13px;
     position: relative;
     transition: all .2s ease;
-    width: 14px;
+    width: 13px;
     margin-top: 0
 }
 
@@ -822,15 +822,15 @@ a.plyr__control::after, a.plyr__control::before {
 
 .plyr__progress {
     flex: 1;
-    left: 7px;
-    margin-right: 14px;
+    left: 6.5px;
+    margin-right: 13px;
     position: relative
 }
 
 .plyr__progress input[type=range], .plyr__progress__buffer {
-    margin-left: -7px;
-    margin-right: -7px;
-    width: calc(100% + 14px)
+    margin-left: -6.5px;
+    margin-right: -6.5px;
+    width: calc(100% + 13px)
 }
 
 .plyr__progress input[type=range] {
@@ -848,29 +848,29 @@ a.plyr__control::after, a.plyr__control::before {
     background: 0 0;
     border: 0;
     border-radius: 100px;
-    height: 4px;
+    height: 5px;
     left: 0;
-    margin-top: -2px;
+    margin-top: -2.5px;
     padding: 0;
     position: absolute;
     top: 50%
 }
 
 .plyr__progress__buffer::-webkit-progress-bar {
-    background: 0 0;
-    transition: width .2s ease
+    background: 0 0
 }
 
 .plyr__progress__buffer::-webkit-progress-value {
     background: currentColor;
     border-radius: 100px;
-    min-width: 4px
+    min-width: 5px;
+    transition: width .2s ease
 }
 
 .plyr__progress__buffer::-moz-progress-bar {
     background: currentColor;
     border-radius: 100px;
-    min-width: 4px;
+    min-width: 5px;
     transition: width .2s ease
 }
 
@@ -945,14 +945,6 @@ a.plyr__control::after, a.plyr__control::before {
     width: 100%
 }
 
-.plyr:-moz-full-screen {
-    background: #000;
-    border-radius: 0 !important;
-    height: 100%;
-    margin: 0;
-    width: 100%
-}
-
 .plyr:-ms-fullscreen {
     background: #000;
     border-radius: 0 !important;
@@ -973,10 +965,6 @@ a.plyr__control::after, a.plyr__control::before {
     height: 100%
 }
 
-.plyr:-moz-full-screen video {
-    height: 100%
-}
-
 .plyr:-ms-fullscreen video {
     height: 100%
 }
@@ -986,11 +974,6 @@ a.plyr__control::after, a.plyr__control::before {
 }
 
 .plyr:-webkit-full-screen .plyr__video-wrapper {
-    height: 100%;
-    width: 100%
-}
-
-.plyr:-moz-full-screen .plyr__video-wrapper {
     height: 100%;
     width: 100%
 }
@@ -1005,29 +988,7 @@ a.plyr__control::after, a.plyr__control::before {
     width: 100%
 }
 
-.plyr:-webkit-full-screen .plyr__video-embed {
-    overflow: visible
-}
-
-.plyr:-moz-full-screen .plyr__video-embed {
-    overflow: visible
-}
-
-.plyr:-ms-fullscreen .plyr__video-embed {
-    overflow: visible
-}
-
-.plyr:fullscreen .plyr__video-embed {
-    overflow: visible
-}
-
 .plyr:-webkit-full-screen.plyr--vimeo .plyr__video-wrapper {
-    height: 0;
-    top: 50%;
-    transform: translateY(-50%)
-}
-
-.plyr:-moz-full-screen.plyr--vimeo .plyr__video-wrapper {
     height: 0;
     top: 50%;
     transform: translateY(-50%)
@@ -1049,10 +1010,6 @@ a.plyr__control::after, a.plyr__control::before {
     display: block
 }
 
-.plyr:-moz-full-screen .plyr__control .icon--exit-fullscreen {
-    display: block
-}
-
 .plyr:-ms-fullscreen .plyr__control .icon--exit-fullscreen {
     display: block
 }
@@ -1062,10 +1019,6 @@ a.plyr__control::after, a.plyr__control::before {
 }
 
 .plyr:-webkit-full-screen .plyr__control .icon--exit-fullscreen + svg {
-    display: none
-}
-
-.plyr:-moz-full-screen .plyr__control .icon--exit-fullscreen + svg {
     display: none
 }
 
@@ -1081,10 +1034,6 @@ a.plyr__control::after, a.plyr__control::before {
     cursor: none
 }
 
-.plyr:-moz-full-screen.plyr--hide-controls {
-    cursor: none
-}
-
 .plyr:-ms-fullscreen.plyr--hide-controls {
     cursor: none
 }
@@ -1095,10 +1044,6 @@ a.plyr__control::after, a.plyr__control::before {
 
 @media (min-width: 1024px) {
     .plyr:-webkit-full-screen .plyr__captions {
-        font-size: 21px
-    }
-
-    .plyr:-moz-full-screen .plyr__captions {
         font-size: 21px
     }
 
@@ -1128,10 +1073,6 @@ a.plyr__control::after, a.plyr__control::before {
     width: 100%
 }
 
-.plyr:-webkit-full-screen .plyr__video-embed {
-    overflow: visible
-}
-
 .plyr:-webkit-full-screen.plyr--vimeo .plyr__video-wrapper {
     height: 0;
     top: 50%;
@@ -1173,10 +1114,6 @@ a.plyr__control::after, a.plyr__control::before {
     width: 100%
 }
 
-.plyr:-moz-full-screen .plyr__video-embed {
-    overflow: visible
-}
-
 .plyr:-moz-full-screen.plyr--vimeo .plyr__video-wrapper {
     height: 0;
     top: 50%;
@@ -1216,10 +1153,6 @@ a.plyr__control::after, a.plyr__control::before {
 .plyr:-ms-fullscreen .plyr__video-wrapper {
     height: 100%;
     width: 100%
-}
-
-.plyr:-ms-fullscreen .plyr__video-embed {
-    overflow: visible
 }
 
 .plyr:-ms-fullscreen.plyr--vimeo .plyr__video-wrapper {
@@ -1267,10 +1200,6 @@ a.plyr__control::after, a.plyr__control::before {
 .plyr--fullscreen-fallback .plyr__video-wrapper {
     height: 100%;
     width: 100%
-}
-
-.plyr--fullscreen-fallback .plyr__video-embed {
-    overflow: visible
 }
 
 .plyr--fullscreen-fallback.plyr--vimeo .plyr__video-wrapper {
@@ -1336,14 +1265,116 @@ a.plyr__control::after, a.plyr__control::before {
 .plyr__cues {
     background: currentColor;
     display: block;
-    height: 4px;
+    height: 5px;
     left: 0;
-    margin: -2px 0 0;
+    margin: -2.5px 0 0;
     opacity: .8;
     position: absolute;
     top: 50%;
     width: 3px;
     z-index: 3
+}
+
+.plyr__preview-thumb {
+    background-color: rgba(255, 255, 255, .9);
+    border-radius: 3px;
+    bottom: 100%;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .15);
+    margin-bottom: 10px;
+    opacity: 0;
+    padding: 3px;
+    pointer-events: none;
+    position: absolute;
+    transform: translate(0, 10px) scale(.8);
+    transform-origin: 50% 100%;
+    transition: transform .2s .1s ease, opacity .2s .1s ease;
+    z-index: 2
+}
+
+.plyr__preview-thumb--is-shown {
+    opacity: 1;
+    transform: translate(0, 0) scale(1)
+}
+
+.plyr__preview-thumb::before {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid rgba(255, 255, 255, .9);
+    bottom: -4px;
+    content: '';
+    height: 0;
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%);
+    width: 0;
+    z-index: 2
+}
+
+.plyr__preview-thumb__image-container {
+    background: #b7c5cd;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    z-index: 0
+}
+
+.plyr__preview-thumb__image-container img {
+    height: 100%;
+    left: 0;
+    max-height: none;
+    max-width: none;
+    position: absolute;
+    top: 0;
+    width: 100%
+}
+
+.plyr__preview-thumb__time-container {
+    bottom: 6px;
+    left: 0;
+    position: absolute;
+    right: 0;
+    white-space: nowrap;
+    z-index: 3
+}
+
+.plyr__preview-thumb__time-container span {
+    background-color: rgba(0, 0, 0, .55);
+    border-radius: 2px;
+    color: #fff;
+    font-size: 14px;
+    padding: 3px 6px
+}
+
+.plyr__preview-scrubbing {
+    bottom: 0;
+    filter: blur(1px);
+    height: 100%;
+    left: 0;
+    margin: auto;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: opacity .3s ease;
+    width: 100%;
+    z-index: 1
+}
+
+.plyr__preview-scrubbing--is-shown {
+    opacity: 1
+}
+
+.plyr__preview-scrubbing img {
+    height: 100%;
+    left: 0;
+    max-height: none;
+    max-width: none;
+    -o-object-fit: contain;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    width: 100%
 }
 
 .plyr--no-transition {
