@@ -215,7 +215,7 @@ class Basic
 			print "<a href='$link'>$name</a>";
 
 			for ($j = 0; $j < count($arr[$i]); $j++) {
-				if (count($arr[$i][$j])) {
+				if (array_key_exists($j, $arr[$i]) && is_array($arr[$i][$j])) {
 					print '<ul class="sub-menu">';
 
 					$name = $arr[$i][$j]['name'];
@@ -1491,7 +1491,8 @@ class Star
 	{
 		$basic = new Basic();
 		$ext = strtolower($basic->getExtension($url));
-		if($ext === 'jpe' || $ext === 'jpeg') $ext = 'jpg';
+		if ($ext === 'jpe' || $ext === 'jpeg') $ext = 'jpg';
+		$url = str_replace('https://', 'http://', $url);
 
 		$localPath = "../images/stars/$name.$ext";
 

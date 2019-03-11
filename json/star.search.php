@@ -33,8 +33,8 @@ for ($i = 0, $len = count($result), $website_arr = []; $i < $len; $i++) {
 	$websiteName = $result[$i]->websiteName;
 
 	/* Duplicate Check */
-	$nextIsDuplicate = (($result[$i + 1]->starID == $starID) && $i < $len - 1);
-	$prevIsDuplicate = (($result[$i - 1]->starID == $starID) && $i >= 0);
+	$nextIsDuplicate = ($i < $len - 1 && ($result[$i + 1]->starID == $starID));
+	$prevIsDuplicate = ($i > 0 && ($result[$i - 1]->starID == $starID));
 
 
 	if (!$prevIsDuplicate) { // first star of the bunch

@@ -45,8 +45,8 @@ for ($i = 0, $len = count($result), $category_arr = [], $attribute_arr = []; $i 
 
 	/* Duplicate Check */
 	$videoPath = $result[$i]->path;
-	$nextIsDuplicate = (($result[$i + 1]->path == $videoPath) && $i < $len - 1);
-	$prevIsDuplicate = (($result[$i - 1]->path == $videoPath) && $i >= 0);
+	$nextIsDuplicate = ($i < $len - 1 && ($result[$i + 1]->path == $videoPath));
+	$prevIsDuplicate = ($i > 0 && ($result[$i - 1]->path == $videoPath));
 
 
 	if (!$prevIsDuplicate) { // first video of the bunch
