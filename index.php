@@ -3,7 +3,7 @@ include('_class.php');
 $basic = new Basic();
 $home = new HomePage();
 
-$home->count = 7;
+$home->count = 6;
 ?>
 
 <!doctype html>

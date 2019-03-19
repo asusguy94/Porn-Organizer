@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     autoComplete();
 
-    videoVolume(0.25);
+    videoVolume(0.125);
 
     onFocus(bookmarkCollision);
 
@@ -146,6 +146,16 @@ function isPlaying() {
 function playFrom(seconds) {
     videoPlayer.currentTime = seconds;
     videoPlayer.play();
+}
+
+function addLocation(locationID) {
+    let arguments = 'videoID=' + videoID + '&locationID=' + locationID;
+    ajax('ajax/add_videolocation.php', arguments);
+}
+
+function removeLocation(locationID) {
+    let arguments = 'videoID=' + videoID + '&locationID=' + locationID;
+    ajax('ajax/remove_videolocation.php', arguments);
 }
 
 function addAttribute(attributeID) {
@@ -396,6 +406,32 @@ $(function () {
                         }
                     });
                 }
+            }, "add_location": {
+                name: "Add Location",
+                icon: "add",
+                callback: function () {
+                    $('body').append('<div id="dialog" title="Add Attribute"></div>');
+
+                    $(function () {
+                        const dialogQuery = $('#dialog');
+                        dialogQuery.dialog({
+                            close: function () {
+                                $(this).dialog('close');
+                                this.closest('.ui-dialog').remove();
+                            },
+                            width: 250,
+                            position: {my: "top", at: "top+150"}
+                        });
+
+                        const query = $('#locations.hidden > .location');
+                        for (let i = 0; i < query.length; i++) {
+                            let locationID = query.eq(i).attr('data-location-id');
+                            let locationName = query.eq(i).text();
+
+                            dialogQuery.append('<div class="btn unselectable" onclick="addLocation(' + locationID + ')">' + locationName + '</div>');
+                        }
+                    });
+                }
             }
         }
     });
@@ -635,6 +671,23 @@ $(function () {
                     let attributeID = options.$trigger.attr('data-attribute-id');
 
                     removeAttribute(attributeID);
+                }
+            }
+        }
+    });
+});
+/* Location */
+$(function () {
+    $.contextMenu({
+        selector: '#video > h2 small > span.location',
+        items: {
+            "remove_location": {
+                name: "Remove Location",
+                icon: "delete",
+                callback: function (itemKey, options) {
+                    let locationID = options.$trigger.attr('data-location-id');
+
+                    removeLocation(locationID);
                 }
             }
         }

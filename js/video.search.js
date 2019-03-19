@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const website_select = document.querySelector('#websites > select');
     const category_checkbox = document.querySelectorAll('input[name^="category_"]');
     const attributes_checkbox = document.querySelectorAll('input[name^="attribute_"]');
+    const locations_checkbox = document.querySelectorAll('input[name^="location_"]');
 
     const existing_checkbox = document.querySelector('input[name="existing"]');
 
@@ -50,6 +51,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 let attribute = elem[i]['attribute'];
                 if (!attribute.length) attribute.push('0');
 
+                let location = elem[i]['location'];
+                if (!location.length) location.push('0');
+
                 let a = document.createElement('a');
                 a.classList.add('video', 'ribbon-container');
                 a.setAttribute('href', 'video.php?id=' + videoID);
@@ -62,6 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 a.setAttribute('data-existing', existing);
                 a.setAttribute('data-category-name', '["' + category + '"]');
                 a.setAttribute('data-attribute-name', '["' + attribute + '"]');
+                a.setAttribute('data-location-name', '["' + location + '"]');
 
                 let img = document.createElement('img');
                 img.classList.add('lazy');
@@ -103,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function () {
             /* Title Search */
             title_input.addEventListener('keydown', function () {
                 setTimeout(function () {
-                    let input = title_input.value.toLowerCase();
+                    let input = title_input.value.toLowerCase()/*.replace(/\?/g, '').replace(/:/g, '').replace(/"/g, "'")*/;
                     $video.removeClass('hidden-title');
 
                     if (input !== '') {
@@ -113,6 +118,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
             });
+
+            // TODO Add checkbox for filtering special characters from the title
 
             /* Star Search */
             star_input.addEventListener('keydown', function () {
@@ -204,6 +211,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (this.checked) $video.not('.tmp').addClass('hidden-attribute-' + attribute_class);
                     else $video.removeClass('hidden-attribute-' + attribute_class);
+                    $video.removeClass('tmp'); // remove leftover classes
+                });
+            }
+
+            /* Location */
+            for (let i = 0, wrapperLen = locations_checkbox.length; i < wrapperLen; i++) {
+                locations_checkbox[i].addEventListener('change', function () {
+                    locations_checkbox[i].parentElement.classList.toggle('selected');
+
+                    let location = this.name.split('location_').pop();
+                    let location_class = location.replace(/ /g, '-');
+
+                    for (let j = 0; j < videoLength; j++) {
+                        let location_arr = video[j].getAttribute('data-location-name').slice(2, -2).split(',');
+
+                        for (let k = 0, len = location_arr.length; k < len; k++) {
+                            if (this.checked && (location_arr[k] === location)) {
+                                video[j].classList.add('tmp');
+                            }
+                        }
+                    }
+
+                    if (this.checked) $video.not('.tmp').addClass('hidden-location-' + location_class);
+                    else $video.removeClass('hidden-location-' + location_class);
                     $video.removeClass('tmp'); // remove leftover classes
                 });
             }

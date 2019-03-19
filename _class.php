@@ -21,6 +21,7 @@ define('SIMILAR_DEF', $opt['similar_def']);
 define('SIMILAR_MAX', $opt['similar_max']);
 define('SIMILAR_TEXT', $opt['similar_text']);
 
+define('CDN', false);
 define('CDN_MAX', $opt['cdn_max']);
 define('THUMBNAIL_RES', $opt['thumbnail_res']); // Thumbnail height
 define('THUMBNAIL_START', $opt['thumbnail_start']); // Thumbnail start time
@@ -29,6 +30,9 @@ define('PARSER', $opt['parser']); // Enable FreeOnes
 define('enableWEBM', $opt['enable_webm']); // Enable compression lvl-1
 define('enableMKV', $opt['enable_mkv']); // Enable compression lvl-2
 define('enableFA', $opt['enable_fa']); // Enable FontAwesome
+
+define('bootstrapCols', 12);
+define('bootstrapColsDef', 6);
 
 /* Initialize Header */
 ob_start();
@@ -53,23 +57,31 @@ class HomePage
 		$this->printData($query->fetchAll());
 	}
 
-	function printData($input)
+	function printData($input, $items_per_line = bootstrapColsDef)
 	{
+		if (!(12 % $items_per_line)) {
+			$col = bootstrapCols / $items_per_line;
+		} else {
+			$col = bootstrapCols / bootstrapColsDef;
+		}
+
 		$count = $this->count;
+		print "<div class='row'>";
 		foreach ($input AS $data) {
 			if ($count > 0) {
 				if (file_exists("videos/$data[path]")) {
 					$count--;
 
-					print "<a class='video' href='video.php?id=$data[id]'>";
-					print "<img class='lazy' data-src='images/videos/$data[id]-" . THUMBNAIL_RES . ".jpg'>";
-					print "<span class='title'>$data[name]</span>";
+					print "<a class='video col-$col' href='video.php?id=$data[id]'>";
+					print "<img class='lazy mx-auto img-thumbnail' data-src='images/videos/$data[id]-" . THUMBNAIL_RES . ".jpg'>";
+					print "<span class='title mx-auto'>$data[name]</span>";
 					print '</a>';
 				}
 			} else {
 				break;
 			}
 		}
+		print '</div>';
 	}
 }
 
@@ -1402,7 +1414,7 @@ class Star
 		if ($query->rowCount()) {
 			$date_class = new Date();
 
-			print '<div id="videos">';
+			print "<div id='videos' class='row'>";
 			$cdnNumber = 1;
 			foreach ($query->fetchAll() as $data) {
 				$ageInVideo = $date_class->daysToYears($data['ageinvideo']);
@@ -1411,21 +1423,21 @@ class Star
 				$localPathWebm = str_replace('.mp4', '.webm', str_replace('.m4v', '.webm', $localPath));
 				$localPathMkv = str_replace('.mp4', '.mkv', str_replace('.m4v', '.mkv', $localPath));
 
-				$fullPath = "http://cdn$cdnNumber-$_SERVER[HTTP_HOST]/$localPath";
-				$fullPathWebm = "http://cdn$cdnNumber-$_SERVER[HTTP_HOST]/$localPathWebm";
-				$fullPathMkv = "http://cdn$cdnNumber-$_SERVER[HTTP_HOST]/$localPathMkv";
+				if(CDN) $cdnPrefix = "http://cdn$cdnNumber-";
+				else $cdnPrefix = "http://";
+				$fullPath = "$cdnPrefix$_SERVER[HTTP_HOST]/$localPath";
+				$fullPathWebm = "$cdnPrefix$_SERVER[HTTP_HOST]/$localPathWebm";
+				$fullPathMkv = "$cdnPrefix$_SERVER[HTTP_HOST]/$localPathMkv";
 
 				$localPath_img = "images/videos/$data[id]-" . THUMBNAIL_RES . ".jpg";
-				$fullPath_img = "http://cdn$cdnNumber-$_SERVER[HTTP_HOST]/$localPath_img";
+				$fullPath_img = "$cdnPrefix$_SERVER[HTTP_HOST]/$localPath_img";
 
-
-				print "<a class='video ribbon-container' href='video.php?id=$data[id]'>";
-				print "<video poster='$fullPath_img?v=" . md5_file($localPath_img) . "' preload='none' muted>";
+				print "<a class='video col-4 ribbon-container' href='video.php?id=$data[id]'>";
+				print "<video class='mx-auto' poster='$fullPath_img?v=" . md5_file($localPath_img) . "' preload='none' muted>";
 				if (enableWEBM && file_exists($localPathWebm)) print "<source src='$fullPathWebm' type='video/webm'>";
 				if (enableMKV && file_exists($localPathMkv)) print "<source src='$fullPathMkv' type='video/x-matroska'>";
 				print "<source src='$fullPath' type='video/mp4'>";
 				print "</video>";
-
 
 				print "<span class='title'>$data[name]</span>";
 				print '<span class="info">';
@@ -1843,6 +1855,31 @@ class Attributes
 	}
 }
 
+class Location
+{
+	static function getLocations($videoID)
+	{
+		global $pdo;
+		$query = $pdo->prepare("SELECT videolocations.locationID AS id, locations.name FROM locations JOIN videolocations ON locations.id = videolocations.locationID WHERE videolocations.videoID = :videoID");
+		$query->bindParam(':videoID', $videoID);
+		$query->execute();
+		if ($query->rowCount()) {
+			return $query->fetchAll();
+		} else {
+			return '';
+		}
+	}
+
+	static function locationCount($videoID)
+	{
+		global $pdo;
+		$query = $pdo->prepare("SELECT locations.name FROM locations JOIN videolocations ON locations.id = videolocations.locationID WHERE videolocations.videoID = :videoID");
+		$query->bindParam(':videoID', $videoID);
+		$query->execute();
+		return $query->rowCount();
+	}
+}
+
 class Video
 {
 	public $noStar;
@@ -1996,7 +2033,7 @@ class Video
 			$attr = '';
 			if (Attributes::attributeCount($id)) {
 				$first = true;
-				$attr .= '<small>(';
+				$attr .= '<small class="attributes">(';
 				foreach (Attributes::getAttributes($id) AS $attribute) {
 					if (!$first) {
 						$attr .= ', ';
@@ -2008,9 +2045,24 @@ class Video
 				$attr .= ')</small>';
 			}
 
+			$lcn = '';
+			if (Location::locationCount($id)) {
+				$first = true;
+				$lcn .= '<small class="locations">(';
+				foreach (Location::getLocations($id) AS $location) {
+					if (!$first) {
+						$lcn .= ', ';
+					} else {
+						$first = false;
+					}
+					$lcn .= "<span class='location' data-location-id='$location[id]'>$location[name]</span>";
+				}
+				$lcn .= ')</small>';
+			}
+
 			print '<div id="video">';
 
-			print "<h2 id='video-title'><span id='video-name'>$name</span><small>$attr</small></h2>";
+			print "<h2 id='video-title'><span id='video-name'>$name</span><small>$attr</small><small>$lcn</small></h2>";
 			print "<h3 id='video-site'>$wsite</h3>";
 
 			print "<a id='next' class='btn btn-outline-primary' href='?id=$next[id]' title='$next[name]'>Next</a>";
@@ -2302,6 +2354,16 @@ class Video
 			print '<div id="attributes" class="hidden">';
 			foreach ($query->fetchAll() as $data) {
 				print "<span class='attribute' data-attribute-id='$data[id]'>$data[name]</span>";
+			}
+			print '</div>';
+		}
+
+		$query = $pdo->prepare("SELECT id, name FROM locations");
+		$query->execute();
+		if ($query->rowCount()) {
+			print '<div id="locations" class="hidden">';
+			foreach ($query->fetchAll() as $data) {
+				print "<span class='location' data-location-id='$data[id]'>$data[name]</span>";
 			}
 			print '</div>';
 		}

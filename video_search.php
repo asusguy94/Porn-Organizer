@@ -122,6 +122,22 @@ global $pdo;
 						print '</div>';
 					}
 					?>
+
+                    <h2>Locations</h2>
+					<?php
+					$query = $pdo->prepare("SELECT * FROM locations ORDER BY name");
+					$query->execute();
+					if ($query->rowCount()) {
+						print '<div id="locations">';
+						foreach ($query->fetchAll() as $data) {
+							print '<div class="input-wrapper">';
+							print "<input type='checkbox' name='location_$data[name]'>";
+							print "<label for='location_$data[name]'>$data[name]</label>";
+							print '</div>';
+						}
+						print '</div>';
+					}
+					?>
                 </aside>
 
                 <section id="videos" class="col-10">

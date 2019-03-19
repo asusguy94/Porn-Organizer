@@ -112,9 +112,9 @@ nav li.active {
 }
 
 /* Videos */
-#videos {
+/*#videos {
   float: left;
-}
+}*/
 
 a.video {
   text-decoration: none !important;
@@ -122,10 +122,6 @@ a.video {
 }
 
 .video {
-  float: left;
-  display: inline-block;
-  margin: 5px;
-
   /*width: 320px;*/
 
   span {
@@ -153,7 +149,7 @@ a.video {
 
   img, video {
     display: block;
-    height: $thumbnailHeight + px;
+    /*height: $thumbnailHeight + px;*/
     width: $thumbnailWidth + px;
   }
 }
@@ -176,7 +172,7 @@ form {
 label {
   margin-right: 5px;
 
-  &[for="eye"], &[for="hair"]{
+  &[for="eye"], &[for="hair"] {
     font-weight: bold
   }
 }
@@ -241,7 +237,7 @@ label {
   transform-origin: top left;
 
   font-weight: bold;
-  min-width: 16px;
+  min-width: 20px;
 
   &:before, &:after {
     content: '';
@@ -263,6 +259,16 @@ label {
 }
 
 /* Attribute */
+.attribute {
+  display: inline-block;
+}
+
+/* Attribute */
+.attribute {
+  display: inline-block;
+}
+
+/* Location */
 .attribute {
   display: inline-block;
 }
@@ -317,7 +323,14 @@ label {
 
 small {
   margin-left: 10px;
-  color: blue;
+
+  &.attributes {
+    color: blue;
+  }
+
+  &.locations {
+    color: purple;
+  }
 }
 
 input.xdsoft_input {
@@ -386,7 +399,6 @@ input.xdsoft_input {
     color: green;
   }
 }
-
 
 .unselectable {
   -webkit-user-select: none;

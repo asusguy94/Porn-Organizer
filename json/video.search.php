@@ -3,7 +3,7 @@ include('../_class.php');
 
 global $pdo;
 $sql = "
-            SELECT videos.id AS videoID, videos.path, videos.name AS videoName, videos.date AS videoDate, stars.name AS star, datediff(videos.date, stars.birthdate) AS ageinvideo, categories.name AS categoryName, attributes.name AS attributeName, websites.name AS websiteName
+            SELECT videos.id AS videoID, videos.path, videos.name AS videoName, videos.date AS videoDate, stars.name AS star, datediff(videos.date, stars.birthdate) AS ageinvideo, categories.name AS categoryName, attributes.name AS attributeName, locations.name AS locationName, websites.name AS websiteName
             	FROM videos
                 	LEFT JOIN videostars ON videos.id = videostars.videoID
                 	LEFT JOIN stars ON stars.id = videostars.starID
@@ -13,6 +13,8 @@ $sql = "
                 	LEFT JOIN categories ON videocategories.categoryID = categories.id
                 	LEFT JOIN videoattributes ON videos.id = videoattributes.videoID
                 	LEFT JOIN attributes ON videoattributes.attributeID = attributes.id
+                	LEFT OUTER JOIN videolocations ON videos.id = videolocations.videoID
+                	LEFT JOIN locations ON videolocations.locationID = locations.id
             	ORDER BY videoName
           ";
 
@@ -22,7 +24,7 @@ $result = $query->fetchAll(PDO::FETCH_OBJ);
 
 print '{';
 print '"videos": [';
-for ($i = 0, $len = count($result), $category_arr = [], $attribute_arr = []; $i < $len; $i++) {
+for ($i = 0, $len = count($result), $category_arr = [], $attribute_arr = [], $location_arr = []; $i < $len; $i++) {
 	$videoID = $result[$i]->videoID;
 	$videoName = $result[$i]->videoName;
 	$videoDate = $result[$i]->videoDate;
@@ -39,8 +41,9 @@ for ($i = 0, $len = count($result), $category_arr = [], $attribute_arr = []; $i 
 	if (!$ageInVideo) $ageInVideo = 0;
 
 	/* Array */
-	$categoryName = $result[$i]->categoryName;
-	$attributeName = $result[$i]->attributeName;
+	$categoryName	= $result[$i]->categoryName;
+	$attributeName	= $result[$i]->attributeName;
+	$locationName	= $result[$i]->locationName;
 
 
 	/* Duplicate Check */
@@ -81,6 +84,11 @@ for ($i = 0, $len = count($result), $category_arr = [], $attribute_arr = []; $i 
 		if (!in_array($attributeName, $attribute_arr)) array_push($attribute_arr, $attributeName);
 	}
 
+	// Locations INIT
+	if (!is_null($locationName)) {
+		if (!in_array($locationName, $location_arr)) array_push($location_arr, $locationName);
+	}
+
 	// Duplicate Check
 	if (!$nextIsDuplicate) { // last video of the bunch
 		// Category
@@ -101,6 +109,16 @@ for ($i = 0, $len = count($result), $category_arr = [], $attribute_arr = []; $i 
 				if ($j < count($attribute_arr) - 1) print ',';
 			}
 		}
+		print '],';
+
+		// Location
+		print '"location": [';
+		if (count($location_arr)) {
+			for ($j = 0; $j < count($location_arr); $j++) {
+				print "\"$location_arr[$j]\"";
+				if ($j < count($location_arr) - 1) print ',';
+			}
+		}
 		print ']';
 
 		if ($i < $len - 1) print '},';
@@ -109,6 +127,7 @@ for ($i = 0, $len = count($result), $category_arr = [], $attribute_arr = []; $i 
 		/* RESETS */
 		$category_arr = [];
 		$attribute_arr = [];
+		$location_arr = [];
 	}
 }
 

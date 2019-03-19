@@ -2,7 +2,6 @@
 include('_class.php');
 $basic = new Basic();
 $videos = new Video();
-$ffmpeg = new FFMPEG();
 
 if (isset($_GET['id']) && !empty($_GET['id'])) {
 	$id = $_GET['id'];

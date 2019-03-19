@@ -79,7 +79,7 @@ global $pdo;
 						foreach ($query->fetchAll() as $data) {
 							print '<div class="input-wrapper">';
 							print '<input type="radio" name="breast">';
-							print '<label>' . $data['breast'] . '</label>';
+							print "<label>$data[breast]</label>";
 							print '</div>';
 						}
 						print '</div>';

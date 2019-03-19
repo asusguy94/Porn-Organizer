@@ -5,6 +5,9 @@ h2 {
 }
 
 .video {
+  float: left;
+  margin: 5px;
+
   width: $thumbnailWidth + px;
   height: 230px;
 
