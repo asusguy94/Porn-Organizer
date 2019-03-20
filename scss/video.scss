@@ -148,6 +148,14 @@ form[autocomplete] {
 
   background-color: white;
 
+  &.location {
+    border-color: $btnLocationColor;
+
+    &:not(.no-hover):hover, &:not(.no-hover):focus {
+      background-color: $btnLocationColor;
+    }
+  }
+
   &[disabled], &-cancel {
     border-color: grey;
 

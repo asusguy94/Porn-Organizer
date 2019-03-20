@@ -60,6 +60,7 @@ for ($i = 0, $len = count($result), $category_arr = [], $attribute_arr = [], $lo
 
 		print "\"videoID\": $videoID,";
 		print "\"videoName\": \"" . str_replace('"', '\\"', $videoName) . "\",";
+		//print "\"videoName\": \"" . str_replace('"', '\\"', str_replace('=', '\\=', $videoName)) . "\",";
 		print "\"videoDate\": \"$videoDate\",";
 		print "\"star\": \"$star\",";
 		print "\"websiteName\": \"$websiteName\",";

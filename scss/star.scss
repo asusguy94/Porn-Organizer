@@ -25,16 +25,9 @@ aside {
 
 .ignored {
   color: red;
-
-  /*position: relative;
-
-  &:before {
-    border-bottom: 2px solid red;
-    position: absolute;
-    content: "";
-    width: 100%;
-    height: 50%;
-  }*/
+  & + small .alias {
+    color: red;
+  }
 }
 
 .flag {

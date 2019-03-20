@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
         hoverIntent: 1000
     });
 
-    const loadData =  function () {
+    const loadData = function () {
         fetch('json/video.search.php').then(function (jsonData) {
             return jsonData.json();
         }).then(function (data) {
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function () {
             /* Title Search */
             title_input.addEventListener('keydown', function () {
                 setTimeout(function () {
-                    let input = title_input.value.toLowerCase()/*.replace(/\?/g, '').replace(/:/g, '').replace(/"/g, "'")*/;
+                    let input = title_input.value.toLowerCase();
                     $video.removeClass('hidden-title');
 
                     if (input !== '') {
@@ -116,6 +116,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             return this.getAttribute('data-title').toLowerCase().indexOf(input) > -1;
                         }).addClass('hidden-title');
                     }
+
+                    console.log(input);
                 });
             });
 
@@ -330,6 +332,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-function resetData(){
+function resetData() {
     $('.video').remove();
 }

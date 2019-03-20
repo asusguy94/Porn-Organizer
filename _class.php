@@ -1423,7 +1423,7 @@ class Star
 				$localPathWebm = str_replace('.mp4', '.webm', str_replace('.m4v', '.webm', $localPath));
 				$localPathMkv = str_replace('.mp4', '.mkv', str_replace('.m4v', '.mkv', $localPath));
 
-				if(CDN) $cdnPrefix = "http://cdn$cdnNumber-";
+				if (CDN) $cdnPrefix = "http://cdn$cdnNumber-";
 				else $cdnPrefix = "http://";
 				$fullPath = "$cdnPrefix$_SERVER[HTTP_HOST]/$localPath";
 				$fullPathWebm = "$cdnPrefix$_SERVER[HTTP_HOST]/$localPathWebm";
@@ -2033,36 +2033,36 @@ class Video
 			$attr = '';
 			if (Attributes::attributeCount($id)) {
 				$first = true;
-				$attr .= '<small class="attributes">(';
+				$attr .= '<small class="attributes">';
 				foreach (Attributes::getAttributes($id) AS $attribute) {
 					if (!$first) {
 						$attr .= ', ';
 					} else {
 						$first = false;
 					}
-					$attr .= "<span class='attribute' data-attribute-id='$attribute[id]'>$attribute[name]</span>";
+					$attr .= "<span class='attribute btn' data-attribute-id='$attribute[id]'>$attribute[name]</span>";
 				}
-				$attr .= ')</small>';
+				$attr .= '</small>';
 			}
 
 			$lcn = '';
 			if (Location::locationCount($id)) {
 				$first = true;
-				$lcn .= '<small class="locations">(';
+				$lcn .= '<small class="locations">';
 				foreach (Location::getLocations($id) AS $location) {
 					if (!$first) {
 						$lcn .= ', ';
 					} else {
 						$first = false;
 					}
-					$lcn .= "<span class='location' data-location-id='$location[id]'>$location[name]</span>";
+					$lcn .= "<span class='location btn' data-location-id='$location[id]'>$location[name]</span>";
 				}
-				$lcn .= ')</small>';
+				$lcn .= '</small>';
 			}
 
 			print '<div id="video">';
 
-			print "<h2 id='video-title'><span id='video-name'>$name</span><small>$attr</small><small>$lcn</small></h2>";
+			print "<h2 id='video-title'><span id='video-name'>$name</span><small>$lcn</small><small>$attr</small></h2>";
 			print "<h3 id='video-site'>$wsite</h3>";
 
 			print "<a id='next' class='btn btn-outline-primary' href='?id=$next[id]' title='$next[name]'>Next</a>";
