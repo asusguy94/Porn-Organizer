@@ -91,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-
 document.onkeydown = checkKey;
 
 function checkKey(e) {
@@ -382,7 +381,7 @@ $(function () {
                 }
             }, "add_attribute": {
                 name: "Add Attribute",
-                icon: "add",
+                icon: "fas fa-tag",
                 callback: function () {
                     $('body').append('<div id="dialog" title="Add Attribute"></div>');
 
@@ -408,7 +407,7 @@ $(function () {
                 }
             }, "add_location": {
                 name: "Add Location",
-                icon: "add",
+                icon: "fas fa-map-marker-alt",
                 callback: function () {
                     $('body').append('<div id="dialog" title="Add Attribute"></div>');
 

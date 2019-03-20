@@ -84,6 +84,15 @@ nav li.active {
   max-width: 200px;
 }
 
+/* TODO Bootstrap-code */
+.card.star {
+  max-width: 200px;
+
+  .card-img-top {
+    max-height: 275px;
+  }
+}
+
 .star .name {
   display: block;
   text-align: center;

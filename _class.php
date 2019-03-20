@@ -33,6 +33,7 @@ define('enableFA', $opt['enable_fa']); // Enable FontAwesome
 
 define('bootstrapCols', 12);
 define('bootstrapColsDef', 6);
+define('HLS', true); // true=HLS; false=mp4 (or webm or mkv if enabled)
 
 /* Initialize Header */
 ob_start();
@@ -266,6 +267,10 @@ class Basic
 	function removeExtension($filename)
 	{
 		return pathinfo($filename, PATHINFO_FILENAME);
+	}
+
+	static function removeExtensionPath($path){
+		return substr($path, 0, strrpos($path, "."));
 	}
 
 	function startsWith($haystack, $needle)
@@ -2032,14 +2037,8 @@ class Video
 
 			$attr = '';
 			if (Attributes::attributeCount($id)) {
-				$first = true;
 				$attr .= '<small class="attributes">';
 				foreach (Attributes::getAttributes($id) AS $attribute) {
-					if (!$first) {
-						$attr .= ', ';
-					} else {
-						$first = false;
-					}
 					$attr .= "<span class='attribute btn' data-attribute-id='$attribute[id]'>$attribute[name]</span>";
 				}
 				$attr .= '</small>';
@@ -2047,14 +2046,8 @@ class Video
 
 			$lcn = '';
 			if (Location::locationCount($id)) {
-				$first = true;
 				$lcn .= '<small class="locations">';
 				foreach (Location::getLocations($id) AS $location) {
-					if (!$first) {
-						$lcn .= ', ';
-					} else {
-						$first = false;
-					}
 					$lcn .= "<span class='location btn' data-location-id='$location[id]'>$location[name]</span>";
 				}
 				$lcn .= '</small>';
@@ -2067,9 +2060,19 @@ class Video
 
 			print "<a id='next' class='btn btn-outline-primary' href='?id=$next[id]' title='$next[name]'>Next</a>";
 
-			print "<video poster='images/videos/$id.jpg?v=" . md5_file("images/videos/$id.jpg") . "' preload>";
-			if (file_exists("videos/$fnameWebm")) print "<source src='videos/$localPathWebm' type='video/webm'>";
-			print "<source src='videos/$localPath' type='video/mp4'>";
+
+			/* Video */
+			print "<video poster='images/videos/$id.jpg?v=" . md5_file("images/videos/$id.jpg") . "'>";
+
+			$hlsDir = htmlspecialchars(Basic::removeExtensionPath($fname), ENT_QUOTES);
+			$hlsFile = "videos/$hlsDir/index.m3u8";
+			if(HLS && file_exists($hlsFile)){
+				print "<source src='$hlsFile' type='application/x-mpegURL'>";
+			}else{
+				if (file_exists("videos/$fnameWebm")) print "<source src='videos/$localPathWebm' type='video/webm'>";
+				print "<source src='videos/$localPath' type='video/mp4'>";
+			}
+
 			print "</video>";
 
 			print '<span id="duration" class="hidden">' . $this->videoDuration . '</span>';
