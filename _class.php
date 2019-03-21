@@ -269,7 +269,8 @@ class Basic
 		return pathinfo($filename, PATHINFO_FILENAME);
 	}
 
-	static function removeExtensionPath($path){
+	static function removeExtensionPath($path)
+	{
 		return substr($path, 0, strrpos($path, "."));
 	}
 
@@ -1925,7 +1926,7 @@ class Video
 		$query->execute();
 		if ($query->rowCount()) {
 			foreach ($query->fetchAll() as $data) {
-				if ((enableWEBM || enableMKV) && file_exists("videos/$data[path]")) continue;
+				if (!file_exists("videos/$data[path]")) continue;
 
 				$age = $date_class->daysToYears($data['ageinvideo']);
 				if (!$age) $age = '00';
@@ -2066,9 +2067,9 @@ class Video
 
 			$hlsDir = htmlspecialchars(Basic::removeExtensionPath($fname), ENT_QUOTES);
 			$hlsFile = "videos/$hlsDir/index.m3u8";
-			if(HLS && file_exists($hlsFile)){
-				print "<source src='$hlsFile' type='application/x-mpegURL'>";
-			}else{
+			if (HLS && file_exists($hlsFile)) {
+				print "<source src='' data-src='$hlsFile'>";
+			} else {
 				if (file_exists("videos/$fnameWebm")) print "<source src='videos/$localPathWebm' type='video/webm'>";
 				print "<source src='videos/$localPath' type='video/mp4'>";
 			}

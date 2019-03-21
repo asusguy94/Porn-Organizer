@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     window.videoWrapper = document.getElementById('video');
     window.videoPlayer = document.getElementsByTagName('video')[0];
+    window.videoSource = document.querySelectorAll('video > source')[0].getAttribute('data-src');
     window.videoID = window.location.href.split('id=')[1];
     window.videoHeight = 500;
     window.seekTime = 1;
@@ -48,6 +49,14 @@ document.addEventListener('DOMContentLoaded', function () {
         "hideControls": false // never hide controls
     });
     /* PLYR */
+
+
+    /* HLS */
+    if (Hls.isSupported() && typeof source !== "undefined") {
+        const hls = new Hls();
+        hls.loadSource(videoSource);
+        hls.attachMedia(videoPlayer);
+    }
 
     videoWrapper.addEventListener('wheel', function (e) {
         let speed = 10;
@@ -168,12 +177,12 @@ function removeAttribute(attributeID) {
 }
 
 function renameVideo(videoName) {
-    let arguments = 'videoID=' + videoID + '&videoName=' + videoName;
+    let arguments = 'videoID=' + videoID + '&videoName=' + encodeURIComponent(videoName);
     ajax('ajax/rename_video.php', arguments);
 }
 
 function renameFile(videoPath) {
-    let arguments = 'videoID=' + videoID + '&videoPath=' + videoPath;
+    let arguments = 'videoID=' + videoID + '&videoPath=' + encodeURIComponent(videoPath);
     ajax('ajax/rename_file.php', arguments);
 }
 
@@ -350,7 +359,7 @@ $(function () {
     $.contextMenu({
         selector: '#video > h2 #video-name',
         items: {
-            "rename": {
+            "rename_title": {
                 name: "Rename",
                 icon: "edit",
                 callback: function () {

@@ -15,7 +15,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 <!doctype html>
 <html>
     <head>
-		<?php $basic->head($videos->getVideo($id), array('jqueryui', 'contextmenu', 'autocomplete', 'plyr', 'video'), array('jquery', 'jqueryui', 'contextmenu', 'autocomplete', 'plyr', 'video')) ?>
+		<?php $basic->head($videos->getVideo($id), array('jqueryui', 'contextmenu', 'autocomplete', 'plyr', 'video'), array('jquery', 'jqueryui', 'contextmenu', 'autocomplete', 'hls', 'plyr', 'video')) ?>
     </head>
 
     <body>

@@ -9,30 +9,33 @@ if (isset($_GET['videoID'])) {
 		$query = $pdo->prepare("SELECT * FROM videos WHERE id = :videoID LIMIT 1");
 		$query->bindParam(':videoID', $videoID);
 		$query->execute();
-		foreach ($query->fetchAll() as $data){
+		foreach ($query->fetchAll() as $data) {
 			$query = $pdo->prepare("SELECT id FROM videostars WHERE videoID = :videoID LIMIT 1");
 			$query->bindParam(':videoID', $videoID);
 			$query->execute();
-			if(!$query->rowCount()) { // check if the video has some stars
+			if (!$query->rowCount()) { // check if the video has some stars
 				if (file_exists('../videos/' . $data['path'])) {
 					if (unlink('../videos/' . $data['path'])) {
 						$webmPath = str_replace('.mp4', '.webm', str_replace('.m4v', '.webm', $data['path']));
-						if(file_exists('../videos/' . $webmPath)){
+						if (file_exists('../videos/' . $webmPath)) {
 							unlink('../videos/' . $webmPath);
 						}
 						removeFromDB($videoID);
 						removeThumbnails($videoID);
+						//removeHls($data['path']);
 					}
 				} else {
 					removeFromDB($videoID);
 					removeThumbnails($videoID);
+					//removeHls($data['path']);
 				}
 			}
 		}
 	}
 }
 
-function removeFromDB($videoID){
+function removeFromDB($videoID)
+{
 	global $pdo;
 
 	/* Remove Video */
@@ -56,10 +59,13 @@ function removeFromDB($videoID){
 	$query->execute();
 }
 
-function removeThumbnails($videoID){ // DOES NOT WORK --fixed? --needtesting
+function removeThumbnails($videoID)
+{
 	unlink("../images/videos/$videoID.jpg");
 	unlink("../images/videos/$videoID-" . THUMBNAIL_RES . ".jpg");
 
 	unlink("../images/thumbnails/$videoID.jpg");
 	unlink("../images/vtt/$videoID.vtt");
 }
+
+// TODO php cannot remove folder containing square brackets
