@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     /* HLS */
-    if (Hls.isSupported() && typeof source !== "undefined") {
+    if (videoSource && Hls.isSupported()) {
         const hls = new Hls();
         hls.loadSource(videoSource);
         hls.attachMedia(videoPlayer);

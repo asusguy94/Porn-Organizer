@@ -22,12 +22,12 @@ if (isset($_GET['videoID'])) {
 						}
 						removeFromDB($videoID);
 						removeThumbnails($videoID);
-						//removeHls($data['path']);
+						removeHls('../videos/' . Basic::removeExtensionPath($data['path']));
 					}
 				} else {
 					removeFromDB($videoID);
 					removeThumbnails($videoID);
-					//removeHls($data['path']);
+					removeHls('../videos/' . Basic::removeExtensionPath($data['path']));
 				}
 			}
 		}
@@ -68,4 +68,19 @@ function removeThumbnails($videoID)
 	unlink("../images/vtt/$videoID.vtt");
 }
 
-// TODO php cannot remove folder containing square brackets
+function removeHls($dir)
+{
+	$path = opendir($dir);
+	while (false !== ($file = readdir($path))) {
+		if (($file != '.') && ($file != '..')) {
+			$full = $dir . '/' . $file;
+			if (is_dir($full)) {
+				removeHls($full);
+			} else {
+				unlink($full);
+			}
+		}
+	}
+	closedir($path);
+	rmdir($dir);
+}
