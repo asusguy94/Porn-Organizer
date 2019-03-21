@@ -154,7 +154,7 @@ class Basic
 				} else if ($data[$i] === 'bootstrap') {
 					print '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">';
 				} else if ($data[$i] === 'contextmenu') {
-					if (enableFA) print '<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">';
+					if (enableFA) print '<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.0/css/all.css">';
 					print '<link rel="stylesheet" href="css/jquery.contextMenu.min.css">';
 				} else if ($data[$i] === 'autocomplete') {
 					print '<link rel="stylesheet" href="css/jquery.autocomplete.min.css">';
