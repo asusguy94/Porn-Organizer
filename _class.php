@@ -152,7 +152,7 @@ class Basic
 				if ($data[$i] === 'jqueryui') {
 					print '<link rel="stylesheet" href="css/jquery.ui.min.css">';
 				} else if ($data[$i] === 'bootstrap') {
-					print '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">';
+					print '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">';
 				} else if ($data[$i] === 'contextmenu') {
 					if (enableFA) print '<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.0/css/all.css">';
 					print '<link rel="stylesheet" href="css/jquery.contextMenu.min.css">';
@@ -182,6 +182,8 @@ class Basic
 				if ($data[$i] !== '') {
 					if ($data[$i] == 'jquery') {
 						print '<script src="js/jquery.min.js"></script>';
+					} else if ($data[$i] == 'bootstrap') {
+						print '<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>';
 					} else if ($data[$i] == 'contextmenu') {
 						print '<script src="js/jquery.contextMenu.min.js"></script>';
 					} else if ($data[$i] == 'autocomplete') {
