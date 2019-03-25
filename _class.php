@@ -317,6 +317,10 @@ class Basic
 	{
 		return file_exists($filename);
 	}
+
+	static function file_exists_alt($filename){
+		return is_file($filename);
+	}
 }
 
 class File

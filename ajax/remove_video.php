@@ -10,6 +10,8 @@ if (isset($_GET['videoID'])) {
 		$query->bindParam(':videoID', $videoID);
 		$query->execute();
 		foreach ($query->fetchAll() as $data) {
+			$hlsDir = '../videos/' . Basic::removeExtensionPath($data['path']);
+
 			$query = $pdo->prepare("SELECT id FROM videostars WHERE videoID = :videoID LIMIT 1");
 			$query->bindParam(':videoID', $videoID);
 			$query->execute();
@@ -22,12 +24,12 @@ if (isset($_GET['videoID'])) {
 						}
 						removeFromDB($videoID);
 						removeThumbnails($videoID);
-						removeHls('../videos/' . Basic::removeExtensionPath($data['path']));
+						removeHls($hlsDir);
 					}
 				} else {
 					removeFromDB($videoID);
 					removeThumbnails($videoID);
-					removeHls('../videos/' . Basic::removeExtensionPath($data['path']));
+					removeHls($hlsDir);
 				}
 			}
 		}
