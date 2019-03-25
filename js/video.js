@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     window.videoWrapper = document.getElementById('video');
     window.videoPlayer = document.getElementsByTagName('video')[0];
-    window.videoSource = document.querySelectorAll('video > source')[0].getAttribute('data-src');
+    window.videoSource = document.querySelector('source[type="application/x-mpegURL"]');
     window.videoID = window.location.href.split('id=')[1];
     window.videoHeight = 500;
     window.seekTime = 1;
@@ -37,6 +37,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    /* HLS */
+    if (!!videoSource && Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(videoSource);
+        hls.attachMedia(videoPlayer);
+    }
+
     /* PLYR */
     new Plyr(videoPlayer, {
         "controls": ['play-large', 'play', 'progress', 'current-time', 'fullscreen'],
@@ -48,15 +55,6 @@ document.addEventListener('DOMContentLoaded', function () {
         "previewThumbnails": {enabled: false, src: 'vtt/' + videoID + '.vtt'},
         "hideControls": false // never hide controls
     });
-    /* PLYR */
-
-
-    /* HLS */
-    if (videoSource && Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(videoSource);
-        hls.attachMedia(videoPlayer);
-    }
 
     videoWrapper.addEventListener('wheel', function (e) {
         let speed = 10;
@@ -418,7 +416,7 @@ $(function () {
                 name: "Add Location",
                 icon: "fas fa-map-marker-alt",
                 callback: function () {
-                    $('body').append('<div id="dialog" title="Add Attribute"></div>');
+                    $('body').append('<div id="dialog" title="Add Location"></div>');
 
                     $(function () {
                         const dialogQuery = $('#dialog');
@@ -742,6 +740,39 @@ function hasNoBookmarks() {
 
 /* Bookmark Collision Check */
 function collisionCheck(firstElement, secondElement) {
+    const distance_min = {
+        x: 5,
+        y: 35
+    };
+
+    let first = {
+        dom: firstElement.getBoundingClientRect(),
+        x: $(firstElement).offset().left,
+        y: $(firstElement).offset().top
+    };
+
+    let second = {
+        dom: secondElement.getBoundingClientRect(),
+        x: $(secondElement).offset().left,
+        y: $(secondElement).offset().top
+    }
+
+    let distance = {
+        x: Math.abs((first.x + first.dom.width) - second.x),
+        y: Math.abs(first.y - second.y)
+    };
+
+    console.log(distance);
+
+    return !(
+        first.dom.right < second.dom.left ||
+        first.dom.left > second.dom.right ||
+        first.dom.bottom < second.dom.top ||
+        first.dom.top > second.dom.bottom
+    ) || (distance.x < distance_min.x && distance.y < distance_min.y);
+}
+
+function _collisionCheck(firstElement, secondElement) {
     let distanceX_min = 10;
     let distanceY_min = 35;
 
@@ -774,16 +805,17 @@ function bookmarkCollision() {
             let first = bookmark[i - 1];
             let second = bookmark[i];
 
-            addSpace();
-
-            function addSpace() {
+            (function addSpace() {
                 setTimeout(function () {
                     if (collisionCheck(first, second)) {
-                        $(bookmark).eq(i).attr('data-level', level++);
+                        if (level < 10) level = ++level;
+                        else level = 1;
+
+                        $(bookmark).eq(i).attr('data-level', level);
                         addSpace();
                     }
                 }, 250);
-            }
+            })();
         }
     }
 }

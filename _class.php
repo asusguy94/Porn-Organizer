@@ -2063,18 +2063,19 @@ class Video
 
 			print "<a id='next' class='btn btn-outline-primary' href='?id=$next[id]' title='$next[name]'>Next</a>";
 
-
 			/* Video */
 			print "<video poster='images/videos/$id.jpg?v=" . md5_file("images/videos/$id.jpg") . "'>";
 
-			$hlsDir = htmlspecialchars(Basic::removeExtensionPath($fname), ENT_QUOTES);
+			$hlsDir = Basic::removeExtensionPath($fname);
 			$hlsFile = "videos/$hlsDir/index.m3u8";
 			if (HLS && file_exists($hlsFile)) {
-				print "<source src='' data-src='$hlsFile'>";
-			} else {
-				if (file_exists("videos/$fnameWebm")) print "<source src='videos/$localPathWebm' type='video/webm'>";
-				print "<source src='videos/$localPath' type='video/mp4'>";
+				$hlsFile = htmlspecialchars($hlsFile, ENT_QUOTES);
+				print "<source src='$hlsFile' type='application/x-mpegURL'>";
 			}
+			/* Webm */
+			if (file_exists("videos/$fnameWebm")) print "<source src='videos/$localPathWebm' type='video/webm'>";
+			/* MP4 */
+			print "<source src='videos/$localPath' type='video/mp4'>";
 
 			print "</video>";
 

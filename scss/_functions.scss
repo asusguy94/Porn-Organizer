@@ -1,3 +1,5 @@
+@import "variables";
+
 @mixin center($x, $y){
   left: $x;
   top: $y;
@@ -8,4 +10,19 @@
   width: $size;
   height: $size;
   line-height: $size;
+}
+
+@mixin bookmarkPosition() {
+  $levelSelector: 1;
+  $margin: 0;
+  $margin-offset: 35;
+
+  @for $i from 1 through $bookmarkRows {
+    $margin: ($levelSelector - 1) * $margin-offset;
+    .bookmark[data-level="#{$i}"] {
+      margin-top: $margin + px;
+    }
+
+    $levelSelector: $levelSelector+1;
+  }
 }

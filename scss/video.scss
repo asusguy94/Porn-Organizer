@@ -1,4 +1,4 @@
-@import "variables";
+@import "functions";
 
 section {
   width: 75%;
@@ -85,25 +85,6 @@ video {
 }
 
 /* Timeline */
-@mixin bookmarkPosition() {
-  $levelSelector: 1;
-  $margin: 0;
-  $margin-offset: 35;
-
-  @for $i from 1 through $totalBookmarkRows {
-    $margin: ($levelSelector - 1) * $margin-offset;
-
-    .bookmark[data-level="#{$i}"] {
-      margin-top: $margin + px;
-    }
-
-    $levelSelector: $levelSelector+1;
-    @if $levelSelector > $bookmarkRows {
-      $levelSelector: 1;
-    }
-  }
-}
-
 #timeline {
   position: relative;
   left: 135px;
