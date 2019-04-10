@@ -24,6 +24,17 @@ This is a project I'm using for an automated system of organizing my porn. Impor
 - **Database password**: insert into ```_class.php``` (or use default)
 - If you want the DB-link in the navbar to work, you need to install phpmyadmin and move its install folder to phpMyAdmin inside the project folder
 
+
+## Release vs Clone
+There are 2 ways to use this project
+- Download a release (stable but not often updated)
+- Clone the project (latest features and updated often)
+  - If you choose to clone the project you will need to do one more thing in order to use the project
+   1. Install [Node.JS](https://nodejs.org/)
+   2. Open the terminal of choice and CD into where you downloaded/cloned the directory to
+      - If you downloaded the file to `C:/downloads`, you can run `CD C:/downloads/porn-organizer`
+   3. Type `gulp` to compile the nesseary files
+
 ## TODO
 - [ ] Implement Bootstap 4
 - [ ] Video-page bookmark-visuals are broken on smaller devices
