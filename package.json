@@ -1,0 +1,30 @@
+{
+  "name": "porn-organizer",
+  "version": "1.0.0",
+  "description": "This is a project I'm using for an automated system of organizing my porn. Import **database.sql** with phpmyadmin to create the database and tables.",
+  "main": "index.php",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asusguy94/Porn-Organizer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/asusguy94/Porn-Organizer/issues"
+  },
+  "homepage": "https://github.com/asusguy94/Porn-Organizer#readme",
+  "dependencies": {
+    "eslint": "^5.16.0",
+    "gulp": "^4.0.0",
+    "gulp-clean-css": "^4.0.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-terser": "^1.1.7",
+    "gulp-uglify-es": "^1.0.4"
+  },
+  "eslintConfig": {}
+}
