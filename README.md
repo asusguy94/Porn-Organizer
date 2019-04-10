@@ -7,10 +7,10 @@ This is a project I'm using for an automated system of organizing my porn. Impor
 - The program is dependent on some libraries/files, but all of them should be within this repository
 - The program is heavily dependent on the structure of the files/folders, for more info check the [Wiki](../../wiki)
 - This project is **early in development**
-- If anyone needs help with anything reguarding the project, don't hesitate to ask!
+- If anyone needs help with anything regarding the project, don't hesitate to ask!
 - This project is loosely based on a Windows app, if you want to try that one here [Pornganizer](https://pornganizer.org)
   - This project uses some of the functionality similar to that program, but with a lot of folder/file automation.
-- I also have another version of this project for a hentai-version of this organizer, if that is somthing that anyone wants to use as well, I can upload that too.
+- I also have another version of this project for a hentai-version of this organizer, if that is something that anyone wants to use as well, I can upload that too.
 - Any help is appreciated...also with GitHub, as I'm quite new to the platform
 
 ## Requirements
@@ -22,9 +22,12 @@ This is a project I'm using for an automated system of organizing my porn. Impor
 - **Database name**: insert it into ```_class.php``` (or use default)
 - **Database username**: insert into ```_class.php``` (or use default)
 - **Database password**: insert into ```_class.php``` (or use default)
-- If you want the DB-link in the navbar to work, you need to install phpmyadmin move its install folder to phpMyAdmin inside the project folder
+- If you want the DB-link in the navbar to work, you need to install phpmyadmin and move its install folder to phpMyAdmin inside the project folder
 
 ## TODO
 - [ ] Implement Bootstap 4
 - [ ] Video-page bookmark-visuals are broken on smaller devices
 - [x] Upload .SQL file for project
+
+## Work in Progress
+![Settings Page](https://user-images.githubusercontent.com/38838751/55843947-272d7780-5b3b-11e9-8dd3-7b99207a96ee.png)
