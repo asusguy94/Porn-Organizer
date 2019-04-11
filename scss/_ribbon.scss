@@ -1,0 +1,44 @@
+.star, .ribbon-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ribbon-green {
+  background-color: green !important;
+
+  &:before, &:after {
+    background-color: green !important;
+  }
+}
+
+.ribbon {
+  background: red;
+  color: white;
+  padding: 7px 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateX(30%) translateY(0%) rotate(45deg);
+  transform-origin: top left;
+
+  font-weight: bold;
+  min-width: 20px;
+
+  &:before, &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    margin: 0 -1px; /* tweak */
+    width: 200%;
+    height: 100%;
+    background: red;
+  }
+
+  &:before {
+    right: 100%
+  }
+
+  &:after {
+    left: 100%
+  }
+}

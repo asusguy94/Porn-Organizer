@@ -1,7 +1,7 @@
 <?php
 include('../_class.php');
 
-if (isset($_GET['attributeID']) && isset($_GET['videoID'])){
+if (isset($_GET['attributeID']) && isset($_GET['videoID'])) {
 	if (!empty($_GET['attributeID']) && !empty($_GET['videoID'])) {
 		$videoID = $_GET['videoID'];
 		$attributeID = $_GET['attributeID'];
@@ -11,7 +11,7 @@ if (isset($_GET['attributeID']) && isset($_GET['videoID'])){
 		$query->bindParam(':videoID', $videoID);
 		$query->bindParam(':attributeID', $attributeID);
 		$query->execute();
-		if(!$query->rowCount()){
+		if (!$query->rowCount()) {
 			$query = $pdo->prepare("INSERT INTO videoattributes(attributeID, videoID) VALUES(:attributeID, :videoID)");
 			$query->bindParam(':videoID', $videoID);
 			$query->bindParam(':attributeID', $attributeID);
@@ -22,7 +22,7 @@ if (isset($_GET['attributeID']) && isset($_GET['videoID'])){
 			$query->bindParam(':attributeID', $attributeID);
 			$query->execute();
 			$id = $query->fetch()['id'];
-			if($query->rowCount() == 1){
+			if ($query->rowCount() == 1) {
 				print $id;
 			}
 		}

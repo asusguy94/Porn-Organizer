@@ -1,7 +1,7 @@
 <?php
 include('../_class.php');
 
-if (isset($_GET['locationID']) && isset($_GET['videoID'])){
+if (isset($_GET['locationID']) && isset($_GET['videoID'])) {
 	if (!empty($_GET['locationID']) && !empty($_GET['videoID'])) {
 		$videoID = $_GET['videoID'];
 		$locationID = $_GET['locationID'];
@@ -11,7 +11,7 @@ if (isset($_GET['locationID']) && isset($_GET['videoID'])){
 		$query->bindParam(':videoID', $videoID);
 		$query->bindParam(':locationID', $locationID);
 		$query->execute();
-		if(!$query->rowCount()){
+		if (!$query->rowCount()) {
 			$query = $pdo->prepare("INSERT INTO videolocations(locationID, videoID) VALUES(:locationID, :videoID)");
 			$query->bindParam(':videoID', $videoID);
 			$query->bindParam(':locationID', $locationID);
@@ -22,7 +22,7 @@ if (isset($_GET['locationID']) && isset($_GET['videoID'])){
 			$query->bindParam(':locationID', $locationID);
 			$query->execute();
 			$id = $query->fetch()['id'];
-			if($query->rowCount() == 1){
+			if ($query->rowCount() == 1) {
 				print $id;
 			}
 		}

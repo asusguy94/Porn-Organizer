@@ -40,6 +40,3 @@ There are 2 ways to use this project
 - [ ] Implement Bootstap 4
 - [ ] Video-page bookmark-visuals are broken on smaller devices
 - [x] Upload .SQL file for project
-
-## Work in Progress
-![Settings Page](https://user-images.githubusercontent.com/38838751/55843947-272d7780-5b3b-11e9-8dd3-7b99207a96ee.png)

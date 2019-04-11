@@ -26,5 +26,9 @@
     "gulp-terser": "^1.1.7",
     "gulp-uglify-es": "^1.0.4"
   },
-  "eslintConfig": {}
+  "eslintConfig": {
+    "env": {
+      "es6": true
+    }
+  }
 }

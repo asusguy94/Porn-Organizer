@@ -21,7 +21,7 @@ define('SIMILAR_DEF', $opt['similar_def']);
 define('SIMILAR_MAX', $opt['similar_max']);
 define('SIMILAR_TEXT', $opt['similar_text']);
 
-define('CDN', false);
+define('CDN', $opt['cdn']);
 define('CDN_MAX', $opt['cdn_max']);
 define('THUMBNAIL_RES', $opt['thumbnail_res']); // Thumbnail height
 define('THUMBNAIL_START', $opt['thumbnail_start']); // Thumbnail start time
@@ -30,10 +30,10 @@ define('PARSER', $opt['parser']); // Enable FreeOnes
 define('enableWEBM', $opt['enable_webm']); // Enable compression lvl-1
 define('enableMKV', $opt['enable_mkv']); // Enable compression lvl-2
 define('enableFA', $opt['enable_fa']); // Enable FontAwesome
+define('enableHLS', $opt['enable_hls']); // true=HLS; false=mp4 (or webm or mkv if enabled)
 
 define('bootstrapCols', 12);
 define('bootstrapColsDef', 6);
-define('HLS', true); // true=HLS; false=mp4 (or webm or mkv if enabled)
 
 /* Initialize Header */
 ob_start();
@@ -41,6 +41,7 @@ ob_start();
 class HomePage
 {
 	public $count;
+	public $fileExist = false; // set to true, to check if file exists
 
 	function recent()
 	{
@@ -70,7 +71,7 @@ class HomePage
 		print "<div class='row'>";
 		foreach ($input AS $data) {
 			if ($count > 0) {
-				if (file_exists("videos/$data[path]")) {
+				if (!$this->fileExist || file_exists("videos/$data[path]")) {
 					$count--;
 
 					print "<a class='video col-$col' href='video.php?id=$data[id]'>";
@@ -100,7 +101,7 @@ class Basic
 			"link" => "video_search.php",
 			array(
 				"name" => "Videos",
-				"link" => "videos.php"
+				"link" => "video_list.php"
 			)
 		), array(
 			"name" => "Star Search",
@@ -109,6 +110,9 @@ class Basic
 				"name" => "Stars",
 				"link" => "stars.php"
 			)
+		), array(
+			"name" => "Settings",
+			"link" => 'settings.php'
 		), array(
 			"name" => "DB",
 			"link" => "http://ds1517/phpMyAdmin?pma_username=" . DB_USER . "&pma_password=" . DB_PASS
@@ -148,7 +152,6 @@ class Basic
 			for ($i = 0; $i < count($data); $i++) {
 				if (!$i && !in_array('', $data))
 					print '<link rel="stylesheet" href="css/main.min.css?v=' . md5_file("css/main.min.css") . '">';
-
 				if ($data[$i] === 'jqueryui') {
 					print '<link rel="stylesheet" href="css/jquery.ui.min.css">';
 				} else if ($data[$i] === 'bootstrap') {
@@ -162,16 +165,25 @@ class Basic
 					print '<link rel="stylesheet" href="css/jquery.prettydropdown.min.css">';
 				} else if ($data[$i] === 'plyr') {
 					print '<link rel="stylesheet" href="css/plyr.min.css">';
-				} else if (file_exists("css/$data[$i].min.css")) {
-					print '<link rel="stylesheet" href="css/' . $data[$i] . '.min.css?v=' . md5_file("css/$data[$i].min.css") . '">';
 				} else {
-					print '<link rel="stylesheet" href="css/' . $data[$i] . '.css?v=' . md5_file("css/$data[$i].css") . '">';
+					if (file_exists("css/$data[$i].min.css")) {
+						print '<link rel="stylesheet" href="css/' . $data[$i] . '.min.css?v=' . md5_file("css/$data[$i].min.css") . '">';
+					} else {
+						print '<link rel="stylesheet" href="css/' . $data[$i] . '.css?v=' . md5_file("css/$data[$i].css") . '">';
+					}
 				}
 			}
 		} else if ($data !== '') {
-			print "<link rel='stylesheet' href='css/$data'>";
+			if (file_exists("css/$data.min.css"))
+				print "<link rel='stylesheet' href='css/$data.min.css'>";
+			else
+				print "<link rel='stylesheet' href='css/$data.css'>";
 		} else if ($data === '') {
-			print '<link rel="stylesheet" href="css/main.min.css?v=' . md5_file("css/main.min.css") . '">';
+			if (file_exists("css/$data.min.css"))
+				print '<link rel="stylesheet" href="css/main.min.css?v=' . md5_file("css/main.min.css") . '">';
+			else
+				print '<link rel="stylesheet" href="css/main.css?v=' . md5_file("css/main.css") . '">';
+
 		}
 	}
 
@@ -183,7 +195,8 @@ class Basic
 					if ($data[$i] == 'jquery') {
 						print '<script src="js/jquery.min.js"></script>';
 					} else if ($data[$i] == 'bootstrap') {
-						print '<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>';
+						print '<script src="js/jquery.min.js"></script>';
+						print '<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>';
 					} else if ($data[$i] == 'contextmenu') {
 						print '<script src="js/jquery.contextMenu.min.js"></script>';
 					} else if ($data[$i] == 'autocomplete') {
@@ -207,7 +220,10 @@ class Basic
 				}
 			}
 		} else if ($data !== '') {
-			print "<script src='js/$data.min.js?v=" . md5_file("js/$data.min.js") . "'></script>";
+			if (file_exists("js/$data.min.js"))
+				print "<script src='js/$data.min.js?v=" . md5_file("js/$data.min.js") . "'></script>";
+			else
+				print "<script src='js/$data.js?v=" . md5_file("js/$data.js") . "'></script>";
 		}
 	}
 
@@ -318,7 +334,8 @@ class Basic
 		return file_exists($filename);
 	}
 
-	static function file_exists_alt($filename){
+	static function file_exists_alt($filename)
+	{
 		return is_file($filename);
 	}
 }
@@ -943,10 +960,10 @@ class Star
 					$similarity = round(similar_text($currentStar['name'], $star['name']));
 				}
 
-				print "<a href='?id=$star[id]' class='similar-star ribbon-container'>";
+				print "<a href='?id=$star[id]' class='similar-star ribbon-container card'>";
 
-				print "<img src='images/stars/$star[image]?v=" . md5_file("images/stars/$star[image]") . "' class='lazy'>";
-				print "<h2>$star[name]</h2>";
+				print "<img src='images/stars/$star[image]?v=" . md5_file("images/stars/$star[image]") . "' class='lazy card-img-top' />";
+				print "<h3 class='card-title'>$star[name]</h3>";
 
 
 				if (SIMILAR_TEXT) {
@@ -1428,6 +1445,7 @@ class Star
 
 			print "<div id='videos' class='row'>";
 			$cdnNumber = 1;
+
 			foreach ($query->fetchAll() as $data) {
 				$ageInVideo = $date_class->daysToYears($data['ageinvideo']);
 
@@ -1444,21 +1462,21 @@ class Star
 				$localPath_img = "images/videos/$data[id]-" . THUMBNAIL_RES . ".jpg";
 				$fullPath_img = "$cdnPrefix$_SERVER[HTTP_HOST]/$localPath_img";
 
-				print "<a class='video col-4 ribbon-container' href='video.php?id=$data[id]'>";
+				print "<a class='video card ribbon-container' href='video.php?id=$data[id]' style='width:" . THUMBNAIL_RES . "px'>";
 				print "<video class='mx-auto' poster='$fullPath_img?v=" . md5_file($localPath_img) . "' preload='none' muted>";
 				if (enableWEBM && file_exists($localPathWebm)) print "<source src='$fullPathWebm' type='video/webm'>";
 				if (enableMKV && file_exists($localPathMkv)) print "<source src='$fullPathMkv' type='video/x-matroska'>";
 				print "<source src='$fullPath' type='video/mp4'>";
 				print "</video>";
 
-				print "<span class='title'>$data[name]</span>";
-				print '<span class="info">';
+				print "<span class='title card-title'>$data[name]</span>";
+				print '<span class="info card-subtitle">';
 				print "<span class='wsite''>$data[website]</span>";
 				if (!is_null($data['site'])) {
 					print '<span class="divider">&ndash;</span>';
 					print "<span class='site'>$data[site]</span>";
 				}
-				print '</span>';
+				print '</span>'; // end .info
 
 				if (!$ageInVideo) {
 					$query_age = $pdo->prepare("SELECT starAge FROM videos WHERE id = :videoID AND starAge IS NOT NULL");
@@ -2025,7 +2043,7 @@ class Video
 		$query->bindValue(1, $id);
 		$query->execute();
 		if (!$query->rowCount()) {
-			header('Location: videos.php');
+			header('Location: video_list.php');
 		} else {
 			$result = $query->fetch();
 
@@ -2072,7 +2090,7 @@ class Video
 
 			$hlsDir = Basic::removeExtensionPath($fname);
 			$hlsFile = "videos/$hlsDir/index.m3u8";
-			if (HLS && file_exists($hlsFile)) {
+			if (enableHLS && file_exists($hlsFile)) {
 				$hlsFile = htmlspecialchars($hlsFile, ENT_QUOTES);
 				print "<source src='$hlsFile' type='application/x-mpegURL'>";
 			}
@@ -2575,5 +2593,26 @@ class Settings
 		$query = $pdo->prepare("SELECT $name FROM settings LIMIT 1");
 		$query->execute();
 		return $query->fetch()[$name];
+	}
+
+	static function saveSetting($name, $value)
+	{
+		global $pdo;
+		$query = $pdo->prepare("UPDATE settings SET $name = :value");
+		$query->bindParam(':value', $value);
+		$query->execute();
+	}
+
+	static function saveSettings($nameArr, $valueArr)
+	{
+		global $pdo;
+
+		$str = "UPDATE settings SET";
+		for ($i = 0, $length = count($nameArr); $i < $length; $i++) {
+			$str .= " $nameArr[$i] = $valueArr[$i]";
+			if ($i < $length - 1) $str .= ',';
+		}
+		$query = $pdo->prepare($str);
+		$query->execute();
 	}
 }

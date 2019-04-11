@@ -6,7 +6,7 @@ $videos = new Video();
 if (isset($_GET['id']) && !empty($_GET['id'])) {
 	$id = $_GET['id'];
 } else {
-	header('Location: videos.php');
+	header('Location: video_list.php');
 }
 
 // TODO Enable bootstrap
@@ -15,7 +15,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 <!doctype html>
 <html>
     <head>
-		<?php $basic->head($videos->getVideo($id), array('jqueryui', 'contextmenu', 'autocomplete', 'plyr', 'video'), array('jquery', 'jqueryui', 'contextmenu', 'autocomplete', 'hls', 'plyr', 'video')) ?>
+		<?php $basic->head($videos->getVideo($id), array('jqueryui', 'contextmenu', 'autocomplete', 'plyr', 'video'), array('bootstrap', 'jqueryui', 'contextmenu', 'autocomplete', 'hls', 'plyr', 'video')) ?>
     </head>
 
     <body>
@@ -38,7 +38,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 						$id = $_GET['id'];
 						$videos->fetchInfo_sidebar($id);
 					} else {
-						header('Location: videos.php');
+						header('Location: video_list.php');
 					}
 					?>
                 </aside>

@@ -27,9 +27,12 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('json/star.search.php').then(function (jsonData) {
             return jsonData.json();
         }).then(function (data) {
-            let wrapper = document.getElementById('stars');
-            let elem = data['stars'];
+            const wrapper = document.getElementById('stars');
 
+            const row = document.createElement('div');
+            row.classList.add('row');
+
+            const elem = data['stars'];
             for (let i = 0; i < elem.length; i++) {
                 let starID = elem[i]['starID'];
                 let starName = elem[i]['starName'];
@@ -45,9 +48,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 let website = elem[i]['website'];
 
                 let a = document.createElement('a');
-                a.classList.add('star');
+                a.classList.add('star', 'card');
                 a.style.display = 'inline-block';
-                a.setAttribute('href', 'star.php?id=' + starID);
+                a.href = `star.php?id=${starID}`;
                 a.setAttribute('data-star-id', starID);
                 a.setAttribute('data-badge', videoCount);
                 a.setAttribute('data-age', starAge);
@@ -56,16 +59,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 a.setAttribute('data-hair', hair);
                 a.setAttribute('data-ethnicity', ethnicity);
                 a.setAttribute('data-country', country);
-                a.setAttribute('data-website-name', '["' + website + '"]');
+                a.setAttribute('data-website-name', `["${website}"]`);
 
                 let img = document.createElement('img');
-                img.classList.add('lazy');
+                img.classList.add('lazy', 'card-img-top');
                 img.style.width = '200px';
                 img.style.height = '275px';
                 img.setAttribute('data-src', thumbnail);
 
                 let span = document.createElement('span');
-                span.classList.add('name');
+                span.classList.add('name', 'card-title');
                 span.textContent = starName;
 
                 a.appendChild(img);
@@ -78,9 +81,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     a.appendChild(ribbon);
                 }
-
-                wrapper.appendChild(a);
+                row.appendChild(a);
             }
+            wrapper.appendChild(row);
         }).then(function () {
             loader.remove();
 
@@ -97,17 +100,13 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             /* Star Search */
-            star_input.addEventListener('keydown', function () {
-                setTimeout(function () {
-                    let input = star_input.value.toLowerCase();
-                    $stars.removeClass('hidden-name');
+            star_input.addEventListener('keyup', function () {
+                let input = star_input.value.toLowerCase();
+                $stars.removeClass('hidden-name');
 
-                    if (input !== '') {
-                        $stars.not(function () {
-                            return $(this).find('.name').text().toLowerCase().indexOf(input) > -1;
-                        }).addClass('hidden-name');
-                    }
-                }, 0);
+                $stars.not(function () {
+                    return $(this).find('.name').text().toLowerCase().indexOf(input) > -1;
+                }).addClass('hidden-name');
             });
 
             /* Breast Radio Buttons */
@@ -297,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             $stars.sort(video_count_reverse);
                             break;
                         default:
-                            console.log('No sort method for: ' + label);
+                            console.log(`No sort method for: ${label}`);
                     }
 
                     for (let i = 0; i < starLength; i++) {
@@ -307,8 +306,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }).then(function () {
             new LazyLoad({
-                elements_selector: ".lazy",
-                threshold: 3000
+                elements_selector: '.lazy'
             });
         })
     })();

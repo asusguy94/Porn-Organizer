@@ -12,7 +12,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 <!doctype html>
 <html>
     <head>
-		<?php $basic->head($stars->getStar($id), array('bootstrap', 'jqueryui', 'contextmenu', 'autocomplete', 'star', 'flags'), array('jquery', 'jqueryui', 'contextmenu', 'autocomplete', 'star')) ?>
+		<?php $basic->head($stars->getStar($id), array('bootstrap', 'jqueryui', 'contextmenu', 'autocomplete', 'star', 'flags'), array('bootstrap', 'jqueryui', 'contextmenu', 'autocomplete', 'star')) ?>
     </head>
 
     <body>

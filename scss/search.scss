@@ -1,15 +1,13 @@
-@import "variables";
+@import "functions";
 
 h2 {
   margin-bottom: 0;
 }
 
 .video {
-  float: left;
   margin: 5px;
 
   width: $thumbnailWidth + px;
-  height: 230px;
 
   img {
     width: inherit;
@@ -43,8 +41,6 @@ h2 {
   font-weight: bold;
 }
 
-// TODO Write selector for any checkbox AND radio-button
-
 #loader {
   border: 16px solid #F3F3F3;
   border-top-color: $spinnerBlue;
@@ -70,5 +66,3 @@ h2 {
 .flag {
   margin-right: 5px;
 }
-
-// TODO remove unused code

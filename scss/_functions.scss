@@ -6,10 +6,10 @@
   transform: translate($x * -1, $y * -1);
 }
 
-@mixin circle($size){
-  width: $size;
-  height: $size;
-  line-height: $size;
+@mixin circle($sizeY, $sizeX: $sizeY){
+  width: $sizeX;
+  height: $sizeY;
+  line-height: $sizeY;
 }
 
 @mixin bookmarkPosition() {

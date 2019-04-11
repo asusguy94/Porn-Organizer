@@ -9,7 +9,7 @@ global $pdo;
 <!doctype html>
 <html>
     <head>
-		<?php $basic->head('Video Search', array('bootstrap', 'prettydropdown', 'search'), array('jquery', 'lazyload', 'prettydropdown', 'video.search')) ?>
+		<?php $basic->head('Video Search', array('bootstrap', 'prettydropdown', 'search'), array('bootstrap', 'lazyload', 'prettydropdown', 'video.search')) ?>
     </head>
 
     <body>
@@ -24,11 +24,16 @@ global $pdo;
                         <input type="text" name="title" placeholder="Title" autofocus>
                     </div>
 
+                    <div class="input-wrapper" data-toggle="tooltip" data-placement="right" title="Useful when renaming video-titles that includes special characters">
+                        <input id="special_char" type="checkbox" name="special_char">
+                        <label for="special_char">Special Char</label>
+                    </div>
+
                     <div class="input-wrapper">
                         <input type="text" name="star" placeholder="Star">
                     </div>
 
-                    <div class="input-wrapper">
+                    <div class="input-wrapper" data-toggle="tooltip" data-placement="right" title="Check if file exists">
                         <input id="existing" type="checkbox" name="existing">
                         <label for="existing">Existing</label>
                     </div>

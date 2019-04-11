@@ -8,7 +8,7 @@ $db = new DB();
 <!doctype html>
 <html>
     <head>
-		<?php $basic->head('Stars', array('bootstrap', 'jqueryui', 'contextmenu'), array('jquery', 'jqueryui', 'contextmenu', 'stars')) ?>
+		<?php $basic->head('Stars', array('bootstrap', 'jqueryui', 'contextmenu'), array('bootstrap', 'jqueryui', 'contextmenu', 'stars')) ?>
     </head>
 
     <body>

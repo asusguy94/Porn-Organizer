@@ -65,7 +65,7 @@
     white-space: nowrap;
     cursor: pointer;
     line-height: 1.5em;
-    padding: 2px 0px 2px 0px;
+    padding: 2px 0 2px 0;
 }
 
 .xdsoft_autocomplete .xdsoft_autocomplete_dropdown > div.active {

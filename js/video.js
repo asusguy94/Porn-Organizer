@@ -11,15 +11,13 @@ document.addEventListener('DOMContentLoaded', function () {
     window.videoTitle = document.getElementById('video-name');
 
     document.addEventListener('keydown', function (e) {
-        switch (e.keyCode) {
-            case 9:
-                e.preventDefault();
-                $('#next')[0].click();
-                break;
+        if (e.keyCode === 9) {
+            e.preventDefault();
+            $('#next')[0].click();
         }
     });
 
-    if (typeof localStorage.bookmark !== "undefined") {
+    if (typeof localStorage.bookmark !== 'undefined') {
         window.seconds = parseInt(localStorage.bookmark);
         if (localStorage.video === videoID) {
             videoPlayer.currentTime = seconds;
@@ -38,22 +36,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /* HLS */
-    if (!!videoSource && Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(videoSource);
+    if (videoSource && Hls.isSupported()) {
+        const hls = new Hls({
+            maxBufferLength: 180 /* 3x duration of hls_time */
+        });
+        hls.loadSource(videoSource.getAttribute('src'));
         hls.attachMedia(videoPlayer);
     }
 
     /* PLYR */
     new Plyr(videoPlayer, {
-        "controls": ['play-large', 'play', 'progress', 'current-time', 'fullscreen'],
-        "invertTime": false,
-        "toggleInvert": false,
-        "seekTime": window.seekTime,
-        "volume": 1, // reset volume
-        "muted": false,
-        "previewThumbnails": {enabled: false, src: 'vtt/' + videoID + '.vtt'},
-        "hideControls": false // never hide controls
+        'controls': ['play-large', 'play', 'progress', 'current-time', 'fullscreen'],
+        'invertTime': false,
+        'toggleInvert': false,
+        'seekTime': window.seekTime,
+        'volume': 1, // reset volume
+        'muted': false,
+        'previewThumbnails': {enabled: false, src: `vtt/${videoID}.vtt`},
+        'hideControls': false // never hide controls
     });
 
     videoWrapper.addEventListener('wheel', function (e) {
@@ -62,16 +62,39 @@ document.addEventListener('DOMContentLoaded', function () {
         else rewind(speed);
     });
 
-    videoWrapper.addEventListener('timeupdate', function () {
+    /*videoPlayer.addEventListener('loadedmetadata', function () {
+        let track = this.addTextTrack('chapters', 'Bookmarks', 'en');
+        track.mode = 'showing';
+
+        track.addCue(new VTTCue(0, 12, "First"));
+        track.addCue(new VTTCue(18.7, 21.5, "Second"));
+        track.addCue(new VTTCue(22.8, 26.8, "Third"));
+
+        let progressBar = document.createElement('span');
+        progressBar.classList.add('progress-bookmarks');
+        progressBar.textContent = 'progress';
+        $('progress').first().before(progressBar);
+
+        const c = videoPlayer.textTracks[0].cues;
+        for (let i = 0; i < c.length; i++) {
+            let s = document.createElement("span");
+            //s.innerHTML = c[i].text;
+            s.setAttribute('data-start', c[i].startTime);
+            console.log(s);
+            progressBar.appendChild(s);
+        }
+    });*/
+
+    videoPlayer.addEventListener('timeupdate', function () {
         localStorage.bookmark = Math.round(videoPlayer.currentTime);
         if (localStorage.video !== videoID) localStorage.video = videoID;
     });
 
-    videoWrapper.addEventListener('playing', function () {
+    videoPlayer.addEventListener('playing', function () {
         localStorage.playing = 1;
     });
 
-    videoWrapper.addEventListener('pause', function () {
+    videoPlayer.addEventListener('pause', function () {
         localStorage.playing = 0;
     });
 
@@ -80,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     videoWrapper.addEventListener('exitfullscreen', function () {
-        videoPlayer.style.maxHeight = videoHeight + 'px'
+        videoPlayer.style.maxHeight = `${videoHeight}px`;
     });
 
     $(bookmark).on('click', function () {
@@ -155,59 +178,52 @@ function playFrom(seconds) {
 }
 
 function addLocation(locationID) {
-    let arguments = 'videoID=' + videoID + '&locationID=' + locationID;
-    ajax('ajax/add_videolocation.php', arguments);
+    ajax('ajax/add_videolocation.php', `videoID=${videoID}&locationID=${locationID}`);
 }
 
 function removeLocation(locationID) {
-    let arguments = 'videoID=' + videoID + '&locationID=' + locationID;
-    ajax('ajax/remove_videolocation.php', arguments);
+    ajax('ajax/remove_videolocation.php', `videoID=${videoID}&locationID=${locationID}`);
 }
 
 function addAttribute(attributeID) {
-    let arguments = 'videoID=' + videoID + '&attributeID=' + attributeID;
-    ajax('ajax/add_videoattribute.php', arguments);
+    ajax('ajax/add_videoattribute.php', `videoID=${videoID}&attributeID=${attributeID}`);
 }
 
 function removeAttribute(attributeID) {
-    let arguments = 'videoID=' + videoID + '&attributeID=' + attributeID;
-    ajax('ajax/remove_videoattribute.php', arguments);
+    ajax('ajax/remove_videoattribute.php', `videoID=${videoID}&attributeID=${attributeID}`);
 }
 
 function renameVideo(videoName) {
-    let arguments = 'videoID=' + videoID + '&videoName=' + encodeURIComponent(videoName);
-    ajax('ajax/rename_video.php', arguments);
+    ajax('ajax/rename_video.php', `videoID=${videoID}&videoName=${encodeURIComponent(videoName)}`);
 }
 
 function renameFile(videoPath) {
-    let arguments = 'videoID=' + videoID + '&videoPath=' + encodeURIComponent(videoPath);
-    ajax('ajax/rename_file.php', arguments);
+    ajax('ajax/rename_file.php', `videoID=${videoID}&videoPath=${encodeURIComponent(videoPath)}`);
 }
 
 function addBookmark(categoryID, categoryName) {
     let seconds = Math.round(videoPlayer.currentTime);
     localStorage.bookmark = seconds;
 
-    let arguments = 'seconds=' + seconds + '&categoryID=' + categoryID + '&videoID=' + videoID;
-    ajax('ajax/add_bookmark.php', arguments, function (data) {
+    ajax('ajax/add_bookmark.php', `seconds=${seconds}&categoryID=${categoryID}&videoID=${videoID}`, function (data) {
         if (!$('#timeline').length) {
             let div = document.createElement('div');
-            div.setAttribute('id', 'timeline');
+            div.id = 'timeline';
 
             insertBefore(document.getElementById('videoDetails'), div);
         }
         let wrapper = document.getElementById('timeline');
 
 
-        if (!$('.bookmark[data-bookmark-time="' + seconds + '"][data-category-id="' + categoryID + '"]').length) {
+        if (!$(`.bookmark[data-bookmark-time="${seconds}"][data-category-id="${categoryID}"]`).length) {
             let a = document.createElement('a');
             a.classList.add('bookmark', 'btn');
             a.setAttribute('data-category-id', categoryID);
             a.setAttribute('data-bookmark-id', data.responseText);
             a.setAttribute('data-bookmark-time', seconds.toString());
             a.setAttribute('data-level', '1');
-            a.setAttribute('href', 'javascript:;');
-            a.setAttribute('style', 'margin-left: ' + getOffset(seconds) + '%');
+            a.href = 'javascript:;';
+            a.style.marginLeft = `${getOffset(seconds)}%`;
             a.textContent = categoryName;
 
             wrapper.appendChild(a);
@@ -224,18 +240,16 @@ function addBookmark(categoryID, categoryName) {
 }
 
 function bookmark_editCategory(bookmarkID, categoryID) {
-    let arguments = 'bookmarkID=' + bookmarkID + '&categoryID=' + categoryID;
-    ajax('ajax/bookmark_editCategory.php', arguments);
+    ajax('ajax/bookmark_editCategory.php', `bookmarkID=${bookmarkID}&categoryID=${categoryID}`);
 }
 
 function bookmark_editTime(bookmarkID) {
     let seconds = Math.round(videoPlayer.currentTime);
     localStorage.bookmark = seconds;
 
-    let arguments = 'bookmarkID=' + bookmarkID + '&seconds=' + seconds;
-    ajax('ajax/bookmark_editTime.php', arguments, function () {
-        let btn = document.querySelector('.bookmark[data-bookmark-id="' + bookmarkID + '"]');
-        btn.setAttribute('style', 'margin-left: ' + getOffset(seconds) + '%');
+    ajax('ajax/bookmark_editTime.php', `bookmarkID=${bookmarkID}&seconds=${seconds}`, function () {
+        let btn = document.querySelector(`.bookmark[data-bookmark-id="${bookmarkID}"]`);
+        btn.style.marginLeft = getOffset(seconds);
         btn.setAttribute('data-bookmark-time', seconds.toString());
 
 
@@ -245,23 +259,19 @@ function bookmark_editTime(bookmarkID) {
 }
 
 function removeBookmark(id) {
-    let arguments = 'id=' + id;
-    ajax('ajax/remove_bookmark.php', arguments);
+    ajax('ajax/remove_bookmark.php', `id=${id}`);
 }
 
 function removeBookmarks() {
-    let arguments = 'videoID=' + videoID;
-    ajax('ajax/remove_bookmarks.php', arguments);
+    ajax('ajax/remove_bookmarks.php', `videoID=${videoID}`);
 }
 
 function removeVideoCategory(videoID, categoryID) {
-    let arguments = 'videoID=' + videoID + '&categoryID=' + categoryID;
-    ajax('ajax/remove_videocategory.php', arguments);
+    ajax('ajax/remove_videocategory.php', `videoID=${videoID}&categoryID=${categoryID}`);
 }
 
 function removeVideoStar(videoID, starID) {
-    let arguments = 'videoID=' + videoID + '&starID=' + starID;
-    ajax('ajax/remove_videostar.php', arguments);
+    ajax('ajax/remove_videostar.php', `videoID=${videoID}&starID=${starID}`);
 }
 
 function addCategory_and_bookmark(categoryID, categoryName) {
@@ -270,11 +280,10 @@ function addCategory_and_bookmark(categoryID, categoryName) {
     let seconds = Math.round(videoPlayer.currentTime);
     localStorage.bookmark = seconds;
 
-    let arguments = 'videoID=' + videoID + '&categoryID=' + categoryID + '&seconds=' + seconds;
-    ajax('ajax/add_category_and_bookmark.php', arguments, function (data) {
+    ajax('ajax/add_category_and_bookmark.php', `videoID=${videoID}&categoryID=${categoryID}&seconds=${seconds}`, function (data) {
         if (!$('#timeline').length) {
             let div = document.createElement('div');
-            div.setAttribute('id', 'timeline');
+            div.id = 'timeline';
 
             insertBefore(document.getElementById('videoDetails'), div);
         }
@@ -282,32 +291,32 @@ function addCategory_and_bookmark(categoryID, categoryName) {
 
         if (!$('#categories').length) {
             let div = document.createElement('div');
-            div.setAttribute('id', 'categories');
+            div.id = 'categories';
 
             insertBefore(document.querySelector('#videoDetails > div[style]'), div);
         }
         let categoriesWrapper = document.getElementById('categories');
 
-        if (!$('.category[data-category-id="' + categoryID + '"]').length) {
+        if (!$(`.category[data-category-id="${categoryID}"]`).length) {
             let cat = document.createElement('a');
             cat.classList.add('category', 'btn');
             cat.setAttribute('data-category-id', categoryID);
-            cat.setAttribute('href', 'category.php?id=' + categoryID);
+            cat.href = `category.php?id=${categoryID}`;
             cat.textContent = categoryName;
 
             categoriesWrapper.appendChild(cat);
         }
 
 
-        if (!$('.bookmark[data-bookmark-time="' + seconds + '"][data-category-id="' + categoryID + '"]').length) {
+        if (!$(`.bookmark[data-bookmark-time="${seconds}"][data-category-id="${categoryID}"]`).length) {
             let a = document.createElement('a');
             a.classList.add('bookmark', 'btn');
             a.setAttribute('data-category-id', categoryID);
             a.setAttribute('data-bookmark-id', data.responseText);
             a.setAttribute('data-bookmark-time', seconds.toString());
             a.setAttribute('data-level', '1');
-            a.setAttribute('href', 'javascript:;');
-            a.setAttribute('style', 'margin-left: ' + getOffset(seconds) + '%');
+            a.href = 'javascript:;';
+            a.style.marginLeft = `${getOffset(seconds)}%`;
             a.textContent = categoryName;
 
             wrapper.appendChild(a);
@@ -324,24 +333,21 @@ function addCategory_and_bookmark(categoryID, categoryName) {
 }
 
 function generateThumbnail() {
-    let arguments = 'videoID=' + videoID;
-    ajax('ajax/video_generatethumbnail.php', arguments);
+    ajax('ajax/video_generatethumbnail.php', `videoID=${videoID}`);
 }
 
 function removeVideo() {
-    let arguments = 'videoID=' + videoID;
-    ajax('ajax/remove_video.php', arguments);
+    ajax('ajax/remove_video.php', `videoID=${videoID}`);
 }
 
 function setAge(age) {
-    let arguments = 'videoID=' + videoID + '&age=' + age;
-    ajax('ajax/video_age.php', arguments);
+    ajax('ajax/video_age.php', `videoID=${videoID}&age=${age}`);
 }
 
 function ajax(page, params, callback = function () {
     location.href = location.href
 }) {
-    let url = page + '?' + params;
+    let url = `${page}?${params}`;
 
     let xhr = new XMLHttpRequest();
     xhr.open('GET', url);
@@ -357,12 +363,15 @@ $(function () {
     $.contextMenu({
         selector: '#video > h2 #video-name',
         items: {
-            "rename_title": {
-                name: "Rename",
-                icon: "edit",
+            'rename_title': {
+                name: 'Rename',
+                icon: 'edit',
                 callback: function () {
-                    $('body').append('<div id="dialog" title="Edit Video"></div>');
+                    const dialogWrapper = document.createElement('div');
+                    dialogWrapper.id = 'dialog';
+                    dialogWrapper.title = 'Edit Video';
 
+                    document.body.appendChild(dialogWrapper);
                     $(function () {
                         const dialogQuery = $('#dialog');
                         dialogQuery.dialog({
@@ -373,7 +382,13 @@ $(function () {
                             width: 250
                         });
 
-                        dialogQuery.append('<input type="text" name="videoName_edit" value="' + videoTitle.textContent + '" autofocus>');
+                        const dialogInput = document.createElement('input');
+                        dialogInput.type = 'text';
+                        dialogInput.name = 'videoName_edit';
+                        dialogInput.value = videoTitle.textContent;
+                        dialogInput.autofocus = '';
+
+                        dialogQuery.append(dialogInput);
                         let input = $('input[name="videoName_edit"]');
                         let len = input.val().length;
                         input[0].focus();
@@ -386,12 +401,15 @@ $(function () {
                         });
                     });
                 }
-            }, "add_attribute": {
-                name: "Add Attribute",
-                icon: "fas fa-tag",
+            }, 'add_attribute': {
+                name: 'Add Attribute',
+                icon: 'fas fa-tag',
                 callback: function () {
-                    $('body').append('<div id="dialog" title="Add Attribute"></div>');
+                    const dialogWrapper = document.createElement('div');
+                    dialogWrapper.id = 'dialog';
+                    dialogWrapper.title = 'Add Attrubute';
 
+                    document.body.appendChild(dialogWrapper);
                     $(function () {
                         const dialogQuery = $('#dialog');
                         dialogQuery.dialog({
@@ -403,21 +421,39 @@ $(function () {
                             position: {my: "top", at: "top+150"}
                         });
 
+                        const searchWrapper = document.createElement('span');
+                        searchWrapper.classList.add('search');
+                        const searchInner = document.createElement('span');
+                        searchInner.classList.add('inner');
+
+                        searchWrapper.appendChild(searchInner);
+                        dialogQuery.append(searchWrapper);
                         const query = $('#attributes.hidden > .attribute');
                         for (let i = 0; i < query.length; i++) {
                             let attributeID = query.eq(i).attr('data-attribute-id');
                             let attributeName = query.eq(i).text();
 
-                            dialogQuery.append('<div class="btn unselectable" onclick="addAttribute(' + attributeID + ')">' + attributeName + '</div>');
+                            let btn = document.createElement('div');
+                            btn.classList.add('btn', 'unselectable');
+                            btn.onclick = function () {
+                                addAttribute(attributeID);
+                            };
+                            btn.textContent = attributeName;
+
+                            dialogQuery.append(btn);
                         }
+                        categorySearch();
                     });
                 }
-            }, "add_location": {
-                name: "Add Location",
-                icon: "fas fa-map-marker-alt",
+            }, 'add_location': {
+                name: 'Add Location',
+                icon: 'fas fa-map-marker-alt',
                 callback: function () {
-                    $('body').append('<div id="dialog" title="Add Location"></div>');
+                    const dialogWrapper = document.createElement('div');
+                    dialogWrapper.id = 'dialog';
+                    dialogWrapper.title = 'Add Location';
 
+                    document.body.appendChild(dialogWrapper);
                     $(function () {
                         const dialogQuery = $('#dialog');
                         dialogQuery.dialog({
@@ -429,13 +465,29 @@ $(function () {
                             position: {my: "top", at: "top+150"}
                         });
 
+                        const searchWrapper = document.createElement('span');
+                        searchWrapper.classList.add('search');
+                        const searchInner = document.createElement('span');
+                        searchInner.classList.add('inner');
+
+                        searchWrapper.appendChild(searchInner);
+                        dialogQuery.append(searchWrapper);
                         const query = $('#locations.hidden > .location');
                         for (let i = 0; i < query.length; i++) {
                             let locationID = query.eq(i).attr('data-location-id');
                             let locationName = query.eq(i).text();
 
-                            dialogQuery.append('<div class="btn unselectable" onclick="addLocation(' + locationID + ')">' + locationName + '</div>');
+
+                            let btn = document.createElement('div');
+                            btn.classList.add('btn', 'unselectable');
+                            btn.onclick = function () {
+                                addLocation(locationID);
+                            };
+                            btn.textContent = locationName;
+
+                            dialogQuery.append(btn);
                         }
+                        categorySearch();
                     });
                 }
             }
@@ -447,14 +499,18 @@ $(function () {
     $.contextMenu({
         selector: '.bookmark',
         items: {
-            "edit": {
-                name: "Change Category",
-                icon: "edit",
+            'edit': {
+                name: 'Change Category',
+                icon: 'edit',
                 callback: function (itemKey, options) {
                     let bookmarkID = options.$trigger.attr('data-bookmark-id');
                     let bookmarkName = options.$trigger.text().trim();
 
-                    $('body').append('<div id="dialog" title="Change Category"></div>');
+                    const dialogWrapper = document.createElement('div');
+                    dialogWrapper.id = 'dialog';
+                    dialogWrapper.title = 'Change Category';
+
+                    document.body.appendChild(dialogWrapper);
                     $(function () {
                         const dialogQuery = $('#dialog');
                         dialogQuery.dialog({
@@ -466,31 +522,45 @@ $(function () {
                             position: {my: "top", at: "top+150"}
                         });
 
-                        dialogQuery.append('<span class="search"><span class="inner"></span></span>');
+                        const searchWrapper = document.createElement('span');
+                        searchWrapper.classList.add('search');
+                        const searchInner = document.createElement('span');
+                        searchInner.classList.add('inner');
+
+                        searchWrapper.appendChild(searchInner);
+                        dialogQuery.append(searchWrapper);
                         const query = $('#category_list > option');
                         for (let i = 0; i < query.length; i++) {
                             let category = query.eq(i);
                             let categoryID = category.attr('data-category-id');
                             let categoryName = category.attr('value');
 
-                            if (categoryName !== bookmarkName)
-                                dialogQuery.append('<div class="btn unselectable" onclick="bookmark_editCategory(' + bookmarkID + ',' + categoryID + ')">' + categoryName + '</div>');
+                            if (categoryName !== bookmarkName) {
+                                let btn = document.createElement('div');
+                                btn.classList.add('btn', 'unselectable');
+                                btn.onclick = function () {
+                                    bookmark_editCategory(bookmarkID, categoryID);
+                                };
+                                btn.textContent = categoryName;
+
+                                dialogQuery.append(btn);
+                            }
                         }
 
                         categorySearch();
                     });
                 }
-            }, "edit_time": {
-                name: "Change Time",
-                icon: "far fa-clock",
+            }, 'edit_time': {
+                name: 'Change Time',
+                icon: 'far fa-clock',
                 callback: function (itemKey, options) {
                     bookmark_editTime(options.$trigger.attr('data-bookmark-id'));
                 }
             },
-            "divider": "---",
-            "delete": {
-                name: "Delete",
-                icon: "delete",
+            'divider': '---',
+            'delete': {
+                name: 'Delete',
+                icon: 'delete',
                 callback: function (itemKey, options) {
                     let id = options.$trigger.attr('data-bookmark-id');
                     removeBookmark(id);
@@ -504,19 +574,19 @@ $(function () {
     $.contextMenu({
         selector: '.category',
         items: {
-            "add_bookmark": {
-                name: "Add Bookmark",
-                icon: "add",
+            'add_bookmark': {
+                name: 'Add Bookmark',
+                icon: 'add',
                 callback: function (itemKey, options) {
                     let id = options.$trigger.attr('data-category-id');
                     let categoryName = options.$trigger.text();
                     addBookmark(id, categoryName);
                 }
             },
-            "divider": "---",
-            "remove": {
-                name: "Remove",
-                icon: "delete",
+            'divider': '---',
+            'remove': {
+                name: 'Remove',
+                icon: 'delete',
                 callback: function (itemKey, options) {
                     let id = options.$trigger.attr('data-category-id');
                     removeVideoCategory(videoID, id);
@@ -530,13 +600,15 @@ $(function () {
     $.contextMenu({
         selector: '.star[data-star-id]',
         items: {
-            "add_bookmark": {
-                name: "Add Bookmark",
-                icon: "add",
-                callback: function (/*itemKey, options*/) {
-                    //let starID = options.$trigger.attr('data-star-id');
-                    $('body').append('<div id="dialog" title="Add Bookmark"></div>');
+            'add_bookmark': {
+                name: 'Add Bookmark',
+                icon: 'add',
+                callback: function () {
+                    const dialogWrapper = document.createElement('div');
+                    dialogWrapper.id = 'dialog';
+                    dialogWrapper.title = 'Add Bookmark';
 
+                    document.body.appendChild(dialogWrapper);
                     $(function () {
                         const dialogQuery = $('#dialog');
                         dialogQuery.dialog({
@@ -548,23 +620,36 @@ $(function () {
                             position: {my: "right top", at: "right-160 top+250"}
                         });
 
-                        dialogQuery.append('<span class="search"><span class="inner"></span></span>');
+                        const searchWrapper = document.createElement('span');
+                        searchWrapper.classList.add('search');
+                        const searchInner = document.createElement('span');
+                        searchInner.classList.add('inner');
+
+                        searchWrapper.appendChild(searchInner);
+                        dialogQuery.append(searchWrapper);
                         const query = $('#category_list > option');
                         for (let i = 0; i < query.length; i++) {
                             let categoryID = query.eq(i).attr('data-category-id');
                             let categoryName = query.eq(i).attr('value');
 
-                            dialogQuery.append('<div class="btn unselectable" onclick="addCategory_and_bookmark(' + categoryID + ',\'' + categoryName + '\')">' + categoryName + '</div>');
+                            let btn = document.createElement('div');
+                            btn.classList.add('btn', 'unselectable');
+                            btn.onclick = function () {
+                                addCategory_and_bookmark(categoryID, categoryName)
+                            };
+                            btn.textContent = categoryName;
+
+                            dialogQuery.append(btn);
                         }
 
                         categorySearch();
                     });
                 }
             },
-            "divider": "---",
-            "remove": {
-                name: "Remove",
-                icon: "delete",
+            'divider': '---',
+            'remove': {
+                name: 'Remove',
+                icon: 'delete',
                 callback: function (itemKey, options) {
                     let id = options.$trigger.attr('data-star-id');
                     removeVideoStar(videoID, id);
@@ -579,12 +664,15 @@ $(function () {
         selector: '#video .plyr',
         zIndex: 3,
         items: {
-            "set_age": {
-                name: "Set Age",
+            'set_age': {
+                name: 'Set Age',
                 icon: 'add',
                 callback: function () {
-                    $('body').append('<div id="dialog" title="Set Age"></div>');
+                    const dialogWrapper = document.createElement('div');
+                    dialogWrapper.id = 'dialog';
+                    dialogWrapper.title = 'Set Age';
 
+                    document.body.appendChild(dialogWrapper);
                     $(function () {
                         const dialogQuery = $('#dialog');
                         dialogQuery.dialog({
@@ -595,8 +683,12 @@ $(function () {
                             width: 350
                         });
 
-                        dialogQuery.append('<input type="number" name="videoAge_set" autofocus>');
+                        const dialogInput = document.createElement('input');
+                        dialogInput.type = 'number';
+                        dialogInput.name = 'videoAge_set';
+                        dialogInput.autofocus = '';
 
+                        dialogQuery.append(dialogInput);
                         document.querySelector('input[name="videoAge_set"]').addEventListener('keydown', function (e) {
                             if (e.keyCode === 13) {
                                 setAge(this.value);
@@ -605,15 +697,18 @@ $(function () {
                     });
                 }
             },
-            "rename_video": {
-                name: "Rename File",
-                icon: "edit",
+            'rename_video': {
+                name: 'Rename File',
+                icon: 'edit',
                 callback: function () {
                     let source = $(videoPlayer).find('source').not('[type="video/webm"]').first().attr('src');
-                    let videoPath_current = source.split('/')[1] + '/' + source.split('/')[2];
+                    let videoPath_current = `${source.split('/')[1]}/${source.split('/')[2]}`;
 
-                    $('body').append('<div id="dialog" title="Edit File"></div>');
+                    const dialogWrapper = document.createElement('div');
+                    dialogWrapper.id = 'dialog';
+                    dialogWrapper.title = 'Edit File';
 
+                    document.body.appendChild(dialogWrapper);
                     $(function () {
                         const dialogQuery = $('#dialog');
                         dialogQuery.dialog({
@@ -624,7 +719,13 @@ $(function () {
                             width: 350
                         });
 
-                        dialogQuery.append('<input type="text" name="videoFile_edit" value="' + videoPath_current + '" autofocus>');
+                        const dialogInput = document.createElement('input');
+                        dialogInput.type = 'text';
+                        dialogInput.name = 'videoFile_edit';
+                        dialogInput.value = videoPath_current;
+                        dialogInput.autofocus = '';
+
+                        dialogQuery.append(dialogInput);
                         let input = $('input[name="videoFile_edit"]');
                         let len = input.val().length;
                         input[0].focus();
@@ -638,25 +739,25 @@ $(function () {
                     });
                 }
             },
-            "fix_thumbnail": {
-                name: "Fix Thumbnail",
-                icon: "edit",
+            'fix_thumbnail': {
+                name: 'Fix Thumbnail',
+                icon: 'edit',
                 callback: function () {
                     generateThumbnail();
                 }
             },
-            "divider": "---",
-            "remove_bookmarks": {
-                name: "Remove Bookmarks",
-                icon: "delete",
+            'divider': '---',
+            'remove_bookmarks': {
+                name: 'Remove Bookmarks',
+                icon: 'delete',
                 callback: function () {
                     removeBookmarks();
                 },
                 disabled: hasNoBookmarks()
             },
-            "remove_video": {
-                name: "Remove Video",
-                icon: "delete",
+            'remove_video': {
+                name: 'Remove Video',
+                icon: 'delete',
                 callback: function () {
                     removeVideo();
                 },
@@ -670,9 +771,9 @@ $(function () {
     $.contextMenu({
         selector: '#video > h2 small > span.attribute',
         items: {
-            "remove_attribute": {
-                name: "Remove Attribute",
-                icon: "delete",
+            'remove_attribute': {
+                name: 'Remove Attribute',
+                icon: 'delete',
                 callback: function (itemKey, options) {
                     let attributeID = options.$trigger.attr('data-attribute-id');
 
@@ -687,9 +788,9 @@ $(function () {
     $.contextMenu({
         selector: '#video > h2 small > span.location',
         items: {
-            "remove_location": {
-                name: "Remove Location",
-                icon: "delete",
+            'remove_location': {
+                name: 'Remove Location',
+                icon: 'delete',
                 callback: function (itemKey, options) {
                     let locationID = options.$trigger.attr('data-location-id');
 
@@ -762,38 +863,12 @@ function collisionCheck(firstElement, secondElement) {
         y: Math.abs(first.y - second.y)
     };
 
-    console.log(distance);
-
     return !(
         first.dom.right < second.dom.left ||
         first.dom.left > second.dom.right ||
         first.dom.bottom < second.dom.top ||
         first.dom.top > second.dom.bottom
     ) || (distance.x < distance_min.x && distance.y < distance_min.y);
-}
-
-function _collisionCheck(firstElement, secondElement) {
-    let distanceX_min = 10;
-    let distanceY_min = 35;
-
-    let first = firstElement.getBoundingClientRect();
-    let second = secondElement.getBoundingClientRect();
-
-    let firstPosX = $(firstElement).offset().left;
-    let secondPosX = $(secondElement).offset().left;
-
-    let firstPosY = $(firstElement).offset().top;
-    let secondPosY = $(secondElement).offset().top;
-
-    let distanceX = Math.abs((firstPosX + first.width) - secondPosX);
-    let distanceY = Math.abs(firstPosY - secondPosY);
-
-    return !(
-        first.right < second.left ||
-        first.left > second.right ||
-        first.bottom < second.top ||
-        first.top > second.bottom
-    ) || (distanceX < distanceX_min && distanceY < distanceY_min);
 }
 
 function bookmarkCollision() {
@@ -845,9 +920,7 @@ function autoComplete() {
     let stars = [];
 
     const starQuery = $('.star-autocomplete');
-
     for (let i = 0; i < starQuery.length; i++) stars.push(starQuery.eq(i).text());
-
     $('input[name="star"]').autocomplete({source: [stars]});
 }
 
@@ -878,7 +951,7 @@ function getOffset(start) {
 
 function animation(src, duration_start = 300, duration_end = duration_start) {
     let img = document.createElement('img');
-    img.src = 'css/images/' + src;
+    img.src = `css/images/${src}`;
     img.classList.add('symbol');
 
     insertBefore(document.getElementsByClassName('plyr')[0], img);

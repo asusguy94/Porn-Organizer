@@ -43,10 +43,10 @@ for ($i = 0, $len = count($result); $i < $len; $i++) {
 
 $error = [];
 foreach ($path_arr as $directory) { // for each directory (website)
-	$files = glob($directory . '/*');
+	$files = glob("$directory/*.*");
 	foreach ($files as $file) {
 		$video_path = $file_class->getPath($file);
-		if ($basic->getExtension($file) === 'webm' || !$basic->hasExtension($video_path)) continue;
+		if (!is_file("videos/$video_path") || $basic->getExtension($file) === 'webm' || !$basic->hasExtension($video_path)) continue;
 
 		// Extract Data from File
 		$video_website = $file_class->getWebsite($file);
@@ -111,6 +111,7 @@ foreach ($path_arr as $directory) { // for each directory (website)
 if (count($error)) {
 	for ($i = 0; $i < count($error); $i++) {
 		echo "$error[$i]<br>";
+
 	}
 } else if ($filesAdded) {
 	header('Location: video_generatethumbnails.php');

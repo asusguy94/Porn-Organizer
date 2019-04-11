@@ -12,99 +12,85 @@ document.addEventListener('DOMContentLoaded', function () {
     let form = document.getElementsByTagName('form');
     for (let i = 0; i < form.length; i++) {
         form[i].addEventListener('keydown', function (e) {
-            if (e.keyCode === 13) {
-                $('form').eq(i).submit()
-            }
-            else if (e.keyCode === 9) {
-                e.preventDefault();
+            switch (e.keyCode) {
+                case 13: // enter
+                    $(form).eq(i).submit();
+                    break;
+                case 9: // tab
+                    e.preventDefault();
 
-                if (i < form.length - 1) $('form').eq(i + 1).find('input')[0].focus();
-                else $('#next')[0].click();
+                    if (i < form.length - 1) $(form).eq(i + 1).find("input")[0].focus();
+                    else $("#next")[0].click();
             }
         });
     }
 
     setFocus();
-
     videoHover();
 
     if (isIgnored()) title.classList.add('ignored');
-    if ($('.ribbon-green').length === 1) alert('Warning!');
+    if ($(".ribbon-green").length === 1) alert('Warning!');
 });
 
 function isIgnored() {
-    return ($('h2 > #star-name[data-star-ignore]').attr('data-star-ignore') === "1");
+    return ($('h2 > #star-name[data-star-ignore]').attr('data-star-ignore') === '1');
 }
 
 function ignoreStar() {
-    let arguments = 'starID=' + starID;
-    ajax('ajax/ignoreStar.php', arguments);
+    ajax('ajax/ignoreStar.php', `starID=${starID}`);
 }
 
 function enableStar() {
-    let arguments = 'starID=' + starID;
-    ajax('ajax/enableStar.php', arguments);
+    ajax('ajax/enableStar.php', `starID=${starID}`);
 }
 
 function addStarImage(id, url) {
-    let arguments = 'id=' + id + '&image=' + url;
-
     let ext = getExtension(pathToFname(url));
-    let fname = starID + '.' + ext;
-    console.log('url: ' + fname);
-    console.log('url: ' + url);
-    ajax('ajax/add_star_image.php', arguments, function (data) {
+
+    ajax('ajax/add_star_image.php', `id=${id}&image=${url}`, function (data) {
         let dropbox = document.getElementById('dropbox');
 
         let img = document.createElement('img');
-        img.src = 'images/stars/' + starID + '.' + ext + '?v=' + data.responseText;
+        img.src = `images/stars/${starID}.${ext}?v=${data.responseText}`;
 
         insertBefore(dropbox, img);
-
         dropbox.remove();
     });
 }
 
 function removeStarImage(id) {
-    let arguments = 'id=' + id;
-    ajax('ajax/remove_star_image.php', arguments);
+    ajax('ajax/remove_star_image.php', `id=${id}`);
 }
 
 function deleteStar(starID) {
-    let arguments = 'starID=' + starID;
-    ajax('ajax/remove_star.php', arguments);
+    ajax('ajax/remove_star.php', `starID=${starID}`);
 }
 
 function renameStar(starID, starName) {
-    let arguments = 'starID=' + starID + '&starName=' + starName;
-    ajax('ajax/rename_star.php', arguments);
+    ajax('ajax/rename_star.php', `starID=${starID}&starName=${starName}`);
 }
 
 function addStarAlias(alias) {
-    let arguments = 'starID=' + starID + '&aliasName=' + alias;
-    ajax('ajax/addStarAlias.php', arguments);
+    ajax('ajax/addStarAlias.php', `starID=${starID}&aliasName=${alias}`);
 }
 
 function removeStarAlias(id) {
-    let arguments = 'aliasID=' + id;
-    ajax('ajax/removeStarAlias.php', arguments);
+    ajax('ajax/removeStarAlias.php', `aliasID=${id}`);
 }
 
 function removeVideoStar(videoID) {
-    let arguments = 'videoID=' + videoID + '&starID=' + starID;
-    ajax('ajax/remove_videostar.php', arguments);
+    ajax('ajax/remove_videostar.php', `videoID=${videoID}&starID=${starID}`);
 }
 
 function aliasSwapTitle(aliasID) {
-    let arguments = 'aliasID=' + aliasID + '&starID=' + starID;
-    ajax('ajax/alias_swap_title.php', arguments);
+    ajax('ajax/alias_swap_title.php', `aliasID=${aliasID}&starID=${starID}`);
 }
 
 
 function ajax(page, params, callback = function () {
     location.href = location.href
 }) {
-    let url = page + '?' + params;
+    let url = `${page}?${params}`;
 
     let xhr = new XMLHttpRequest();
     xhr.open('GET', url);
@@ -120,9 +106,9 @@ $(function () {
     $.contextMenu({
         selector: '#star > img',
         items: {
-            "delete_image": {
-                name: "Delete Image",
-                icon: "delete",
+            'delete_image': {
+                name: 'Delete Image',
+                icon: 'delete',
                 callback: function () {
                     removeStarImage(starID);
                 }
@@ -135,9 +121,9 @@ $(function () {
     $.contextMenu({
         selector: '#star > #dropbox',
         items: {
-            "delete_star": {
-                name: "Delete Star",
-                icon: "delete",
+            'delete_star': {
+                name: 'Delete Star',
+                icon: 'delete',
                 callback: function () {
                     deleteStar(starID);
                 },
@@ -152,12 +138,15 @@ $(function () {
         selector: '#star #star-name',
         zIndex: 2,
         items: {
-            "rename": {
-                name: "Rename",
-                icon: "rename",
+            'rename': {
+                name: 'Rename',
+                icon: 'rename',
                 callback: function () {
-                    $('body').append('<div id="dialog" title="Edit Star"></div>');
+                    const dialogWrapper = document.createElement('div');
+                    dialogWrapper.id = 'dialog';
+                    dialogWrapper.title = 'Edit Star';
 
+                    document.body.appendChild(dialogWrapper);
                     $(function () {
                         const dialogQuery = $('#dialog');
                         dialogQuery.dialog({
@@ -167,7 +156,13 @@ $(function () {
                             width: 250
                         });
 
-                        dialogQuery.append('<input type="text" name="starName_edit" value="' + $('#star > h2 > #star-name').text() + '" autofocus>');
+                        const dialogInput = document.createElement('input');
+                        dialogInput.type = 'text';
+                        dialogInput.name = 'starName_edit';
+                        dialogInput.value = $('#star > h2 > #star-name').text();
+                        dialogInput.autofocus = '';
+
+                        dialogQuery.append(dialogInput);
                         let input = $('input[name="starName_edit"]');
                         let len = input.val().length;
                         input[0].focus();
@@ -184,7 +179,11 @@ $(function () {
             "add_alias": {
                 name: "Add Alias",
                 callback: function () {
-                    $('body').append('<div id="dialog" title="Add Alias"></div>');
+                    const dialogWrapper = document.createElement('div');
+                    dialogWrapper.id = 'dialog';
+                    dialogWrapper.title = 'Add Alias';
+
+                    document.body.appendChild(dialogWrapper);
 
                     $(function () {
                         const dialogQuery = $('#dialog');
@@ -195,7 +194,12 @@ $(function () {
                             width: 250
                         });
 
-                        dialogQuery.append('<input type="text" name="starName_alias" autofocus>');
+                        const dialogInput = document.createElement('input');
+                        dialogInput.type = 'text';
+                        dialogInput.name = 'starName_alias';
+                        dialogInput.autofocus = '';
+
+                        dialogQuery.append(dialogInput);
                         document.querySelector('input[name="starName_alias"]').addEventListener('keydown', function (e) {
                             if (e.keyCode === 13) {
                                 addStarAlias(this.value);
@@ -204,15 +208,15 @@ $(function () {
                     });
                 }
             },
-            "ignore_star": {
-                name: "Ignore Star",
+            'ignore_star': {
+                name: 'Ignore Star',
                 callback: function () {
                     ignoreStar();
                 },
                 visible: !isIgnored()
             },
-            "enable_star": {
-                name: "Enable Star",
+            'enable_star': {
+                name: 'Enable Star',
                 callback: function () {
                     enableStar();
                 },
@@ -227,15 +231,15 @@ $(function () {
         selector: '#star .alias',
         zIndex: 2,
         items: {
-            "edit_alias": {
-                name: "Remove Alias",
+            'edit_alias': {
+                name: 'Remove Alias',
                 callback: function (itemKey, options) {
                     let id = options.$trigger.attr('data-alias-id');
                     removeStarAlias(id);
                 }
             },
-            "swap_alias_and_title": {
-                name: "Make Default",
+            'swap_alias_and_title': {
+                name: 'Make Default',
                 callback: function (itemKey, options) {
                     let id = options.$trigger.attr('data-alias-id');
                     aliasSwapTitle(id);
@@ -249,9 +253,9 @@ $(function () {
     $.contextMenu({
         selector: '.video',
         items: {
-            "remove_star": {
-                name: "Remove",
-                icon: "delete",
+            'remove_star': {
+                name: 'Remove',
+                icon: 'delete',
                 callback: function (itemKey, options) {
                     let id = options.$trigger.attr('href').split('id=')[1];
                     removeVideoStar(id);
@@ -423,11 +427,11 @@ function videoHover() {
 }
 
 function pathToFname(path) {
-    return path.substr(path.lastIndexOf('/') + 1);
+    return path.substr(path.lastIndexOf("/") + 1);
 }
 
 function getExtension(fname) {
-    return fname.substr(fname.lastIndexOf('.') + 1);
+    return fname.substr(fname.lastIndexOf(".") + 1);
 }
 
 function insertBefore(referenceNode, el) {

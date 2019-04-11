@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
     new LazyLoad({
-        elements_selector: ".lazy"
+        elements_selector: '.lazy'
     });
 });

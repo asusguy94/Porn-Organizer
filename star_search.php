@@ -8,7 +8,7 @@ global $pdo;
 <!doctype html>
 <html>
     <head>
-		<?php $basic->head('Star Search', array('bootstrap', 'prettydropdown', 'flags', 'search'), array('jquery', 'lazyload', 'prettydropdown', 'star.search')) ?>
+		<?php $basic->head('Star Search', array('bootstrap', 'prettydropdown', 'flags', 'search'), array('bootstrap', 'lazyload', 'prettydropdown', 'star.search')) ?>
     </head>
 
     <body>
@@ -63,6 +63,38 @@ global $pdo;
                         <input id="videocount_desc" type="radio" name="sort">
                         <label for="videocount_desc">Most Videos</label>
                     </div>
+
+                    <h2>Website</h2>
+                    <?php
+					$query = $pdo->prepare("SELECT websites.name FROM websites ORDER BY websites.name");
+					$query->execute();
+					if ($query->rowCount()) {
+						print '<div id="websites">';
+						print '<select class="pretty">';
+						print '<option name="websites_All">All</option>';
+						foreach ($query->fetchAll() as $data) {
+							print "<option name='website_$data[name]' value='$data[name]'>$data[name]</option>";
+						}
+						print '</select>';
+						print '</div>';
+					}
+					?>
+
+                    <h2>Country</h2>
+					<?php
+					$query = $pdo->prepare("SELECT country.name, country.code FROM country JOIN stars ON country.name = stars.country GROUP BY country.name ORDER BY country.name");
+					$query->execute();
+					if ($query->rowCount()) {
+						print '<div id="countries">';
+						print '<select class="pretty">';
+						print '<option name="country_All">All</option>';
+						foreach ($query->fetchAll() as $data) {
+							print "<option name='country_$data[name]' value='$data[name]' data-prefix='<span class=\"flag flag-$data[code]\"></span>'>$data[name]</option>";
+						}
+						print '</select>';
+						print '</div>';
+					}
+					?>
 
                     <h2>Breast</h2>
 					<?php
@@ -126,38 +158,6 @@ global $pdo;
 							print "<label>$data[ethnicity]</label>";
 							print '</div>';
 						}
-						print '</div>';
-					}
-					?>
-
-                    <h2>Country</h2>
-					<?php
-					$query = $pdo->prepare("SELECT country.name, country.code FROM country JOIN stars ON country.name = stars.country GROUP BY country.name ORDER BY country.name");
-					$query->execute();
-					if ($query->rowCount()) {
-						print '<div id="countries">';
-						print '<select class="pretty">';
-						print '<option name="country_All">All</option>';
-						foreach ($query->fetchAll() as $data) {
-							print "<option name='country_$data[name]' value='$data[name]' data-prefix='<span class=\"flag flag-$data[code]\"></span>'>$data[name]</option>";
-						}
-						print '</select>';
-						print '</div>';
-					}
-					?>
-
-                    <h2>Website</h2>
-					<?php
-					$query = $pdo->prepare("SELECT websites.name FROM websites ORDER BY websites.name");
-					$query->execute();
-					if ($query->rowCount()) {
-						print '<div id="websites">';
-						print '<select class="pretty">';
-						print '<option name="websites_All">All</option>';
-						foreach ($query->fetchAll() as $data) {
-							print "<option name='website_$data[name]' value='$data[name]'>$data[name]</option>";
-						}
-						print '</select>';
 						print '</div>';
 					}
 					?>

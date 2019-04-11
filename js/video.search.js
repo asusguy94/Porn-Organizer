@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const locations_checkbox = document.querySelectorAll('input[name^="location_"]');
 
     const existing_checkbox = document.querySelector('input[name="existing"]');
+    const specialchar_checkbox = document.querySelector('input[name="special_char"]');
 
     const loader = document.getElementById('loader');
     const updBtn = document.getElementById('update');
@@ -17,6 +18,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function daysToYears(days) {
         return Math.floor(days / 365);
     }
+
+    // ToolTip
+    $('[data-toggle="tooltip"]').tooltip();
 
     // Pretty DropDown
     $('select.pretty').prettyDropdown({
@@ -29,9 +33,12 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('json/video.search.php').then(function (jsonData) {
             return jsonData.json();
         }).then(function (data) {
-            let wrapper = document.getElementById('videos');
-            let elem = data['videos'];
+            const wrapper = document.getElementById('videos');
 
+            const row = document.createElement('div');
+            row.classList.add('row');
+
+            const elem = data['videos'];
             for (let i = 0; i < elem.length; i++) {
                 let md5 = elem[i]['md5'];
                 let thumbnail = elem[i]['thumbnail'];
@@ -55,8 +62,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!location.length) location.push('0');
 
                 let a = document.createElement('a');
-                a.classList.add('video', 'ribbon-container');
-                a.setAttribute('href', 'video.php?id=' + videoID);
+                a.classList.add('video', 'ribbon-container', 'card');
+                a.href = `video.php?id=${videoID}`;
                 a.setAttribute('data-video-id', videoID);
                 a.setAttribute('data-video-date', videoDate);
                 a.setAttribute('data-ageinvideo', ageInVideo.toString());
@@ -64,16 +71,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 a.setAttribute('data-star', star);
                 a.setAttribute('data-website', websiteName);
                 a.setAttribute('data-existing', existing);
-                a.setAttribute('data-category-name', '["' + category + '"]');
-                a.setAttribute('data-attribute-name', '["' + attribute + '"]');
-                a.setAttribute('data-location-name', '["' + location + '"]');
+                a.setAttribute('data-category-name', `["${category}"]`);
+                a.setAttribute('data-attribute-name', `["${attribute}"]`);
+                a.setAttribute('data-location-name', `["${location}"]`);
 
                 let img = document.createElement('img');
-                img.classList.add('lazy');
-                img.setAttribute('data-src', thumbnail + '?v=' + md5);
+                img.classList.add('lazy', 'card-img-top');
+                img.setAttribute('data-src', `${thumbnail}?v=${md5}`);
 
                 let span = document.createElement('span');
-                span.classList.add('title');
+                span.classList.add('title', 'card-title');
                 span.textContent = videoName;
 
                 a.appendChild(img);
@@ -86,9 +93,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     a.appendChild(ribbon);
                 }
-
-                wrapper.appendChild(a);
+                row.appendChild(a);
             }
+            wrapper.appendChild(row);
         }).then(function () {
             loader.remove();
 
@@ -106,35 +113,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
             /** FILTER **/
             /* Title Search */
-            title_input.addEventListener('keydown', function () {
-                setTimeout(function () {
-                    let input = title_input.value.toLowerCase();
-                    $video.removeClass('hidden-title');
+            specialchar_checkbox.addEventListener('change', titleSearch);
+            title_input.addEventListener('keyup', titleSearch);
 
-                    if (input !== '') {
-                        $video.not(function () {
-                            return this.getAttribute('data-title').toLowerCase().indexOf(input) > -1;
-                        }).addClass('hidden-title');
-                    }
+            function titleSearch() {
+                let input = title_input.value.toLowerCase();
+                if (specialchar_checkbox.checked) input = input
+                    .replace(/</g, '')
+                    .replace(/>/g, '')
+                    .replace(/:/g, '')
+                    .replace(/\//g, '')
+                    .replace(/\\/g, '')
+                    .replace(/\|/g, '')
+                    .replace(/\?/g, '')
+                    .replace(/\*/g, '');
 
-                    console.log(input);
-                });
-            });
+                $video.removeClass('hidden-title');
 
-            // TODO Add checkbox for filtering special characters from the title
+                $video.not(function () {
+                    return this.getAttribute('data-title').toLowerCase().indexOf(input) > -1;
+                }).addClass('hidden-title');
+            }
 
             /* Star Search */
-            star_input.addEventListener('keydown', function () {
-                setTimeout(function () {
-                    let input = star_input.value.toLowerCase();
-                    $video.removeClass('hidden-star');
+            star_input.addEventListener('keyup', function () {
+                let input = star_input.value.toLowerCase();
+                $video.removeClass('hidden-star');
 
-                    if (input !== '') {
-                        $video.not(function () {
-                            return this.getAttribute('data-star').toLowerCase().indexOf(input) > -1;
-                        }).addClass('hidden-star');
-                    }
-                });
+                $video.not(function () {
+                    return this.getAttribute('data-star').toLowerCase().indexOf(input) > -1;
+                }).addClass('hidden-star');
             });
 
             /* Existing */
@@ -187,8 +195,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
 
-                    if (this.checked) $video.not('.tmp').addClass('hidden-category-' + category_class);
-                    else $video.removeClass('hidden-category-' + category_class);
+                    if (this.checked) $video.not('.tmp').addClass(`hidden-category-${category_class}`);
+                    else $video.removeClass(`hidden-category-${category_class}`);
                     $video.removeClass('tmp'); // remove leftover classes
                 });
             }
@@ -211,8 +219,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
 
-                    if (this.checked) $video.not('.tmp').addClass('hidden-attribute-' + attribute_class);
-                    else $video.removeClass('hidden-attribute-' + attribute_class);
+                    if (this.checked) $video.not('.tmp').addClass(`hidden-attribute-${attribute_class}`);
+                    else $video.removeClass(`hidden-attribute-${attribute_class}`);
                     $video.removeClass('tmp'); // remove leftover classes
                 });
             }
@@ -235,8 +243,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
 
-                    if (this.checked) $video.not('.tmp').addClass('hidden-location-' + location_class);
-                    else $video.removeClass('hidden-location-' + location_class);
+                    if (this.checked) $video.not('.tmp').addClass(`hidden-location-${location_class}`);
+                    else $video.removeClass(`hidden-location-${location_class}`);
                     $video.removeClass('tmp'); // remove leftover classes
                 });
             }
@@ -309,7 +317,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             $video.sort(actor_age_reverse);
                             break;
                         default:
-                            console.log('No sort method for: ' + label);
+                            console.log(`No sort method for: ${label}`);
                     }
 
                     for (let i = 0; i < videoLength; i++) {
@@ -319,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }).then(function () {
             new LazyLoad({
-                elements_selector: ".lazy",
+                elements_selector: '.lazy',
                 threshold: 300
             });
         });
