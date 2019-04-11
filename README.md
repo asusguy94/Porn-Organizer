@@ -33,7 +33,8 @@ There are 2 ways to use this project
    1. Install [Node.JS](https://nodejs.org/)
    2. Open the terminal of choice and CD into where you downloaded/cloned the directory to
       - If you downloaded the file to `C:/downloads`, you can run `CD C:/downloads/porn-organizer`
-   3. Type `gulp` to compile the nesseary files
+   4. Type `npm install` to download the required files.
+   3. Type `gulp` to compile the nesseary files.
 
 ## TODO
 - [ ] Implement Bootstap 4
