@@ -266,7 +266,7 @@ input.xdsoft_input {
   }
 }
 
-.unselectable {
+.unselectable, .input-wrapper > label {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
