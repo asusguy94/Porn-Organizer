@@ -160,7 +160,7 @@ $(function () {
                         dialogInput.type = 'text';
                         dialogInput.name = 'starName_edit';
                         dialogInput.value = $('#star > h2 > #star-name').text();
-                        dialogInput.autofocus = '';
+                        dialogInput.autofocus = true;
 
                         dialogQuery.append(dialogInput);
                         let input = $('input[name="starName_edit"]');
@@ -197,7 +197,7 @@ $(function () {
                         const dialogInput = document.createElement('input');
                         dialogInput.type = 'text';
                         dialogInput.name = 'starName_alias';
-                        dialogInput.autofocus = '';
+                        dialogInput.autofocus = true;
 
                         dialogQuery.append(dialogInput);
                         document.querySelector('input[name="starName_alias"]').addEventListener('keydown', function (e) {

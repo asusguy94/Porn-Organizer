@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (starAge) {
                     let ribbon = document.createElement('span');
                     ribbon.classList.add('ribbon');
-                    ribbon.textContent = daysToYears(starAge);
+                    ribbon.textContent = daysToYears(starAge).toString();
 
                     a.appendChild(ribbon);
                 }
