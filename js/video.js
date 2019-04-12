@@ -249,7 +249,7 @@ function bookmark_editTime(bookmarkID) {
 
     ajax('ajax/bookmark_editTime.php', `bookmarkID=${bookmarkID}&seconds=${seconds}`, function () {
         let btn = document.querySelector(`.bookmark[data-bookmark-id="${bookmarkID}"]`);
-        btn.style.marginLeft = getOffset(seconds);
+        btn.style.marginLeft = `${getOffset(seconds)}%`;
         btn.setAttribute('data-bookmark-time', seconds.toString());
 
 
