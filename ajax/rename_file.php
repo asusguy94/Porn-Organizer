@@ -33,6 +33,12 @@ if (isset($_GET['videoID']) && isset($_GET['videoPath'])) {
 					if (file_exists("../videos/$path_webm") && !file_exists("../videos/$newPath_webm")) {
 						rename("../videos/$path_webm", "../videos/$newPath_webm");
 					}
+
+					$path_hls = "$wsite/" . $basic->removeExtension($path);
+					$newPath_hls = "$wsite/" . $basic->removeExtension($newPath);
+					if(file_exists("../videos/$path_hls") && !file_exists("../videos/$newPath_hls")){
+						rename("../videos/$path_hls", "../videos/$newPath_hls");
+					}
 				}
 			}
 		}

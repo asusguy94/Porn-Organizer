@@ -77,17 +77,19 @@ function removeThumbnails($videoID)
 
 function removeHls($dir)
 {
-	$path = opendir($dir);
-	while (false !== ($file = readdir($path))) {
-		if (($file != '.') && ($file != '..')) {
-			$full = $dir . '/' . $file;
-			if (is_dir($full)) {
-				removeHls($full);
-			} else {
-				unlink($full);
+	if(is_dir($dir)) {
+		$path = opendir($dir);
+		while (false !== ($file = readdir($path))) {
+			if (($file != '.') && ($file != '..')) {
+				$full = $dir . '/' . $file;
+				if (is_dir($full)) {
+					removeHls($full);
+				} else {
+					unlink($full);
+				}
 			}
 		}
+		closedir($path);
+		rmdir($dir);
 	}
-	closedir($path);
-	rmdir($dir);
 }
