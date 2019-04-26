@@ -73,12 +73,6 @@ aside {
   }
 }
 
-video {
-  width: inherit;
-  max-height: 550px;
-  float: left;
-}
-
 /* Video Details */
 #videoDetails {
   margin-top: 5px
@@ -87,8 +81,8 @@ video {
 /* Timeline */
 #timeline {
   position: relative;
-  left: 135px;
-  margin-right: 12.5%;
+  left: 130px;
+  margin-right: 17.2%;
 
   .bookmark {
     position: absolute;
@@ -158,23 +152,27 @@ form[autocomplete] {
   }
 }
 
-/*.btn.category {
-  display: block;
-  width: auto;
-}*/
-
 /* FIXES */
-.plyr--video.plyr--menu-open { // settings menu breaks this
-  overflow: hidden;
-}
+@import 'plyr';
 
-.plyr__time {
-  margin-left: 0 !important;
-  width: 85px;
-}
+#chapter-container {
+  width: 101%;
+  margin-left: -8px;
 
-.plyr__progress {
-  margin-right: 20px !important;
+  position: absolute;
+  top: 0;
+
+  height: 100%;
+
+  .chapter {
+    position: absolute;
+
+    height: 100%;
+    width: 6px; // TODO set in JavaScript
+
+    background-color: red;
+    z-index: 10;
+  }
 }
 
 // TODO remove unused code

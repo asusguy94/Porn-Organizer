@@ -133,6 +133,10 @@ label {
 /* Other */
 .location, .attribute {
   display: inline-block;
+
+  &::before {
+    margin-right: 5px;
+  }
 }
 
 h3 {
@@ -189,14 +193,6 @@ h3 {
 
 small {
   margin-left: 10px;
-
-  &.attributes {
-    color: blue;
-  }
-
-  &.locations {
-    color: purple;
-  }
 }
 
 input.xdsoft_input {
@@ -272,15 +268,3 @@ input.xdsoft_input {
   -ms-user-select: none;
   user-select: none;
 }
-
-/*.progress-bookmarks {
-  position: absolute;
-  width: 100%;
-  border: 1px solid red;
-  left: 0;
-  top: 0;
-
-  [data-start]{
-    border: 1px solid blue;
-  }
-}*/

@@ -2064,7 +2064,7 @@ class Video
 			if (Attributes::attributeCount($id)) {
 				$attr .= '<small class="attributes">';
 				foreach (Attributes::getAttributes($id) AS $attribute) {
-					$attr .= "<span class='attribute btn' data-attribute-id='$attribute[id]'>$attribute[name]</span>";
+					$attr .= "<span class='attribute btn fas fa-tag' data-attribute-id='$attribute[id]'>$attribute[name]</span>";
 				}
 				$attr .= '</small>';
 			}
@@ -2073,7 +2073,7 @@ class Video
 			if (Location::locationCount($id)) {
 				$lcn .= '<small class="locations">';
 				foreach (Location::getLocations($id) AS $location) {
-					$lcn .= "<span class='location btn' data-location-id='$location[id]'>$location[name]</span>";
+					$lcn .= "<span class='location btn fas fa-map-marker-alt' data-location-id='$location[id]'>$location[name]</span>";
 				}
 				$lcn .= '</small>';
 			}

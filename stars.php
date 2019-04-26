@@ -20,10 +20,17 @@ $db = new DB();
             <section class="row">
                 <div class="col">
                     <h2>Add Star</h2>
-                    <form method="post">
-                        <label for="star">Name: </label>
-                        <input type="text" name="star" id="star">
-                        <input type="submit" name="addStar" value="Add">
+                    <form method="post" class="form-inline">
+                        <label for="star" class="d-none">Star</label>
+                        <input type="text" name="star" class="form-control" id="star">
+
+                        <input type="submit" name="addStar" value="Add" class="btn btn-primary">
+
+
+                        <div class="btn btn-secondary">
+                            <label for="auto" class="d-inline">Auto</label>
+                            <input type="checkbox" name="auto" id="auto" value="1" <? if($_GET['auto']) echo 'checked' ?>>
+                        </div>
                     </form>
 
 					<?php

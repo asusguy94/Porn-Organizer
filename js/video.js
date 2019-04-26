@@ -46,7 +46,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /* PLYR */
     new Plyr(videoPlayer, {
-        'controls': ['play-large', 'play', 'progress', 'current-time', 'fullscreen'],
+        'controls': ['play-large', 'play', 'current-time', 'progress', 'duration', 'fullscreen'],
+        'ratio': '21:9',
         'invertTime': false,
         'toggleInvert': false,
         'seekTime': window.seekTime,
@@ -111,7 +112,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     autoComplete();
-
     videoVolume(0.125);
 
     onFocus(bookmarkCollision);
@@ -213,7 +213,6 @@ function addBookmark(categoryID, categoryName) {
             insertBefore(document.getElementById('videoDetails'), div);
         }
         let wrapper = document.getElementById('timeline');
-
 
         if (!$(`.bookmark[data-bookmark-time="${seconds}"][data-category-id="${categoryID}"]`).length) {
             let a = document.createElement('a');
@@ -386,7 +385,7 @@ $(function () {
                         dialogInput.type = 'text';
                         dialogInput.name = 'videoName_edit';
                         dialogInput.value = videoTitle.textContent;
-                        dialogInput.autofocus = '';
+                        dialogInput.autofocus = true;
 
                         dialogQuery.append(dialogInput);
                         let input = $('input[name="videoName_edit"]');
@@ -476,7 +475,6 @@ $(function () {
                         for (let i = 0; i < query.length; i++) {
                             let locationID = query.eq(i).attr('data-location-id');
                             let locationName = query.eq(i).text();
-
 
                             let btn = document.createElement('div');
                             btn.classList.add('btn', 'unselectable');
@@ -686,7 +684,7 @@ $(function () {
                         const dialogInput = document.createElement('input');
                         dialogInput.type = 'number';
                         dialogInput.name = 'videoAge_set';
-                        dialogInput.autofocus = '';
+                        dialogInput.autofocus = true;
 
                         dialogQuery.append(dialogInput);
                         document.querySelector('input[name="videoAge_set"]').addEventListener('keydown', function (e) {
@@ -701,7 +699,7 @@ $(function () {
                 name: 'Rename File',
                 icon: 'edit',
                 callback: function () {
-                    let source = $(videoPlayer).find('source').not('[type="video/webm"]').first().attr('src');
+                    let source = $(videoPlayer).find('source').not('[type="video/webm"], [type="application/x-mpegURL"]').first().attr('src');
                     let videoPath_current = `${source.split('/')[1]}/${source.split('/')[2]}`;
 
                     const dialogWrapper = document.createElement('div');
@@ -723,7 +721,7 @@ $(function () {
                         dialogInput.type = 'text';
                         dialogInput.name = 'videoFile_edit';
                         dialogInput.value = videoPath_current;
-                        dialogInput.autofocus = '';
+                        dialogInput.autofocus = true;
 
                         dialogQuery.append(dialogInput);
                         let input = $('input[name="videoFile_edit"]');
@@ -856,7 +854,7 @@ function collisionCheck(firstElement, secondElement) {
         dom: secondElement.getBoundingClientRect(),
         x: $(secondElement).offset().left,
         y: $(secondElement).offset().top
-    }
+    };
 
     let distance = {
         x: Math.abs((first.x + first.dom.width) - second.x),

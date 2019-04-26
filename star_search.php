@@ -65,13 +65,13 @@ global $pdo;
                     </div>
 
                     <h2>Website</h2>
-                    <?php
-					$query = $pdo->prepare("SELECT websites.name FROM websites ORDER BY websites.name");
+					<?php
+					$query = $pdo->prepare("SELECT websites.name FROM websites JOIN videowebsites ON websites.id = videowebsites.websiteID GROUP BY name ORDER BY name");
 					$query->execute();
 					if ($query->rowCount()) {
 						print '<div id="websites">';
 						print '<select class="pretty">';
-						print '<option name="websites_All">All</option>';
+						print '<option name="website_All">All</option>';
 						foreach ($query->fetchAll() as $data) {
 							print "<option name='website_$data[name]' value='$data[name]'>$data[name]</option>";
 						}

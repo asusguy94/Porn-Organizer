@@ -234,27 +234,41 @@ a.plyr__control::after, a.plyr__control::before {
     text-align: center
 }
 
-.plyr__controls .plyr__menu, .plyr__controls .plyr__progress, .plyr__controls .plyr__time, .plyr__controls .plyr__volume, .plyr__controls > .plyr__control {
-    margin-left: 5px
+.plyr__controls .plyr__progress__container {
+    flex: 1
 }
 
-.plyr__controls .plyr__menu + .plyr__control, .plyr__controls .plyr__progress + .plyr__control, .plyr__controls > .plyr__control + .plyr__control, .plyr__controls > .plyr__control + .plyr__menu {
-    margin-left: 2px
+.plyr__controls .plyr__controls__item {
+    margin-left: 2.5px
 }
 
-.plyr__controls > .plyr__control:first-child, .plyr__controls > .plyr__control:first-child + [data-plyr=pause] {
+.plyr__controls .plyr__controls__item:first-child {
     margin-left: 0;
     margin-right: auto
 }
 
-.plyr__controls:empty {
-    display: none
+.plyr__controls .plyr__controls__item.plyr__progress__container {
+    padding-left: 2.5px
 }
 
-@media (min-width: 480px) {
-    .plyr__controls .plyr__menu, .plyr__controls .plyr__progress, .plyr__controls .plyr__time, .plyr__controls .plyr__volume, .plyr__controls > .plyr__control {
-        margin-left: 10px
-    }
+.plyr__controls .plyr__controls__item.plyr__time {
+    padding: 0 5px
+}
+
+.plyr__controls .plyr__controls__item.plyr__progress__container:first-child, .plyr__controls .plyr__controls__item.plyr__time + .plyr__time, .plyr__controls .plyr__controls__item.plyr__time:first-child {
+    padding-left: 0
+}
+
+.plyr__controls .plyr__controls__item.plyr__volume {
+    padding-right: 5px
+}
+
+.plyr__controls .plyr__controls__item.plyr__volume:first-child {
+    padding-right: 0
+}
+
+.plyr__controls:empty {
+    display: none
 }
 
 .plyr--audio .plyr__controls {
@@ -296,31 +310,6 @@ a.plyr__control::after, a.plyr__control::before {
 
 .plyr--airplay-supported [data-plyr=airplay], .plyr--captions-enabled [data-plyr=captions], .plyr--fullscreen-enabled [data-plyr=fullscreen], .plyr--pip-supported [data-plyr=pip] {
     display: inline-block
-}
-
-.plyr__video-embed {
-    height: 0;
-    padding-bottom: 56.25%;
-    position: relative
-}
-
-.plyr__video-embed iframe {
-    border: 0;
-    height: 100%;
-    left: 0;
-    position: absolute;
-    top: 0;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    width: 100%
-}
-
-.plyr--full-ui .plyr__video-embed > .plyr__video-embed__container {
-    padding-bottom: 240%;
-    position: relative;
-    transform: translateY(-38.28125%)
 }
 
 .plyr__menu {
@@ -820,8 +809,31 @@ a.plyr__control::after, a.plyr__control::before {
     z-index: 0
 }
 
+.plyr__video-embed, .plyr__video-wrapper--fixed-ratio {
+    height: 0;
+    padding-bottom: 56.25%
+}
+
+.plyr__video-embed iframe, .plyr__video-wrapper--fixed-ratio video {
+    border: 0;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    width: 100%
+}
+
+.plyr--full-ui .plyr__video-embed > .plyr__video-embed__container {
+    padding-bottom: 240%;
+    position: relative;
+    transform: translateY(-38.28125%)
+}
+
 .plyr__progress {
-    flex: 1;
     left: 6.5px;
     margin-right: 13px;
     position: relative
