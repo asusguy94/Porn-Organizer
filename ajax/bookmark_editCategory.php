@@ -49,6 +49,17 @@ if (isset($_GET['bookmarkID']) && isset($_GET['categoryID'])) {
 					$query->execute();
 				}
 			}
+
+			$query = $pdo->prepare("SELECT id FROM bookmarks WHERE videoID = ? AND categoryID = ? LIMIT 1");
+			$query->bindValue(1, $videoID);
+			$query->bindValue(2, $categoryID);
+			$query->execute();
+			if(!$query->rowCount()){
+				$query = $pdo->prepare("DELETE FROM videocategories WHERE videoID = ? AND categoryID = ?");
+				$query->bindValue(1, $videoID);
+				$query->bindValue(2, $categoryID);
+				$query->execute();
+			}
 		}
 	}
 }

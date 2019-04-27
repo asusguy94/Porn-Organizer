@@ -99,14 +99,6 @@ document.addEventListener('DOMContentLoaded', function () {
         localStorage.playing = 0;
     });
 
-    videoWrapper.addEventListener('enterfullscreen', function () {
-        videoPlayer.style.maxHeight = 'none'
-    });
-
-    videoWrapper.addEventListener('exitfullscreen', function () {
-        videoPlayer.style.maxHeight = `${videoHeight}px`;
-    });
-
     $(bookmark).on('click', function () {
         playFrom($(this).attr('data-bookmark-time'));
     });
