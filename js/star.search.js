@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
     $('select.pretty').prettyDropdown({
         height: 30,
         classic: true,
-        hoverIntent: 1000
+        hoverIntent: -1
     });
 
     (function () {

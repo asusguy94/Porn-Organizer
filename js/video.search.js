@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', function () {
     $('select.pretty').prettyDropdown({
         height: 30,
         classic: true,
-        hoverIntent: 1000
-    });
+        hoverIntent: -1
+    })
 
     const loadData = function () {
         fetch('json/video.search.php').then(function (jsonData) {
