@@ -3,14 +3,6 @@
   overflow: hidden;
 }
 
-.ribbon-green {
-  background-color: green !important;
-
-  &:before, &:after {
-    background-color: green !important;
-  }
-}
-
 .ribbon {
   background: red;
   color: white;
@@ -28,7 +20,7 @@
     content: '';
     position: absolute;
     top: 0;
-    margin: 0 -1px; /* tweak */
+    margin: 0 -1px; // tweak
     width: 200%;
     height: 100%;
     background: red;
@@ -40,5 +32,13 @@
 
   &:after {
     left: 100%
+  }
+
+  .ribbon-green {
+    background-color: green !important;
+
+    &:before, &:after {
+      background-color: green !important;
+    }
   }
 }

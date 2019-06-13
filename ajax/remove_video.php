@@ -64,6 +64,11 @@ function removeFromDB($videoID)
 	$query = $pdo->prepare("DELETE FROM videolocations WHERE videoID = :videoID");
 	$query->bindParam(':videoID', $videoID);
 	$query->execute();
+
+	/* Remove Plays */
+	$query = $pdo->prepare("DELETE FROM plays WHERE videoID = :videoID");
+	$query->bindParam(':videoID', $videoID);
+	$query->execute();
 }
 
 function removeThumbnails($videoID)

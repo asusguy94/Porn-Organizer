@@ -3,7 +3,7 @@ include('../_class.php');
 
 global $pdo;
 $sql = "
-            SELECT videos.id AS videoID, videos.path, videos.name AS videoName, videos.date AS videoDate, stars.name AS star, datediff(videos.date, stars.birthdate) AS ageinvideo, categories.name AS categoryName, attributes.name AS attributeName, locations.name AS locationName, websites.name AS websiteName
+            SELECT videos.id AS videoID, videos.starAge, videos.path, videos.name AS videoName, videos.date AS videoDate, stars.name AS star, datediff(videos.date, stars.birthdate) AS ageinvideo, categories.name AS categoryName, attributes.name AS attributeName, locations.name AS locationName, websites.name AS websiteName
             	FROM videos
                 	LEFT JOIN videostars ON videos.id = videostars.videoID
                 	LEFT JOIN stars ON stars.id = videostars.starID
@@ -31,14 +31,12 @@ for ($i = 0, $len = count($result), $category_arr = [], $attribute_arr = [], $lo
 	$star = $result[$i]->star;
 	$websiteName = $result[$i]->websiteName;
 	$ageInVideo = $result[$i]->ageinvideo;
+	$ageInVideo_alt = $result[$i]->starAge;
 
-	if (!$ageInVideo) {
-		$query_age = $pdo->prepare("SELECT starAge FROM videos WHERE id = :videoID AND starAge IS NOT NULL");
-		$query_age->bindParam(':videoID', $videoID);
-		$query_age->execute();
-		if ($query_age->rowCount()) $ageInVideo = $query_age->fetch()['starAge'] * 365;
+	if(!$ageInVideo){
+		if(!is_null($ageInVideo_alt)) $ageInVideo = $ageInVideo_alt;
+		else $ageInVideo = 0;
 	}
-	if (!$ageInVideo) $ageInVideo = 0;
 
 	/* Array */
 	$categoryName	= $result[$i]->categoryName;
@@ -67,7 +65,7 @@ for ($i = 0, $len = count($result), $category_arr = [], $attribute_arr = [], $lo
 		print "\"ageInVideo\": \"$ageInVideo\",";
 		print "\"thumbnail\": \"$thumbnail\",";
 
-		if (basic::file_exists($thumbnail)) print '"md5": "' . md5_file("..$thumbnail") . '",';
+		if (basic::file_exists($thumbnail)) print '"md5": "' . md5_file("$thumbnail") . '",';
 		else print '"md5": "0",';
 
 		/*if (basic::file_exists($video)) print '"existing": "1",';

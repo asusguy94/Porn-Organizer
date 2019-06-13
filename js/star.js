@@ -44,10 +44,34 @@ function enableStar() {
     ajax('ajax/enableStar.php', `starID=${starID}`);
 }
 
-function addStarImage(id, url) {
+function addStarImage(url) {
     let ext = getExtension(pathToFname(url));
+    if (ext === 'jpe' || ext === 'jpeg') ext = 'jpg';
 
-    ajax('ajax/add_star_image.php', `id=${id}&image=${url}`, function (data) {
+    ajax('ajax/add_star_image.php', `id=${starID}&image=${url}`, function (data) {
+        let dropbox = document.getElementById('dropbox');
+
+        let img = document.createElement('img');
+        img.src = `images/stars/${starID}.${ext}?v=${data.responseText}`;
+
+        insertBefore(dropbox, img);
+        dropbox.remove();
+    });
+}
+
+function addStarImage_local(file) {
+    let ext = getExtension(file.name);
+    console.log(file);
+
+    ajax_post('ajax/add_star_image_local.php', [
+        {
+            'name': 'file',
+            'value': file,
+        }, {
+            'name': 'starID',
+            'value': starID
+        }
+    ], function (data) {
         let dropbox = document.getElementById('dropbox');
 
         let img = document.createElement('img');
@@ -95,8 +119,25 @@ function ajax(page, params, callback = function () {
     let xhr = new XMLHttpRequest();
     xhr.open('GET', url);
     xhr.send();
-    xhr.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) callback(this);
+    xhr.onload = function () {
+        callback(this);
+    }
+}
+
+function ajax_post(url, postObj, callback = function () {
+    location.href = location.href;
+}) {
+    let formData = new FormData();
+    for (let postData of postObj) {
+        formData.append(postData['name'], postData['value']);
+    }
+
+    let xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+    xhr.send(formData);
+
+    xhr.onload = function () {
+        callback(this);
     }
 }
 
@@ -270,10 +311,31 @@ function dropbox() {
     const dropArea = document.getElementById('dropbox');
 
     if (dropArea) {
-        dropArea.addEventListener('dragenter', dropboxDefault, false);
-        dropArea.addEventListener('dragexit', dropboxDefault, false);
-        dropArea.addEventListener('dragover', dropboxDefault, false);
-        dropArea.addEventListener('drop', drop, false);
+        dropArea.addEventListener('dragenter dragover', function (e) {
+            dropboxDefault(e);
+            add();
+        }, false);
+        dropArea.addEventListener('dragover', function (e) {
+            dropboxDefault(e);
+            add();
+        }, false);
+        dropArea.addEventListener('dragleave', function (e) {
+            dropboxDefault(e);
+            remove();
+        }, false);
+        dropArea.addEventListener('drop', function (e) {
+            dropboxDefault(e);
+            remove();
+            drop(e);
+        }, false);
+    }
+
+    function add() {
+        dropArea.classList.add('hover');
+    }
+
+    function remove() {
+        dropArea.classList.remove('hover');
     }
 
     function dropboxDefault(evt) {
@@ -283,8 +345,18 @@ function dropbox() {
 
     function drop(evt) {
         let image = evt.dataTransfer.getData('text');
-        dropboxDefault(evt);
-        addStarImage(starID, imageWithoutParameter(image));
+
+        if (isLocalFile(image)) {
+            /* TODO Needs fix */
+
+            image = evt.dataTransfer.files;
+            if (image.length === 1) {
+                image = image[0];
+                addStarImage_local(image);
+            }
+        } else {
+            addStarImage(imageWithoutParameter(image));
+        }
     }
 }
 
@@ -318,6 +390,17 @@ function hasNoVideos() {
 }
 
 function autoComplete() {
+    function swapOrder(first, second, array) {
+        let index_one = array.indexOf(first);
+        let index_two = array.indexOf(second);
+        if (index_one >= 0 && index_two >= 0) {
+            let tmp = array[index_one];
+
+            array[index_one] = array[index_two];
+            array[index_two] = tmp;
+        }
+    }
+
     let breasts = [],
         eyes = [],
         hair = [],
@@ -341,6 +424,8 @@ function autoComplete() {
     for (let i = 0; i < countryQuery.length; i++) country.push(countryQuery.eq(i).text());
     for (let i = 0; i < startQuery.length; i++) start.push(startQuery.eq(i).text());
     for (let i = 0; i < endQuery.length; i++) end.push(endQuery.eq(i).text());
+
+    swapOrder('Russia', 'Belarus', country);
 
     $('input[name="breast"]').autocomplete({source: [breasts]});
     $('input[name="eye"]').autocomplete({source: [eyes]});
@@ -437,3 +522,56 @@ function getExtension(fname) {
 function insertBefore(referenceNode, el) {
     referenceNode.parentNode.insertBefore(el, referenceNode);
 }
+
+function isLocalFile(path) {
+    return !((path.indexOf('http://') > -1) || (path.indexOf('https://') > -1));
+}
+
+
+/* TODO WORK IN PROGRESS
+function createModal(title, content) {
+    // SETUP
+    let modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.role = 'dialog';
+
+    let modal_dialog = document.createElement('div');
+    modal_dialog.classList.add('modal-dialog');
+
+    let modal_content = document.createElement('div');
+    modal_content.classList.add('modal-content');
+
+    let modal_header = document.createElement('div');
+    modal_header.classList.add('modal-header');
+
+    let modal_title = document.createElement('h4');
+    modal_title.classList.add('modal-title');
+    modal_title.textContent = title;
+
+    let modal_close = document.createElement('button');
+    modal_close.type = 'button';
+    modal_close.classList.add('close');
+    modal_close.setAttribute('data-dismiss', 'modal');
+    modal_close.innerHTML = '&times;';
+
+    let modal_body = document.createElement('div');
+    modal_body.classList.add('modal_body');
+    modal_body.innerHTML = content;
+
+    // BUILD
+    modal_header.appendChild(modal_title);
+    modal_header.appendChild(modal_close);
+
+    modal_content.appendChild(modal_header);
+    modal_content.appendChild(modal_body);
+
+    modal_dialog.appendChild(modal_content);
+
+    modal.appendChild(modal_dialog);
+
+    document.body.appendChild(modal);
+
+    // RETURN ELEMENT
+    $('.modal').modal('show');
+}
+*/

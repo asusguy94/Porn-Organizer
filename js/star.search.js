@@ -7,7 +7,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const hair_radio = document.querySelectorAll('input[name="hair"]');
     const ethnicity_radio = document.querySelectorAll('input[name="ethnicity"]');
     const country_select = document.querySelector('#countries > select');
+
     const website_select = document.querySelector('#websites > select');
+    const websiteNot_select = document.querySelector('#websites-not > select');
+
     const sort_radio = document.querySelectorAll('input[name="sort"]');
 
     const loader = document.getElementById('loader');
@@ -223,6 +226,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         if (website_arr.indexOf(selectedWebsite) < 0 && selectedWebsite !== 'All') {
                             stars[i].classList.add('hidden-website');
+                        }
+                    }
+                });
+            }
+
+            /* Website */
+            if (websiteNot_select) {
+                const prettyWebsiteNot_select = document.querySelectorAll('#websites-not > .prettydropdown');
+                $(prettyWebsiteNot_select).on('change', function () {
+                    $stars.removeClass('hidden-website-not');
+
+                    let selectedWebsite_not = websiteNot_select.options[websiteNot_select.selectedIndex].textContent;
+                    for (let i = 0; i < starLength; i++) {
+                        let websiteNot_arr = stars[i].getAttribute('data-website-name').slice(2, -2).split(',');
+
+                        if (websiteNot_arr.indexOf(selectedWebsite_not) > -1 && selectedWebsite_not !== 'All') {
+                            stars[i].classList.add('hidden-website-not');
                         }
                     }
                 });

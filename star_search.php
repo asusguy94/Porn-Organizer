@@ -80,6 +80,22 @@ global $pdo;
 					}
 					?>
 
+                    <h2>!Website</h2>
+					<?php
+					$query = $pdo->prepare("SELECT websites.name FROM websites JOIN videowebsites ON websites.id = videowebsites.websiteID GROUP BY name ORDER BY name");
+					$query->execute();
+					if ($query->rowCount()) {
+						print '<div id="websites-not">';
+						print '<select class="pretty">';
+						print '<option name="website_All">All</option>';
+						foreach ($query->fetchAll() as $data) {
+							print "<option name='website_$data[name]' value='$data[name]'>$data[name]</option>";
+						}
+						print '</select>';
+						print '</div>';
+					}
+					?>
+
                     <h2>Country</h2>
 					<?php
 					$query = $pdo->prepare("SELECT country.name, country.code FROM country JOIN stars ON country.name = stars.country GROUP BY country.name ORDER BY country.name");

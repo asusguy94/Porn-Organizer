@@ -30,10 +30,8 @@ define('PARSER', $opt['parser']); // Enable FreeOnes
 define('enableWEBM', $opt['enable_webm']); // Enable compression lvl-1
 define('enableMKV', $opt['enable_mkv']); // Enable compression lvl-2
 define('enableFA', $opt['enable_fa']); // Enable FontAwesome
-define('enableHLS', $opt['enable_hls']); // true=HLS; false=mp4 (or webm or mkv if enabled)
-
-define('bootstrapCols', 12);
-define('bootstrapColsDef', 6);
+define('enableHLS', $opt['enable_hls']); // Hls similar to streaming
+define('enableHTTPS', $opt['enable_https']); // Remove HTTP/HTTPS notices from the browser console
 
 /* Initialize Header */
 ob_start();
@@ -46,7 +44,11 @@ class HomePage
 	function recent()
 	{
 		global $pdo;
-		$query = $pdo->prepare("SELECT * FROM videos ORDER BY id DESC");
+		$query = $pdo->prepare("
+											SELECT *
+											FROM videos
+											ORDER BY id DESC
+										");
 		$query->execute();
 		$this->printData($query->fetchAll());
 	}
@@ -54,19 +56,43 @@ class HomePage
 	function newest()
 	{
 		global $pdo;
-		$query = $pdo->prepare("SELECT * FROM videos ORDER BY date DESC");
+		$query = $pdo->prepare("
+											SELECT *
+											FROM videos
+											ORDER BY date DESC
+										");
 		$query->execute();
 		$this->printData($query->fetchAll());
 	}
 
-	function printData($input, $items_per_line = bootstrapColsDef)
+	function random()
 	{
-		if (!(12 % $items_per_line)) {
-			$col = bootstrapCols / $items_per_line;
-		} else {
-			$col = bootstrapCols / bootstrapColsDef;
-		}
+		global $pdo;
+		$query = $pdo->prepare("
+											SELECT *
+											FROM videos
+											ORDER BY RAND()
+										");
+		$query->execute();
+		$this->printData($query->fetchAll());
+	}
 
+	function popular()
+	{
+		global $pdo;
+		$query = $pdo->prepare("
+											SELECT videos.id, videos.name, COUNT(*) AS total
+											FROM plays
+											JOIN videos ON plays.videoID = videos.id
+											GROUP BY videoID
+											ORDER BY total DESC, videoID
+										");
+		$query->execute();
+		$this->printData($query->fetchAll(), 'total');
+	}
+
+	function printData($input, $ribbonCol = null)
+	{
 		$count = $this->count;
 		print "<div class='row'>";
 		foreach ($input AS $data) {
@@ -74,10 +100,12 @@ class HomePage
 				if (!$this->fileExist || file_exists("videos/$data[path]")) {
 					$count--;
 
-					print "<a class='video col-$col' href='video.php?id=$data[id]'>";
-					print "<img class='lazy mx-auto img-thumbnail' data-src='images/videos/$data[id]-" . THUMBNAIL_RES . ".jpg'>";
-					print "<span class='title mx-auto'>$data[name]</span>";
-					print '</a>';
+					print "
+							<a class='video col px-0 mx-3 ribbon-container' href='video.php?id=$data[id]'>
+								<img class='lazy mx-auto img-thumbnail' data-src='images/videos/$data[id]-" . THUMBNAIL_RES . ".jpg' alt='thumbnail'/>
+								<span class='title mx-auto'>$data[name]</span>";
+								if($ribbonCol) print "<span class='ribbon'>$data[$ribbonCol]</span>";
+							print "</a>";
 				}
 			} else {
 				break;
@@ -151,38 +179,39 @@ class Basic
 		if (is_array($data)) {
 			for ($i = 0; $i < count($data); $i++) {
 				if (!$i && !in_array('', $data))
-					print '<link rel="stylesheet" href="css/main.min.css?v=' . md5_file("css/main.min.css") . '">';
+					print "<link rel='stylesheet' href='/css/main.min.css?v=" . md5_file("css/main.min.css") . "'>";
 				if ($data[$i] === 'jqueryui') {
-					print '<link rel="stylesheet" href="css/jquery.ui.min.css">';
+					print '<link rel="stylesheet" href="/node_modules/jquery-ui-dist/jquery-ui.min.css">';
 				} else if ($data[$i] === 'bootstrap') {
-					print '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">';
+					print '<link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">';
+					print '<link rel="stylesheet" href="/node_modules/bootstrap-switch-button/css/bootstrap-switch-button.css">';
 				} else if ($data[$i] === 'contextmenu') {
-					if (enableFA) print '<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.0/css/all.css">';
-					print '<link rel="stylesheet" href="css/jquery.contextMenu.min.css">';
+					if (enableFA) print '<link rel="stylesheet" href="/node_modules/@fortawesome/fontawesome-free/css/all.min.css">';
+					print '<link rel="stylesheet" href="/node_modules/jquery-contextmenu/dist/jquery.contextMenu.min.css">';
 				} else if ($data[$i] === 'autocomplete') {
-					print '<link rel="stylesheet" href="css/jquery.autocomplete.min.css">';
+					print '<link rel="stylesheet" href="/node_modules/jquery-autocomplete/jquery.autocomplete.css">';
 				} else if ($data[$i] === 'prettydropdown') {
-					print '<link rel="stylesheet" href="css/jquery.prettydropdown.min.css">';
+					print '<link rel="stylesheet" href="/node_modules/pretty-dropdowns/dist/css/prettydropdowns.css">';
 				} else if ($data[$i] === 'plyr') {
-					print '<link rel="stylesheet" href="css/plyr.min.css">';
+					print '<link rel="stylesheet" href="/node_modules/plyr/dist/plyr.css">';
 				} else {
 					if (file_exists("css/$data[$i].min.css")) {
-						print '<link rel="stylesheet" href="css/' . $data[$i] . '.min.css?v=' . md5_file("css/$data[$i].min.css") . '">';
+						print "<link rel='stylesheet' href='/css/$data[$i].min.css?v=" . md5_file("css/$data[$i].min.css") . "'>";
 					} else {
-						print '<link rel="stylesheet" href="css/' . $data[$i] . '.css?v=' . md5_file("css/$data[$i].css") . '">';
+						print "<link rel='stylesheet' href='/css/$data[$i].css?v=" . md5_file("css/$data[$i].css") . "'>";
 					}
 				}
 			}
 		} else if ($data !== '') {
 			if (file_exists("css/$data.min.css"))
-				print "<link rel='stylesheet' href='css/$data.min.css'>";
+				print "<link rel='stylesheet' href='/css/$data.min.css'>";
 			else
-				print "<link rel='stylesheet' href='css/$data.css'>";
+				print "<link rel='stylesheet' href='/css/$data.css'>";
 		} else if ($data === '') {
 			if (file_exists("css/$data.min.css"))
-				print '<link rel="stylesheet" href="css/main.min.css?v=' . md5_file("css/main.min.css") . '">';
+				print '<link rel="stylesheet" href="/css/main.min.css?v=' . md5_file("css/main.min.css") . '">';
 			else
-				print '<link rel="stylesheet" href="css/main.css?v=' . md5_file("css/main.css") . '">';
+				print '<link rel="stylesheet" href="/css/main.css?v=' . md5_file("css/main.css") . '">';
 
 		}
 	}
@@ -193,37 +222,38 @@ class Basic
 			for ($i = 0; $i < count($data); $i++) {
 				if ($data[$i] !== '') {
 					if ($data[$i] == 'jquery') {
-						print '<script src="js/jquery.min.js"></script>';
+						print '<script src="/node_modules/jquery/dist/jquery.min.js"></script>';
 					} else if ($data[$i] == 'bootstrap') {
-						print '<script src="js/jquery.min.js"></script>';
-						print '<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>';
+						print '<script src="/node_modules/jquery/dist/jquery.min.js"></script>';
+						print '<script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>';
+						print '<script src="/node_modules/bootstrap-switch-button/js/bootstrap-switch-button.js"></script>';
 					} else if ($data[$i] == 'contextmenu') {
-						print '<script src="js/jquery.contextMenu.min.js"></script>';
+						print '<script src="/node_modules/jquery-contextmenu/dist/jquery.contextMenu.min.js"></script>';
 					} else if ($data[$i] == 'autocomplete') {
-						print '<script src="js/jquery.autocomplete.min.js"></script>';
+						print '<script src="/node_modules/jquery-autocomplete/jquery.autocomplete.js"></script>';
 					} else if ($data[$i] == 'jqueryui') {
-						print '<script src="js/jquery.ui.min.js"></script>';
+						print '<script src="/node_modules/jquery-ui-dist/jquery-ui.min.js"></script>';
 					} else if ($data[$i] == 'prettydropdown') {
-						print '<script src="js/jquery.prettydropdown.min.js"></script>';
+						print '<script src="/node_modules/pretty-dropdowns/dist/js/jquery.prettydropdowns.js"></script>';
 					} else if ($data[$i] == 'plyr') {
-						print '<script src="js/plyr.min.js?v=' . md5_file("js/plyr.min.js") . '"></script>';
+						print '<script src="/node_modules/plyr/dist/plyr.min.js"></script>';
 					} else if ($data[$i] == 'lazyload') {
-						print '<script src="js/lazyload.min.js?v=' . md5_file("js/lazyload.min.js") . '"></script>';
+						print '<script src="/node_modules/vanilla-lazyload/dist/lazyload.min.js"></script>';
 					} else if ($data[$i] == 'hls') {
-						print '<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>';
+						print '<script src="/node_modules/hls.js/dist/hls.min.js"></script>';
 					} else {
 						if (file_exists("js/$data[$i].min.js"))
-							print "<script src='js/$data[$i].min.js?v=" . md5_file("js/$data[$i].min.js") . "'></script>";
+							print "<script src='/js/$data[$i].min.js?v=" . md5_file("js/$data[$i].min.js") . "'></script>";
 						else
-							print "<script src='js/$data[$i].js?v=" . md5_file("js/$data[$i].js") . "'></script>";
+							print "<script src='/js/$data[$i].js?v=" . md5_file("js/$data[$i].js") . "'></script>";
 					}
 				}
 			}
 		} else if ($data !== '') {
 			if (file_exists("js/$data.min.js"))
-				print "<script src='js/$data.min.js?v=" . md5_file("js/$data.min.js") . "'></script>";
+				print "<script src='/js/$data.min.js?v=" . md5_file("js/$data.min.js") . "'></script>";
 			else
-				print "<script src='js/$data.js?v=" . md5_file("js/$data.js") . "'></script>";
+				print "<script src='/js/$data.js?v=" . md5_file("js/$data.js") . "'></script>";
 		}
 	}
 
@@ -243,7 +273,10 @@ class Basic
 			else
 				print '<li>';
 
-			print "<a href='$link'>$name</a>";
+			if ($this->isAbsolutePath($link))
+				print "<a href='$link'>$name</a>";
+			else
+				print "<a href='/$link'>$name</a>";
 
 			for ($j = 0; $j < count($arr[$i]); $j++) {
 				if (array_key_exists($j, $arr[$i]) && is_array($arr[$i][$j])) {
@@ -253,9 +286,11 @@ class Basic
 					$link = $arr[$i][$j]['link'];
 
 					if ($link === $currentPage)
-						print "<li class='active'><a href='$link'>$name</a></li>";
-					else
+						print "<li class='active'><a href='/$link'>$name</a></li>";
+					else if ($this->isAbsolutePath($link))
 						print "<li><a href='$link'>$name</a></li>";
+					else
+						print "<li><a href='/$link'>$name</a></li>";
 
 					print '</ul>';
 				}
@@ -337,6 +372,14 @@ class Basic
 	static function file_exists_alt($filename)
 	{
 		return is_file($filename);
+	}
+
+	function isAbsolutePath($path)
+	{
+		return (
+			$this->startsWith($path, 'http://') ||
+			$this->startsWith($path, 'https://')
+		);
 	}
 }
 
@@ -813,6 +856,8 @@ class Star
 	public $groupStr = '';
 	public $havingStr = ' HAVING image IS NULL';
 
+	//public $havingStr = ' HAVING name NOT LIKE "% %" AND autoTaggerIgnore = FALSE';
+
 	function sql($order = 1)
 	{
 		if ($this->sqlMethod == '') {
@@ -1100,10 +1145,10 @@ class Star
 			print '<label for="breast">Breast </label>';
 			print "<input type='text' name='breast' value='$breast'>";
 			print '<div id="breasts" class="hidden">';
-			$query = $pdo->prepare("SELECT * FROM stars GROUP BY breast");
+			$query = $pdo->prepare("SELECT breast FROM stars WHERE breast IS NOT NULL GROUP BY breast");
 			$query->execute();
 			foreach ($query->fetchAll() as $data) {
-				if (!is_null($data['breast'])) print "<span class='breast'>$data[breast]</span>";
+				print "<span class='breast'>$data[breast]</span>";
 			}
 			print '</div>';
 
@@ -1113,10 +1158,10 @@ class Star
 			print '<label for="eye">EyeColor </label>';
 			print "<input type='text' name='eye' value='$eyecolor'>";
 			print '<div id="eyes" class="hidden">';
-			$query = $pdo->prepare("SELECT * FROM stars GROUP BY eyecolor");
+			$query = $pdo->prepare("SELECT eyecolor FROM stars WHERE eyecolor IS NOT NULL GROUP BY eyecolor");
 			$query->execute();
 			foreach ($query->fetchAll() as $data) {
-				if (!is_null($data['eyecolor'])) print "<span class='eye'>$data[eyecolor]</span>";
+				print "<span class='eye'>$data[eyecolor]</span>";
 			}
 			print '</div>';
 
@@ -1126,10 +1171,10 @@ class Star
 			print '<label for="hair">HairColor </label>';
 			print "<input type='text' name='hair' value='$haircolor'>";
 			print '<div id="hairs" class="hidden">';
-			$query = $pdo->prepare("SELECT * FROM stars GROUP BY haircolor");
+			$query = $pdo->prepare("SELECT haircolor FROM stars WHERE haircolor IS NOT NULL GROUP BY haircolor");
 			$query->execute();
 			foreach ($query->fetchAll() as $data) {
-				if (!is_null($data['haircolor'])) print "<span class='hair'>$data[haircolor]</span>";
+				print "<span class='hair'>$data[haircolor]</span>";
 			}
 			print '</div>';
 
@@ -1139,10 +1184,10 @@ class Star
 			print '<label for="ethnicity">Ethnicity </label>';
 			print "<input type='text' name='ethnicity' value='$ethnicity'>";
 			print '<div id="ethnicities" class="hidden">';
-			$query = $pdo->prepare("SELECT * FROM stars GROUP BY ethnicity");
+			$query = $pdo->prepare("SELECT ethnicity FROM stars WHERE ethnicity IS NOT NULL GROUP BY ethnicity");
 			$query->execute();
 			foreach ($query->fetchAll() as $data) {
-				if (!is_null($data['ethnicity'])) print "<span class='ethnicity'>$data[ethnicity]</span>";
+				print "<span class='ethnicity'>$data[ethnicity]</span>";
 			}
 			print '</div>';
 
@@ -1153,10 +1198,10 @@ class Star
 			print "<input type='text' name='country' value='$country'>";
 			print "<div class='flag flag-$country_char'></div>";
 			print '<div id="countries" class="hidden">';
-			$query = $pdo->prepare("SELECT * FROM stars GROUP BY country");
+			$query = $pdo->prepare("SELECT country FROM stars WHERE country IS NOT NULL GROUP BY country");
 			$query->execute();
 			foreach ($query->fetchAll() as $data) {
-				if (!is_null($data['country'])) print "<span class='country'>$data[country]</span>";
+				print "<span class='country'>$data[country]</span>";
 			}
 			print '</div>';
 
@@ -1190,10 +1235,10 @@ class Star
 			print '<label>Year </label>';
 			print "<input type='text' name='start' placeholder='Start' value='$start'>";
 			print '<div id="starts" class="hidden">';
-			$query = $pdo->prepare("SELECT * FROM stars GROUP BY start");
+			$query = $pdo->prepare("SELECT start FROM stars WHERE start IS NOT NULL GROUP BY start");
 			$query->execute();
 			foreach ($query->fetchAll() as $data) {
-				if (!is_null($data['start'])) print "<span class='start'>$data[start]</span>";
+				print "<span class='start'>$data[start]</span>";
 			}
 			print '</div>'; // #starts
 
@@ -1202,10 +1247,10 @@ class Star
 
 			print "<input type='text' name='end' placeholder='End' value='$end'>";
 			print '<div id="ends" class="hidden">';
-			$query = $pdo->prepare("SELECT * FROM stars GROUP BY end");
+			$query = $pdo->prepare("SELECT end FROM stars WHERE end IS NOT NULL GROUP BY end");
 			$query->execute();
 			foreach ($query->fetchAll() as $data) {
-				if (!is_null($data['end'])) print "<span class='end'>$data[end]</span>";
+				print "<span class='end'>$data[end]</span>";
 			}
 			print '</div>'; // #ends
 
@@ -1453,8 +1498,12 @@ class Star
 				$localPathWebm = str_replace('.mp4', '.webm', str_replace('.m4v', '.webm', $localPath));
 				$localPathMkv = str_replace('.mp4', '.mkv', str_replace('.m4v', '.mkv', $localPath));
 
-				if (CDN) $cdnPrefix = "http://cdn$cdnNumber-";
-				else $cdnPrefix = "http://";
+				if(enableHTTPS) $protocol = 'https:';
+				else $protocol = 'http:';
+
+				if (CDN) $cdnPrefix = "$protocol//cdn$cdnNumber-";
+				else $cdnPrefix = "$protocol//";
+
 				$fullPath = "$cdnPrefix$_SERVER[HTTP_HOST]/$localPath";
 				$fullPathWebm = "$cdnPrefix$_SERVER[HTTP_HOST]/$localPathWebm";
 				$fullPathMkv = "$cdnPrefix$_SERVER[HTTP_HOST]/$localPathMkv";
@@ -1522,7 +1571,7 @@ class Star
 					$query->bindValue(1, "$id.$ext");
 					$query->bindValue(2, $id);
 					if ($query->execute()) {
-						print '<script>reload(true)</script>';
+						Basic::reload();
 					}
 				}
 			}
@@ -1534,13 +1583,18 @@ class Star
 		$basic = new Basic();
 		$ext = strtolower($basic->getExtension($url));
 		if ($ext === 'jpe' || $ext === 'jpeg') $ext = 'jpg';
-		$url = str_replace('https://', 'http://', $url);
 
 		$localPath = "../images/stars/$name.$ext";
 
 		$url = str_replace(' ', '%20', $url);
 
 		return copy($url, $localPath);
+	}
+
+	function downloadImage_local($file, $name, $ext)
+	{
+		$localPath = "../images/stars/$name.$ext";
+		return move_uploaded_file($file, $localPath);
 	}
 
 	function freeOnes($id)
@@ -1594,7 +1648,7 @@ class Star
 			array_push($names_arr, strtolower($alias));
 		}
 
-		/* Calculate MatchRate */
+		// Calculate MatchRate
 		$matchRate = intval(trim(explode('>', end(explode(' ', explode('%', $searchElement)[0])))[1]));
 		if ($matchRate < 100 || !in_array(strtolower($star['name']), $names_arr)) {
 			return;
@@ -1629,7 +1683,8 @@ class Star
 				break;
 		}
 
-		/* COUNTRY */
+
+		// COUNTRY
 		$country = explode('" />', explode('title="', explode('<img class="middle"', $searchElement)[1])[1])[0];
 
 		$date = '';
@@ -1942,19 +1997,21 @@ class Video
 		return true;
 	}
 
-	function fetchVideos()
+	function fetchVideos($limit)
 	{
 		$date_class = new Date();
 		global $pdo;
-		$query = $pdo->prepare($this->sql() . $this->sqlOrder);
+		$query = $pdo->prepare("{$this->sql()}{$this->sqlOrder}");
 		$query->execute();
 		if ($query->rowCount()) {
 			foreach ($query->fetchAll() as $data) {
+				if(!$limit) return;
 				if (!file_exists("videos/$data[path]")) continue;
 
 				$age = $date_class->daysToYears($data['ageinvideo']);
 				if (!$age) $age = '00';
 				print "<p>Age: $age <a href='video.php?id=$data[id]'>$data[name]</a></p>";
+				$limit--;
 			}
 		}
 	}
@@ -2047,8 +2104,10 @@ class Video
 		} else {
 			$result = $query->fetch();
 
+			$date = date("j F Y", strtotime($result['date']));
 			$name = htmlentities($result['name']);
-			$wsite = $this->getSite($result['id']);
+			$wsite = $this->getWebsite($result['id']);
+			$site = $this->getSite($result['id']);
 			$fname = $result['path'];
 			$fnameWebm = str_replace('.mp4', '.webm', str_replace('.m4v', '.webm', $fname));
 
@@ -2059,6 +2118,8 @@ class Video
 
 			$localPath = htmlspecialchars($fname, ENT_QUOTES);
 			$localPathWebm = htmlspecialchars($fnameWebm, ENT_QUOTES);
+
+			$date = "<small class='date btn far fa-calendar-check'>$date</small>";
 
 			$attr = '';
 			if (Attributes::attributeCount($id)) {
@@ -2080,8 +2141,14 @@ class Video
 
 			print '<div id="video">';
 
-			print "<h2 id='video-title'><span id='video-name'>$name</span><small>$lcn</small><small>$attr</small></h2>";
-			print "<h3 id='video-site'>$wsite</h3>";
+			print "<h2 id='video-title'><span id='video-name'>$name</span><small>$date</small><small>$lcn</small><small>$attr</small></h2>";
+
+			if (strlen($site)) {
+				print "<h3 id='video-site'>$wsite - $site</h3>";
+			} else {
+				print "<h3 id='video-site'>$wsite</h3>";
+			}
+
 
 			print "<a id='next' class='btn btn-outline-primary' href='?id=$next[id]' title='$next[name]'>Next</a>";
 
@@ -2102,6 +2169,7 @@ class Video
 			print "</video>";
 
 			print '<span id="duration" class="hidden">' . $this->videoDuration . '</span>';
+			print '<span id="vtt" class="hidden">' . file_exists("vtt/$id.vtt") .'</span>';
 
 			print '</div>';
 		}
@@ -2172,9 +2240,6 @@ class Video
 				}
 				if ($ageInVideo) print "<span class='ribbon'>$ageInVideo</span>";
 
-				print "<div class='star-info' data-star-id='$data[starID]'>";
-				print '</div>';
-
 				print '</div>'; // .star
 			}
 			print '</div>'; // #stars
@@ -2199,10 +2264,10 @@ class Video
 	function getOffset($start)
 	{
 		$offset_decimal = $start / $this->videoDuration;
-		$offset_custom = 0.5;
+		$offset_mx = 1.01;
 
 		$offset = ($offset_decimal * 100);
-		$offset += $offset_custom;
+		$offset *= $offset_mx;
 
 		return $offset;
 	}
@@ -2210,7 +2275,7 @@ class Video
 	function fetchBookmarks($id)
 	{
 		global $pdo;
-		$query = $pdo->prepare("SELECT bookmarks.id, bookmarks.start, categories.name, categories.id AS categoryID  FROM bookmarks JOIN categories ON bookmarks.categoryID = categories.id WHERE videoID = ? ORDER BY start ASC");
+		$query = $pdo->prepare("SELECT bookmarks.id, bookmarks.start, categories.name, categories.id AS categoryID  FROM bookmarks JOIN categories ON bookmarks.categoryID = categories.id WHERE videoID = ? ORDER BY start");
 		$query->bindValue(1, $id);
 		$query->execute();
 		if ($query->rowCount()) {
@@ -2405,9 +2470,9 @@ class Date
 	{
 		$minutes = floor($seconds / 60);
 		$seconds = $seconds % 60;
-		if ($seconds < 10) $seconds = '0' . $seconds;
+		if ($seconds < 10) $seconds = "0$seconds";
 
-		return $minutes . ':' . $seconds;
+		return "$minutes:$seconds";
 	}
 
 	function stringToDate($str)

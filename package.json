@@ -18,13 +18,25 @@
   },
   "homepage": "https://github.com/asusguy94/Porn-Organizer#readme",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.9.0",
+    "bootstrap": "^4.3.1",
+    "bootstrap-switch-button": "^1.0.0",
     "eslint": "^5.16.0",
     "gulp": "^4.0.0",
     "gulp-clean-css": "^4.0.0",
     "gulp-rename": "^1.4.0",
     "gulp-sass": "^4.0.2",
     "gulp-terser": "^1.1.7",
-    "gulp-uglify-es": "^1.0.4"
+    "gulp-uglify-es": "^1.0.4",
+    "hls.js": "^0.12.4",
+    "jquery": "^3.4.1",
+    "jquery-autocomplete": "^1.2.8",
+    "jquery-contextmenu": "^2.8.0",
+    "jquery-ui-dist": "^1.12.1",
+    "plyr": "^3.5.4",
+    "popper.js": "^1.15.0",
+    "pretty-dropdowns": "^4.17.0",
+    "vanilla-lazyload": "^12.0.0"
   },
   "eslintConfig": {
     "env": {

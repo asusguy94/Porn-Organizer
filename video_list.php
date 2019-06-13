@@ -18,7 +18,7 @@ $videos = new Video();
         <main class="container-fluid">
             <section class="row">
                 <div class="col-12">
-					<?php $videos->fetchVideos() ?>
+					<?php $videos->fetchVideos(30) ?>
                 </div>
             </section>
         </main>

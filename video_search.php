@@ -24,9 +24,8 @@ global $pdo;
                         <input type="text" name="title" placeholder="Title" autofocus>
                     </div>
 
-                    <div class="input-wrapper" data-toggle="tooltip" data-placement="right" title="Useful when renaming video-titles that includes special characters">
-                        <input id="special_char" type="checkbox" name="special_char">
-                        <label for="special_char">Special Char</label>
+                    <div class="input-wrapper" data-toggle="tooltip" data-placement="right" title="Remove special characters from search field">
+                        <input type="checkbox" name="special_char" data-toggle="switchbutton" data-onlabel="Special Char" data-offlabel="Regular">
                     </div>
 
                     <div class="input-wrapper">
@@ -34,8 +33,7 @@ global $pdo;
                     </div>
 
                     <div class="input-wrapper" data-toggle="tooltip" data-placement="right" title="Check if file exists">
-                        <input id="existing" type="checkbox" name="existing">
-                        <label for="existing">Existing</label>
+                        <input type="checkbox" name="existing" data-toggle="switchbutton" data-onlabel="Existing" data-offlabel="Any" data-width="100" disabled>
                     </div>
 
                     <h2>Sort</h2>

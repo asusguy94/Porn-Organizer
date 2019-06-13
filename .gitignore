@@ -1,3 +1,4 @@
 node_modules
 *.min.*
 package-lock.json
+.idea

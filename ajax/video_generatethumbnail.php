@@ -4,7 +4,7 @@ include('../_class.php');
 $ffmpeg = new FFMPEG();
 
 if (isset($_GET['videoID']) && !empty($_GET['videoID'])) {
-	if (isset($_GET['seconds']) && !empty($_POST['seconds'])) {
+	if (isset($_GET['seconds']) && !empty($_GET['seconds'])) {
 		$seconds = $_GET['seconds'];
 	}else{
 		$seconds = THUMBNAIL_START;

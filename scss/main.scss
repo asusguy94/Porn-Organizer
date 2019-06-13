@@ -54,19 +54,17 @@
 /* Category */
 #categories {
   margin-bottom: 20px;
-}
 
-.category {
-  display: block;
-  width: 90px;
-}
-
-a.video {
-  text-decoration: none !important;
-  color: black;
+  .category {
+    display: block;
+    width: 90px;
+  }
 }
 
 .video {
+  text-decoration: none !important;
+  color: black;
+
   span {
     text-align: center;
   }
@@ -92,7 +90,6 @@ a.video {
 
   img, video {
     display: block;
-    /*height: $thumbnailHeight + px;*/
     width: $thumbnailWidth + px;
   }
 }
@@ -114,18 +111,7 @@ label {
 @import "dialog";
 
 /* Dropbox */
-#dropbox {
-  width: 275px;
-  height: 275px;
-  border: 2px dashed red;
-  text-align: center;
-
-  & > span {
-    position: relative;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-}
+@import "dropbox";
 
 /* Ribbon */
 @import "ribbon";
@@ -154,29 +140,6 @@ h3 {
 
 .selected {
   border-color: green
-}
-
-.bookmark-info, .star-info {
-  display: none;
-  position: fixed;
-
-  border: 1px solid black;
-  border-radius: 4px;
-  padding: 10px;
-  background-color: #eeeeee;
-}
-
-.bookmark-info.active {
-  display: block;
-  z-index: 1;
-}
-
-.star-info {
-  min-width: 300px;
-
-  .btn {
-    display: inline-block;
-  }
 }
 
 .hidden {

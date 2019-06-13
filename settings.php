@@ -21,21 +21,30 @@ $basic = new Basic();
                         <h2>Settings</h2>
 
                         <h4>Functionality</h4>
+                        <!-- HTTPS -->
+                        <fieldset class="form-group" data-toggle="tooltip" data-placement="right" data-html="true"
+                                  title="Use HTTPS instead of HTTP<br>">
+                            <div class="row">
+                                <legend class="col-form-label col-2 pt-0">HTTPS</legend>
+                                <div class="col-10">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="enable_https"
+                                               data-toggle="switchbutton" data-onlabel="HTTPS"
+                                               data-offlabel="HTTP" <? if (enableHTTPS) echo 'checked' ?>>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+
                         <!-- CDN -->
                         <fieldset class="form-group">
                             <div class="row">
                                 <legend class="col-form-label col-2 pt-0">CDN</legend>
                                 <div class="col-10">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="cdn"
-                                               id="radio-cdn-on" value="1" <? if (CDN) echo 'checked' ?>>
-                                        <label class="form-check-label" for="radio-cdn-on">Enable</label>
-                                    </div>
-
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="cdn"
-                                               id="radio-cdn-off" value="0" <? if (!CDN) echo 'checked' ?>>
-                                        <label class="form-check-label" for="radio-cdn-off">Disable</label>
+                                        <input class="form-check-input" type="checkbox" name="cdn"
+                                               data-toggle="switchbutton" data-onlabel="Enable"
+                                               data-offlabel="Disable" <? if (CDN) echo 'checked' ?>>
                                     </div>
                                 </div>
                             </div>
@@ -48,15 +57,9 @@ $basic = new Basic();
                                 <legend class="col-form-label col-2 pt-0">Similar Star</legend>
                                 <div class="col-10">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="similar_text"
-                                               id="radio-similar-on" value="1" <? if (SIMILAR_TEXT) echo 'checked' ?>>
-                                        <label class="form-check-label" for="radio-similar-on">Enable</label>
-                                    </div>
-
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="similar_text"
-                                               id="radio-similar-off" value="0" <? if (!SIMILAR_TEXT) echo 'checked' ?>>
-                                        <label class="form-check-label" for="radio-similar-off">Disable</label>
+                                        <input class="form-check-input" type="checkbox" name="similar_text"
+                                               data-toggle="switchbutton" data-onlabel="Enable"
+                                               data-offlabel="Disable" <? if (SIMILAR_TEXT) echo 'checked' ?>>
                                     </div>
                                 </div>
                             </div>
@@ -69,15 +72,9 @@ $basic = new Basic();
                                 <legend class="col-form-label col-2 pt-0">FontAwesome</legend>
                                 <div class="col-10">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="enable_fa"
-                                               id="radio-fa-on" value="1" <? if (enableFA) echo 'checked' ?>>
-                                        <label class="form-check-label" for="radio-fa-on">Enable</label>
-                                    </div>
-
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="enable_fa"
-                                               id="radio-fa-off" value="0" <? if (!enableFA) echo 'checked' ?>>
-                                        <label class="form-check-label" for="radio-fa-off">Disable</label>
+                                        <input class="form-check-input" type="checkbox" name="enable_fa"
+                                               data-toggle="switchbutton" data-onlabel="Enable"
+                                               data-offlabel="Disable" <? if (enableFA) echo 'checked' ?>>
                                     </div>
                                 </div>
                             </div>
@@ -90,17 +87,9 @@ $basic = new Basic();
                                 <legend class="col-form-label col-2 pt-0">WebM</legend>
                                 <div class="col-10">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="enable_webm"
-                                               id="radio-webm-on"
-                                               value="1" <? if (enableWEBM && !enableWEBM) echo 'checked' ?>>
-                                        <label class="form-check-label" for="radio-webm-on">Enable</label>
-                                    </div>
-
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="enable_webm"
-                                               id="radio-webm-off"
-                                               value="0" <? if (!enableWEBM || enableHLS) echo 'checked' ?>>
-                                        <label class="form-check-label" for="radio-webm-off">Disable</label>
+                                        <input class="form-check-input" type="checkbox" name="enable_webm"
+                                               data-toggle="switchbutton" data-onlabel="Enable"
+                                               data-offlabel="Disable" <? if (enableWEBM && !enableHLS) echo 'checked' ?>>
                                     </div>
                                 </div>
                             </div>
@@ -113,16 +102,9 @@ $basic = new Basic();
                                 <legend class="col-form-label col-2 pt-0">MKV</legend>
                                 <div class="col-10">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="enable_mkv" id="radio-mkv-on"
-                                               value="1" <? if (enableMKV) echo 'checked' ?>>
-                                        <label class="form-check-label" for="radio-mkv-on">Enable</label>
-                                    </div>
-
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="enable_mkv"
-                                               id="radio-mkv-off"
-                                               value="0" <? if (!enableMKV) echo 'checked' ?>>
-                                        <label class="form-check-label" for="radio-mkv-off">Disable</label>
+                                        <input class="form-check-input" type="checkbox" name="enable_mkv"
+                                               data-toggle="switchbutton" data-onlabel="Enable"
+                                               data-offlabel="Disable" <? if (enableMKV) echo 'checked' ?>>
                                     </div>
                                 </div>
                             </div>
@@ -135,16 +117,9 @@ $basic = new Basic();
                                 <legend class="col-form-label col-2 pt-0">HLS</legend>
                                 <div class="col-10">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="enable_hls" id="radio-hls-on"
-                                               value="1" <? if (enableHLS) echo 'checked' ?>>
-                                        <label class="form-check-label" for="radio-hls-on">Enable</label>
-                                    </div>
-
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="enable_hls"
-                                               id="radio-hls-off"
-                                               value="0" <? if (!enableHLS) echo 'checked' ?>>
-                                        <label class="form-check-label" for="radio-hls-off">Disable</label>
+                                        <input class="form-check-input" type="checkbox" name="enable_hls"
+                                               data-toggle="switchbutton" data-onlabel="Enable"
+                                               data-offlabel="Disable" <? if (enableHLS) echo 'checked' ?>>
                                     </div>
                                 </div>
                             </div>
@@ -192,7 +167,7 @@ $basic = new Basic();
                         <div class="form-group row" data-toggle="tooltip" data-placement="right" data-html="true"
                              title="Number of CDN's to use.<br>CDN's would be formatted like cdn1.localhost, cnd2.localhost etc">
                             <label for="cdn-max" class="col-form-label col-2">CDN Limit</label>
-                            <div><input type="number" class="form-control col-4" id="cdn-max" name="cdn_max" min="0"
+                            <div><input type="number" class="form-control col-8" id="cdn-max" name="cdn_max" min="0"
                                         max="5"
                                         value="<?= CDN_MAX ?>"></div>
                         </div>
@@ -202,9 +177,17 @@ $basic = new Basic();
 						<?php
 
 						if (isset($_POST['submit'])) {
-							$names = ['cdn', 'similar_text', 'enable_fa', 'enable_webm', 'enable_mkv', 'enable_hls', 'similar_def', 'similar_max', 'thumbnail_res', 'thumbnail_start', 'cdn_max'];
+							$names = ['enable_https', 'cdn', 'similar_text', 'enable_fa', 'enable_webm', 'enable_mkv', 'enable_hls', 'similar_def', 'similar_max', 'thumbnail_res', 'thumbnail_start', 'cdn_max'];
 							$values = array_map(function ($item) {
-								return $_POST[$item];
+								$val = $_POST[$item];
+
+								if (empty($val) || $val == 'off') {
+									return 0;
+								} else if ($val == 'on') {
+									return 1;
+								} else {
+									return $val;
+								}
 							}, $names);
 
 							Settings::saveSettings($names, $values);
@@ -219,4 +202,4 @@ $basic = new Basic();
     </body>
 </html>
 
-<script>$('[data-toggle="tooltip"]').tooltip();</script>
+<script>$('[data-toggle="tooltip"]').tooltip()</script>

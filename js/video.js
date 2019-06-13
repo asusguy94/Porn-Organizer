@@ -1,37 +1,45 @@
 document.addEventListener('DOMContentLoaded', function () {
-    window.videoWrapper = document.getElementById('video');
-    window.videoPlayer = document.getElementsByTagName('video')[0];
-    window.videoSource = document.querySelector('source[type="application/x-mpegURL"]');
-    window.videoID = window.location.href.split('id=')[1];
-    window.videoHeight = 500;
-    window.seekTime = 1;
+    window.videoWrapper = document.getElementById('video')
+    window.videoPlayer = document.getElementsByTagName('video')[0]
+    window.videoSource = document.querySelector('source[type="application/x-mpegURL"]')
+    window.videoID = window.location.href.split('id=')[1]
+    window.videoHeight = 500
+    window.seekTime = 1
 
-    window.bookmark = document.getElementsByClassName('bookmark');
-    window.duration = document.getElementById('duration').textContent;
-    window.videoTitle = document.getElementById('video-name');
+    window.vtt_source = `vtt/${videoID}.vtt`
+    window.bookmark = document.getElementsByClassName('bookmark')
+    window.duration = document.getElementById('duration').textContent
+    window.videoTitle = document.getElementById('video-name')
+
+    legacyBookmarks = true // use old bookmark visuals
 
     document.addEventListener('keydown', function (e) {
         if (e.keyCode === 9) {
-            e.preventDefault();
-            $('#next')[0].click();
+            e.preventDefault()
+            $('#next')[0].click()
         }
-    });
+    })
 
-    if (typeof localStorage.bookmark !== 'undefined') {
-        window.seconds = parseInt(localStorage.bookmark);
-        if (localStorage.video === videoID) {
-            videoPlayer.currentTime = seconds;
+    function videoStats() {
+        let seconds = videoPlayer.currentTime
+        if (typeof localStorage.bookmark !== "undefined" && localStorage.video === videoID)
+            seconds = parseInt(localStorage.bookmark)
 
-            if (typeof localStorage.playing !== 'undefined') {
-                if (!!parseInt(localStorage.playing)) {
-                    setTimeout(function () {
-                        videoPlayer.play();
-                    }, 100);
-                }
-            }
-        } else {
-            localStorage.video = videoID;
-            localStorage.bookmark = 0;
+        if (localStorage.video !== videoID) {
+            localStorage.video = videoID
+            localStorage.bookmark = seconds
+            localStorage.playing = 0
+
+            $(videoPlayer).one('play', function () {
+                addPlay()
+            })
+        }
+
+        if(seconds) videoPlayer.currentTime = seconds
+        if (typeof localStorage.playing !== 'undefined' && localStorage.playing === "1") {
+            setTimeout(function () {
+                videoPlayer.play()
+            }, 100)
         }
     }
 
@@ -39,9 +47,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (videoSource && Hls.isSupported()) {
         const hls = new Hls({
             maxBufferLength: 180 /* 3x duration of hls_time */
-        });
-        hls.loadSource(videoSource.getAttribute('src'));
-        hls.attachMedia(videoPlayer);
+        })
+        hls.loadSource(videoSource.getAttribute('src'))
+        hls.attachMedia(videoPlayer)
     }
 
     /* PLYR */
@@ -53,15 +61,53 @@ document.addEventListener('DOMContentLoaded', function () {
         'seekTime': window.seekTime,
         'volume': 1, // reset volume
         'muted': false,
-        'previewThumbnails': {enabled: false, src: `vtt/${videoID}.vtt`},
+        'previewThumbnails': {enabled: !!$('#vtt').length, src: vtt_source},
         'hideControls': false // never hide controls
-    });
+    })
+
+    /** Chapter Marker **/
+    /*if (!legacyBookmarks) {
+        // Create Existing
+        for (let i = 0; i < bookmark.length; i++) {
+            let seconds = bookmark[i].getAttribute('data-bookmark-time');
+            createChapterMarker(seconds);
+        }
+
+        // Create existing
+        for (let i = 0, chapterMarkers = document.getElementsByClassName('chapter'); i < chapterMarkers.length; i++) {
+            let timeout = [];
+            chapterMarkers[i].addEventListener('mouseenter', mouseEnter);
+            chapterMarkers[i].addEventListener('mouseleave', mouseLeave);
+            chapterMarkers[i].addEventListener('click', mouseClick);
+
+            bookmark[i].addEventListener('mouseenter', function () {
+                if (bookmark[i].classList.contains('active')) mouseEnter();
+            });
+            bookmark[i].addEventListener('mouseleave', mouseLeave);
+
+            function mouseEnter() {
+                clearTimeout(timeout[i]);
+                bookmark[i].classList.add('active');
+            }
+
+            function mouseLeave() {
+                timeout[i] = setTimeout(function () {
+                    bookmark[i].classList.remove('active');
+                }, 600);
+            }
+
+            function mouseClick() {
+                $(bookmark)[i].click();
+            }
+        }
+    }*/
+    /** Chapter Marker **/
 
     videoWrapper.addEventListener('wheel', function (e) {
-        let speed = 10;
-        if (e.deltaY < 0) skip(speed);
-        else rewind(speed);
-    });
+        let speed = 10
+        if (e.deltaY < 0) skip(speed)
+        else rewind(speed)
+    })
 
     /*videoPlayer.addEventListener('loadedmetadata', function () {
         let track = this.addTextTrack('chapters', 'Bookmarks', 'en');
@@ -87,264 +133,274 @@ document.addEventListener('DOMContentLoaded', function () {
     });*/
 
     videoPlayer.addEventListener('timeupdate', function () {
-        localStorage.bookmark = Math.round(videoPlayer.currentTime);
-        if (localStorage.video !== videoID) localStorage.video = videoID;
-    });
+        localStorage.bookmark = Math.round(videoPlayer.currentTime)
+    })
 
     videoPlayer.addEventListener('playing', function () {
-        localStorage.playing = 1;
-    });
+        localStorage.playing = 1
+    })
 
     videoPlayer.addEventListener('pause', function () {
-        localStorage.playing = 0;
-    });
+        localStorage.playing = 0
+    })
 
     $(bookmark).on('click', function () {
-        playFrom($(this).attr('data-bookmark-time'));
-    });
+        playFrom($(this).attr('data-bookmark-time'))
+    })
 
-    autoComplete();
-    videoVolume(0.125);
+    autoComplete()
+    videoVolume(0.125)
 
-    onFocus(bookmarkCollision);
+    onFocus(videoStats)
+    onFocus(bookmarkCollision)
 
     windowResize(function () {
-        bookmarkCollision();
-    });
-});
+        bookmarkCollision()
+    })
+})
 
-document.onkeydown = checkKey;
+document.onkeydown = checkKey
 
 function checkKey(e) {
-    e = e || window.event;
+    e = e || window.event
 
     if (!$('input').is(':focus')) {
         switch (e.keyCode) {
             case 37:
-                rewind();
-                break;
+                rewind()
+                break
             case 39:
-                skip();
-                break;
+                skip()
+                break
             case 32:
-                playPause();
-                break;
+                playPause()
+                break
         }
     }
 }
 
 function rewind(seconds = seekTime) {
-    let prevSeekTime = seekTime;
+    let prevSeekTime = seekTime
     if (seconds !== seekTime) {
-        prevSeekTime = seekTime;
-        window.seekTime = seconds;
+        prevSeekTime = seekTime
+        window.seekTime = seconds
     }
-    videoPlayer.currentTime -= seconds;
+    videoPlayer.currentTime -= seconds
     if (prevSeekTime !== seekTime)
-        window.seekTime = prevSeekTime;
+        window.seekTime = prevSeekTime
 }
 
 function skip(seconds = seekTime) {
-    let prevSeekTime = seekTime;
+    let prevSeekTime = seekTime
     if (seconds !== seekTime) {
-        prevSeekTime = seekTime;
-        window.seekTime = seconds;
+        prevSeekTime = seekTime
+        window.seekTime = seconds
     }
-    videoPlayer.currentTime += seconds;
+    videoPlayer.currentTime += seconds
     if (prevSeekTime !== seekTime)
-        window.seekTime = prevSeekTime;
+        window.seekTime = prevSeekTime
 }
 
 function playPause() {
-    if (!isPlaying()) videoPlayer.play();
-    else videoPlayer.pause();
+    if (!isPlaying()) videoPlayer.play()
+    else videoPlayer.pause()
 }
 
 function isPlaying() {
-    return !videoPlayer.paused;
+    return !videoPlayer.paused
 }
 
 function playFrom(seconds) {
-    videoPlayer.currentTime = seconds;
-    videoPlayer.play();
+    videoPlayer.currentTime = seconds
+    videoPlayer.play()
+}
+
+function addPlay() {
+    let arguments = `videoID=${videoID}`
+    ajax('ajax/video_addplay.php', arguments, function () {
+        console.log('play added')
+        return
+    })
 }
 
 function addLocation(locationID) {
-    ajax('ajax/add_videolocation.php', `videoID=${videoID}&locationID=${locationID}`);
+    ajax('ajax/add_videolocation.php', `videoID=${videoID}&locationID=${locationID}`)
 }
 
 function removeLocation(locationID) {
-    ajax('ajax/remove_videolocation.php', `videoID=${videoID}&locationID=${locationID}`);
+    ajax('ajax/remove_videolocation.php', `videoID=${videoID}&locationID=${locationID}`)
 }
 
 function addAttribute(attributeID) {
-    ajax('ajax/add_videoattribute.php', `videoID=${videoID}&attributeID=${attributeID}`);
+    ajax('ajax/add_videoattribute.php', `videoID=${videoID}&attributeID=${attributeID}`)
 }
 
 function removeAttribute(attributeID) {
-    ajax('ajax/remove_videoattribute.php', `videoID=${videoID}&attributeID=${attributeID}`);
+    ajax('ajax/remove_videoattribute.php', `videoID=${videoID}&attributeID=${attributeID}`)
 }
 
 function renameVideo(videoName) {
-    ajax('ajax/rename_video.php', `videoID=${videoID}&videoName=${encodeURIComponent(videoName)}`);
+    ajax('ajax/rename_video.php', `videoID=${videoID}&videoName=${encodeURIComponent(videoName)}`)
 }
 
 function renameFile(videoPath) {
-    ajax('ajax/rename_file.php', `videoID=${videoID}&videoPath=${encodeURIComponent(videoPath)}`);
+    ajax('ajax/rename_file.php', `videoID=${videoID}&videoPath=${encodeURIComponent(videoPath)}`)
 }
 
 function addBookmark(categoryID, categoryName) {
-    let seconds = Math.round(videoPlayer.currentTime);
-    localStorage.bookmark = seconds;
+    let seconds = Math.round(videoPlayer.currentTime)
+    localStorage.bookmark = seconds
 
     ajax('ajax/add_bookmark.php', `seconds=${seconds}&categoryID=${categoryID}&videoID=${videoID}`, function (data) {
         if (!$('#timeline').length) {
-            let div = document.createElement('div');
-            div.id = 'timeline';
+            let div = document.createElement('div')
+            div.id = 'timeline'
 
-            insertBefore(document.getElementById('videoDetails'), div);
+            insertBefore(document.getElementById('videoDetails'), div)
         }
-        let wrapper = document.getElementById('timeline');
+        let wrapper = document.getElementById('timeline')
 
         if (!$(`.bookmark[data-bookmark-time="${seconds}"][data-category-id="${categoryID}"]`).length) {
-            let a = document.createElement('a');
-            a.classList.add('bookmark', 'btn');
-            a.setAttribute('data-category-id', categoryID);
-            a.setAttribute('data-bookmark-id', data.responseText);
-            a.setAttribute('data-bookmark-time', seconds.toString());
-            a.setAttribute('data-level', '1');
-            a.href = 'javascript:;';
-            a.style.marginLeft = `${getOffset(seconds)}%`;
-            a.textContent = categoryName;
+            let a = document.createElement('a')
+            a.classList.add('bookmark', 'btn')
+            a.setAttribute('data-category-id', categoryID)
+            a.setAttribute('data-bookmark-id', data.responseText)
+            a.setAttribute('data-bookmark-time', seconds.toString())
+            a.setAttribute('data-level', '1')
+            a.href = 'javascript:;'
+            a.style.marginLeft = `${getOffset(seconds)}%`
+            a.textContent = categoryName
 
-            wrapper.appendChild(a);
+            wrapper.appendChild(a)
+            // createChapterMarker(seconds);
         }
 
-        animation('checkbox.png');
+        animation('checkbox.png')
 
         $(bookmark).on('click', function () {
-            playFrom($(this).attr('data-bookmark-time'));
-        });
+            playFrom($(this).attr('data-bookmark-time'))
+        })
 
-        bookmarkCollision();
-    });
+        bookmarkCollision()
+    })
 }
 
 function bookmark_editCategory(bookmarkID, categoryID) {
-    ajax('ajax/bookmark_editCategory.php', `bookmarkID=${bookmarkID}&categoryID=${categoryID}`);
+    ajax('ajax/bookmark_editCategory.php', `bookmarkID=${bookmarkID}&categoryID=${categoryID}`)
 }
 
 function bookmark_editTime(bookmarkID) {
-    let seconds = Math.round(videoPlayer.currentTime);
-    localStorage.bookmark = seconds;
+    let seconds = Math.round(videoPlayer.currentTime)
+    localStorage.bookmark = seconds
 
     ajax('ajax/bookmark_editTime.php', `bookmarkID=${bookmarkID}&seconds=${seconds}`, function () {
-        let btn = document.querySelector(`.bookmark[data-bookmark-id="${bookmarkID}"]`);
-        btn.style.marginLeft = `${getOffset(seconds)}%`;
-        btn.setAttribute('data-bookmark-time', seconds.toString());
+        let btn = document.querySelector(`.bookmark[data-bookmark-id="${bookmarkID}"]`)
+        btn.style.marginLeft = `${getOffset(seconds)}%`
+        btn.setAttribute('data-bookmark-time', seconds.toString())
 
 
-        animation('checkbox.png');
-        bookmarkCollision();
-    });
+        animation('checkbox.png')
+        bookmarkCollision()
+    })
 }
 
 function removeBookmark(id) {
-    ajax('ajax/remove_bookmark.php', `id=${id}`);
+    ajax('ajax/remove_bookmark.php', `id=${id}`)
 }
 
 function removeBookmarks() {
-    ajax('ajax/remove_bookmarks.php', `videoID=${videoID}`);
+    ajax('ajax/remove_bookmarks.php', `videoID=${videoID}`)
 }
 
 function removeVideoCategory(videoID, categoryID) {
-    ajax('ajax/remove_videocategory.php', `videoID=${videoID}&categoryID=${categoryID}`);
+    ajax('ajax/remove_videocategory.php', `videoID=${videoID}&categoryID=${categoryID}`)
 }
 
 function removeVideoStar(videoID, starID) {
-    ajax('ajax/remove_videostar.php', `videoID=${videoID}&starID=${starID}`);
+    ajax('ajax/remove_videostar.php', `videoID=${videoID}&starID=${starID}`)
 }
 
 function addCategory_and_bookmark(categoryID, categoryName) {
-    $('#dialog').dialog('close');
+    $('#dialog').dialog('close')
 
-    let seconds = Math.round(videoPlayer.currentTime);
-    localStorage.bookmark = seconds;
+    let seconds = Math.round(videoPlayer.currentTime)
+    localStorage.bookmark = seconds
 
     ajax('ajax/add_category_and_bookmark.php', `videoID=${videoID}&categoryID=${categoryID}&seconds=${seconds}`, function (data) {
         if (!$('#timeline').length) {
-            let div = document.createElement('div');
-            div.id = 'timeline';
+            let div = document.createElement('div')
+            div.id = 'timeline'
 
-            insertBefore(document.getElementById('videoDetails'), div);
+            insertBefore(document.getElementById('videoDetails'), div)
         }
-        let wrapper = document.getElementById('timeline');
+        let wrapper = document.getElementById('timeline')
 
         if (!$('#categories').length) {
-            let div = document.createElement('div');
-            div.id = 'categories';
+            let div = document.createElement('div')
+            div.id = 'categories'
 
-            insertBefore(document.querySelector('#videoDetails > div[style]'), div);
+            insertBefore(document.querySelector('#videoDetails > div[style]'), div)
         }
-        let categoriesWrapper = document.getElementById('categories');
+        let categoriesWrapper = document.getElementById('categories')
 
         if (!$(`.category[data-category-id="${categoryID}"]`).length) {
-            let cat = document.createElement('a');
-            cat.classList.add('category', 'btn');
-            cat.setAttribute('data-category-id', categoryID);
-            cat.href = `category.php?id=${categoryID}`;
-            cat.textContent = categoryName;
+            let cat = document.createElement('a')
+            cat.classList.add('category', 'btn')
+            cat.setAttribute('data-category-id', categoryID)
+            cat.href = `category.php?id=${categoryID}`
+            cat.textContent = categoryName
 
-            categoriesWrapper.appendChild(cat);
+            categoriesWrapper.appendChild(cat)
         }
 
 
         if (!$(`.bookmark[data-bookmark-time="${seconds}"][data-category-id="${categoryID}"]`).length) {
-            let a = document.createElement('a');
-            a.classList.add('bookmark', 'btn');
-            a.setAttribute('data-category-id', categoryID);
-            a.setAttribute('data-bookmark-id', data.responseText);
-            a.setAttribute('data-bookmark-time', seconds.toString());
-            a.setAttribute('data-level', '1');
-            a.href = 'javascript:;';
-            a.style.marginLeft = `${getOffset(seconds)}%`;
-            a.textContent = categoryName;
+            let a = document.createElement('a')
+            a.classList.add('bookmark', 'btn')
+            a.setAttribute('data-category-id', categoryID)
+            a.setAttribute('data-bookmark-id', data.responseText)
+            a.setAttribute('data-bookmark-time', seconds.toString())
+            a.setAttribute('data-level', '1')
+            a.href = 'javascript:;'
+            a.style.marginLeft = `${getOffset(seconds)}%`
+            a.textContent = categoryName
 
-            wrapper.appendChild(a);
+            wrapper.appendChild(a)
+            //createChapterMarker(seconds);
         }
 
-        animation('checkbox.png');
+        animation('checkbox.png')
 
         $(bookmark).on('click', function () {
-            playFrom($(this).attr('data-bookmark-time'));
-        });
+            playFrom($(this).attr('data-bookmark-time'))
+        })
 
-        bookmarkCollision();
-    });
+        bookmarkCollision()
+    })
 }
 
 function generateThumbnail() {
-    ajax('ajax/video_generatethumbnail.php', `videoID=${videoID}`);
+    ajax('ajax/video_generatethumbnail.php', `videoID=${videoID}`)
 }
 
 function removeVideo() {
-    ajax('ajax/remove_video.php', `videoID=${videoID}`);
+    ajax('ajax/remove_video.php', `videoID=${videoID}`)
 }
 
 function setAge(age) {
-    ajax('ajax/video_age.php', `videoID=${videoID}&age=${age}`);
+    ajax('ajax/video_age.php', `videoID=${videoID}&age=${age}`)
 }
 
 function ajax(page, params, callback = function () {
     location.href = location.href
 }) {
-    let url = `${page}?${params}`;
+    let url = `${page}?${params}`
 
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', url);
-    xhr.send();
+    let xhr = new XMLHttpRequest()
+    xhr.open('GET', url)
+    xhr.send()
     xhr.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) callback(this);
+        if (this.readyState === 4 && this.status === 200) callback(this)
     }
 }
 
@@ -358,132 +414,132 @@ $(function () {
                 name: 'Rename',
                 icon: 'edit',
                 callback: function () {
-                    const dialogWrapper = document.createElement('div');
-                    dialogWrapper.id = 'dialog';
-                    dialogWrapper.title = 'Edit Video';
+                    const dialogWrapper = document.createElement('div')
+                    dialogWrapper.id = 'dialog'
+                    dialogWrapper.title = 'Edit Video'
 
-                    document.body.appendChild(dialogWrapper);
+                    document.body.appendChild(dialogWrapper)
                     $(function () {
-                        const dialogQuery = $('#dialog');
+                        const dialogQuery = $('#dialog')
                         dialogQuery.dialog({
                             close: function () {
-                                $(this).dialog('close');
-                                this.closest('.ui-dialog').remove();
+                                $(this).dialog('close')
+                                this.closest('.ui-dialog').remove()
                             },
                             width: 250
-                        });
+                        })
 
-                        const dialogInput = document.createElement('input');
-                        dialogInput.type = 'text';
-                        dialogInput.name = 'videoName_edit';
-                        dialogInput.value = videoTitle.textContent;
-                        dialogInput.autofocus = true;
+                        const dialogInput = document.createElement('input')
+                        dialogInput.type = 'text'
+                        dialogInput.name = 'videoName_edit'
+                        dialogInput.value = videoTitle.textContent
+                        dialogInput.autofocus = true
 
-                        dialogQuery.append(dialogInput);
-                        let input = $('input[name="videoName_edit"]');
-                        let len = input.val().length;
-                        input[0].focus();
-                        input[0].setSelectionRange(len, len);
+                        dialogQuery.append(dialogInput)
+                        let input = $('input[name="videoName_edit"]')
+                        let len = input.val().length
+                        input[0].focus()
+                        input[0].setSelectionRange(len, len)
 
                         document.querySelector('input[name="videoName_edit"]').addEventListener('keydown', function (e) {
                             if (e.keyCode === 13) {
-                                renameVideo(this.value);
+                                renameVideo(this.value)
                             }
-                        });
-                    });
+                        })
+                    })
                 }
             }, 'add_attribute': {
                 name: 'Add Attribute',
                 icon: 'fas fa-tag',
                 callback: function () {
-                    const dialogWrapper = document.createElement('div');
-                    dialogWrapper.id = 'dialog';
-                    dialogWrapper.title = 'Add Attrubute';
+                    const dialogWrapper = document.createElement('div')
+                    dialogWrapper.id = 'dialog'
+                    dialogWrapper.title = 'Add Attrubute'
 
-                    document.body.appendChild(dialogWrapper);
+                    document.body.appendChild(dialogWrapper)
                     $(function () {
-                        const dialogQuery = $('#dialog');
+                        const dialogQuery = $('#dialog')
                         dialogQuery.dialog({
                             close: function () {
-                                $(this).dialog('close');
-                                this.closest('.ui-dialog').remove();
+                                $(this).dialog('close')
+                                this.closest('.ui-dialog').remove()
                             },
                             width: 250,
                             position: {my: "top", at: "top+150"}
-                        });
+                        })
 
-                        const searchWrapper = document.createElement('span');
-                        searchWrapper.classList.add('search');
-                        const searchInner = document.createElement('span');
-                        searchInner.classList.add('inner');
+                        const searchWrapper = document.createElement('span')
+                        searchWrapper.classList.add('search')
+                        const searchInner = document.createElement('span')
+                        searchInner.classList.add('inner')
 
-                        searchWrapper.appendChild(searchInner);
-                        dialogQuery.append(searchWrapper);
-                        const query = $('#attributes.hidden > .attribute');
+                        searchWrapper.appendChild(searchInner)
+                        dialogQuery.append(searchWrapper)
+                        const query = $('#attributes.hidden > .attribute')
                         for (let i = 0; i < query.length; i++) {
-                            let attributeID = query.eq(i).attr('data-attribute-id');
-                            let attributeName = query.eq(i).text();
+                            let attributeID = query.eq(i).attr('data-attribute-id')
+                            let attributeName = query.eq(i).text()
 
-                            let btn = document.createElement('div');
-                            btn.classList.add('btn', 'unselectable');
+                            let btn = document.createElement('div')
+                            btn.classList.add('btn', 'unselectable')
                             btn.onclick = function () {
-                                addAttribute(attributeID);
-                            };
-                            btn.textContent = attributeName;
+                                addAttribute(attributeID)
+                            }
+                            btn.textContent = attributeName
 
-                            dialogQuery.append(btn);
+                            dialogQuery.append(btn)
                         }
-                        categorySearch();
-                    });
+                        categorySearch()
+                    })
                 }
             }, 'add_location': {
                 name: 'Add Location',
                 icon: 'fas fa-map-marker-alt',
                 callback: function () {
-                    const dialogWrapper = document.createElement('div');
-                    dialogWrapper.id = 'dialog';
-                    dialogWrapper.title = 'Add Location';
+                    const dialogWrapper = document.createElement('div')
+                    dialogWrapper.id = 'dialog'
+                    dialogWrapper.title = 'Add Location'
 
-                    document.body.appendChild(dialogWrapper);
+                    document.body.appendChild(dialogWrapper)
                     $(function () {
-                        const dialogQuery = $('#dialog');
+                        const dialogQuery = $('#dialog')
                         dialogQuery.dialog({
                             close: function () {
-                                $(this).dialog('close');
-                                this.closest('.ui-dialog').remove();
+                                $(this).dialog('close')
+                                this.closest('.ui-dialog').remove()
                             },
                             width: 250,
                             position: {my: "top", at: "top+150"}
-                        });
+                        })
 
-                        const searchWrapper = document.createElement('span');
-                        searchWrapper.classList.add('search');
-                        const searchInner = document.createElement('span');
-                        searchInner.classList.add('inner');
+                        const searchWrapper = document.createElement('span')
+                        searchWrapper.classList.add('search')
+                        const searchInner = document.createElement('span')
+                        searchInner.classList.add('inner')
 
-                        searchWrapper.appendChild(searchInner);
-                        dialogQuery.append(searchWrapper);
-                        const query = $('#locations.hidden > .location');
+                        searchWrapper.appendChild(searchInner)
+                        dialogQuery.append(searchWrapper)
+                        const query = $('#locations.hidden > .location')
                         for (let i = 0; i < query.length; i++) {
-                            let locationID = query.eq(i).attr('data-location-id');
-                            let locationName = query.eq(i).text();
+                            let locationID = query.eq(i).attr('data-location-id')
+                            let locationName = query.eq(i).text()
 
-                            let btn = document.createElement('div');
-                            btn.classList.add('btn', 'unselectable');
+                            let btn = document.createElement('div')
+                            btn.classList.add('btn', 'unselectable')
                             btn.onclick = function () {
-                                addLocation(locationID);
-                            };
-                            btn.textContent = locationName;
+                                addLocation(locationID)
+                            }
+                            btn.textContent = locationName
 
-                            dialogQuery.append(btn);
+                            dialogQuery.append(btn)
                         }
-                        categorySearch();
-                    });
+                        categorySearch()
+                    })
                 }
             }
         }
-    });
-});
+    })
+})
 /* Bookmarks */
 $(function () {
     $.contextMenu({
@@ -493,58 +549,58 @@ $(function () {
                 name: 'Change Category',
                 icon: 'edit',
                 callback: function (itemKey, options) {
-                    let bookmarkID = options.$trigger.attr('data-bookmark-id');
-                    let bookmarkName = options.$trigger.text().trim();
+                    let bookmarkID = options.$trigger.attr('data-bookmark-id')
+                    let bookmarkName = options.$trigger.text().trim()
 
-                    const dialogWrapper = document.createElement('div');
-                    dialogWrapper.id = 'dialog';
-                    dialogWrapper.title = 'Change Category';
+                    const dialogWrapper = document.createElement('div')
+                    dialogWrapper.id = 'dialog'
+                    dialogWrapper.title = 'Change Category'
 
-                    document.body.appendChild(dialogWrapper);
+                    document.body.appendChild(dialogWrapper)
                     $(function () {
-                        const dialogQuery = $('#dialog');
+                        const dialogQuery = $('#dialog')
                         dialogQuery.dialog({
                             close: function () {
-                                $(this).dialog('close');
-                                this.closest('.ui-dialog').remove();
+                                $(this).dialog('close')
+                                this.closest('.ui-dialog').remove()
                             },
                             width: 250,
                             position: {my: "top", at: "top+150"}
-                        });
+                        })
 
-                        const searchWrapper = document.createElement('span');
-                        searchWrapper.classList.add('search');
-                        const searchInner = document.createElement('span');
-                        searchInner.classList.add('inner');
+                        const searchWrapper = document.createElement('span')
+                        searchWrapper.classList.add('search')
+                        const searchInner = document.createElement('span')
+                        searchInner.classList.add('inner')
 
-                        searchWrapper.appendChild(searchInner);
-                        dialogQuery.append(searchWrapper);
-                        const query = $('#category_list > option');
+                        searchWrapper.appendChild(searchInner)
+                        dialogQuery.append(searchWrapper)
+                        const query = $('#category_list > option')
                         for (let i = 0; i < query.length; i++) {
-                            let category = query.eq(i);
-                            let categoryID = category.attr('data-category-id');
-                            let categoryName = category.attr('value');
+                            let category = query.eq(i)
+                            let categoryID = category.attr('data-category-id')
+                            let categoryName = category.attr('value')
 
                             if (categoryName !== bookmarkName) {
-                                let btn = document.createElement('div');
-                                btn.classList.add('btn', 'unselectable');
+                                let btn = document.createElement('div')
+                                btn.classList.add('btn', 'unselectable')
                                 btn.onclick = function () {
-                                    bookmark_editCategory(bookmarkID, categoryID);
-                                };
-                                btn.textContent = categoryName;
+                                    bookmark_editCategory(bookmarkID, categoryID)
+                                }
+                                btn.textContent = categoryName
 
-                                dialogQuery.append(btn);
+                                dialogQuery.append(btn)
                             }
                         }
 
-                        categorySearch();
-                    });
+                        categorySearch()
+                    })
                 }
             }, 'edit_time': {
                 name: 'Change Time',
                 icon: 'far fa-clock',
                 callback: function (itemKey, options) {
-                    bookmark_editTime(options.$trigger.attr('data-bookmark-id'));
+                    bookmark_editTime(options.$trigger.attr('data-bookmark-id'))
                 }
             },
             'divider': '---',
@@ -552,13 +608,13 @@ $(function () {
                 name: 'Delete',
                 icon: 'delete',
                 callback: function (itemKey, options) {
-                    let id = options.$trigger.attr('data-bookmark-id');
-                    removeBookmark(id);
+                    let id = options.$trigger.attr('data-bookmark-id')
+                    removeBookmark(id)
                 }
             }
         }
-    });
-});
+    })
+})
 /* Categories */
 $(function () {
     $.contextMenu({
@@ -568,9 +624,9 @@ $(function () {
                 name: 'Add Bookmark',
                 icon: 'add',
                 callback: function (itemKey, options) {
-                    let id = options.$trigger.attr('data-category-id');
-                    let categoryName = options.$trigger.text();
-                    addBookmark(id, categoryName);
+                    let id = options.$trigger.attr('data-category-id')
+                    let categoryName = options.$trigger.text()
+                    addBookmark(id, categoryName)
                 }
             },
             'divider': '---',
@@ -578,13 +634,13 @@ $(function () {
                 name: 'Remove',
                 icon: 'delete',
                 callback: function (itemKey, options) {
-                    let id = options.$trigger.attr('data-category-id');
-                    removeVideoCategory(videoID, id);
+                    let id = options.$trigger.attr('data-category-id')
+                    removeVideoCategory(videoID, id)
                 }
             }
         }
-    });
-});
+    })
+})
 /* Star */
 $(function () {
     $.contextMenu({
@@ -594,46 +650,46 @@ $(function () {
                 name: 'Add Bookmark',
                 icon: 'add',
                 callback: function () {
-                    const dialogWrapper = document.createElement('div');
-                    dialogWrapper.id = 'dialog';
-                    dialogWrapper.title = 'Add Bookmark';
+                    const dialogWrapper = document.createElement('div')
+                    dialogWrapper.id = 'dialog'
+                    dialogWrapper.title = 'Add Bookmark'
 
-                    document.body.appendChild(dialogWrapper);
+                    document.body.appendChild(dialogWrapper)
                     $(function () {
-                        const dialogQuery = $('#dialog');
+                        const dialogQuery = $('#dialog')
                         dialogQuery.dialog({
                             close: function () {
-                                $(this).dialog('close');
-                                this.closest('.ui-dialog').remove();
+                                $(this).dialog('close')
+                                this.closest('.ui-dialog').remove()
                             },
                             width: 250,
                             position: {my: "right top", at: "right-160 top+250"}
-                        });
+                        })
 
-                        const searchWrapper = document.createElement('span');
-                        searchWrapper.classList.add('search');
-                        const searchInner = document.createElement('span');
-                        searchInner.classList.add('inner');
+                        const searchWrapper = document.createElement('span')
+                        searchWrapper.classList.add('search')
+                        const searchInner = document.createElement('span')
+                        searchInner.classList.add('inner')
 
-                        searchWrapper.appendChild(searchInner);
-                        dialogQuery.append(searchWrapper);
-                        const query = $('#category_list > option');
+                        searchWrapper.appendChild(searchInner)
+                        dialogQuery.append(searchWrapper)
+                        const query = $('#category_list > option')
                         for (let i = 0; i < query.length; i++) {
-                            let categoryID = query.eq(i).attr('data-category-id');
-                            let categoryName = query.eq(i).attr('value');
+                            let categoryID = query.eq(i).attr('data-category-id')
+                            let categoryName = query.eq(i).attr('value')
 
-                            let btn = document.createElement('div');
-                            btn.classList.add('btn', 'unselectable');
+                            let btn = document.createElement('div')
+                            btn.classList.add('btn', 'unselectable')
                             btn.onclick = function () {
                                 addCategory_and_bookmark(categoryID, categoryName)
-                            };
-                            btn.textContent = categoryName;
+                            }
+                            btn.textContent = categoryName
 
-                            dialogQuery.append(btn);
+                            dialogQuery.append(btn)
                         }
 
-                        categorySearch();
-                    });
+                        categorySearch()
+                    })
                 }
             },
             'divider': '---',
@@ -641,13 +697,13 @@ $(function () {
                 name: 'Remove',
                 icon: 'delete',
                 callback: function (itemKey, options) {
-                    let id = options.$trigger.attr('data-star-id');
-                    removeVideoStar(videoID, id);
+                    let id = options.$trigger.attr('data-star-id')
+                    removeVideoStar(videoID, id)
                 }
             }
         }
-    });
-});
+    })
+})
 /* Video */
 $(function () {
     $.contextMenu({
@@ -658,82 +714,82 @@ $(function () {
                 name: 'Set Age',
                 icon: 'add',
                 callback: function () {
-                    const dialogWrapper = document.createElement('div');
-                    dialogWrapper.id = 'dialog';
-                    dialogWrapper.title = 'Set Age';
+                    const dialogWrapper = document.createElement('div')
+                    dialogWrapper.id = 'dialog'
+                    dialogWrapper.title = 'Set Age'
 
-                    document.body.appendChild(dialogWrapper);
+                    document.body.appendChild(dialogWrapper)
                     $(function () {
-                        const dialogQuery = $('#dialog');
+                        const dialogQuery = $('#dialog')
                         dialogQuery.dialog({
                             close: function () {
-                                $(this).dialog('close');
-                                this.closest('.ui-dialog').remove();
+                                $(this).dialog('close')
+                                this.closest('.ui-dialog').remove()
                             },
                             width: 350
-                        });
+                        })
 
-                        const dialogInput = document.createElement('input');
-                        dialogInput.type = 'number';
-                        dialogInput.name = 'videoAge_set';
-                        dialogInput.autofocus = true;
+                        const dialogInput = document.createElement('input')
+                        dialogInput.type = 'number'
+                        dialogInput.name = 'videoAge_set'
+                        dialogInput.autofocus = true
 
-                        dialogQuery.append(dialogInput);
+                        dialogQuery.append(dialogInput)
                         document.querySelector('input[name="videoAge_set"]').addEventListener('keydown', function (e) {
                             if (e.keyCode === 13) {
-                                setAge(this.value);
+                                setAge(this.value)
                             }
-                        });
-                    });
+                        })
+                    })
                 }
             },
             'rename_video': {
                 name: 'Rename File',
                 icon: 'edit',
                 callback: function () {
-                    let source = $(videoPlayer).find('source').not('[type="video/webm"], [type="application/x-mpegURL"]').first().attr('src');
-                    let videoPath_current = `${source.split('/')[1]}/${source.split('/')[2]}`;
+                    let source = $(videoPlayer).find('source').not('[type="video/webm"], [type="application/x-mpegURL"]').first().attr('src')
+                    let videoPath_current = `${source.split('/')[1]}/${source.split('/')[2]}`
 
-                    const dialogWrapper = document.createElement('div');
-                    dialogWrapper.id = 'dialog';
-                    dialogWrapper.title = 'Edit File';
+                    const dialogWrapper = document.createElement('div')
+                    dialogWrapper.id = 'dialog'
+                    dialogWrapper.title = 'Edit File'
 
-                    document.body.appendChild(dialogWrapper);
+                    document.body.appendChild(dialogWrapper)
                     $(function () {
-                        const dialogQuery = $('#dialog');
+                        const dialogQuery = $('#dialog')
                         dialogQuery.dialog({
                             close: function () {
-                                $(this).dialog('close');
-                                this.closest('.ui-dialog').remove();
+                                $(this).dialog('close')
+                                this.closest('.ui-dialog').remove()
                             },
                             width: 350
-                        });
+                        })
 
-                        const dialogInput = document.createElement('input');
-                        dialogInput.type = 'text';
-                        dialogInput.name = 'videoFile_edit';
-                        dialogInput.value = videoPath_current;
-                        dialogInput.autofocus = true;
+                        const dialogInput = document.createElement('input')
+                        dialogInput.type = 'text'
+                        dialogInput.name = 'videoFile_edit'
+                        dialogInput.value = videoPath_current
+                        dialogInput.autofocus = true
 
-                        dialogQuery.append(dialogInput);
-                        let input = $('input[name="videoFile_edit"]');
-                        let len = input.val().length;
-                        input[0].focus();
-                        input[0].setSelectionRange(len, len);
+                        dialogQuery.append(dialogInput)
+                        let input = $('input[name="videoFile_edit"]')
+                        let len = input.val().length
+                        input[0].focus()
+                        input[0].setSelectionRange(len, len)
 
                         document.querySelector('input[name="videoFile_edit"]').addEventListener('keydown', function (e) {
                             if (e.keyCode === 13) {
-                                renameFile(this.value);
+                                renameFile(this.value)
                             }
-                        });
-                    });
+                        })
+                    })
                 }
             },
             'fix_thumbnail': {
                 name: 'Fix Thumbnail',
                 icon: 'edit',
                 callback: function () {
-                    generateThumbnail();
+                    generateThumbnail()
                 }
             },
             'divider': '---',
@@ -741,7 +797,7 @@ $(function () {
                 name: 'Remove Bookmarks',
                 icon: 'delete',
                 callback: function () {
-                    removeBookmarks();
+                    removeBookmarks()
                 },
                 disabled: hasNoBookmarks()
             },
@@ -749,13 +805,13 @@ $(function () {
                 name: 'Remove Video',
                 icon: 'delete',
                 callback: function () {
-                    removeVideo();
+                    removeVideo()
                 },
                 disabled: !(hasNoStar() && hasNoBookmarks())
             }
         }
-    });
-});
+    })
+})
 /* Attribute */
 $(function () {
     $.contextMenu({
@@ -765,14 +821,14 @@ $(function () {
                 name: 'Remove Attribute',
                 icon: 'delete',
                 callback: function (itemKey, options) {
-                    let attributeID = options.$trigger.attr('data-attribute-id');
+                    let attributeID = options.$trigger.attr('data-attribute-id')
 
-                    removeAttribute(attributeID);
+                    removeAttribute(attributeID)
                 }
             }
         }
-    });
-});
+    })
+})
 /* Location */
 $(function () {
     $.contextMenu({
@@ -782,51 +838,51 @@ $(function () {
                 name: 'Remove Location',
                 icon: 'delete',
                 callback: function (itemKey, options) {
-                    let locationID = options.$trigger.attr('data-location-id');
+                    let locationID = options.$trigger.attr('data-location-id')
 
-                    removeLocation(locationID);
+                    removeLocation(locationID)
                 }
             }
         }
-    });
-});
+    })
+})
 
 function categorySearch() {
-    let input = '';
+    let input = ''
     document.addEventListener('keydown', function (e) {
-        const CHAR_BACKSPACE = 8;
-        const CHAR_SPACE = 32;
-        const CHAR_A = 65;
-        const CHAR_Z = 90;
+        const CHAR_BACKSPACE = 8
+        const CHAR_SPACE = 32
+        const CHAR_A = 65
+        const CHAR_Z = 90
 
         if (((e.which === CHAR_BACKSPACE && input.length) || e.which === CHAR_SPACE) || (e.which >= CHAR_A && e.which <= CHAR_Z)) {
-            e.preventDefault(); // spacebar scroll
+            e.preventDefault() // spacebar scroll
 
             if (e.which === 8) {
-                updateLabel(input = input.slice(0, -1));
+                updateLabel(input = input.slice(0, -1))
             } else {
-                updateLabel(input += String.fromCharCode(e.which).toLowerCase());
+                updateLabel(input += String.fromCharCode(e.which).toLowerCase())
             }
 
             $('#dialog .btn').removeClass('no-match').not(function () {
-                return this.textContent.toLowerCase().indexOf(input) > -1;
-            }).addClass('no-match');
+                return this.textContent.toLowerCase().indexOf(input) > -1
+            }).addClass('no-match')
         }
 
         function updateLabel(input) {
             if (document.querySelector('.search > .inner')) {
-                document.querySelector('.search > .inner').textContent = input;
+                document.querySelector('.search > .inner').textContent = input
             }
         }
-    });
+    })
 }
 
 function hasNoStar() {
-    return !$('.star').length;
+    return !$('.star').length
 }
 
 function hasNoBookmarks() {
-    return !$('.bookmark').length;
+    return !$('.bookmark').length
 }
 
 /* Bookmark Collision Check */
@@ -834,134 +890,183 @@ function collisionCheck(firstElement, secondElement) {
     const distance_min = {
         x: 5,
         y: 35
-    };
+    }
 
     let first = {
         dom: firstElement.getBoundingClientRect(),
         x: $(firstElement).offset().left,
         y: $(firstElement).offset().top
-    };
+    }
 
     let second = {
         dom: secondElement.getBoundingClientRect(),
         x: $(secondElement).offset().left,
         y: $(secondElement).offset().top
-    };
+    }
 
     let distance = {
         x: Math.abs((first.x + first.dom.width) - second.x),
         y: Math.abs(first.y - second.y)
-    };
+    }
 
     return !(
         first.dom.right < second.dom.left ||
         first.dom.left > second.dom.right ||
         first.dom.bottom < second.dom.top ||
         first.dom.top > second.dom.bottom
-    ) || (distance.x < distance_min.x && distance.y < distance_min.y);
+    ) || (distance.x < distance_min.x && distance.y < distance_min.y)
 }
 
 function bookmarkCollision() {
-    $(bookmark).attr('data-level', 1);
+    bookmarkSort()
+
+    $(bookmark).attr('data-level', 1)
     for (let i = 0; i < bookmark.length; i++) {
-        let level = $(bookmark).eq(i).attr('data-level');
+        let level = $(bookmark).eq(i).attr('data-level')
 
         if (i) {
-            let first = bookmark[i - 1];
+            let first = bookmark[i - 1]
             let second = bookmark[i];
 
             (function addSpace() {
                 setTimeout(function () {
                     if (collisionCheck(first, second)) {
-                        if (level < 10) level = ++level;
-                        else level = 1;
+                        if (level < 10) level = ++level
+                        else level = 1
 
-                        $(bookmark).eq(i).attr('data-level', level);
-                        addSpace();
+                        $(bookmark).eq(i).attr('data-level', level)
+                        addSpace()
                     }
-                }, 250);
-            })();
+                }, 250)
+            })()
         }
     }
 }
 
-function onFocus(callback) {
-    if (!document.hasFocus()) {
-        setTimeout(function () {
-            onFocus(callback);
-        });
-        return;
-    }
-    callback();
-    onBlur(callback); // make blur-and-focus connected
+function bookmarkSort() {
+    $(bookmark).sort(function (a, b) {
+        let valA = a.getAttribute('data-bookmark-time')
+        let valB = b.getAttribute('data-bookmark-time')
+
+
+        return valA - valB
+    })
+
+    $(bookmark).parent().append($(bookmark))
 }
 
-function onBlur(callback) {
+function onFocus(callback) {
     if (document.hasFocus()) {
-        setTimeout(function () {
-            onBlur(callback);
+        callback()
+    } else {
+        $(window).focus(function () {
+            callback();
         });
-        return;
     }
-    onFocus(callback); // make blur-and-focus connected
 }
 
 function autoComplete() {
-    let stars = [];
+    let stars = []
 
-    const starQuery = $('.star-autocomplete');
-    for (let i = 0; i < starQuery.length; i++) stars.push(starQuery.eq(i).text());
-    $('input[name="star"]').autocomplete({source: [stars]});
+    const starQuery = $('.star-autocomplete')
+    for (let i = 0; i < starQuery.length; i++) stars.push(starQuery.eq(i).text())
+    $('input[name="star"]').autocomplete({source: [stars]})
 }
 
 function videoVolume(level = 1) {
     if (level > 1) {
-        let audioCtx = new AudioContext();
-        let source = audioCtx.createMediaElementSource(videoPlayer);
+        let audioCtx = new AudioContext()
+        let source = audioCtx.createMediaElementSource(videoPlayer)
 
-        let gainNode = audioCtx.createGain();
-        gainNode.gain.value = level;
+        let gainNode = audioCtx.createGain()
+        gainNode.gain.value = level
 
-        source.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
+        source.connect(gainNode)
+        gainNode.connect(audioCtx.destination)
     } else if (level >= 0) {
-        videoPlayer.volume = level;
+        videoPlayer.volume = level
     }
 }
 
 function getOffset(start) {
-    let offset_decimal = start / duration;
-    let offset_custom = 0.5;
+    const offset_decimal = start / duration
+    const offset_mx = 1.01
 
-    let offset = offset_decimal * 100;
-    offset += offset_custom;
+    let offset = offset_decimal * 100
+    offset *= offset_mx
 
-    return offset;
+    return offset
 }
 
 function animation(src, duration_start = 300, duration_end = duration_start) {
-    let img = document.createElement('img');
-    img.src = `css/images/${src}`;
-    img.classList.add('symbol');
+    let img = document.createElement('img')
+    img.src = `css/images/${src}`
+    img.classList.add('symbol')
 
-    insertBefore(document.getElementsByClassName('plyr')[0], img);
+    insertBefore(document.getElementsByClassName('plyr')[0], img)
     $(img).fadeIn(duration_start, function () {
         $(this).fadeOut(duration_end, function () {
-            img.remove();
-        });
-    });
+            img.remove()
+        })
+    })
 }
 
 function insertBefore(parentNode, newNode) {
-    parentNode.insertBefore(newNode, parentNode.firstChild);
+    parentNode.insertBefore(newNode, parentNode.firstChild)
 }
 
 function windowResize(callback) {
-    let resizeEvt;
+    let resizeEvt
     window.addEventListener('resize', function () {
-        clearInterval(resizeEvt);
+        clearInterval(resizeEvt)
         resizeEvt = setTimeout(function () {
-            callback();
-        }, 100);
-    });
+            callback()
+        }, 100)
+    })
+}
+
+function createChapterMarker(seconds) {
+    if (!initChapterContainer()) {
+        setTimeout(function () {
+            createChapterMarker(seconds)
+        }, 100)
+    } else {
+        let chapterMarker = document.createElement('div')
+        chapterMarker.classList.add('chapter')
+        chapterMarker.style.left = `${getOffset(seconds)}%`
+        initChapterContainer().appendChild(chapterMarker)
+
+        chapterMarker.addEventListener('mouseenter', mouseEnter)
+        chapterMarker.addEventListener('mouseleave', mouseLeave)
+        chapterMarker.addEventListener('click', mouseClick)
+
+        let timeout, currentBookmark = document.querySelector(`.bookmark[data-bookmark-time="${seconds}"]`)
+        currentBookmark.addEventListener('mouseenter', function () {
+            if (currentBookmark.classList.contains('active')) mouseEnter()
+        })
+        currentBookmark.addEventListener('mouseleave', mouseLeave)
+
+        function mouseEnter() {
+            clearTimeout(timeout)
+            currentBookmark.classList.add('active')
+        }
+
+        function mouseLeave() {
+            timeout = setTimeout(function () {
+                currentBookmark.classList.remove('active')
+            }, 600)
+        }
+
+        function mouseClick() {
+            currentBookmark.click()
+        }
+    }
+}
+
+function initChapterContainer() {
+    return document.getElementById('chapter-container')
+}
+
+String.prototype.isUpperCase = function () {
+    return this.valueOf().toUpperCase() === this.valueOf()
 }
