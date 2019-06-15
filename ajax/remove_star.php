@@ -12,11 +12,7 @@ if (isset($_GET['starID'])) {
 		$query->execute();
 		if ($query->rowCount()) {
 			$image = $query->fetch()['image'];
-			unlink('../images/stars/' . $image);
-
-			$query = $pdo->prepare("UPDATE stars SET image = NULL WHERE id = ?");
-			$query->bindValue(1, $id);
-			$query->execute();
+			unlink('images/stars/' . $image);
 		}
 
 		$query = $pdo->prepare("SELECT id FROM videostars WHERE starID = ? LIMIT 1");
@@ -28,7 +24,7 @@ if (isset($_GET['starID'])) {
 			$query->execute();
 		}
 
-		$query = $pdo->prepare("DELETE FROM staralias WHERE starID = ?");
+		$query = $pdo->prepare("DELETE FROM starattributes WHERE starID = ?");
 		$query->bindValue(1, $id);
 		$query->execute();
 	}

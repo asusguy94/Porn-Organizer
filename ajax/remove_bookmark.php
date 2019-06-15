@@ -17,6 +17,14 @@ if (isset($_GET['id'])) {
 		$query->bindValue(1, $id);
 		$query->execute();
 
+		$query = $pdo->prepare("DELETE FROM bookmarkstars WHERE bookmarkID = ?");
+		$query->bindValue(1, $id);
+		$query->execute();
+
+		$query = $pdo->prepare("DELETE FROM bookmarkattributes WHERE bookmarkID = ?");
+		$query->bindValue(1, $id);
+		$query->execute();
+
 		$query = $pdo->prepare("SELECT id FROM bookmarks WHERE videoID = ? AND categoryID = ? LIMIT 1");
 		$query->bindValue(1, $videoID);
 		$query->bindValue(2, $categoryID);

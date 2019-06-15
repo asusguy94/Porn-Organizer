@@ -1,75 +1,64 @@
 @import "variables";
 
-nav {
-  li {
-    list-style-type: none;
-  }
+ul li {
+  list-style-type: none;
+}
 
-  a {
-    outline: 0;
-  }
+.main-menu {
+  background-color: green;
 
-  .main-menu {
-    background-color: green;
+  padding: 0;
 
-    padding: 0;
+  width: auto;
+  display: block;
 
-    width: auto;
-    display: block;
+  & > li {
+    display: inline-block;
+    min-width: 60px;
+    text-align: center;
+    transition-duration: 300ms;
 
-    & > li {
-      display: inline-block;
-      min-width: 60px;
-      text-align: center;
-      transition-duration: 300ms;
-
-      &:nth-last-of-type(-n+#{$navElementsRight}) {
-        float: right;
-      }
-    }
-
-    li.active {
-      background-color: rgba(85, 85, 85, 0.5);
-
-      & > a {
-        font-weight: bold;
-      }
-    }
-
-    .sub-menu {
-      display: none;
-      position: absolute;
-      background-color: green;
-      box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-      z-index: 1;
-      padding-left: 0;
-
-      & > li {
-        padding-left: 8px;
-        padding-right: 8px;
-      }
-    }
-
-    li:not(.active):hover {
-      background-color: forestgreen;
-    }
-  }
-
-
-  .main-menu {
-    &, .sub-menu {
-      & > li > a {
-        display: inline-block;
-
-        color: white;
-        text-decoration: none;
-        padding: 12px;
-      }
-    }
-
-    li:hover .sub-menu {
-      display: block;
+    &:nth-last-of-type(-n+#{$navElementsRight}) {
+      float: right;
     }
   }
 }
 
+ul > li:not(.active):hover {
+  background-color: forestgreen;
+}
+
+nav li.active {
+  background-color: rgba(85, 85, 85, 0.5);
+
+  & > a {
+    font-weight: bold;
+  }
+}
+
+.main-menu > li > a,
+.sub-menu > li > a {
+  display: inline-block;
+
+  color: white;
+  text-decoration: none;
+  padding: 12px;
+}
+
+.sub-menu {
+  display: none;
+  position: absolute;
+  background-color: green;
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  padding-left: 0;
+
+  & > li {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+.main-menu li:hover .sub-menu {
+  display: block;
+}

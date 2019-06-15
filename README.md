@@ -1,42 +1,124 @@
-# Welcome
-This is a project I'm using for an automated system of organizing my porn. Import **database.sql** with phpmyadmin to create the database and tables.
+# hentai
+A simple web management solution
+## Getting started
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+### Prerequisites
+#### Database
+- Create a database
+- Add tables to the database
+  - **attributes** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY_KEY
+    - **name** (VARCHAR255)
+  - **bookmarkattributes** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY_KEY
+    - **bookmarkID** (INT)
+    - **attributeID** (INT)
+  - **bookmarks** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY_KEY
+    - **videoID** (INT)
+    - **categoryID** (INT)
+    - **start** (INT)
+  - **bookmarkstars** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY KEY
+    - **bookmarkID** (INT)
+    - **starID** (INT)
+  - **breast** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY KEY
+    - **name** (VARCHAR255)
+  - **categories** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY KEY
+    - **name** (VARCHAR255)
+  - **eye** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY KEY
+    - **name** (VARCHAR255)
+  - **hair** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY KEY
+    - **name** (VARCHAR255)
+  - **hairlength** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY KEY
+    - **name** (VARCHAR255)
+  - **hairstyle** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY KEY
+    - **name** (VARCHAR255)
+  - **starattributes** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY KEY
+    - **starID** (INT)
+    - **attributeID** (INT)
+  - **stars** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY KEY
+    - **name** (VARCHAR255)
+    - **image** (VARCHAR255)
+    - **hair** (VARCHAR255)
+    - **hairstyle** (VARCHAR255)
+    - **eye** (VARCHAR255)
+    - **breast** (VARCHAR255)
+  - **videoalias** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY KEY
+    - **videoID** (INT)
+    - **name** (VARCHAR255)
+  - **videocategories** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY KEY
+    - **videoID** (INT)
+    - **starID** (INT)
+  - **videos** (TABLE NAME)
+    - **id** (INT) AUTO_INCREMENT PRIMARY KEY
+    - **name** (VARCHAR255)
+    - **episode** (VARCHAR255)
+    - **path** (VARCHAR255)
+    - **franchise** (VARCHAR255)
+    - **noStar** (BOOL or TINY)
+  - **videostars**
+    - **id** (INT) AUTO_INCREMENT PRIMARY_KEY
+    - **starID** (INT)
+    - **videoID** (INT)
 
-## Some information about the system
-- The program is built on **HTML, PHP, MySQL & JavaScript**, so to use it you either have to run a local server or if you have another computer you could run the server from there
-  - I'm running the server on a NAS...so any computer should be able to outperform my setup.
-- The program is dependent on some libraries/files, but all of them should be within this repository
-- The program is heavily dependent on the structure of the files/folders, for more info check the [Wiki](../../wiki)
-- This project is **early in development**
-- If anyone needs help with anything regarding the project, don't hesitate to ask!
-- This project is loosely based on a Windows app, if you want to try that one here [Pornganizer](https://pornganizer.org)
-  - This project uses some of the functionality similar to that program, but with a lot of folder/file automation.
-- I also have another version of this project for a hentai-version of this organizer, if that is something that anyone wants to use as well, I can upload that too.
-- Any help is appreciated...also with GitHub, as I'm quite new to the platform
+[Script for automatic creation](https://raw.githubusercontent.com/mnervik/hentai/master/hentai.sql?token=AOnpQNNlEOTnJeK-BZyG_i2jv_216ZYJks5b3rBswA%3D%3D)
 
-## Requirements
-- Server
-  - **Linux**: LAMP
-  - **WindowsXP**: XAMP
-  - **Windows**: WAMP
-- **Modern Web browser**: Chrome, Chromium, Firefox, etc..
-- **Database name**: insert it into ```_class.php``` (or use default)
-- **Database username**: insert into ```_class.php``` (or use default)
-- **Database password**: insert into ```_class.php``` (or use default)
-- If you want the DB-link in the navbar to work, you need to install phpmyadmin and move its install folder to phpMyAdmin inside the project folder
+#### _class.php
+Edit the define-data at the top of the **_class.php** file, before "Try {".
+- define('DB', 'INSERT_NAME_OF_YOUR_DATABASE')
+- define('DB_USER', 'INSERT_DATABASE_USERNAME')
+```
+Use root if unsure
+```
+- define('DB_PASS', 'INSERT_DATABASE_PASSWORD')
+```
+Use blank if unsure and you used root as username
+```
+- define('CDN_MAX', NUMBER_OF_CDNS)
+```
+Number of virual cdn's to use for the project.
+Set to 0 if you're not shure about what to set, or if you want to disable the feature.
+This just allows the browser to load more than 6 elements at the same time due to a browser-limit.
+```
+- define('THUMBNAIL_RES', DESIRED_THUMBNAIL_WIDTH);
+- OPTIONAL: define('DB_STR', 'mysql:host=YOUR_IP:PORT_NUMBER;dbname=' . DB);
+```
+  mariaDB port: 3307
+  mySQL port: 3306
+```
 
+Thats it, now you're ready, enjoy.
 
-## Release vs Clone
-There are 2 ways to use this project
-- Download a release (stable but not often updated)
-- Clone the project (latest features and updated often)
-  - If you choose to clone the project you will need to do one more thing in order to use the project
-   1. Install [Node.JS](https://nodejs.org/)
-   2. Open the terminal of choice and CD into where you downloaded/cloned the directory to
-      - If you downloaded the file to `C:/downloads`, you can run `CD C:/downloads/porn-organizer`
-   4. Type `npm install` to download the required files.
-   3. Type `gulp` to compile the nesseary files.
+## Issues
+Bugs and issues withe low priority, learn to live with them. Most of the will not bother you more than once.
 
-## TODO
-- [ ] Implement Bootstap 4
-- [ ] Video-page bookmark-visuals are broken on smaller devices
-- [x] Upload .SQL file for project
+**If no categories exists, you cannot add any category to a video**
+```
+1. Add a category manually to the database table. This bug only occurs when the table has 0 rows.
+```
+
+**Attribute spelling error, or you accedentally created a new category by writing "softt" instead of "soft"**
+```
+Currently the way the structure of the database and php-functions work, is that it will create a new row that cannot be deleted through the app.
+1. Remove the incorrect data by writing "_NULL" in the field with the incorrect data and click enter to save the changes. This will remove all data from that field.
+2. Go to the database (click on "DB" at the top right to get into the administration)
+3. Go to the database responsible for your app.
+4. Go to the table with the incorrect data, i.e if you want to fix haircolor go to the hair-table.
+5. BEFORE DOING ANYTHING: Check that nothing is using the unwanted data, this can be checked with the app (easy), or with the administration (intermediate).
+6. Remove the unwanted data from the administration website and go back to the app. it should now be working again
+```
+## Copyright and License
+[Plyr](js/license.md)
+
+[The MIT License](LICENSE.md)

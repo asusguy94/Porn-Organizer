@@ -3,46 +3,34 @@ include('_class.php');
 $basic = new Basic();
 $videos = new Video();
 
-if (isset($_GET['id']) && !empty($_GET['id'])) {
+if (isset($_GET['id']) && !empty($_GET['id']))
 	$id = $_GET['id'];
-} else {
-	header('Location: video_list.php');
-}
+else
+	header('Location: videos.php');
 
-// TODO Enable bootstrap
 ?>
 
 <!doctype html>
 <html>
-    <head>
-		<?php $basic->head($videos->getVideo($id), array('jqueryui', 'contextmenu', 'autocomplete', 'plyr', 'video'), array('bootstrap', 'jqueryui', 'contextmenu', 'autocomplete', 'hls', 'plyr', 'video')) ?>
-    </head>
+<head>
+	<?php $basic->head($videos->getVideo($id), array('', 'jqueryui', 'contextmenu', 'plyr', 'video'), array('jquery', 'jqueryui', 'contextmenu', 'hls', 'plyr', 'video')) ?>
+</head>
 
-    <body>
-        <nav>
-			<?php $basic->navigation() ?>
-        </nav>
-
-        <main class="container-fluid">
-            <div class="row">
-                <section class="col-10">
-					<?php
-					$videos->fetchVideo($id);
-					$videos->fetchInfo($id);
-					?>
-                </section>
-
-                <aside class="col-2">
-					<?php
-					if (isset($_GET['id']) && !empty($_GET['id'])) {
-						$id = $_GET['id'];
-						$videos->fetchInfo_sidebar($id);
-					} else {
-						header('Location: video_list.php');
-					}
-					?>
-                </aside>
-            </div>
-        </main>
-    </body>
+<body>
+<nav><?php $basic->navigation() ?></nav>
+<main class="container-fluid">
+    <div class="row">
+        <!-- TODO bootstrap-buttons not working -->
+        <section>
+			<?php
+			$videos->fetchVideo($id);
+			$videos->fetchInfo($id);
+			?>
+        </section>
+        <aside>
+			<?php $videos->fetchInfo_sidebar($id) ?>
+        </aside>
+    </div>
+</main>
+</body>
 </html>

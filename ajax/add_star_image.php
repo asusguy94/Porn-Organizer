@@ -9,18 +9,12 @@ if (isset($_GET['id']) && isset($_GET['image'])) {
 		$image = $_GET['image'];
 
 		$ext = $basic->getExtension($image);
-		if ($ext === 'jpe' || $ext === 'jpeg') $ext = 'jpg';
-
 		if ($stars->downloadImage($image, $id)) {
 			global $pdo;
 			$query = $pdo->prepare("UPDATE stars SET image = ? WHERE id = ?");
 			$query->bindValue(1, "$id.$ext");
 			$query->bindValue(2, $id);
 			$query->execute();
-
-			$ext = $basic->getExtension($image);
-			if ($ext === 'jpe' || $ext === 'jpeg') $ext = 'jpg';
-			echo md5_file("../images/stars/$id.$ext");
 		}
 	}
 }

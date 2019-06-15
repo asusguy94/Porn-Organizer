@@ -7,9 +7,14 @@ if (isset($_GET['videoID']) && isset($_GET['videoName'])) {
 		$videoName = $_GET['videoName'];
 
 		global $pdo;
-		$query = $pdo->prepare("UPDATE videos SET name = ? WHERE id = ?");
+		$query = $pdo->prepare("SELECT id FROM videos WHERE name = ?");
 		$query->bindValue(1, $videoName);
-		$query->bindValue(2, $videoID);
 		$query->execute();
+		if(!$query->rowCount()){
+			$query = $pdo->prepare("UPDATE videos SET name = ? WHERE id = ?");
+			$query->bindValue(1, $videoName);
+			$query->bindValue(2, $videoID);
+			$query->execute();
+		}
 	}
 }

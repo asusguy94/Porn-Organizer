@@ -1,119 +1,107 @@
 <?php
 include('_class.php');
+
 $basic = new Basic();
 $db = new DB();
-$file_class = new File();
+$ffmpeg = new FFMPEG();
 ?>
 
     <!doctype html>
     <html>
-    <head>
-		<?php $basic->head('', array('bootstrap')) ?>
-    </head>
+        <head>
+			<?php $basic->head('', array('bootstrap')) ?>
+        </head>
 
-    <body>
-    <nav>
-		<?php $basic->navigation() ?>
-    </nav>
-    </body>
+        <body>
+            <nav>
+				<?php $basic->navigation() ?>
+            </nav>
+        </body>
     </html>
 
 <?php
 global $pdo;
-$root = glob('videos/*', GLOB_ONLYDIR);
+$files = glob('videos/*.mp4');
+$newFiles = [];
 
-$path_arr = [];
-foreach ($root as $file) { // store directory names
-	if (!$basic->contains($file, '_')) {
-		array_push($path_arr, $file);
+foreach ($files as $path) {
+	$file = $basic->pathToFname($path);
+
+	if ($basic->endsWidth($file, '-720.mp4') || $basic->endsWidth($file, '-480.mp4') || $basic->endsWidth($file, '-360.mp4')) { // QUALITY FILE
+		continue;
+	}
+
+	if (!$db->videoExists($file)) {
+		array_push($newFiles, $file);
 	}
 }
 
-$filesAdded = 0;
-
-// get data from videos-table
-$query = $pdo->prepare("SELECT path AS videoPath FROM videos");
+$query = $pdo->prepare("SELECT id, path FROM videos WHERE duration = 0 OR height = 0");
 $query->execute();
-$result = $query->fetchAll(PDO::FETCH_OBJ);
-
-$videoPath_arr = [];
-for ($i = 0, $len = count($result); $i < $len; $i++) {
-	array_push($videoPath_arr, $result[$i]->videoPath);
+foreach ($query->fetchAll() AS $item) {
+	$query = $pdo->prepare("UPDATE videos SET duration = :duration, height = :height WHERE id = :id");
+	$query->bindParam(':id', $item['id']);
+	$query->bindParam(':duration', $ffmpeg->getDuration($item['path']));
+	$query->bindParam(':height', $ffmpeg->getVideoHeight($item['path']));
 }
 
-$error = [];
-foreach ($path_arr as $directory) { // for each directory (website)
-	$files = glob("$directory/*.*");
-	foreach ($files as $file) {
-		$video_path = $file_class->getPath($file);
-		if (!is_file("videos/$video_path") || $basic->getExtension($file) === 'webm' || !$basic->hasExtension($video_path)) continue;
-
-		// Extract Data from File
-		$video_website = $file_class->getWebsite($file);
-		$video_site = $file_class->getSite($file);
-		$video_star = $file_class->getStar($file);
-		$video_title = $file_class->getTitle($file);
-		$video_date = $file_class->getDate($file);
-
-		// Add Data to DB
-		if (!in_array($video_path, $videoPath_arr)) { // file does not exists in videos-table
-			if (!$db->addVideo($video_path, $video_title, $video_date)) { // Add Video
-				array_push($error, "Could not add Video: $video_path");
-			}
-			array_push($videoPath_arr, $video_path); // Update Array
-
-			if ($db->websiteExists($video_website) && $db->siteExists($video_site)) { // Add WebsiteSite
-				if (strlen($video_site)) {
-					$websiteID = $db->getWebsite($video_website);
-					$siteID = $db->getSite($video_site);
-
-					$db->addWebsiteSite($websiteID, $siteID);
-				}
-			} else {
-				if (!$db->websiteExists($video_website)) { // Add WebSite
-					$db->addWebsite($video_website);
-				}
-				if (!$db->siteExists($video_site)) { // Add Site
-					if (strlen($video_site)) {
-						if ($video_website != '') $db->addSite($video_site, $db->getWebsite($video_website));
-						else $db->addSite($video_site);
-					}
-				}
-			}
-			$filesAdded++;
-		} else { // file exists in videos-table
-			/* FIX duration - START */
-			$ffmpeg = new FFMPEG();
-			$query = $pdo->prepare("SELECT id FROM videos WHERE duration = 0 AND path = :path LIMIT 1");
-			$query->bindParam(':path', $video_path);
-			$query->execute();
-			foreach ($query->fetchAll() AS $data) {
-				if (file_exists("videos/$video_path")) {
-					$query = $pdo->prepare("UPDATE videos SET duration = :duration WHERE id = :id AND path = :path");
-					$query->bindParam(':duration', $ffmpeg->getDuration($video_path));
-					$query->bindParam(':id', $data['id']);
-					$query->bindParam(':path', $video_path);
-					$query->execute();
-				}
-			}
-			/* FIX duration - END */
-
-			$db->checkStarRelation($file); // add star-video relation
-
-			$db->checkVideoRelation($file); // add video-site relation
-
-			// Uncomment Bellow if you are editing the date-part of the video-files
-			//$db->checkVideoDate($file);
+if (isset($_POST['submit'])) {
+	if (count(array_filter($_POST)) === count($_POST)) { // check if all fields are filled out!
+		$titleArr = [];
+		$episodeArr = [];
+		$franchiseArr = [];
+		$fnameArr = [];
+		foreach ($_POST['title'] as $data) {
+			array_push($titleArr, $data);
 		}
-	}
-}
+		foreach ($_POST['episode'] as $data) {
+			array_push($episodeArr, $data);
+		}
+		foreach ($_POST['franchise'] as $data) {
+			array_push($franchiseArr, $data);
+		}
+		foreach ($_POST['fname'] as $data) {
+			array_push($fnameArr, $data);
+		}
 
-if (count($error)) {
-	for ($i = 0; $i < count($error); $i++) {
-		echo "$error[$i]<br>";
+		for ($i = 0; $i < count($fnameArr); $i++) {
+			$query = $pdo->prepare("INSERT INTO videos(name, episode, path, franchise, duration, height, date) VALUES(:name, :episode, :path, :franchise, :duration, :height, NOW())");
+			$query->bindParam(':name', $titleArr[$i]);
+			$query->bindParam(':episode', $episodeArr[$i]);
+			$query->bindParam(':path', $fnameArr[$i]);
+			$query->bindParam(':franchise', $franchiseArr[$i]);
+			$query->bindParam(':duration', $ffmpeg->getDuration($fnameArr[$i]));
+			$query->bindParam(':height', Basic::getClosestQ($ffmpeg->getVideoHeight($fnameArr[$i])));
+			$query->execute();
+		}
 
+		header('Location: video_generatethumbnails.php');
 	}
-} else if ($filesAdded) {
-	header('Location: video_generatethumbnails.php');
+} else if (count($newFiles)) {
+	print '<form method="post" id="addVideos">';
+	for ($i = 0; $i < count($newFiles); $i++) {
+		print '<div class="form-group">';
+		print '<label for="fname[]">FileName</label><br>';
+		print "<input type='text' name='fname[]' value='{$newFiles[$i]}'><br>";
+		print '</div>';
+
+		print '<div class="form-group">';
+		print '<label for="title[]">Title</label><br>';
+		print "<input type='text' name='title[]' value='{$basic->generateName($newFiles[$i])}'><br>";
+		print '</div>';
+
+		print '<div class="form-group">';
+		print '<label for="franchise[]">Franchise</label><br>';
+		print "<input type='text' name='franchise[]' value='{$basic->generateFranchise($newFiles[$i])}'><br>";
+		print '</div>';
+
+		print '<div class="form-group">';
+		print '<label for="episode[]">Episode</label><br>';
+		print "<input type='number' name='episode[]' value='{$basic->generateEpisode($newFiles[$i])}'><br>";
+		print '</div>';
+
+		print '<br>';
+	}
+	print '<input type="submit" class="btn btn-primary" name="submit" value="Save Changes">';
+	print '</form>';
 }
-?>

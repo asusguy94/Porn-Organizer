@@ -1,4 +1,4 @@
-@import "functions";
+@import "variables";
 
 section {
   width: 75%;
@@ -13,64 +13,22 @@ aside {
   margin-right: auto;
 
   float: right;
-
-  #stars {
-    margin-top: 10px;
-  }
-
-  .star img {
-    width: 100%;
-  }
-
-  #up-next {
-    display: block;
-    height: 75px;
-
-    margin: 0 15%;
-    padding: 5px 10px;
-
-    background-color: grey;
-    text-decoration: none;
-
-    border-radius: 4px;
-  }
-
-  #up-next * {
-    color: white;
-  }
-
-  #up-next:hover {
-    background-color: darkgrey;
-  }
-
-  #up-next > div {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-  }
 }
 
-#video {
-  & > h2,
-  & > h3 {
-    display: block;
-    width: 90%;
-    float: left;
+#video > h2 {
+  display: block;
+  width: 90%;
+  float: left;
+}
 
-    margin: 0;
-  }
+#video > #next {
+  float: right;
+  margin-top: 1.5%;
+}
 
-  & > h3 {
-    font-size: medium;
-    color: green;
-    margin-bottom: 1%;
-    margin-top: 1px;
-  }
-
-  & > #next {
-    float: right;
-    margin-top: -1.5%;
-  }
+video {
+  width: inherit;
+  float: left;
 }
 
 /* Video Details */
@@ -79,10 +37,29 @@ aside {
 }
 
 /* Timeline */
+@mixin bookmarkPosition() {
+  $levelSelector: 1;
+  $margin: 0;
+  $margin-offset: 35;
+
+  @for $i from 1 through $totalBookmarkRows {
+    $margin: ($levelSelector - 1) * $margin-offset;
+
+    .bookmark[data-level="#{$i}"] {
+      margin-top: $margin + px;
+    }
+
+    $levelSelector: $levelSelector+1;
+    @if $levelSelector > $bookmarkRows {
+      $levelSelector: 1;
+    }
+  }
+}
+
 #timeline {
   position: relative;
-  left: 130px;
-  margin-right: 17.2%;
+  left: 135px;
+  margin-right: 9.5%;
 
   .bookmark {
     position: absolute;
@@ -92,100 +69,99 @@ aside {
     border-bottom-left-radius: 0;
     padding-left: 5px;
     padding-right: 10px;
-
-
-    /* Legacy */
-    //opacity: 0;
-    //transition: opacity 200ms;
-
-    &.active, &.closest {
-      opacity: 1;
-    }
   }
 
   @include bookmarkPosition();
 }
 
-form[autocomplete] {
+/* Sidebar */
+aside #franchise {
+  margin-bottom: 3%;
+}
+
+/* Sidebar */
+aside #stars {
+  margin-top: 10px;
+}
+
+aside .star {
+  width: 29%;
+  vertical-align: top;
+}
+
+aside .star img {
+  width: 100%;
+}
+
+#up-next, .episode {
+  display: block;
+  height: 75px;
+
+  margin: 0 1%;
+  padding: 5px 10px;
+
+  background-color: grey;
+  text-decoration: none;
+
+  border-radius: 4px;
+}
+
+#up-next *, .episode * {
+  color: white;
+}
+
+.episode {
+  margin-top: 10px;
+}
+
+#up-next:hover, .episode:hover {
+  background-color: darkgrey;
+}
+
+#up-next > div, .episode .title {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#franchise .info {
+  height: inherit;
+}
+
+#franchise .info > .title {
+  margin-left: 140px;
+}
+
+#franchise .info > img.thumbnail {
+  height: inherit;
+  float: left;
+}
+
+#video-attributes {
+  text-align: center;
+}
+
+.video-attribute {
   display: inline-block;
-  opacity: .15;
-  transition: .5s;
+  margin-left: 5px;
+}
+
+form[autocomplete] {
+  opacity: 0.15;
+  transition: 0.5s;
+  display: inline-block;
 
   &:hover, &.active {
     opacity: 1;
   }
 }
 
-.btn {
-  border: 1px solid dodgerblue;
-  border-radius: 20px;
-
-  color: black;
-  text-decoration: none;
-  text-align: center;
-
-  padding: 4px 15px;
-  margin: 5px;
-
-  cursor: default;
-  transition-duration: 200ms;
-
-  background-color: white;
-
-  &.date::before {
-    margin-right: 5px;
-  }
-
-  &.location {
-    border-color: $btnLocationColor;
-
-    &:not(.no-hover):hover, &:not(.no-hover):focus {
-      background-color: $btnLocationColor;
-    }
-  }
-
-  &[disabled], &-cancel {
-    border-color: grey;
-
-    &:not(.no-hover):hover, &:not(.no-hover):focus {
-      color: white !important;
-      background-color: grey !important;
-    }
-  }
-
-
-  &:not(.no-hover):hover, &:not(.no-hover):focus {
-    color: white;
-    background-color: dodgerblue;
-  }
-
-  &[disabled]:not(.no-hover):hover, &[disabled]:not(.no-hover):focus {
-    color: white;
-    background-color: grey;
-  }
-}
-
 /* FIXES */
-@import 'plyr';
-
-#chapter-container {
-  width: 101%;
-  margin-left: -8px;
-
-  position: absolute;
-  top: 0;
-
-  height: 100%;
-
-  .chapter {
-    position: absolute;
-
-    height: 100%;
-    width: 6px; // TODO set in JavaScript
-
-    background-color: red;
-    z-index: 10;
-  }
+.plyr--video.plyr--menu-open {
+  overflow: hidden;
 }
 
-// TODO remove unused code
+.plyr__time {
+  margin-left: 0 !important;
+  width: 85px;
+}

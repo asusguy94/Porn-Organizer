@@ -1,10 +1,9 @@
 @import "functions";
-
 /* Navigation */
 @import "navigation";
 
 /* Stars */
-#stars {
+#video-stars {
   text-align: center
 }
 
@@ -20,118 +19,13 @@
   }
 }
 
-.star.no-image .image, div.image {
+.star.no-image .image {
   background-color: #C4C4C4;
 }
 
 .star .image, .star-image {
   max-height: 275px;
   max-width: 200px;
-}
-
-.card.star {
-  max-width: 200px;
-
-  .card-img-top {
-    max-height: 275px;
-  }
-}
-
-/* Star */
-#star {
-  & > img,
-  & > #dropbox {
-    width: 200px;
-  }
-
-  #next {
-    position: absolute;
-    left: 25%;
-    margin-top: 100px;
-  }
-}
-
-/* Category */
-#categories {
-  margin-bottom: 20px;
-
-  .category {
-    display: block;
-    width: 90px;
-  }
-}
-
-.video {
-  text-decoration: none !important;
-  color: black;
-
-  span {
-    text-align: center;
-  }
-
-  .info, .title {
-    display: block;
-  }
-
-  .info {
-    .wsite {
-      color: green;
-    }
-    .site {
-      color: red;
-    }
-  }
-
-  .divider {
-    &::before, &::after {
-      content: ' ';
-    }
-  }
-
-  img, video {
-    display: block;
-    width: $thumbnailWidth + px;
-  }
-}
-
-/* Form */
-form {
-  margin-bottom: 7px
-}
-
-label {
-  margin-right: 5px;
-
-  &[for="eye"], &[for="hair"] {
-    font-weight: bold
-  }
-}
-
-/* Dialog */
-@import "dialog";
-
-/* Dropbox */
-@import "dropbox";
-
-/* Ribbon */
-@import "ribbon";
-
-/* Other */
-.location, .attribute {
-  display: inline-block;
-
-  &::before {
-    margin-right: 5px;
-  }
-}
-
-h3 {
-  margin-bottom: 0
-}
-
-.btn {
-  margin: 5px;
-  cursor: default !important;
 }
 
 .active {
@@ -142,92 +36,168 @@ h3 {
   border-color: green
 }
 
-.hidden {
-  display: none;
+/* Star */
+#star > img,
+#star > #dropbox {
+  width: 200px;
 }
 
-.inline {
-  display: inline-block;
+#star #next {
+  position: absolute;
+  left: 15%;
+  margin-top: 100px;
+}
 
-  &:nth-of-type(2n) {
-    margin-left: 1%;
+.star-info {
+  min-width: 300px;
+
+  .btn {
+    display: inline-block;
+  }
+}
+
+/* Category */
+#video-categories {
+  margin-bottom: 20px;
+}
+
+.category {
+  display: block !important;
+  width: 90px;
+}
+
+/* Videos */
+#videos {
+  float: left;
+}
+
+a.video {
+  text-decoration: none;
+  color: black;
+}
+
+.video {
+  float: left;
+  display: inline-block;
+  margin: 5px;
+
+  span {
+    display: block;
+    text-align: center;
+  }
+}
+
+.video video,
+.video img {
+  display: block;
+  width: 290px;
+}
+
+/* Other */
+h3 {
+  margin-bottom: 0
+}
+
+.btn {
+  border: 1px solid dodgerblue;
+  border-radius: 20px;
+
+  color: black;
+  text-decoration: none;
+  text-align: center;
+
+  padding: 4px 15px;
+  margin: 5px;
+
+  cursor: default;
+  transition-duration: 200ms;
+
+  &:not(.no-hover):hover, &:not(.no-hover):focus {
+    background-color: dodgerblue;
+    color: white;
   }
 }
 
 small {
   margin-left: 10px;
+  color: blue;
 }
 
-input.xdsoft_input {
-  text-transform: capitalize;
-  &[name="breast"] {
-    text-transform: uppercase;
+/* Form */
+form {
+  margin-bottom: 7px
+}
+
+label {
+  margin-right: 5px;
+
+  &[for="eyecolor"], &[for="haircolor"] {
+    font-weight: bold
   }
 }
 
-.no-match {
-  display: none;
+
+/* Dialog */
+@import "dialog";
+
+/* Dropbox */
+@import "dropbox";
+
+/* Ribbon */
+.star {
+  position: relative;
+  overflow: hidden;
 }
 
-.search {
+@import "ribbon";
+
+/* Attribute */
+.attribute {
   display: inline-block;
-  width: 100%;
-  text-align: center;
-
-  .inner {
-    display: inherit;
-    padding: 2px 4px;
-    &:not(:empty) {
-      background-color: orange;
-    }
-  }
 }
 
-.invisible-submit {
-  position: absolute;
-  left: -99999px;
-}
-
-.symbol {
+/* Other */
+.bookmark-info, .star-info {
   display: none;
+  position: fixed;
+
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 10px;
+  background-color: #eeeeee;
+}
+
+.bookmark-info.active {
+  display: block;
+  z-index: 1;
+}
+
+.hidden {
+  display: none
+}
+
+form#addVideos {
   position: absolute;
-  z-index: 10;
+  left: 40%;
 
-  @include center(54%, 50%);
+  input[type="text"] {
+    width: 350px;
+  }
 
-  background-color: #858585;
-  border-radius: 30px;
-  padding: 0 10px;
-}
-
-.flag {
-  margin-bottom: -7px;
-}
-
-[data-badge]:after {
-  content: attr(data-badge);
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  background: green;
-  color: white;
-  text-align: center;
-  border-radius: 50%;
-  box-shadow: 0 0 1px #333;
-
-  @include circle(23px, 30px);
-}
-
-/* Video Count */
-@for $i from 1 through 6 {
-  h#{$i} .count {
-    color: green;
+  input[type="number"] {
+    width: 50px;
   }
 }
 
-.unselectable, .input-wrapper > label {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+/* FLOAT classes */
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.btn {
+  cursor: default !important;
 }

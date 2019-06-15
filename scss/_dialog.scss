@@ -1,20 +1,11 @@
 .ui-dialog {
-  width: 100%;
+  width: 100%
+}
 
-  .ui-dialog-title {
-    text-align: center;
-  }
+.ui-dialog .ui-dialog-title {
+  text-align: center
 }
 
 #dialog {
-  cursor: default;
-
-  #dropbox {
-    width: 100%;
-    height: 275px;
-  }
-
-  input {
-    width: 95%;
-  }
+  cursor: default
 }
