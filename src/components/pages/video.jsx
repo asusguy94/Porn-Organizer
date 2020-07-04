@@ -419,8 +419,12 @@ class VideoPage extends Component {
                             <div className="header__site">
                                 <ContextMenuTrigger id="menu__website">
                                     <span id="wsite">{this.state.video.website}</span>
-                                    <span className="separator">-</span>
-                                    <span id="site">{this.state.video.subsite}</span>
+                                    {this.state.video.subsite && (
+                                        <React.Fragment>
+                                            <span className="separator">-</span>
+                                            <span id="site">{this.state.video.subsite}</span>
+                                        </React.Fragment>
+                                    )}
                                 </ContextMenuTrigger>
 
                                 <ContextMenu id="menu__website">
