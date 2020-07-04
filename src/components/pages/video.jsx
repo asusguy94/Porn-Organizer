@@ -161,6 +161,16 @@ class VideoPage extends Component {
             })
     }
 
+    handleBookmark_clear() {
+        Axios.get(`${config.api}/removebookmarks.php?id=${this.state.video.id}`)
+            .then(() => {
+                this.setState(() => {
+                    let bookmarks = [{id: 0, name: "", start: 0}]
+                    return {bookmarks}
+                })
+            })
+    }
+
     handleBookmark_time(id) {
         let time = Math.round(this.player.player.currentTime)
 
@@ -491,7 +501,7 @@ class VideoPage extends Component {
 
                             <hr/>
 
-                            <MenuItem disabled>
+                            <MenuItem onClick={() => this.handleBookmark_clear()}>
                                 <i className="far fa-trash-alt"/> Remove Bookmarks
                             </MenuItem>
 
@@ -691,6 +701,8 @@ class VideoPage extends Component {
 
                 let first = items[i - 1]
                 let second = items[i]
+
+                if (first === null || second === null) continue // skip if error
 
                 if (collisionCheck(first, second)) {
                     collision = true
