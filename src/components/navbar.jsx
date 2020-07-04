@@ -39,16 +39,16 @@ class NavBar extends Component {
                     </li>
 
                     <li>
+                        <a href="https://ds1517/phpMyAdmin">DB</a>
+                    </li>
+
+                    <li>
                         <Link to="/generate/thumbnails">Generate Thumbnails</Link>
                         <ul className="sub-menu">
                             <li>
                                 <Link to="/generate/vtt">Generate WebVTT</Link>
                             </li>
                         </ul>
-                    </li>
-
-                    <li>
-                        <a href="https://ds1517/phpMyAdmin">DB</a>
                     </li>
                 </ul>
             </nav>

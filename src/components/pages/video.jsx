@@ -26,6 +26,20 @@ class VideoPage extends Component {
                 published: ""
             },
             plays: 0,
+            website: "",
+            subsite: "",
+            locations: [
+                {
+                    id: 0,
+                    name: ""
+                }
+            ],
+            attributes: [
+                {
+                    id: 0,
+                    name: ""
+                }
+            ]
         },
 
         star: {
@@ -48,12 +62,28 @@ class VideoPage extends Component {
             }
         ],
 
+        attributes: [
+            {
+                id: 0,
+                name: ""
+            }
+        ],
+
+        locations: [
+            {
+                id: 0,
+                name: ""
+            }
+        ],
+
         loaded: {
             hls: false,
             video: false,
             bookmarks: false,
             star: false,
             categories: false,
+            attributes: false,
+            locations: false,
 
             videoEvents: false,
         },
@@ -67,13 +97,6 @@ class VideoPage extends Component {
             visible: false,
             data: null,
         },
-
-        defaultValue: {
-            star: {
-                id: 0,
-                name: ""
-            }
-        }
     }
 
     handleWheel(e) {
@@ -180,8 +203,8 @@ class VideoPage extends Component {
     handleStar_remove(id) {
         Axios.get(`${config.api}/removevideostar.php?videoID=${this.state.video.id}&starID=${id}`)
             .then(() => {
-                let {star} = this.state.defaultValue
-                this.setState({star: {id: star.id, name: star.name}})
+                let star = {id: 0, name: ""}
+                this.setState({star})
             })
     }
 
@@ -198,6 +221,90 @@ class VideoPage extends Component {
             })
     }
 
+    handleDate_fix() {
+        Axios.get(`${config.api}/fixvideodate.php?id=${this.state.video.id}`)
+            .then(({data}) => {
+                if (data.success) {
+                    this.setState(prevState => {
+                        let video = prevState.video
+                        video.date.published = data.date
+
+                        return {video}
+                    })
+                }
+            })
+    }
+
+    handleAttribute_add(attribute) {
+        Axios.get(`${config.api}/addattribute.php?videoID=${this.state.video.id}&attributeID=${attribute.id}`)
+            .then(({data}) => {
+                if (data.success) {
+                    this.setState(prevState => {
+                        let attributes = prevState.video.attributes
+                        attributes.push({id: data.id, name: attribute.name})
+
+                        attributes.sort((a, b) => {
+                            return a.name.localeCompare(b.name)
+                        })
+
+                        let video = prevState.video
+                        video.attributes = attributes
+
+                        return {video}
+                    })
+                }
+            })
+    }
+
+    handleAttribute_remove(attribute) {
+        Axios.get(`${config.api}/removeattribute.php?id=${attribute.id}`)
+            .then(() => {
+                let attributes = this.state.video.attributes.filter((item) => {
+                    return item.id !== attribute.id
+                })
+
+                let video = this.state.video
+                video.attributes = attributes
+
+                this.setState({video})
+            })
+    }
+
+    handleLocation_add(location) {
+        Axios.get(`${config.api}/addlocation.php?videoID=${this.state.video.id}&locationID=${location.id}`)
+            .then(({data}) => {
+                if (data.success) {
+                    this.setState(prevState => {
+                        let locations = prevState.video.locations
+                        locations.push({id: data.id, name: location.name})
+
+                        locations.sort((a, b) => {
+                            return a.name.localeCompare(b.name)
+                        })
+
+                        let video = prevState.video
+                        video.locations = locations
+
+                        return {video}
+                    })
+                }
+            })
+    }
+
+    handleLocation_remove(location) {
+        Axios.get(`${config.api}/removelocation.php?id=${location.id}`)
+            .then(() => {
+                let locations = this.state.video.locations.filter((item) => {
+                    return item.id !== location.id
+                })
+
+                let video = this.state.video
+                video.locations = locations
+
+                this.setState({video})
+            })
+    }
+
     render() {
         return (
             <div className="video-page col-12 row">
@@ -210,11 +317,48 @@ class VideoPage extends Component {
                                 </div>
 
                                 <ContextMenu id="title">
+                                    <MenuItem disabled><i className="far fa-edit"/> Rename</MenuItem>
+
+                                    <MenuItem onClick={() => {
+                                        this.handleModal("Add Attribute",
+                                            Object.keys(this.state.attributes).map((a_i) => {
+                                                return (
+                                                    <div key={a_i}
+                                                         className="btn btn-sm btn-outline-primary d-block"
+                                                         onClick={() => {
+                                                             this.handleModal()
+                                                             this.handleAttribute_add(this.state.attributes[a_i])
+                                                         }}
+                                                    >{this.state.attributes[a_i].name}</div>
+                                                )
+                                            })
+                                        )
+                                    }}><i className="far fa-tag"/> Add Attribute</MenuItem>
+
+                                    <MenuItem onClick={() => {
+                                        this.handleModal("Add Location",
+                                            Object.keys(this.state.locations).map((l_i) => {
+                                                return (
+                                                    <div key={l_i}
+                                                         className="btn btn-sm btn-outline-primary d-block"
+                                                         onClick={() => {
+                                                             this.handleModal()
+                                                             this.handleLocation_add(this.state.locations[l_i])
+                                                         }}
+                                                    >{this.state.locations[l_i].name}</div>
+                                                )
+                                            })
+                                        )
+                                    }}><i className="far fa-tag"/> Add Location</MenuItem>
+
+                                    <hr/>
+
                                     <MenuItem onClick={() => this.handleTitle_copy()}>
                                         <i className="far fa-copy"/> Copy Title
                                     </MenuItem>
 
-                                    <MenuItem onClick={() => this.handleStar_copy()}><i className="far fa-user"/> Copy Star</MenuItem>
+                                    <MenuItem onClick={() => this.handleStar_copy()}><i className="far fa-user"/> Copy
+                                        Star</MenuItem>
                                 </ContextMenu>
                             </h1>
 
@@ -225,8 +369,53 @@ class VideoPage extends Component {
                                 </ContextMenuTrigger>
 
                                 <ContextMenu id="menu__date">
-                                    <MenuItem>
+                                    <MenuItem onClick={() => this.handleDate_fix()}>
                                         <i className="far fa-edit"/> Fix Date
+                                    </MenuItem>
+                                </ContextMenu>
+                            </div>
+                            <div className="header__locations">
+                                {this.state.loaded.video && Object.keys(this.state.video.locations).map((i) => (
+                                    <div key={i} className="btn btn-sm btn-outline-danger location">
+                                        <ContextMenuTrigger id={`location-${i}`}>
+                                            {this.state.video.locations[i].name}
+                                        </ContextMenuTrigger>
+
+                                        <ContextMenu id={`location-${i}`}>
+                                            <MenuItem
+                                                onClick={() => this.handleLocation_remove(this.state.video.locations[i])}>
+                                                <i className="far fa-trash-alt"/> Remove
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="header__attributes">
+                                {this.state.loaded.video && Object.keys(this.state.video.attributes).map((i) => (
+                                    <div key={i} className="btn btn-sm btn-outline-primary attribute">
+                                        <ContextMenuTrigger id={`attribute-${i}`}>
+                                            {this.state.video.attributes[i].name}
+                                        </ContextMenuTrigger>
+
+                                        <ContextMenu id={`attribute-${i}`}>
+                                            <MenuItem
+                                                onClick={() => this.handleAttribute_remove(this.state.video.attributes[i])}>
+                                                <i className="far fa-trash-alt"/> Remove
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="header__site">
+                                <ContextMenuTrigger id="menu__website">
+                                    <span id="wsite">{this.state.video.website}</span>
+                                    <span className="separator">-</span>
+                                    <span id="site">{this.state.video.subsite}</span>
+                                </ContextMenuTrigger>
+
+                                <ContextMenu id="menu__website">
+                                    <MenuItem disabled>
+                                        <i className="far fa-edit"/> Fix Website & Site
                                     </MenuItem>
                                 </ContextMenu>
                             </div>
@@ -284,8 +473,30 @@ class VideoPage extends Component {
                                 )
                             }}><i className="far fa-plus"/> Add Bookmark</MenuItem>
 
+                            <MenuItem disabled>
+                                <i className="far fa-plus"/> Set Age
+                            </MenuItem>
+
+                            <MenuItem disabled>
+                                <i className="far fa-edit"/> Toggle Controls
+                            </MenuItem>
+
+                            <MenuItem disabled>
+                                <i className="far fa-edit"/> Rename File
+                            </MenuItem>
+
+                            <MenuItem disabled>
+                                <i className="far fa-edit"/> Fix Thumbnails
+                            </MenuItem>
+
+                            <hr/>
+
+                            <MenuItem disabled>
+                                <i className="far fa-trash-alt"/> Remove Bookmarks
+                            </MenuItem>
+
                             <MenuItem onClick={() => this.handlePlays_reset()}>
-                                <i className="far fa-thrash-alt"/> Remove Plays
+                                <i className="far fa-trash-alt"/> Remove Plays
                             </MenuItem>
                         </ContextMenu>
                     </div>
@@ -325,6 +536,8 @@ class VideoPage extends Component {
                                         <i className="far fa-clock"/> Change Time
                                     </MenuItem>
 
+                                    <hr/>
+
                                     <MenuItem onClick={() => this.handleBookmark_remove(this.state.bookmarks[i].id)}>
                                         <i className="far fa-trash-alt"/> Delete
                                     </MenuItem>
@@ -363,6 +576,8 @@ class VideoPage extends Component {
                                             })
                                         )
                                     }}><i className="far fa-plus"/> Add Bookmark</MenuItem>
+
+                                    <hr/>
 
                                     <MenuItem onClick={() => this.handleStar_remove(this.state.star.id)}>
                                         <i className="far fa-trash-alt"/> Remove
@@ -440,7 +655,6 @@ class VideoPage extends Component {
                     hls.startLevel = desiredStartLevel
                     hls.autoLevelCapping = maxLevel
 
-                    /* TODO Improve this code */
                     if (Number(localStorage.video) === this.state.video.id) {
                         hls.startLoad(Number(localStorage.bookmark))
 
@@ -489,11 +703,12 @@ class VideoPage extends Component {
                 }
 
                 if (collision && level < LEVEL_MAX) {
-                    if (level < LEVEL_MAX) level++
-                    second.setAttribute('data-level', level)
+                    level++
                 } else {
                     level = LEVEL_MIN
                 }
+
+                second.setAttribute('data-level', level)
             }
         }
     }
@@ -540,6 +755,28 @@ class VideoPage extends Component {
                 this.setState(prevState => {
                     let loaded = prevState.loaded
                     loaded.categories = true
+
+                    return {loaded}
+                })
+            })
+
+        Axios.get(`${config.api}/attributes.php`)
+            .then(({data: attributes}) => this.setState({attributes}))
+            .then(() => {
+                this.setState(prevState => {
+                    let loaded = prevState.loaded
+                    loaded.attributes = true
+
+                    return {loaded}
+                })
+            })
+
+        Axios.get(`${config.api}/locations.php`)
+            .then(({data: locations}) => this.setState({locations}))
+            .then(() => {
+                this.setState(prevState => {
+                    let loaded = prevState.loaded
+                    loaded.locations = true
 
                     return {loaded}
                 })

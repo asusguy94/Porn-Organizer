@@ -4,8 +4,13 @@
   .header {
     margin-bottom: 15px;
 
-    &__title {
+    &__title, &__locations, &__attributes {
       display: inline-block;
+    }
+
+    &__site {
+      color: green;
+      font-weight: 600;
     }
 
     .btn {
@@ -40,6 +45,12 @@
 
     #stars {
       text-align: center;
+    }
+  }
+
+  .separator {
+    &:before, &:after {
+      content: " "
     }
   }
 }

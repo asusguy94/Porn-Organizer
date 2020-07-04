@@ -7,7 +7,7 @@ import config from "../config"
 
 class VideosPage extends Component {
     state = {
-        limit: 100,
+        limit: 24,
         data: []
     }
 
