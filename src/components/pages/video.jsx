@@ -15,6 +15,7 @@ class VideoPage extends Component {
         video: {
             id: 0,
             name: "",
+            star: "",
             path: {
                 file: "",
                 stream: "",
@@ -92,6 +93,10 @@ class VideoPage extends Component {
 
     async handleTitle_copy() {
         await navigator.clipboard.writeText(this.state.video.name)
+    }
+
+    async handleStar_copy() {
+        await navigator.clipboard.writeText(this.state.video.star)
     }
 
     handleVideoPlay(time) {
@@ -209,7 +214,7 @@ class VideoPage extends Component {
                                         <i className="far fa-copy"/> Copy Title
                                     </MenuItem>
 
-                                    <MenuItem disabled><i className="far fa-user"/> Copy Star</MenuItem>
+                                    <MenuItem onClick={() => this.handleStar_copy()}><i className="far fa-user"/> Copy Star</MenuItem>
                                 </ContextMenu>
                             </h1>
 
