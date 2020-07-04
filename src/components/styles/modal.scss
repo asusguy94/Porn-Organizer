@@ -1,0 +1,19 @@
+#modal {
+  position: absolute;
+  left: 20%;
+
+  .card-body {
+    .btn {
+      margin-bottom: 1px;
+    }
+
+    .card-title {
+      border-bottom: 1px solid lightgrey;
+    }
+  }
+
+  .actions {
+    margin-top: 5px;
+    text-align: center;
+  }
+}

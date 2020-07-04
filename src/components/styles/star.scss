@@ -1,0 +1,30 @@
+@import "functions";
+
+.star-page {
+  aside {
+    #relations {
+      text-align: center;
+
+      a.relation {
+        display: inline-block;
+        width: 200px;
+
+        margin: 10px;
+        text-decoration: none;
+        color: inherit;
+
+        &:hover {
+          text-decoration: underline;
+        }
+
+        img {
+          width: inherit;
+        }
+      }
+    }
+  }
+
+  .video {
+    margin: 0 5px 10px;
+  }
+}

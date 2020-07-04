@@ -1,0 +1,10 @@
+// Bookmarks
+$bookmarkRows: 12; // number of rows of bookmarks
+$navElementsRight: 2;
+
+// Thumbnails
+$aspectRatio: (16/9);
+$thumbnailWidth: 290;
+$thumbnailHeight: ($thumbnailWidth / $aspectRatio);
+
+$spinnerBlue: #3498db;

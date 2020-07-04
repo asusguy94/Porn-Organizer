@@ -1,0 +1,35 @@
+@import "functions";
+
+/* Context Menu */
+@import "context-menu";
+
+/* Star */
+.star {
+  &__image {
+    max-height: 275px;
+    max-width: 200px;
+  }
+}
+
+.video {
+  text-decoration: none !important;
+  color: black;
+}
+
+.btn {
+  cursor: default;
+}
+
+@for $i from 1 through 6 {
+  h#{$i} {
+    font-family: 'Roboto', sans-serif;
+  }
+}
+
+.divider {
+  color: grey;
+
+  &:before, &:after {
+    content: ' ';
+  }
+}

@@ -1,0 +1,45 @@
+@import "functions";
+
+.video-page {
+  .header {
+    margin-bottom: 15px;
+
+    &__title {
+      display: inline-block;
+    }
+
+    .btn {
+      margin-left: 15px;
+      color: black;
+
+      &:hover {
+        color: white;
+      }
+
+      i {
+        margin-right: 5px;
+      }
+    }
+  }
+
+  #timeline {
+    position: relative;
+    left: 95px;
+    margin-top: 5px;
+
+    .bookmark {
+      position: absolute;
+      white-space: nowrap;
+
+      @include bookmarkPosition();
+    }
+  }
+
+  aside {
+    margin-top: 5.25em;
+
+    #stars {
+      text-align: center;
+    }
+  }
+}

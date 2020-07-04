@@ -1,0 +1,17 @@
+#dropbox {
+  width: 275px;
+  height: 275px;
+  border: 2px dashed rgba(255, 0, 0, 0.3);
+  text-align: center;
+
+  &.hover {
+    border-color: rgba(255, 0, 0, 1);
+  }
+
+  & > span {
+    position: relative;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+  }
+}
