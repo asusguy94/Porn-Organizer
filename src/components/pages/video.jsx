@@ -46,6 +46,7 @@ class VideoPage extends Component {
         star: {
             id: 0,
             name: "",
+            ageInVideo: 0,
         },
 
         bookmarks: [
@@ -579,12 +580,16 @@ class VideoPage extends Component {
                     <div id="stars" className="row justify-content-center">
                         {this.state.loaded.star && (
                             <React.Fragment>
-                                <div className="star col-12">
+                                <div className="star">
                                     <ContextMenuTrigger id="star">
                                         <img className="star__image w-100" alt="star"
                                              src={`${config.source}/images/stars/${this.state.star.id}`}/>
                                         <a href={`${config.source}/star.php?id=${this.state.star.id}`}
                                            className="star__name d-block">{this.state.star.name}</a>
+                                        {this.state.star.ageInVideo && (
+                                            <span
+                                                className="ribbon">{Math.floor(this.state.star.ageInVideo / 365)}</span>
+                                        )}
                                     </ContextMenuTrigger>
                                 </div>
 
