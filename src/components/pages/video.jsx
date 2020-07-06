@@ -14,6 +14,7 @@ class VideoPage extends Component {
     state = {
         video: {
             id: 0,
+            nextID: 0,
             name: "",
             star: "",
             path: {
@@ -433,6 +434,8 @@ class VideoPage extends Component {
                                     </MenuItem>
                                 </ContextMenu>
                             </div>
+                            <a className="header__next btn btn-outline-primary float-right" id="next"
+                               href={`/video/${this.state.video.nextID}`}>Next</a>
                         </div>
                     </header>
 
