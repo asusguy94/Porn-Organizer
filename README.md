@@ -10,3 +10,6 @@ This is early alpha version of the next version, only use this if you're interes
 ## Backend scripts
 Backend scripts are currently **not** available. It uses the same database structure as the current version,
 and should work flawlessly.
+
+## Features
+Status of features can be found here [features.md](FEATURES.md) 
