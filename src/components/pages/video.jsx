@@ -369,7 +369,7 @@ class VideoPage extends Component {
                                                 )
                                             })
                                         )
-                                    }}><i className="far fa-tag"/> Add Location</MenuItem>
+                                    }}><i className="far fa-map-marker-alt"/> Add Location</MenuItem>
 
                                     <hr/>
 
@@ -398,6 +398,7 @@ class VideoPage extends Component {
                                 {this.state.loaded.video && Object.keys(this.state.video.locations).map((i) => (
                                     <div key={i} className="btn btn-sm btn-outline-danger location">
                                         <ContextMenuTrigger id={`location-${i}`}>
+                                            <i className="far fa-map-marker-alt"/>
                                             {this.state.video.locations[i].name}
                                         </ContextMenuTrigger>
 
@@ -414,6 +415,7 @@ class VideoPage extends Component {
                                 {this.state.loaded.video && Object.keys(this.state.video.attributes).map((i) => (
                                     <div key={i} className="btn btn-sm btn-outline-primary attribute">
                                         <ContextMenuTrigger id={`attribute-${i}`}>
+                                            <i className="far fa-tag"/>
                                             {this.state.video.attributes[i].name}
                                         </ContextMenuTrigger>
 
