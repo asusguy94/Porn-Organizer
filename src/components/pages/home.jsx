@@ -67,7 +67,7 @@ class HomePage extends Component {
         if (obj.enabled) {
             return (
                 <div className="col-12">
-                    <h2>{obj.label} Videos <span className="count">{obj.limit}</span></h2>
+                    <h2>{obj.label} Videos (<span className="count">{obj.limit}</span>)</h2>
                     <div className="row">
                         {Object.keys(obj.data).map((key, i) => (
                             <Link className="video col-1 px-0 mx-3 ribbon-container" key={i}
