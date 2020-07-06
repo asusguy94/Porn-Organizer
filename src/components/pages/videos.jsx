@@ -16,7 +16,7 @@ class VideosPage extends Component {
             <div className="col-12">
                 <div className="list-group">
                     {Object.keys(this.state.data).map((key, i) => (
-                        <li key={i} className="list-group-item">
+                        <li key={i} className="list-group-item list-group-item-action">
                             <span className="badge badge-primary badge-pill">
                                 <DaysToYears>{this.state.data[key].age}</DaysToYears>
                             </span>
