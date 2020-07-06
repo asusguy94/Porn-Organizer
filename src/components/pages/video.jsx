@@ -98,6 +98,8 @@ class VideoPage extends Component {
             visible: false,
             data: null,
         },
+
+        newVideo: false,
     }
 
     handleWheel(e) {
@@ -220,6 +222,13 @@ class VideoPage extends Component {
     }
 
     /* Plays - own class? */
+    handlePlays_add() {
+        Axios.get(`${config.api}/addplay.php?id=${this.state.video.id}`)
+            .then(() => {
+                console.log('Play Added')
+            })
+    }
+
     handlePlays_reset() {
         Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`)
             .then(() => {
@@ -633,6 +642,11 @@ class VideoPage extends Component {
 
                 this.player.player.on('play', () => {
                     localStorage.playing = 1
+
+                    if (this.state.newVideo) {
+                        this.handlePlays_add()
+                        this.setState({newVideo: false})
+                    }
                 })
 
                 this.player.player.on('pause', () => {
@@ -676,9 +690,13 @@ class VideoPage extends Component {
                         hls.startLoad(Number(localStorage.bookmark))
 
                         if (Boolean(Number(localStorage.playing))) this.handleVideoPlay(localStorage.bookmark)
+
+                        this.setState({newVideo: false})
                     } else {
                         localStorage.video = this.state.video.id
                         localStorage.bookmark = 0
+
+                        this.setState({newVideo: true})
 
                         hls.startLoad()
                     }
