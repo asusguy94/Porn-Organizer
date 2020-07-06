@@ -578,7 +578,7 @@ class VideoPage extends Component {
 
                 <aside className="col-2">
                     <div id="stars" className="row justify-content-center">
-                        {this.state.loaded.star && (
+                        {this.state.loaded.star && this.state.star.id !== 0 && (
                             <React.Fragment>
                                 <div className="star">
                                     <ContextMenuTrigger id="star">
