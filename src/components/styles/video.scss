@@ -1,60 +1,63 @@
-@import "functions";
+@import 'functions';
 
 .video-page {
-  .header {
-    margin-bottom: 15px;
+    .header {
+        margin-bottom: 15px;
 
-    &__title, &__locations, &__attributes {
-      display: inline-block;
+        &__title,
+        &__locations,
+        &__attributes {
+            display: inline-block;
+        }
+
+        &__site {
+            color: green;
+            font-weight: 600;
+        }
+
+        &__next {
+            margin-top: -2.5% !important;
+        }
+
+        .btn {
+            margin-left: 15px;
+            color: black;
+
+            &:hover {
+                color: white;
+            }
+
+            i {
+                margin-right: 5px;
+            }
+        }
     }
 
-    &__site {
-      color: green;
-      font-weight: 600;
+    #timeline {
+        position: relative;
+        left: 95px;
+        margin-top: 5px;
+
+        .bookmark {
+            position: absolute;
+            white-space: nowrap;
+
+            @include bookmarkPosition();
+        }
     }
 
-    &__next {
-      margin-top: -2.5% !important;
+    aside {
+        margin-top: 5.25em;
+
+        #stars {
+            text-align: center;
+        }
     }
 
-    .btn {
-      margin-left: 15px;
-      color: black;
-
-      &:hover {
-        color: white;
-      }
-
-      i {
-        margin-right: 5px;
-      }
+    .separator {
+        &:before,
+        &:after {
+            content: ' ';
+        }
     }
-  }
-
-  #timeline {
-    position: relative;
-    left: 95px;
-    margin-top: 5px;
-
-    .bookmark {
-      position: absolute;
-      white-space: nowrap;
-
-      @include bookmarkPosition();
-    }
-  }
-
-  aside {
-    margin-top: 5.25em;
-
-    #stars {
-      text-align: center;
-    }
-  }
-
-  .separator {
-    &:before, &:after {
-      content: " "
-    }
-  }
 }

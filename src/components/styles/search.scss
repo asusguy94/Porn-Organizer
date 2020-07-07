@@ -1,100 +1,102 @@
-@import "functions";
+@import 'functions';
 
 .search-page {
-  h2 {
-    margin-bottom: 0;
-  }
-
-  .video {
-    margin: 5px;
-
-    width: $thumbnailWidth + px;
-
-    img {
-      width: inherit;
-      height: $thumbnailHeight + px;
-    }
-  }
-
-  .input-wrapper {
-    margin-bottom: 4%;
-
-    & > input[type="text"] {
-      width: 100%;
-      padding: 10px;
+    h2 {
+        margin-bottom: 0;
     }
 
-    & > input[type="checkbox"], & > input[type="radio"] {
-      transform: scale(1.5);
+    .video {
+        margin: 5px;
+
+        width: $thumbnailWidth + px;
+
+        img {
+            width: inherit;
+            height: $thumbnailHeight + px;
+        }
     }
 
-    & > label {
-      margin-left: 5px;
+    .input-wrapper {
+        margin-bottom: 4%;
+
+        & > input[type='text'] {
+            width: 100%;
+            padding: 10px;
+        }
+
+        & > input[type='checkbox'],
+        & > input[type='radio'] {
+            transform: scale(1.5);
+        }
+
+        & > label {
+            margin-left: 5px;
+        }
+
+        &.disabled {
+            pointer-events: none;
+            opacity: 0.4;
+        }
     }
 
-    &.disabled {
-      pointer-events: none;
-      opacity: 0.4;
-    }
-  }
-
-  [class^="hidden-"], [class*="hidden-"] {
-    display: none !important;
-  }
-
-  .selected label {
-    font-weight: bold;
-  }
-
-  .not label {
-    color: red;
-    font-weight: bold;
-  }
-
-  #loader {
-    border: 16px solid #F3F3F3;
-    border-top-color: $spinnerBlue;
-    border-bottom-color: $spinnerBlue;
-    border-radius: 50%;
-    width: 120px;
-    height: 120px;
-    animation: spin 2s linear infinite;
-
-    margin: 0 auto;
-  }
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg)
+    [class^='hidden-'],
+    [class*='hidden-'] {
+        display: none !important;
     }
 
-    100% {
-      transform: rotate(360deg)
-    }
-  }
-
-  .flag {
-    margin-right: 5px;
-  }
-
-  .prettydropdown {
-    li {
-      padding-left: 0.3rem !important;
+    .selected label {
+        font-weight: bold;
     }
 
-    .color {
-      display: inline-block;
-      margin-right: 5px;
-
-      $width: 12px;
-      width: $width;
-      height: $width;
-
-      border: 1px solid black;
+    .not label {
+        color: red;
+        font-weight: bold;
     }
-  }
 
-  #video-count {
-    color: blue;
-  }
+    #loader {
+        border: 16px solid #f3f3f3;
+        border-top-color: $spinnerBlue;
+        border-bottom-color: $spinnerBlue;
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+
+        margin: 0 auto;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .flag {
+        margin-right: 5px;
+    }
+
+    .prettydropdown {
+        li {
+            padding-left: 0.3rem !important;
+        }
+
+        .color {
+            display: inline-block;
+            margin-right: 5px;
+
+            $width: 12px;
+            width: $width;
+            height: $width;
+
+            border: 1px solid black;
+        }
+    }
+
+    #video-count {
+        color: blue;
+    }
 }

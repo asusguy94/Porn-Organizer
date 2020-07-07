@@ -1,35 +1,35 @@
-import React, {Component} from 'react'
-import {Link} from "react-router-dom"
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 
-import Axios from "axios"
+import Axios from 'axios'
 
-import config from "../config"
+import config from '../config'
 
 class HomePage extends Component {
     state = {
         recent: {
-            label: "Recent",
+            label: 'Recent',
             enabled: true,
             limit: 10,
-            data: []
+            data: [],
         },
         newest: {
-            label: "Newest",
+            label: 'Newest',
             enabled: true,
             limit: 10,
-            data: []
+            data: [],
         },
         popular: {
-            label: "Popular",
+            label: 'Popular',
             enabled: true,
             limit: 20,
-            data: []
+            data: [],
         },
         random: {
-            label: "Random",
+            label: 'Random',
             enabled: false,
             limit: 20,
-            data: []
+            data: [],
         },
     }
 
@@ -52,29 +52,41 @@ class HomePage extends Component {
     }
 
     getData(type, limit = this.state[type].limit) {
-        Axios.get(`${config.api}/home.php?type=${type}&limit=${limit}`)
-            .then(({data}) => {
-                this.setState(prevState => {
-                    let object = {...prevState[type]}
+        Axios.get(`${config.api}/home.php?type=${type}&limit=${limit}`).then(
+            ({ data }) => {
+                this.setState((prevState) => {
+                    let object = { ...prevState[type] }
                     object.data = data
 
-                    return {[type]: object}
+                    return { [type]: object }
                 })
-            })
+            }
+        )
     }
 
     printData(obj) {
         if (obj.enabled) {
             return (
-                <div className="col-12">
-                    <h2>{obj.label} Videos (<span className="count">{obj.limit}</span>)</h2>
-                    <div className="row">
+                <div className='col-12'>
+                    <h2>
+                        {obj.label} Videos (
+                        <span className='count'>{obj.limit}</span>)
+                    </h2>
+                    <div className='row'>
                         {Object.keys(obj.data).map((key, i) => (
-                            <Link className="video col-1 px-0 mx-3 ribbon-container" key={i}
-                                  to={`/video/${obj.data[key].id}`}>
-                                <img className="mx-auto img-thumbnail" alt="video"
-                                     src={`${config.source}/images/videos/${obj.data[key].id}-290`}/>
-                                <span className="mx-auto d-block text-center">{obj.data[key].name}</span>
+                            <Link
+                                className='video col-1 px-0 mx-3 ribbon-container'
+                                key={i}
+                                to={`/video/${obj.data[key].id}`}
+                            >
+                                <img
+                                    className='mx-auto img-thumbnail'
+                                    alt='video'
+                                    src={`${config.source}/images/videos/${obj.data[key].id}-290`}
+                                />
+                                <span className='mx-auto d-block text-center'>
+                                    {obj.data[key].name}
+                                </span>
                             </Link>
                         ))}
                     </div>

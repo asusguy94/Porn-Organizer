@@ -1,20 +1,20 @@
 #modal {
-  position: absolute;
-  left: 40%;
+    position: absolute;
+    left: 40%;
 
-  .card-body {
-    .btn {
-      margin-bottom: 3px;
-      font-size: 1em;
+    .card-body {
+        .btn {
+            margin-bottom: 3px;
+            font-size: 1em;
+        }
+
+        .card-title {
+            border-bottom: 1px solid lightgrey;
+        }
     }
 
-    .card-title {
-      border-bottom: 1px solid lightgrey;
+    .actions {
+        margin-top: 5px;
+        text-align: center;
     }
-  }
-
-  .actions {
-    margin-top: 5px;
-    text-align: center;
-  }
 }
