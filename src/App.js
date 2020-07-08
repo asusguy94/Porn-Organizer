@@ -7,7 +7,6 @@ import NavBar from './components/navbar'
 /* Page Components */
 import HomePage from './components/pages/home'
 import VideosPage from './components/pages/videos'
-//import VideoSearchPage from "./components/pages/videosearch"
 import VideoPage from './components/pages/video'
 
 /* Style */
