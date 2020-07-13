@@ -4,7 +4,9 @@
     .header {
         margin-bottom: 15px;
 
-        &__title {
+        &__title,
+        &__locations,
+        &__attributes {
             display: inline-block;
         }
 
@@ -18,7 +20,6 @@
         }
 
         .btn {
-            display: inline-block;
             margin-left: 15px;
             color: black;
 
