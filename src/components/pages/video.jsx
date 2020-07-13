@@ -388,7 +388,7 @@ class VideoPage extends Component {
                                         <i className='far fa-map-marker-alt' /> Add Location
                                     </MenuItem>
 
-                                    <hr />
+                                    <MenuItem divider />
 
                                     <MenuItem onClick={() => this.handleTitle_copy()}>
                                         <i className='far fa-copy' /> Copy Title
@@ -551,7 +551,7 @@ class VideoPage extends Component {
                                 <i className='far fa-edit' /> Fix Thumbnails
                             </MenuItem>
 
-                            <hr />
+                            <MenuItem divider />
 
                             <MenuItem onClick={() => this.handleBookmark_clear()}>
                                 <i className='far fa-trash-alt' /> Remove Bookmarks
@@ -561,7 +561,7 @@ class VideoPage extends Component {
                                 <i className='far fa-trash-alt' /> Remove Plays
                             </MenuItem>
 
-                            <hr />
+                            <MenuItem divider />
 
                             <MenuItem
                                 onClick={() => {
@@ -629,7 +629,7 @@ class VideoPage extends Component {
                                             <i className='far fa-clock' /> Change Time
                                         </MenuItem>
 
-                                        <hr />
+                                        <MenuItem divider />
 
                                         <MenuItem onClick={() => this.handleBookmark_remove(this.state.bookmarks[i].id)}>
                                             <i className='far fa-trash-alt' /> Delete
@@ -687,7 +687,7 @@ class VideoPage extends Component {
                                         <i className='far fa-plus' /> Add Bookmark
                                     </MenuItem>
 
-                                    <hr />
+                                    <MenuItem divider />
 
                                     <MenuItem onClick={() => this.handleStar_remove(this.state.star.id)}>
                                         <i className='far fa-trash-alt' /> Remove
