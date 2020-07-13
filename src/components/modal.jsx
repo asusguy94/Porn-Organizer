@@ -13,10 +13,7 @@ class Modal extends Component {
                             <h2 className='card-title'>{this.props.title}</h2>
                             <div className='content'>{this.props.children}</div>
                             <div className='actions'>
-                                <div
-                                    className='btn btn-sm btn-danger'
-                                    onClick={this.props.onClose}
-                                >
+                                <div className='btn btn-sm btn-danger' onClick={this.props.onClose}>
                                     Close
                                 </div>
                             </div>

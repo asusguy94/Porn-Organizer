@@ -1,13 +1,15 @@
 ## Feature implementation status
 
+List of planned & completed features
+
 ## Home Page
 
-| Name           | Status             |
-| -------------- | ------------------ |
-| Recent Videos  | :heavy_check_mark: |
-| Newest Videos  | :heavy_check_mark: |
-| Random Videos  | :heavy_check_mark: |
-| Popular Videos | Count is missing   |
+| Name           | Status             | Priority |
+| -------------- | ------------------ | :------: |
+| Recent Videos  | :heavy_check_mark: |          |
+| Newest Videos  | :heavy_check_mark: |          |
+| Random Videos  | :heavy_check_mark: |          |
+| Popular Videos | _Count is missing_ |   HIGH   |
 
 ## :x: Add Videos
 
@@ -19,7 +21,6 @@
 | ----------- | ------------------ |
 | Age Counter | :heavy_check_mark: |
 | Video Title | :heavy_check_mark: |
-| Styling     | :heavy_check_mark: |
 
 ## :x:Star Search
 
@@ -35,23 +36,33 @@
 
 ## Video Page
 
-| Name                              | Status                       |
-| --------------------------------- | ---------------------------- |
-| Elements                          | :heavy_check_mark:           |
-| Styling                           | :heavy_check_mark:           |
-| Rename Title                      | :x:                          |
-| Add Attribute, Add Location       | Search is missing            |
-| Copy Title, Copy Star             | :heavy_check_mark:           |
-| Fix Date                          | :heavy_check_mark:           |
-| Remove Location, Remove Attribute | :heavy_check_mark:           |
-| Change Website & Site             | :x:                          |
-| Set Age                           | :x:                          |
-| Toggle Controls                   | :x:                          |
-| Rename File                       | :x:                          |
-| Fix Thumbnails                    | :x:                          |
-| Remove Bookmarks                  | :heavy_check_mark:           |
-| Remove Plays                      | :heavy_check_mark:           |
-| Add Bookmark                      | Search is missing            |
-| Remove Star                       | :heavy_check_mark:           |
-| Add Plays                         | :heavy_check_mark:           |
-| Next Video Button                 | Keyboard shortcut is missing |
+### :x: Header
+
+| Name                              | Status             |               Priority                |
+| --------------------------------- | ------------------ | :-----------------------------------: |
+| Rename Title                      | :x:                |                 HIGH                  |
+| Add Attribute, Add Location       | :heavy_check_mark: |
+| Copy Title, Copy Star             | :heavy_check_mark: |                 HIGH                  |
+| Fix Date                          | :heavy_check_mark: |
+| Remove Location, Remove Attribute | :heavy_check_mark: |
+| Change Website & Site             | :x:                | LOW _not working in previous version_ |
+| Next Video Button                 | :heavy_check_mark: |
+
+### :x: Video
+
+| Name             | Status             |               Priority                |
+| ---------------- | ------------------ | :-----------------------------------: |
+| Add Bookmark     | :heavy_check_mark: |
+| Set Age          | :x:                |                 HIGH                  |
+| Toggle Controls  | :x:                |     LOW _difficult to implement_      |
+| Rename File      | :x:                |                 HIGH                  |
+| Fix Thumbnails   | :x:                | LOW _not working in previous version_ |
+| Remove Bookmarks | :heavy_check_mark: |
+| Remove Plays     | :heavy_check_mark: |
+
+### :heavy_check_mark: Star
+
+| Name         | Status             |
+| ------------ | ------------------ |
+| Add Bookmark | :heavy_check_mark: |
+| Remove Star  | :heavy_check_mark: |

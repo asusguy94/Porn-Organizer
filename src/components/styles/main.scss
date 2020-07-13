@@ -17,6 +17,10 @@
 .video {
     text-decoration: none !important;
     color: black;
+
+    &__title {
+        text-align: center;
+    }
 }
 
 .btn {

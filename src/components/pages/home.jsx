@@ -52,16 +52,14 @@ class HomePage extends Component {
     }
 
     getData(type, limit = this.state[type].limit) {
-        Axios.get(`${config.api}/home.php?type=${type}&limit=${limit}`).then(
-            ({ data }) => {
-                this.setState((prevState) => {
-                    let object = { ...prevState[type] }
-                    object.data = data
+        Axios.get(`${config.api}/home.php?type=${type}&limit=${limit}`).then(({ data }) => {
+            this.setState((prevState) => {
+                let object = prevState[type]
+                object.data = data
 
-                    return { [type]: object }
-                })
-            }
-        )
+                return { [type]: object }
+            })
+        })
     }
 
     printData(obj) {
@@ -69,24 +67,18 @@ class HomePage extends Component {
             return (
                 <div className='col-12'>
                     <h2>
-                        {obj.label} Videos (
-                        <span className='count'>{obj.limit}</span>)
+                        {obj.label} Videos (<span className='count'>{obj.limit}</span>)
                     </h2>
+
                     <div className='row'>
-                        {Object.keys(obj.data).map((key, i) => (
-                            <Link
-                                className='video col-1 px-0 mx-3 ribbon-container'
-                                key={i}
-                                to={`/video/${obj.data[key].id}`}
-                            >
+                        {Object.keys(obj.data).map((i) => (
+                            <Link className='video col-1 px-0 mx-3 ribbon-container' key={i} to={`/video/${obj.data[i].id}`}>
                                 <img
                                     className='mx-auto img-thumbnail'
                                     alt='video'
-                                    src={`${config.source}/images/videos/${obj.data[key].id}-290`}
+                                    src={`${config.source}/images/videos/${obj.data[i].id}-290`}
                                 />
-                                <span className='mx-auto d-block text-center'>
-                                    {obj.data[key].name}
-                                </span>
+                                <span className='video__title mx-auto d-block'>{obj.data[i].name}</span>
                             </Link>
                         ))}
                     </div>
