@@ -4,9 +4,7 @@
     .header {
         margin-bottom: 15px;
 
-        &__title,
-        &__locations,
-        &__attributes {
+        &__title {
             display: inline-block;
         }
 
@@ -20,6 +18,7 @@
         }
 
         .btn {
+            display: inline-block;
             margin-left: 15px;
             color: black;
 
@@ -51,13 +50,6 @@
 
         #stars {
             text-align: center;
-        }
-    }
-
-    .separator {
-        &:before,
-        &:after {
-            content: ' ';
         }
     }
 }

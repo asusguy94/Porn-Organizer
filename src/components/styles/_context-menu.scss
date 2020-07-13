@@ -19,64 +19,58 @@
         pointer-events: auto;
         z-index: 9999;
     }
-}
 
-.react-contextmenu-item {
-    background: 0 0;
-    border: 0;
-    color: #373a3c;
-    cursor: pointer;
-    font-weight: 400;
-    line-height: 1.5;
-    padding: 3px 20px;
-    text-align: inherit;
-    white-space: nowrap;
+    &-item {
+        background: 0 0;
+        border: 0;
+        color: #373a3c;
+        cursor: pointer;
+        font-weight: 400;
+        line-height: 1.5;
+        padding: 3px 20px;
+        text-align: inherit;
+        white-space: nowrap;
 
-    &.react-contextmenu-item--active,
-    &.react-contextmenu-item--selected {
-        color: #fff;
-        background-color: #20a0ff;
-        border-color: #20a0ff;
-        text-decoration: none;
-    }
+        &--active,
+        &--selected {
+            color: #fff;
+            background-color: #20a0ff;
+            border-color: #20a0ff;
+            text-decoration: none;
+        }
 
-    &.react-contextmenu-item--disabled {
-        background-color: transparent;
-        border-color: rgba(0, 0, 0, 0.15);
-        color: #878a8c;
-
-        &:hover {
+        &--disabled {
             background-color: transparent;
             border-color: rgba(0, 0, 0, 0.15);
             color: #878a8c;
+
+            &:hover {
+                background-color: transparent;
+                border-color: rgba(0, 0, 0, 0.15);
+                color: #878a8c;
+            }
+        }
+
+        &--divider {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+            cursor: inherit;
+            margin-bottom: 3px;
+            padding: 2px 0;
+            &:hover {
+                background-color: transparent;
+                border-color: rgba(0, 0, 0, 0.15);
+            }
         }
     }
-}
 
-.react-contextmenu-item--divider {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
-    cursor: inherit;
-    margin-bottom: 3px;
-    padding: 2px 0;
+    &-submenu {
+        padding: 0;
 
-    &:hover {
-        background-color: transparent;
-        border-color: rgba(0, 0, 0, 0.15);
+        > .react-contextmenu-item:after {
+            content: '▶';
+            display: inline-block;
+            position: absolute;
+            right: 7px;
+        }
     }
-}
-
-.react-contextmenu-item.react-contextmenu-submenu {
-    padding: 0;
-
-    > .react-contextmenu-item:after {
-        content: '▶';
-        display: inline-block;
-        position: absolute;
-        right: 7px;
-    }
-}
-
-.example-multiple-targets::after {
-    content: attr(data-count);
-    display: block;
 }
