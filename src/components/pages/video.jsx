@@ -754,7 +754,7 @@ class VideoPage extends Component {
             }
 
             /* HLS Handler */
-            if (!this.state.loaded.hls && Hls.isSupported()) {
+            if (!this.state.loaded.hls && Hls.isSupported() && config.hls.enabled) {
                 const hls = new Hls({ autoStartLoad: false })
                 hls.loadSource(this.player.player.media.firstElementChild.getAttribute('src'))
                 hls.attachMedia(this.player.player.media)
@@ -762,9 +762,9 @@ class VideoPage extends Component {
                 hls.on(Hls.Events.MANIFEST_PARSED, (e, data) => {
                     const dataLevels = data['levels'].length - 1
 
-                    let levels = { 360: 0, 480: 1, 720: 2, 1080: 3, 1440: 4, 2160: 5 }
-                    let maxLevel = levels[1080]
-                    let maxStartLevel = levels[480]
+                    const levels = config.hls.levels
+                    const maxLevel = levels[config.hls.maxLevel]
+                    const maxStartLevel = levels[config.hls.maxStartLevel]
 
                     // Default start level to maxLevel-1
                     let desiredStartLevel = maxLevel - 1

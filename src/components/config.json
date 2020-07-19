@@ -3,5 +3,11 @@
     "source": "https://porn.ds1517",
     "timeline": {
         "offset": 0.89
+    },
+    "hls": {
+        "enabled": true,
+        "levels": { "1080": 3, "720": 2, "480": 1, "360": 0 },
+        "maxLevel": 1080,
+        "maxStartLevel": 720
     }
 }
