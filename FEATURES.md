@@ -15,7 +15,31 @@ List of planned & completed features
 
 ## :x: Video Search
 
-## Videos
+### :heavy_check_mark: Main Section
+
+| Name          | Status             |
+| ------------- | ------------------ |
+| Video         | :heavy_check_mark: |
+| Video Ribbon  | :heavy_check_mark: |
+| Video Counter | :heavy_check_mark: |
+
+### :x: Sidebar
+
+| Name                         | Status             |  Priority  |
+| ---------------------------- | ------------------ | :--------: |
+| Include/Exclude _TOGGLE_     | :x:                |    LOW     |
+| Title Search _INPUT_         | :heavy_check_mark: |            |
+| Special Chars _TOGGLE_       | :x:                |    LOW     |
+| Star Search _INPUT_          | :x:                |    HIGH    |
+| Existing _TOGGLE_            | :x:                |    LOW     |
+| Added Today/Anytime _TOGGLE_ | :x:                |    LOW     |
+| Sort                         | :x:                | FUNCTIONAL |
+| Website _DROPDOWN_           | :x:                |    HIGH    |
+| Category _CHECKBOX_          | :heavy_check_mark: |            |
+| Attribute _CHECKBOX_         | :heavy_check_mark: |            |
+| Location _CHECKBOX_          | :heavy_check_mark: |            |
+
+## :heavy_check_mark: Videos
 
 | Name        | Status             |
 | ----------- | ------------------ |
