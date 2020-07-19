@@ -2,14 +2,14 @@
 
 List of planned & completed features
 
-## Home Page
+## :heavy_check_mark: Home Page
 
-| Name           | Status             | Priority |
-| -------------- | ------------------ | :------: |
-| Recent Videos  | :heavy_check_mark: |          |
-| Newest Videos  | :heavy_check_mark: |          |
-| Random Videos  | :heavy_check_mark: |          |
-| Popular Videos | _Count is missing_ |   HIGH   |
+| Name           | Status             |
+| -------------- | ------------------ |
+| Recent Videos  | :heavy_check_mark: |
+| Newest Videos  | :heavy_check_mark: |
+| Random Videos  | :heavy_check_mark: |
+| Popular Videos | :heavy_check_mark: |
 
 ## :x: Add Videos
 
@@ -58,7 +58,7 @@ List of planned & completed features
 
 ## :x:Generate WebVTT
 
-## Video Page
+## :x: Video Page
 
 ### :x: Header
 
