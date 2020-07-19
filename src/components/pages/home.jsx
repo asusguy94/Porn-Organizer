@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 
 import Axios from 'axios'
 
+import '../styles/home.scss'
+
 import config from '../config'
 
 class HomeColumn extends Component {
