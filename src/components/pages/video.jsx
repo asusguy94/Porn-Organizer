@@ -6,6 +6,7 @@ import Hls from 'hls.js'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
 import Modal from '../modal'
+import { DaysToYears } from '../date'
 
 import '../styles/video.scss'
 
@@ -102,7 +103,6 @@ class VideoPage extends Component {
         },
 
         newVideo: false,
-        inputValue: '',
     }
 
     handleWheel(e) {
@@ -148,31 +148,19 @@ class VideoPage extends Component {
                                 start: time,
                             })
 
+                            bookmarks.sort((a, b) => {
+                                let valA = a.start
+                                let valB = b.start
+
+                                return valA - valB
+                            })
+
                             return { bookmarks }
                         })
                     }
                 }
             )
         }
-    }
-
-    handleBookmark_remove(id) {
-        Axios.get(`${config.api}/removebookmark.php?id=${id}`).then(() => {
-            let bookmarks = this.state.bookmarks.filter((item) => {
-                return item.id !== id
-            })
-
-            this.setState({ bookmarks })
-        })
-    }
-
-    handleBookmark_clear() {
-        Axios.get(`${config.api}/removebookmarks.php?id=${this.state.video.id}`).then(() => {
-            this.setState(() => {
-                let bookmarks = [{ id: 0, name: '', start: 0 }]
-                return { bookmarks }
-            })
-        })
     }
 
     handleBookmark_time(id) {
@@ -188,8 +176,34 @@ class VideoPage extends Component {
                     return bookmarks[i]
                 })
 
+                bookmarks.sort((a, b) => {
+                    let valA = a.start
+                    let valB = b.start
+
+                    return valA - valB
+                })
+
                 this.setState({ bookmarks: arr })
             }
+        })
+    }
+
+    handleBookmark_remove(id) {
+        Axios.get(`${config.api}/removebookmark.php?id=${id}`).then(() => {
+            let bookmarks = this.state.bookmarks.filter((item) => {
+                return item.id !== id
+            })
+
+            this.setState({ bookmarks })
+        })
+    }
+
+    handleBookmark_clear() {
+        Axios.get(`${config.api}/removebookmarks.php?id=${this.state.video.id}`).then(() => {
+            this.setState(() => {
+                let bookmarks = []
+                return { bookmarks }
+            })
         })
     }
 
@@ -209,11 +223,6 @@ class VideoPage extends Component {
 
             this.setState({ bookmarks: obj })
         })
-    }
-
-    handleInput(e) {
-        let inputValue = e.target.value
-        this.setState({ inputValue })
     }
 
     /* Star - own class? */
@@ -643,8 +652,8 @@ class VideoPage extends Component {
                 <aside className='col-2'>
                     <div id='stars' className='row justify-content-center'>
                         {this.state.loaded.star && this.state.star.id !== 0 && (
-                            <React.Fragment>
-                                <div className='star card ribbon-container'>
+                            <div className='star'>
+                                <div className='card mb-2 ribbon-container'>
                                     <ContextMenuTrigger id='star'>
                                         <img
                                             className='star__image card-img-top'
@@ -657,7 +666,9 @@ class VideoPage extends Component {
                                         </a>
 
                                         {this.state.star.ageInVideo && (
-                                            <span className='ribbon'>{Math.floor(this.state.star.ageInVideo / 365)}</span>
+                                            <span className='ribbon'>
+                                                <DaysToYears>{this.state.star.ageInVideo}</DaysToYears>
+                                            </span>
                                         )}
                                     </ContextMenuTrigger>
                                 </div>
@@ -693,7 +704,7 @@ class VideoPage extends Component {
                                         <i className='far fa-trash-alt' /> Remove
                                     </MenuItem>
                                 </ContextMenu>
-                            </React.Fragment>
+                            </div>
                         )}
                     </div>
                 </aside>
@@ -711,7 +722,7 @@ class VideoPage extends Component {
         this.getData()
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
+    componentDidUpdate() {
         if (this.state.loaded.video) {
             /* Event Handler */
             if (!this.state.loaded.videoEvents) {
