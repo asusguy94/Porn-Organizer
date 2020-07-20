@@ -49,6 +49,7 @@ class VideoPage extends Component {
             id: 0,
             name: '',
             ageInVideo: 0,
+            numVideos: 0,
         },
 
         bookmarks: [
@@ -103,6 +104,20 @@ class VideoPage extends Component {
         },
 
         newVideo: false,
+        modalInput: '',
+    }
+
+    handleBadge(variation = null) {
+        let data = ''
+        let { numVideos } = this.state.star
+
+        if (variation === 'data') {
+            data = numVideos
+        } else if (numVideos) {
+            data = `badge-${'x'.repeat(String(numVideos).length)}`
+    }
+
+        return data
     }
 
     handleWheel(e) {
@@ -691,7 +706,7 @@ class VideoPage extends Component {
                     <div id='stars' className='row justify-content-center'>
                         {this.state.loaded.star && this.state.star.id !== 0 && (
                             <div className='star'>
-                                <div className='card mb-2 ribbon-container'>
+                                <div className={`card mb-2 ribbon-container ${this.handleBadge()}`} data-badge={this.handleBadge('data')}>
                                     <ContextMenuTrigger id='star'>
                                         <img
                                             className='star__image card-img-top'
@@ -703,7 +718,7 @@ class VideoPage extends Component {
                                             {this.state.star.name}
                                         </a>
 
-                                        {this.state.star.ageInVideo && (
+                                        {this.state.star.ageInVideo > 0 && (
                                             <span className='ribbon'>
                                                 <DaysToYears>{this.state.star.ageInVideo}</DaysToYears>
                                             </span>
