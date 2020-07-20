@@ -2,8 +2,18 @@ import React, { Component } from 'react'
 
 import './styles/modal.scss'
 
-// TODO ESC-key press
 class Modal extends Component {
+    constructor(props) {
+        super(props)
+        this.escFunc = this.escFunc.bind(this)
+    }
+
+    escFunc(e) {
+        if (this.props.visible) {
+            if (e.keyCode === 27) this.props.onClose()
+        }
+    }
+
     render() {
         return (
             <React.Fragment>
@@ -22,6 +32,14 @@ class Modal extends Component {
                 )}
             </React.Fragment>
         )
+    }
+
+    componentDidMount() {
+        document.addEventListener('keydown', this.escFunc, false)
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('keydown', this.escFunc, false)
     }
 }
 
