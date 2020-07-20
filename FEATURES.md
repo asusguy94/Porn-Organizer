@@ -60,16 +60,15 @@ List of planned & completed features
 
 ## :x: Video Page
 
-### :x: Header
+### :heavy_check_mark: Header
 
-| Name                              | Status             |               Priority                |
-| --------------------------------- | ------------------ | :-----------------------------------: |
-| Rename Title                      | :x:                |                 HIGH                  |
+| Name                              | Status             |
+| --------------------------------- | ------------------ |
+| Rename Title                      | :heavy_check_mark: |
 | Add Attribute, Add Location       | :heavy_check_mark: |
-| Copy Title, Copy Star             | :heavy_check_mark: |                 HIGH                  |
+| Copy Title, Copy Star             | :heavy_check_mark: |
 | Fix Date                          | :heavy_check_mark: |
 | Remove Location, Remove Attribute | :heavy_check_mark: |
-| Change Website & Site             | :x:                | LOW _not working in previous version_ |
 | Next Video Button                 | :heavy_check_mark: |
 
 ### :x: Video

@@ -120,6 +120,29 @@ class VideoPage extends Component {
         })
     }
 
+    handleModal_input(e) {
+        let modalInput = e.target.value
+
+        this.setState({ modalInput })
+    }
+
+    handleTitle_rename() {
+        let title = this.state.modalInput
+
+        Axios.get(`${config.api}/settitle.php?videoID=${this.state.video.id}&title=${title}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    let video = prevState.video
+                    video.name = title
+
+                    return { video }
+                })
+            }
+        })
+
+        this.setState({ modalInput: '' })
+    }
+
     async handleTitle_copy() {
         await navigator.clipboard.writeText(this.state.video.name)
     }
@@ -345,7 +368,30 @@ class VideoPage extends Component {
                                 </div>
 
                                 <ContextMenu id='title'>
-                                    <MenuItem disabled>
+                                    <MenuItem
+                                        onClick={() => {
+                                            this.setState({ modalInput: this.state.video.name })
+
+                                            this.handleModal(
+                                                'Change Title',
+                                                <input
+                                                    type='text'
+                                                    className='text-center'
+                                                    defaultValue={this.state.video.name}
+                                                    onChange={this.handleModal_input.bind(this)}
+                                                    ref={(input) => input && input.focus()}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault()
+
+                                                            this.handleModal()
+                                                            this.handleTitle_rename()
+                                                        }
+                                                    }}
+                                                />
+                                            )
+                                        }}
+                                    >
                                         <i className='far fa-edit' /> Rename Title
                                     </MenuItem>
 
@@ -459,7 +505,6 @@ class VideoPage extends Component {
                             </div>
 
                             <div className='header__site'>
-                                <ContextMenuTrigger id='menu__website'>
                                     <span id='wsite'>{this.state.video.website}</span>
                                     {this.state.video.subsite && (
                                         <React.Fragment>
@@ -467,13 +512,6 @@ class VideoPage extends Component {
                                             <span id='site'>{this.state.video.subsite}</span>
                                         </React.Fragment>
                                     )}
-                                </ContextMenuTrigger>
-
-                                <ContextMenu id='menu__website'>
-                                    <MenuItem disabled>
-                                        <i className='far fa-edit' /> Fix Website & Site
-                                    </MenuItem>
-                                </ContextMenu>
                             </div>
 
                             <a
