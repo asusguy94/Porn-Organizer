@@ -361,7 +361,7 @@ class VideoSearchPage extends Component {
                             Object.keys(this.state.videos).map((i) => (
                                 <a
                                     key={i}
-                                    className={`video ribbon-container card ${this.isHidden(this.state.videos[i]) && 'd-none'}`}
+                                    className={`video ribbon-container card ${this.isHidden(this.state.videos[i]) ? 'd-none' : ''}`}
                                     href={`/video/${this.state.videos[i].id}`}
                                 >
                                     <img
