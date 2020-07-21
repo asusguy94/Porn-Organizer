@@ -26,7 +26,9 @@ class VideoSearchPage extends Component {
                     attribute: [],
                     titleSearch: [],
                     noCategory: false,
+                    pov: false,
                 },
+                pov: false,
             },
         ],
 
@@ -73,7 +75,14 @@ class VideoSearchPage extends Component {
     }
 
     isHidden({ hidden }) {
-        return hidden.category.length || hidden.attribute.length || hidden.location.length || hidden.titleSearch || hidden.noCategory
+        return (
+            hidden.category.length ||
+            hidden.attribute.length ||
+            hidden.location.length ||
+            hidden.titleSearch ||
+            hidden.noCategory ||
+            hidden.pov
+        )
     }
 
     handleTitleSearch(e) {
@@ -119,6 +128,16 @@ class VideoSearchPage extends Component {
                     }
                 }
             }
+            return video
+        })
+
+        this.setState({ videos })
+    }
+
+    handleCategoryFilter_POV(e) {
+        let videos = this.state.videos.map((video) => {
+            video.hidden.pov = e.target.checked && !video.pov
+
             return video
         })
 
@@ -265,14 +284,24 @@ class VideoSearchPage extends Component {
                     <h2>Categories</h2>
                     <div id='categories'>
                         <div className='input-wrapper'>
+                            <input type='checkbox' id='category_POV' data-state='0' onChange={(e) => this.handleCategoryFilter_POV(e)} />
+                            <label htmlFor='category_POV' className='global-category'>
+                                POV
+                            </label>
+                        </div>
+
+                        <div className='input-wrapper'>
                             <input
                                 type='checkbox'
                                 id='category_NULL'
                                 data-state='0'
                                 onChange={(e) => this.handleCategoryFilter(e, null)}
                             />
-                            <label htmlFor='category_NULL'>NULL</label>
+                            <label htmlFor='category_NULL' className='global-category'>
+                                NULL
+                            </label>
                         </div>
+
                         {this.state.loaded.categories &&
                             Object.keys(this.state.categories).map((i) => (
                                 <div className='input-wrapper' key={i}>
@@ -372,7 +401,15 @@ class VideoSearchPage extends Component {
                             location: [],
                             titleSearch: false,
                             noCategory: false,
+                            pov: false,
                         }
+
+                        let match = 0
+                        item.categories.forEach((category) => {
+                            match += category.includes('(POV)')
+                        })
+
+                        item.pov = match && match === item.categories.length
 
                         return item
                     })
