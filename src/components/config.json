@@ -2,7 +2,8 @@
     "api": "http://api.porn.ds1517",
     "source": "https://porn.ds1517",
     "timeline": {
-        "offset": 0.89
+        "offset": 0.89,
+        "spacing": 2
     },
     "hls": {
         "enabled": true,

@@ -863,7 +863,7 @@ class VideoPage extends Component {
                 a = a.getBoundingClientRect()
                 b = b.getBoundingClientRect()
 
-                return !(a.x + a.width < b.x || a.x > b.x + b.width)
+                return !(a.x + a.width < b.x - config.timeline.spacing || a.x + config.timeline.spacing > b.x + b.width)
             }
 
             for (let i = 1, items = this.bookmarks, LEVEL_MIN = 1, LEVEL_MAX = 10, level = LEVEL_MIN; i < items.length; i++) {
