@@ -69,7 +69,8 @@ class VideoSearchPage extends Component {
                 !hidden.attribute.length &&
                 !hidden.location.length &&
                 !hidden.titleSearch &&
-                !hidden.noCategory
+                !hidden.noCategory &&
+                !hidden.pov
         })
         return count
     }
