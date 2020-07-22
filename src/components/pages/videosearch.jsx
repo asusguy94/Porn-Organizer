@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 
 import Axios from 'axios'
+import ScrollToTop from 'react-scroll-to-top'
 
 import { DaysToYears } from './../date'
 
@@ -383,6 +384,8 @@ class VideoSearchPage extends Component {
                         )}
                     </div>
                 </section>
+
+                <ScrollToTop smooth />
             </div>
         )
     }
