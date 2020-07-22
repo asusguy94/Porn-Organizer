@@ -523,7 +523,7 @@ class VideoPage extends Component {
                                     <span id='wsite'>{this.state.video.website}</span>
                                     {this.state.video.subsite && (
                                         <React.Fragment>
-                                            <span className='separator'>-</span>
+                                        <span className='divider'>-</span>
                                             <span id='site'>{this.state.video.subsite}</span>
                                         </React.Fragment>
                                     )}

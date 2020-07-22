@@ -22,7 +22,22 @@
         }
     }
 
+    #star {
+        .action {
+            .btn {
+                margin-right: 10px;
+
+                margin-bottom: 10px;
+            }
+        }
+
+        label {
+            margin-right: 5px;
+        }
+    }
+
     .video {
         margin: 0 5px 10px;
+        width: 290px;
     }
 }

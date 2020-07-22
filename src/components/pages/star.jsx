@@ -26,7 +26,7 @@ class StarVideos extends Component {
                             muted
                         />
 
-                        <span className='title card-title mx-auto'>{videos[i].name}</span>
+                        <span className='title card-title text-center'>{videos[i].name}</span>
                     </a>
                 ))}
             </div>
@@ -157,7 +157,6 @@ class Star extends Component {
             visible: false,
             data: null,
         },
-        inputValue: '',
     }
 
     handleModal(title = null, data = null) {
