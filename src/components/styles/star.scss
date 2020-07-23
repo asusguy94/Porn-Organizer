@@ -32,7 +32,13 @@
         }
 
         label {
-            margin-right: 5px;
+            margin-right: 9px;
+
+            &.bold {
+                font-weight: 600;
+                margin-right: 7px;
+            }
+        }
         }
     }
 

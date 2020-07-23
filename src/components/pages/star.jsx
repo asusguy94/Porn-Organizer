@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 
 import Axios from 'axios'
+import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
 import Modal from '../modal'
 
@@ -35,11 +36,16 @@ class StarVideos extends Component {
 }
 
 class StarFormInput extends Component {
-    state = {
+    constructor(props) {
+        super(props)
+        this.state = {
         input: {
-            value: '',
             id: '',
+                value: props.value,
         },
+    }
+
+        this.update = this.props.update
     }
 
     updateValue(e) {
@@ -57,23 +63,50 @@ class StarFormInput extends Component {
 
     keyPress(e) {
         if (e.key === 'Enter') {
-            if (this.state.input.id.length && this.state.input.value.length) {
-                this.props.update(this.state.input.id, this.state.input.value)
+            let { id, value } = this.state.input
+            if (id.length && value.length) {
+                this.update(id, value)
             }
         }
     }
 
+    handleLabelClass() {
+        let serverValue = (this.props.value || '').toLowerCase()
+        let clientValue = (this.state.input.value || '').toLowerCase()
+
+        if (clientValue !== serverValue) {
+            return 'bold'
+        } else {
+            return ''
+        }
+    }
+
     render() {
+        // FIXME input not updating on empty field
+
         return (
             <div className='input-wrapper'>
-                <label htmlFor={this.props.name.toLowerCase()}>{this.props.name}</label>
+                <label className={this.handleLabelClass()} htmlFor={this.props.name.toLowerCase()}>
+                    {this.props.name}
+                </label>
+
                 <input
                     type={this.props.type}
                     id={this.props.name.toLowerCase()}
                     defaultValue={this.props.value}
                     onChange={(e) => this.updateValue(e)}
                     onKeyDown={(e) => this.keyPress(e)}
+                    list={`${this.props.name.toLowerCase()}s`}
                 />
+
+                {this.props.list && (
+                    <datalist id={`${this.props.name.toLowerCase()}s`}>
+                        {this.props.list.map((item, i) => (
+                            <option key={i} value={item} />
+                        ))}
+                    </datalist>
+                )}
+
                 {this.props.children}
             </div>
         )
@@ -87,7 +120,7 @@ class StarForm extends Component {
     }
 
     render() {
-        const { data } = this.props
+        const { data, starData } = this.props
 
         return (
             <React.Fragment>
@@ -101,11 +134,11 @@ class StarForm extends Component {
                     </div>
                 </div>
 
-                <StarFormInput update={this.update} name='Breast' value={data.breast} />
-                <StarFormInput update={this.update} name='EyeColor' value={data.eyecolor} />
-                <StarFormInput update={this.update} name='HairColor' value={data.haircolor} />
-                <StarFormInput update={this.update} name='HairColor' value={data.ethnicity} />
-                <StarFormInput update={this.update} name='Country' value={data.country.name}>
+                <StarFormInput update={this.update} name='Breast' value={data.breast} list={starData.breast} />
+                <StarFormInput update={this.update} name='EyeColor' value={data.eyecolor} list={starData.eyecolor} />
+                <StarFormInput update={this.update} name='HairColor' value={data.haircolor} list={starData.haircolor} />
+                <StarFormInput update={this.update} name='Ethnicity' value={data.ethnicity} list={starData.ethnicity} />
+                <StarFormInput update={this.update} name='Country' value={data.country.name} list={starData.country}>
                     <i className={`flag flag-${data.country.code}`} />
                 </StarFormInput>
                 <StarFormInput update={this.update} name='Birthdate' value={data.birthdate} />
@@ -141,6 +174,13 @@ class Star extends Component {
                     end: 0,
                 },
             },
+        },
+        starData: {
+            breast: [],
+            eyecolor: [],
+            haircolor: [],
+            ethnicity: [],
+            country: [],
         },
         videos: [
             {
@@ -182,6 +222,22 @@ class Star extends Component {
             }
         })
     }
+
+    handleStar_rename() {
+        console.log('open modal with input form')
+        //console.log(`rename "${this.state.star.name}" to "${name}"`)
+    }
+
+    handleStar_remove() {
+        console.log(`remove star WHERE starID=${this.state.star.id}`)
+        // TODO remove star
+    }
+
+    handleStar_removeImage() {
+        console.log(`remove image WHERE starID=${this.state.star.id}`)
+        // TODO remove starImage
+    }
+
     render() {
         return (
             <div className='star-page col-7'>
@@ -189,6 +245,33 @@ class Star extends Component {
                     <div className='star'>
                         <img className='star__image' src={`${config.source}/images/stars/${this.state.star.image}`} alt='star' />
                         <h2>{this.state.star.name}</h2>
+                        </ContextMenuTrigger>
+
+                        <ContextMenu id='title'>
+                            <MenuItem disabled onClick={(e) => this.handleStar_rename(e)}>
+                                <i className='far fa-edit' /> Rename
+                            </MenuItem>
+
+                            <MenuItem disabled>
+                                <i className='far fa-plus' /> Add Alias
+                            </MenuItem>
+
+                            <MenuItem disabled>
+                                <i className='far fa-ban' /> Ignore Star
+                            </MenuItem>
+
+                            <MenuItem divider />
+
+                            <MenuItem disabled>
+                                <i className='far fa-copy' /> Copy Star
+                            </MenuItem>
+                        </ContextMenu>
+
+                        <StarForm
+                            update={(label, value) => this.handleStar_updateInfo(label, value)}
+                            data={this.state.star.info}
+                            starData={this.state.starData}
+                        />
                     </div>
                 )}
 
@@ -228,6 +311,19 @@ class Star extends Component {
                 this.setState((prevState) => {
                     let loaded = prevState.loaded
                     loaded.videos = true
+
+                    return { loaded }
+                })
+            })
+
+        Axios.get(`${config.api}/stardata.php`)
+            .then(({ data: starData }) => {
+                this.setState({ starData })
+            })
+            .then(() => {
+                this.setState((prevState) => {
+                    let loaded = prevState.loaded
+                    loaded.starData = true
 
                     return { loaded }
                 })
