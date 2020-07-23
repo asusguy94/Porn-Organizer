@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 
 import './styles/navbar.scss'
 
+import config from './config.json'
+
 class NavBar extends Component {
     render() {
         return (
@@ -26,16 +28,18 @@ class NavBar extends Component {
                     </li>
 
                     <li>
-                        <Link to='/stars/search'>Star Search</Link>
-                        <ul className='sub-menu d-none'>
+                        <a href={`${config.source}/star_search.php`}>Star Search</a>
+                        <ul className='sub-menu'>
                             <li>
-                                <Link to='/stars'>Stars</Link>
+                                <a href={`${config.source}/stars.php`}>Stars</a>
                             </li>
                         </ul>
                     </li>
 
                     <li>
-                        <Link to='/settings'>Settings</Link>
+                        <Link to='/settings' className='d-none'>
+                            Settings
+                        </Link>
                     </li>
 
                     <li>
@@ -43,12 +47,10 @@ class NavBar extends Component {
                     </li>
 
                     <li>
-                        <Link to='/generate/thumbnails'>
-                            Generate Thumbnails
-                        </Link>
+                        <a href={`${config.source}/video_generatethumbnails.php`}>Generate Thumbnails</a>
                         <ul className='sub-menu'>
                             <li>
-                                <Link to='/generate/vtt'>Generate WebVTT</Link>
+                                <a href={`${config.source}/vtt.php`}>Generte WebVTT</a>
                             </li>
                         </ul>
                     </li>
