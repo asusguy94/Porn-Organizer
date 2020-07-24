@@ -5,14 +5,28 @@
         margin-bottom: 0;
     }
 
+    .star,
     .video {
         margin: 5px;
 
-        width: $thumbnailWidth + px;
-
         img {
             width: inherit;
-            height: $thumbnailHeight + px;
+        }
+
+        .video {
+            width: $thumbnailWidth + px;
+
+            img {
+                height: $thumbnailHeight + px;
+            }
+        }
+
+        &.star {
+            width: $starWidth + px;
+
+            img {
+                height: $starHeight + px;
+            }
         }
     }
 

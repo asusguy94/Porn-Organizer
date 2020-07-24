@@ -10,6 +10,7 @@ import VideosPage from './components/pages/videos'
 import VideoPage from './components/pages/video'
 import StarPage from './components/pages/star'
 import VideoSearchPage from './components/pages/videosearch'
+import StarSearchPage from './components/pages/starsearch'
 
 /* Style */
 import './components/styles/main.scss'
@@ -33,9 +34,7 @@ class App extends Component {
 
                             <Route path='/video/:id' component={VideoPage} />
 
-                            <Route path='/stars/search'>
-                                <h1>Stars Search Page</h1>
-                            </Route>
+                            <Route path='/stars/search' component={StarSearchPage} />
 
                             <Route path='/star/:id' component={StarPage} />
 

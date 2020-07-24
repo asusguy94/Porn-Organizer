@@ -28,7 +28,7 @@ class NavBar extends Component {
                     </li>
 
                     <li>
-                        <a href={`${config.source}/star_search.php`}>Star Search</a>
+                        <Link to='/stars/search'>Star Search</Link>
                         <ul className='sub-menu'>
                             <li>
                                 <a href={`${config.source}/stars.php`}>Stars</a>
