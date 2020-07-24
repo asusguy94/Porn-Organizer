@@ -55,12 +55,29 @@
     }
 
     &.badge-x:after {
-            @include circle(23px);
+        @include circle(23px);
     }
 
     &.badge-xx:after {
         @include circle(23px, 26px);
-            line-height: 23px;
-        }
     }
+}
+
+#dropbox {
+    width: 200px;
+    height: 275px;
+    border: 2px dashed rgba(255, 0, 0, 0.3);
+
+    .label {
+        position: relative;
+        text-align: center;
+        top: 50%;
+    }
+}
+
+.unselectable {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }

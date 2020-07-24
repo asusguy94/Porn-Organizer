@@ -39,11 +39,11 @@ class StarFormInput extends Component {
     constructor(props) {
         super(props)
         this.state = {
-        input: {
-            id: '',
+            input: {
+                id: '',
                 value: props.value,
-        },
-    }
+            },
+        }
 
         this.update = this.props.update
     }
@@ -151,6 +151,45 @@ class StarForm extends Component {
     }
 }
 
+class StarImageDropbox extends Component {
+    constructor(props) {
+        super(props)
+        this.removeStar = this.props.removeStar
+        this.removeImage = this.props.removeImage
+    }
+
+    render() {
+        const { image } = this.props
+        if (image !== null) {
+            return (
+                <React.Fragment>
+                    <ContextMenuTrigger id='star__image'>
+                        <img className='star__image' src={`${config.source}/images/stars/${this.props.image}`} alt='star' />
+                    </ContextMenuTrigger>
+
+                    <ContextMenu id='star__image'>
+                        <MenuItem onClick={this.removeImage}>Delete Image</MenuItem>
+                    </ContextMenu>
+                </React.Fragment>
+            )
+        } else {
+            return (
+                <React.Fragment>
+                    <ContextMenuTrigger id='star__dropbox'>
+                        <div id='dropbox'>
+                            <div className='unselectable label'>Drop Image Here</div>
+                        </div>
+                    </ContextMenuTrigger>
+
+                    <ContextMenu id='star__dropbox'>
+                        <MenuItem onClick={this.removeStar}>Remove Star</MenuItem>
+                    </ContextMenu>
+                </React.Fragment>
+            )
+        }
+    }
+}
+
 class Star extends Component {
     state = {
         star: {
@@ -242,9 +281,15 @@ class Star extends Component {
         return (
             <div className='star-page col-7'>
                 {this.state.loaded.star && (
-                    <div className='star'>
-                        <img className='star__image' src={`${config.source}/images/stars/${this.state.star.image}`} alt='star' />
-                        <h2>{this.state.star.name}</h2>
+                    <div id='star' className='col-3 border'>
+                        <StarImageDropbox
+                            image={this.state.star.image}
+                            removeStar={() => this.handleStar_remove()}
+                            removeImage={() => this.handleStar_removeImage()}
+                        />
+
+                        <ContextMenuTrigger id='title'>
+                            <h2>{this.state.star.name}</h2>
                         </ContextMenuTrigger>
 
                         <ContextMenu id='title'>
