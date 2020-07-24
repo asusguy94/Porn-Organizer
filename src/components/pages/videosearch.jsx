@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 
-import { DaysToYears } from './../date'
+import { DaysToYears } from '../date'
 
 import '../styles/search.scss'
 
@@ -286,19 +286,14 @@ class VideoSearchPage extends Component {
                     <h2>Categories</h2>
                     <div id='categories'>
                         <div className='input-wrapper'>
-                            <input type='checkbox' id='category_POV' data-state='0' onChange={(e) => this.handleCategoryFilter_POV(e)} />
+                            <input type='checkbox' id='category_POV' onChange={(e) => this.handleCategoryFilter_POV(e)} />
                             <label htmlFor='category_POV' className='global-category'>
                                 POV
                             </label>
                         </div>
 
                         <div className='input-wrapper'>
-                            <input
-                                type='checkbox'
-                                id='category_NULL'
-                                data-state='0'
-                                onChange={(e) => this.handleCategoryFilter(e, null)}
-                            />
+                            <input type='checkbox' id='category_NULL' onChange={(e) => this.handleCategoryFilter(e, null)} />
                             <label htmlFor='category_NULL' className='global-category'>
                                 NULL
                             </label>
@@ -310,7 +305,6 @@ class VideoSearchPage extends Component {
                                     <input
                                         type='checkbox'
                                         id={`category-${this.state.categories[i].name}`}
-                                        data-state='0'
                                         onChange={(e) => this.handleCategoryFilter(e, this.state.categories[i])}
                                     />
                                     <label htmlFor={`category-${this.state.categories[i].name}`}>{this.state.categories[i].name}</label>
@@ -326,7 +320,6 @@ class VideoSearchPage extends Component {
                                     <input
                                         type='checkbox'
                                         id={`attribute-${this.state.attributes[i].name}`}
-                                        data-state='0'
                                         onChange={(e) => this.handleAttributeFilter(e, this.state.attributes[i])}
                                     />
                                     <label htmlFor={`attribute-${this.state.attributes[i].name}`}>{this.state.attributes[i].name}</label>
@@ -342,7 +335,6 @@ class VideoSearchPage extends Component {
                                     <input
                                         type='checkbox'
                                         id={`attribute-${this.state.locations[i].name}`}
-                                        data-state='0'
                                         onChange={(e) => this.handleLocationFilter(e, this.state.locations[i])}
                                     />
                                     <label htmlFor={`attribute-${this.state.locations[i].name}`}>{this.state.locations[i].name}</label>

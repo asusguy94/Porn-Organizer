@@ -167,8 +167,10 @@ class VideoPage extends Component {
     }
 
     handleVideo_play(time) {
-        this.player.player.currentTime = Number(time)
-        this.player.player.play()
+        const { player } = this.player
+
+        player.currentTime = Number(time)
+        player.play()
     }
 
     /* Bookmarks - own class? */
@@ -273,7 +275,7 @@ class VideoPage extends Component {
 
     /* Plays - own class? */
     handlePlays_add() {
-        Axios.get(`${config.api}/addplay.php?id=${this.state.video.id}`).then(() => {
+        Axios.get(`${config.api}/addplay.php?videoID=${this.state.video.id}`).then(() => {
             console.log('Play Added')
         })
     }
