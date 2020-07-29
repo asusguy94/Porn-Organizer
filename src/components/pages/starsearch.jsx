@@ -70,7 +70,7 @@ class StarSearchPage extends Component {
         let stars = this.state.stars.map((star) => {
             star.hidden.breast = false
             if (target === null) {
-                star.hidden.noBreast = e.target.checked && !star.breast.length
+                star.hidden.noBreast = e.target.checked && star.breast.length
             } else {
                 let match = star.breast.toLowerCase() !== target.toLowerCase()
 
@@ -85,6 +85,7 @@ class StarSearchPage extends Component {
     handleBreastFilter_ALL() {
         let stars = this.state.stars.map((star) => {
             star.hidden.breast = false
+            star.hidden.noBreast = false
 
             return star
         })
