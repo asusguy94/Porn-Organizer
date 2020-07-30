@@ -43,15 +43,34 @@ class StarSearchPage extends Component {
     }
 
     getCount() {
-        let count = 0
-        this.state.stars.forEach(({ hidden }) => {
-            count += !hidden.breast && !hidden.titleSearch && !hidden.noBreast
+        const obj = this.state.stars
+        let count = obj.length
+
+        obj.forEach(({ hidden }) => {
+            let value = 0
+            for (let prop in hidden) {
+                if (typeof hidden[prop] !== 'object') {
+                    value += Number(hidden[prop])
+                } else {
+                    value += Number(hidden[prop].length > 0)
+                }
+            }
+            if (value) count--
         })
         return count
     }
 
     isHidden({ hidden }) {
-        return hidden.breast || hidden.titleSearch || hidden.noBreast
+        let value = 0
+        for (var prop in hidden) {
+            if (typeof hidden[prop] !== 'object') {
+                value += Number(hidden[prop])
+            } else {
+                value += Number(hidden[prop].length > 0)
+            }
+        }
+
+        return value
     }
 
     handleTitleSearch(e) {

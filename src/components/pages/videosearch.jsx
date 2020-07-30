@@ -63,28 +63,34 @@ class VideoSearchPage extends Component {
     }
 
     getCount() {
-        let count = 0
-        this.state.videos.forEach(({ hidden }) => {
-            count +=
-                !hidden.category.length &&
-                !hidden.attribute.length &&
-                !hidden.location.length &&
-                !hidden.titleSearch &&
-                !hidden.noCategory &&
-                !hidden.pov
+        const obj = this.state.videos
+        let count = obj.length
+
+        obj.forEach(({ hidden }) => {
+            let value = 0
+            for (let prop in hidden) {
+                if (typeof hidden[prop] !== 'object') {
+                    value += Number(hidden[prop])
+                } else {
+                    value += Number(hidden[prop].length > 0)
+                }
+            }
+            if (value) count--
         })
         return count
     }
 
     isHidden({ hidden }) {
-        return (
-            hidden.category.length ||
-            hidden.attribute.length ||
-            hidden.location.length ||
-            hidden.titleSearch ||
-            hidden.noCategory ||
-            hidden.pov
-        )
+        let value = 0
+        for (var prop in hidden) {
+            if (typeof hidden[prop] !== 'object') {
+                value += Number(hidden[prop])
+            } else {
+                value += Number(hidden[prop].length > 0)
+            }
+        }
+
+        return value
     }
 
     handleTitleSearch(e) {
