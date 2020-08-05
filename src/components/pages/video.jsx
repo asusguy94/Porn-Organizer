@@ -232,65 +232,77 @@ class VideoPage extends Component {
     }
 
     handleBookmark_remove(id) {
-        Axios.get(`${config.api}/removebookmark.php?id=${id}`).then(() => {
-            let bookmarks = this.state.bookmarks.filter((item) => {
-                return item.id !== id
-            })
+        Axios.get(`${config.api}/removebookmark.php?id=${id}`).then(({ data }) => {
+            if (data.success) {
+                let bookmarks = this.state.bookmarks.filter((item) => {
+                    return item.id !== id
+                })
 
-            this.setState({ bookmarks })
+                this.setState({ bookmarks })
+            }
         })
     }
 
     handleBookmark_clear() {
-        Axios.get(`${config.api}/removebookmarks.php?id=${this.state.video.id}`).then(() => {
-            this.setState(() => {
-                let bookmarks = []
-                return { bookmarks }
-            })
+        Axios.get(`${config.api}/removebookmarks.php?id=${this.state.video.id}`).then(({ data }) => {
+            if (data.success) {
+                this.setState(() => {
+                    let bookmarks = []
+                    return { bookmarks }
+                })
+            }
         })
     }
 
     handleBookmark_category(category, bookmark) {
-        Axios.get(`${config.api}/changebookmarkcategory.php?id=${bookmark.id}&categoryID=${category.id}`).then(() => {
-            let bookmarks = this.state.bookmarks
-            let obj = Object.keys(bookmarks).map((i) => {
-                if (bookmarks[i].id === bookmark.id) {
-                    let item = bookmarks[i]
-                    item.name = category.name
+        Axios.get(`${config.api}/changebookmarkcategory.php?id=${bookmark.id}&categoryID=${category.id}`).then(({ data }) => {
+            if (data.success) {
+                let bookmarks = this.state.bookmarks
+                let obj = Object.keys(bookmarks).map((i) => {
+                    if (bookmarks[i].id === bookmark.id) {
+                        let item = bookmarks[i]
+                        item.name = category.name
 
-                    return item
-                }
+                        return item
+                    }
 
-                return bookmarks[i]
-            })
+                    return bookmarks[i]
+                })
 
-            this.setState({ bookmarks: obj })
+                this.setState({ bookmarks: obj })
+            }
         })
     }
 
     /* Star - own class? */
     handleStar_remove(id) {
-        Axios.get(`${config.api}/removevideostar.php?videoID=${this.state.video.id}&starID=${id}`).then(() => {
-            let star = { id: 0, name: '' }
-            this.setState({ star })
+        Axios.get(`${config.api}/removevideostar.php?videoID=${this.state.video.id}&starID=${id}`).then(({ data }) => {
+            if (data.success) {
+                let star = { id: 0, name: '' }
+                this.setState({ star })
+            }
         })
     }
 
     /* Plays - own class? */
     handlePlays_add() {
-        Axios.get(`${config.api}/addplay.php?videoID=${this.state.video.id}`).then(() => {
-            console.log('Play Added')
+        Axios.get(`${config.api}/addplay.php?videoID=${this.state.video.id}`).then(({ data }) => {
+            if (data.success) {
+                console.log('Play Added')
+            }
         })
     }
 
     handlePlays_reset() {
-        Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`).then(() => {
-            this.setState((prevState) => {
-                let video = prevState.video
-                video.plays = 0
+        Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    let video = prevState.video
+                    video.plays = 0
 
-                return { video }
-            })
+                    return { video }
+                })
+            }
         })
     }
 
@@ -330,15 +342,17 @@ class VideoPage extends Component {
     }
 
     handleAttribute_remove(attribute) {
-        Axios.get(`${config.api}/removeattribute.php?id=${attribute.id}`).then(() => {
-            let attributes = this.state.video.attributes.filter((item) => {
-                return item.id !== attribute.id
-            })
+        Axios.get(`${config.api}/removeattribute.php?id=${attribute.id}`).then(({ data }) => {
+            if (data.success) {
+                let attributes = this.state.video.attributes.filter((item) => {
+                    return item.id !== attribute.id
+                })
 
-            let video = this.state.video
-            video.attributes = attributes
+                let video = this.state.video
+                video.attributes = attributes
 
-            this.setState({ video })
+                this.setState({ video })
+            }
         })
     }
 
@@ -364,15 +378,17 @@ class VideoPage extends Component {
     }
 
     handleLocation_remove(location) {
-        Axios.get(`${config.api}/removelocation.php?id=${location.id}`).then(() => {
-            let locations = this.state.video.locations.filter((item) => {
-                return item.id !== location.id
-            })
+        Axios.get(`${config.api}/removelocation.php?id=${location.id}`).then(({ data }) => {
+            if (data.success) {
+                let locations = this.state.video.locations.filter((item) => {
+                    return item.id !== location.id
+                })
 
-            let video = this.state.video
-            video.locations = locations
+                let video = this.state.video
+                video.locations = locations
 
-            this.setState({ video })
+                this.setState({ video })
+            }
         })
     }
 
