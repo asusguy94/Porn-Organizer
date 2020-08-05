@@ -9,33 +9,123 @@ import '../styles/star.scss'
 
 import config from '../config'
 
+class StarVideo extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            dataSrc: `${config.source}/videos/${props.video.fname}`,
+            src: '',
+        }
+    }
+
+    async reloadVideo() {
+        this.setState((prevState) => {
+            let state = prevState
+            state.src = prevState.dataSrc
+            state.dataSrc = ''
+
+            return state
+        })
+    }
+
+    async unloadVideo() {
+        this.setState((prevState) => {
+            let state = prevState
+            state.dataSrc = prevState.src
+            state.src = ''
+
+            return state
+        })
+    }
+
+    playFrom(video, time = 0) {
+        if (time) video.currentTime = Number(time)
+        video.play()
+    }
+
+    stopFrom(video, time) {
+        if (time) video.currentTime = Number(time)
+        video.pause()
+    }
+
+    async startThumbnailPlayback(video) {
+        let time = 100
+        let offset = 60
+        let duration = 1.5
+
+        this.playFrom(video, time)
+        this.thumbnail = setInterval(() => {
+            time += offset
+            if (time > video.duration) {
+                this.stopThumbnailPlayback(video)
+                this.startThumbnailPlayback(video)
+            }
+            this.playFrom(video, (time += offset))
+        }, duration * 1000)
+    }
+
+    async stopThumbnailPlayback(video) {
+        this.stopFrom(video)
+        clearInterval(this.thumbnail)
+    }
+
+    handleMouseEnter(e) {
+        const { target } = e
+
+        if (this.state.dataSrc.length && !this.state.src.length) {
+            this.reloadVideo().then(() => {
+                this.startThumbnailPlayback(target)
+            })
+        }
+    }
+
+    handleMouseLeave(e) {
+        const { target } = e
+
+        if (!this.state.dataSrc.length && this.state.src.length) {
+            this.stopThumbnailPlayback(target).then(() => {
+                this.unloadVideo()
+            })
+        }
+    }
+
+    render() {
+        const { video } = this.props
+
+        return (
+            <a className='video card' href={`/video/${video.id}`}>
+                <video
+                    className='card-img-top'
+                    src={this.state.src}
+                    data-src={this.state.dataSrc}
+                    poster={`${config.source}/images/videos/${video.id}-290`}
+                    preload='metadata'
+                    muted
+                    onMouseEnter={this.handleMouseEnter.bind(this)}
+                    onMouseLeave={this.handleMouseLeave.bind(this)}
+                />
+
+                <span className='title card-title text-center'>{video.name}</span>
+            </a>
+        )
+    }
+}
+
 class StarVideos extends Component {
     render() {
         const { videos } = this.props
 
         return (
-            <div id='videos' className='row'>
-                {Object.keys(videos).map((key, i) => (
-                    <a key={i} className='video card' href={`/video/${videos[i].id}`}>
-                        <img alt='video' className='card-img-top' src={`${config.source}/images/videos/${videos[i].id}-290`} />
-
-                        <video
-                            className='card-img-top d-none'
-                            src={`${config.source}/videos/${videos[i].fname}`}
-                            poster={`${config.source}/images/videos/${videos[i].id}-290`}
-                            preload='metadata'
-                            muted
-                        />
-
-                        <span className='title card-title text-center'>{videos[i].name}</span>
-                    </a>
+            <div id='videos' className={this.props.className}>
+                {Object.keys(videos).map((i) => (
+                    <StarVideo video={videos[i]} key={i} />
                 ))}
             </div>
         )
     }
 }
 
-class StarFormInput extends Component {
+class StarInputForm extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -49,8 +139,7 @@ class StarFormInput extends Component {
     }
 
     updateValue(e) {
-        let inputValue = e.target.value
-        let inputID = e.target.id
+        let { value: inputValue, id: inputID } = e.target
 
         this.setState((prevState) => {
             let input = prevState.input
@@ -64,33 +153,28 @@ class StarFormInput extends Component {
     keyPress(e) {
         if (e.key === 'Enter') {
             let { id, value } = this.state.input
-            if (id.length && value.length) {
-                this.update(id, value)
+            if (id.length) {
+                this.update(value, id)
             }
         }
     }
 
-    handleLabelClass() {
+    isChanged() {
         let serverValue = (this.props.value || '').toLowerCase()
         let clientValue = (this.state.input.value || '').toLowerCase()
 
-        if (clientValue !== serverValue) {
-            return 'bold'
-        } else {
-            return ''
-        }
+        return clientValue !== serverValue
     }
 
     render() {
-        // FIXME input not updating on empty field
-
         return (
             <div className='input-wrapper'>
-                <label className={this.handleLabelClass()} htmlFor={this.props.name.toLowerCase()}>
+                <label className={this.isChanged() ? 'bold' : ''} htmlFor={this.props.name.toLowerCase()}>
                     {this.props.name}
                 </label>
 
                 <input
+                    ref={(input) => (this.input = input)}
                     type={this.props.type}
                     id={this.props.name.toLowerCase()}
                     defaultValue={this.props.value}
@@ -116,7 +200,7 @@ class StarFormInput extends Component {
 class StarForm extends Component {
     constructor(props) {
         super(props)
-        this.update = (label, value) => props.update(label, value)
+        this.update = (value, label) => props.update(value, label)
     }
 
     render() {
@@ -134,18 +218,18 @@ class StarForm extends Component {
                     </div>
                 </div>
 
-                <StarFormInput update={this.update} name='Breast' value={data.breast} list={starData.breast} />
-                <StarFormInput update={this.update} name='EyeColor' value={data.eyecolor} list={starData.eyecolor} />
-                <StarFormInput update={this.update} name='HairColor' value={data.haircolor} list={starData.haircolor} />
-                <StarFormInput update={this.update} name='Ethnicity' value={data.ethnicity} list={starData.ethnicity} />
-                <StarFormInput update={this.update} name='Country' value={data.country.name} list={starData.country}>
+                <StarInputForm update={this.update} name='Breast' value={data.breast} list={starData.breast} />
+                <StarInputForm update={this.update} name='EyeColor' value={data.eyecolor} list={starData.eyecolor} />
+                <StarInputForm update={this.update} name='HairColor' value={data.haircolor} list={starData.haircolor} />
+                <StarInputForm update={this.update} name='Ethnicity' value={data.ethnicity} list={starData.ethnicity} />
+                <StarInputForm update={this.update} name='Country' value={data.country.name} list={starData.country}>
                     <i className={`flag flag-${data.country.code}`} />
-                </StarFormInput>
-                <StarFormInput update={this.update} name='Birthdate' value={data.birthdate} />
-                <StarFormInput update={this.update} name='Height' value={data.height} />
-                <StarFormInput update={this.update} name='Weight' value={data.weight} />
-                <StarFormInput update={this.update} name='Start' value={data.year.start} />
-                <StarFormInput update={this.update} name='End' value={data.year.end} />
+                </StarInputForm>
+                <StarInputForm update={this.update} name='Birthdate' value={data.birthdate} />
+                <StarInputForm update={this.update} name='Height' value={data.height} />
+                <StarInputForm update={this.update} name='Weight' value={data.weight} />
+                <StarInputForm update={this.update} name='Start' value={data.start} />
+                <StarInputForm update={this.update} name='End' value={data.end} />
             </React.Fragment>
         )
     }
@@ -156,15 +240,37 @@ class StarImageDropbox extends Component {
         super(props)
         this.removeStar = this.props.removeStar
         this.removeImage = this.props.removeImage
+        this.addImage = props.addImage
+        this.addImage_local = props.addImage_local
+    }
+
+    handleDefault(e) {
+        e.stopPropagation()
+        e.preventDefault()
+    }
+
+    handleDrop(e) {
+        this.handleDefault(e)
+
+        let image = e.dataTransfer.getData('text')
+        if (this.isLocalFile(image)) {
+            image = e.dataTransfer.files
+            if (image.length === 1) {
+                this.addImage_local(image[0])
+            }
+        } else {
+            this.addImage(image)
+        }
     }
 
     render() {
-        const { image } = this.props
-        if (image !== null) {
+        const { star } = this.props
+
+        if (star.image !== null) {
             return (
                 <React.Fragment>
                     <ContextMenuTrigger id='star__image'>
-                        <img className='star__image' src={`${config.source}/images/stars/${this.props.image}`} alt='star' />
+                        <img className='star__image' src={`${config.source}/images/stars/${star.image}`} alt='star' />
                     </ContextMenuTrigger>
 
                     <ContextMenu id='star__image'>
@@ -176,7 +282,13 @@ class StarImageDropbox extends Component {
             return (
                 <React.Fragment>
                     <ContextMenuTrigger id='star__dropbox'>
-                        <div id='dropbox'>
+                        <div
+                            id='dropbox'
+                            onDragEnter={this.handleDefault.bind(this)}
+                            onDragExit={this.handleDefault.bind(this)}
+                            onDragOver={this.handleDefault.bind(this)}
+                            onDrop={this.handleDrop.bind(this)}
+                        >
                             <div className='unselectable label'>Drop Image Here</div>
                         </div>
                     </ContextMenuTrigger>
@@ -187,6 +299,10 @@ class StarImageDropbox extends Component {
                 </React.Fragment>
             )
         }
+    }
+
+    isLocalFile(path) {
+        return !(path.indexOf('http://') > -1 || path.indexOf('https://') > -1)
     }
 }
 
@@ -208,10 +324,8 @@ class Star extends Component {
                 birthdate: '',
                 height: 0,
                 weight: 0,
-                year: {
-                    start: 0,
-                    end: 0,
-                },
+                start: 0,
+                end: 0,
             },
         },
         starData: {
@@ -239,6 +353,8 @@ class Star extends Component {
     }
 
     handleModal(title = null, data = null) {
+        if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
+
         this.setState((prevState) => {
             let modal = prevState.modal
             modal.title = title
@@ -249,7 +365,7 @@ class Star extends Component {
         })
     }
 
-    handleStar_updateInfo(label, value) {
+    handleStar_updateInfo(value, label) {
         Axios.get(`${config.api}/changestarinfo.php?starID=${this.state.star.id}&label=${label}&value=${value}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
@@ -273,19 +389,46 @@ class Star extends Component {
     }
 
     handleStar_removeImage() {
-        console.log(`remove image WHERE starID=${this.state.star.id}`)
-        // TODO remove starImage
+        Axios.get(`${config.source}/ajax/remove_star_image.php?id=${this.state.star.id}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    let star = prevState.star
+                    star.image = null
+
+                    return { star }
+                })
+            }
+        })
+    }
+
+    handleStar_addImage(image) {
+        Axios.get(`${config.source}/ajax/add_star_image.php?id=${this.state.star.id}&image=${image}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    let star = prevState.star
+                    star.image = `${this.state.star.id}.${data.ext}`
+
+                    return { star }
+                })
+            }
+        })
+    }
+
+    handleStar_addLocalImage(image) {
+        console.log('Adding local file is not yet supported')
     }
 
     render() {
         return (
-            <div className='star-page col-7'>
+            <div className='star-page col-12'>
                 {this.state.loaded.star && (
-                    <div id='star' className='col-3 border'>
+                    <div id='star'>
                         <StarImageDropbox
-                            image={this.state.star.image}
+                            star={this.state.star}
                             removeStar={() => this.handleStar_remove()}
                             removeImage={() => this.handleStar_removeImage()}
+                            addImage={(image) => this.handleStar_addImage(image)}
+                            addImage_local={(image) => this.handleStar_addLocalImage(image)}
                         />
 
                         <ContextMenuTrigger id='title'>
@@ -298,17 +441,17 @@ class Star extends Component {
                             </MenuItem>
 
                             <MenuItem disabled>
-                                <i className='far fa-plus' /> Add Alias
+                                <i className={`${config.theme.fa} fa-plus`} /> Add Alias
                             </MenuItem>
 
                             <MenuItem disabled>
-                                <i className='far fa-ban' /> Ignore Star
+                                <i className={`${config.theme.fa} fa-ban`} /> Ignore Star
                             </MenuItem>
 
                             <MenuItem divider />
 
                             <MenuItem disabled>
-                                <i className='far fa-copy' /> Copy Star
+                                <i className={`${config.theme.fa} fa-copy`} /> Copy Star
                             </MenuItem>
                         </ContextMenu>
 
@@ -321,7 +464,7 @@ class Star extends Component {
                 )}
 
                 <h3>Videos</h3>
-                {this.state.loaded.videos && <StarVideos videos={this.state.videos} />}
+                {this.state.loaded.videos && <StarVideos className='row col-12' videos={this.state.videos} />}
 
                 <Modal visible={this.state.modal.visible} onClose={() => this.handleModal()} title={this.state.modal.title}>
                     {this.state.modal.data}

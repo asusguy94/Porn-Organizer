@@ -15,7 +15,7 @@ class HomeColumn extends Component {
             return (
                 <section className='col-12'>
                     <h2>
-                        {obj.label} Videos (<span className='count'>{obj.limit}</span>)
+                        {obj.label} (<span className='count'>{obj.limit}</span>)
                     </h2>
 
                     <div className='row'>
@@ -43,7 +43,7 @@ class HomeColumn extends Component {
 class HomePage extends Component {
     state = {
         recent: {
-            label: 'Recent',
+            label: 'Recent Added',
             enabled: true,
             limit: 10,
             data: [],
@@ -55,7 +55,7 @@ class HomePage extends Component {
             data: [],
         },
         popular: {
-            label: 'Popular',
+            label: 'Most Popular',
             enabled: true,
             limit: 20,
             data: [],

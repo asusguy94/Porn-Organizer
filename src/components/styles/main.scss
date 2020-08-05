@@ -1,6 +1,7 @@
 @import 'functions';
 @import 'context-menu';
 @import 'ribbon';
+@import 'dropbox';
 
 /* Star */
 .star {
@@ -63,19 +64,8 @@
     }
 }
 
-#dropbox {
-    width: 200px;
-    height: 275px;
-    border: 2px dashed rgba(255, 0, 0, 0.3);
-
-    .label {
-        position: relative;
-        text-align: center;
-        top: 50%;
-    }
-}
-
-.unselectable {
+.unselectable,
+input[disabled] + label {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;

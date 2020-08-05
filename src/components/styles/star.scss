@@ -1,3 +1,4 @@
+@import 'functions';
 .star-page {
     aside {
         #relations {
@@ -5,7 +6,7 @@
 
             a.relation {
                 display: inline-block;
-                width: 200;
+                width: 200px;
 
                 margin: 10px;
                 text-decoration: none;
@@ -39,11 +40,19 @@
                 margin-right: 7px;
             }
         }
+
+        input {
+            text-transform: capitalize;
+        }
+
+        .flag {
+            margin-left: 5px;
+            margin-bottom: -5px;
         }
     }
 
     .video {
         margin: 0 5px 10px;
-        width: 290px;
+        width: $thumbnailWidth + px;
     }
 }

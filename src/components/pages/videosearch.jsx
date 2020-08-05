@@ -19,13 +19,14 @@ class VideoSearchPage extends Component {
                 ageInVideo: 0,
                 website: '',
                 site: '',
+                plays: 0,
                 categories: [],
                 attributes: [],
                 locations: [],
                 hidden: {
                     category: [],
                     attribute: [],
-                    titleSearch: [],
+                    titleSearch: false,
                     noCategory: false,
                     pov: false,
                 },
@@ -153,35 +154,35 @@ class VideoSearchPage extends Component {
     }
 
     handleAttributeFilter(e, target) {
-                const targetLower = target.name.toLowerCase()
+        const targetLower = target.name.toLowerCase()
 
         let videos = this.state.videos.map((video) => {
-                if (!e.target.checked) {
-                    let match = !video.attributes
-                        .map((attribute) => {
-                            return attribute.toLowerCase()
-                        })
-                        .includes(targetLower)
+            if (!e.target.checked) {
+                let match = !video.attributes
+                    .map((attribute) => {
+                        return attribute.toLowerCase()
+                    })
+                    .includes(targetLower)
 
-                    if (match) {
-                        let index = video.hidden.attribute.indexOf(targetLower)
-                        video.hidden.attribute.splice(index, 1)
-                    }
-                } else {
-                    let match = !video.attributes
-                        .map((attribute) => {
-                            return attribute.toLowerCase()
-                        })
-                        .includes(targetLower)
-
-                    if (match && !video.hidden.attribute.includes(targetLower)) {
-                        video.hidden.attribute.push(targetLower)
-                    }
+                if (match) {
+                    let index = video.hidden.attribute.indexOf(targetLower)
+                    video.hidden.attribute.splice(index, 1)
                 }
+            } else {
+                let match = !video.attributes
+                    .map((attribute) => {
+                        return attribute.toLowerCase()
+                    })
+                    .includes(targetLower)
+
+                if (match && !video.hidden.attribute.includes(targetLower)) {
+                    video.hidden.attribute.push(targetLower)
+                }
+            }
             return video
         })
         this.setState({ videos })
-            }
+    }
 
     handleLocationFilter(e, target) {
         const targetLower = target.name.toLowerCase()
@@ -205,8 +206,6 @@ class VideoSearchPage extends Component {
                     })
                     .includes(targetLower)
 
-                console.log(video.hidden.location)
-
                 if (match && !video.hidden.location.includes(targetLower)) {
                     video.hidden.location.push(targetLower)
                 }
@@ -216,7 +215,7 @@ class VideoSearchPage extends Component {
         this.setState({ videos })
     }
 
-    sort_asc() {
+    sort_default_asc() {
         let videos = this.state.videos
         videos.sort((a, b) => {
             let valA = a.name.toLowerCase()
@@ -228,15 +227,59 @@ class VideoSearchPage extends Component {
         this.setState({ videos })
     }
 
-    sort_desc() {
+    sort_default_desc() {
         let videos = this.state.videos
-        videos.sort((a, b) => {
+        videos.sort((b, a) => {
             let valA = a.name.toLowerCase()
             let valB = b.name.toLowerCase()
 
-            return valB.localeCompare(valA)
+            return valA.localeCompare(valB)
         })
 
+        this.setState({ videos })
+    }
+
+    sort_plays_asc() {
+        let videos = this.state.videos
+        videos.sort((a, b) => {
+            let valA = a.plays
+            let valB = b.plays
+
+            return valA - valB
+        })
+        this.setState({ videos })
+    }
+
+    sort_plays_desc() {
+        let videos = this.state.videos
+        videos.sort((b, a) => {
+            let valA = a.plays
+            let valB = b.plays
+
+            return valA - valB
+        })
+        this.setState({ videos })
+    }
+
+    sort_age_asc() {
+        let videos = this.state.videos
+        videos.sort((a, b) => {
+            let valA = a.ageInVideo
+            let valB = b.ageInVideo
+
+            return valA - valB
+        })
+        this.setState({ videos })
+    }
+
+    sort_age_desc() {
+        let videos = this.state.videos
+        videos.sort((b, a) => {
+            let valA = a.ageInVideo
+            let valB = b.ageInVideo
+
+            return valA - valB
+        })
         this.setState({ videos })
     }
 
@@ -254,11 +297,11 @@ class VideoSearchPage extends Component {
 
                     <h2>Sort</h2>
                     <div className='input-wrapper'>
-                        <input id='alphabetically' type='radio' name='sort' onChange={this.sort_asc.bind(this)} defaultChecked />
+                        <input id='alphabetically' type='radio' name='sort' onChange={this.sort_default_asc.bind(this)} defaultChecked />
                         <label htmlFor='alphabetically'>A-Z</label>
                     </div>
                     <div className='input-wrapper'>
-                        <input id='alphabetically_desc' type='radio' name='sort' onChange={this.sort_desc.bind(this)} />
+                        <input id='alphabetically_desc' type='radio' name='sort' onChange={this.sort_default_desc.bind(this)} />
                         <label htmlFor='alphabetically_desc'>Z-A</label>
                     </div>
 
@@ -280,12 +323,21 @@ class VideoSearchPage extends Component {
                         <label htmlFor='date_asc'>Newest</label>
                     </div>
 
-                    <div className='input-wrapper disabled'>
-                        <input id='popularity_desc' type='radio' name='sort' />
+                    <div className='input-wrapper'>
+                        <input id='age_desc' type='radio' name='sort' onChange={this.sort_age_asc.bind(this)} />
+                        <label htmlFor='age_desc'>Teen</label>
+                    </div>
+                    <div className='input-wrapper'>
+                        <input id='age_asc' type='radio' name='sort' onChange={this.sort_age_desc.bind(this)} />
+                        <label htmlFor='age_asc'>Milf</label>
+                    </div>
+
+                    <div className='input-wrapper'>
+                        <input id='popularity_desc' type='radio' name='sort' onChange={this.sort_plays_desc.bind(this)} />
                         <label htmlFor='popularity_desc'>Most Popular</label>
                     </div>
-                    <div className='input-wrapper disabled'>
-                        <input id='popularity_asc' type='radio' name='sort' />
+                    <div className='input-wrapper'>
+                        <input id='popularity_asc' type='radio' name='sort' onChange={this.sort_plays_asc.bind(this)} />
                         <label htmlFor='popularity_asc'>Least Popular</label>
                     </div>
 

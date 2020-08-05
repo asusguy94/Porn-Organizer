@@ -3,13 +3,8 @@
     "version": "0.0.4",
     "license": "MIT",
     "dependencies": {
-        "@testing-library/jest-dom": "^5.11.1",
-        "@testing-library/react": "^10.4.7",
-        "@testing-library/user-event": "^12.0.11",
-        "@types/hls.js": "^0.13.0",
-        "@types/react-router-dom": "^5.1.5",
         "axios": "^0.19.2",
-        "hls.js": "^0.14.3",
+        "hls.js": "^0.14.7",
         "node-sass": "^4.14.1",
         "plyr-react": "^2.2.0",
         "react": "^16.13.1",
@@ -20,11 +15,13 @@
         "react-scripts": "3.4.1",
         "react-scroll-to-top": "^1.0.5"
     },
+    "devDependencies": {
+        "@types/hls.js": "^0.13.0",
+        "@types/react-router-dom": "^5.1.5"
+    },
     "scripts": {
         "start": "react-scripts start",
-        "build": "react-scripts build",
-        "test": "react-scripts test",
-        "eject": "react-scripts eject"
+        "build": "react-scripts build"
     },
     "eslintConfig": {
         "extends": "react-app"

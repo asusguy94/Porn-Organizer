@@ -1,6 +1,7 @@
 {
     "api": "http://api.porn.ds1517",
     "source": "https://porn.ds1517",
+    "db": "https://ds1517",
     "timeline": {
         "offset": 0.89,
         "spacing": 2
@@ -10,5 +11,8 @@
         "levels": { "1080": 3, "720": 2, "480": 1, "360": 0 },
         "maxLevel": 1080,
         "maxStartLevel": 720
+    },
+    "theme": {
+        "fa": "far"
     }
 }

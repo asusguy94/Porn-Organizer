@@ -13,7 +13,7 @@ class VideosPage extends Component {
 
     render() {
         return (
-            <div className='col-12'>
+            <div className='col'>
                 <div className='list-group'>
                     {Object.keys(this.state.data).map((key, i) => (
                         <li key={i} className='list-group-item list-group-item-action'>

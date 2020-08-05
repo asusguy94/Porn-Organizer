@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 
 import Axios from 'axios'
 import { PlyrComponent } from 'plyr-react'
 import Hls from 'hls.js'
-import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
+import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 
 import Modal from '../modal'
 import { DaysToYears } from '../date'
@@ -115,7 +116,7 @@ class VideoPage extends Component {
             data = numVideos
         } else if (numVideos) {
             data = `badge-${'x'.repeat(String(numVideos).length)}`
-    }
+        }
 
         return data
     }
@@ -125,6 +126,8 @@ class VideoPage extends Component {
     }
 
     handleModal(title = null, data = null) {
+        if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
+
         this.setState((prevState) => {
             let modal = prevState.modal
             modal.title = title
@@ -378,7 +381,7 @@ class VideoPage extends Component {
             <div className='video-page col-12 row'>
                 <section className='col-10'>
                     <header className='header row'>
-                        <div className='col-12'>
+                        <div className='col-11'>
                             <h1 className='header__title h2 align-middle'>
                                 <div className='d-inline-block align-middle'>
                                     <ContextMenuTrigger id='title'>{this.state.video.name}</ContextMenuTrigger>
@@ -409,7 +412,7 @@ class VideoPage extends Component {
                                             )
                                         }}
                                     >
-                                        <i className='far fa-edit' /> Rename Title
+                                        <i className={`${config.theme.fa} fa-edit`} /> Rename Title
                                     </MenuItem>
 
                                     <MenuItem
@@ -522,17 +525,19 @@ class VideoPage extends Component {
                             </div>
 
                             <div className='header__site'>
-                                    <span id='wsite'>{this.state.video.website}</span>
-                                    {this.state.video.subsite && (
-                                        <React.Fragment>
+                                <span id='wsite'>{this.state.video.website}</span>
+                                {this.state.video.subsite && (
+                                    <React.Fragment>
                                         <span className='divider'>-</span>
-                                            <span id='site'>{this.state.video.subsite}</span>
-                                        </React.Fragment>
-                                    )}
+                                        <span id='site'>{this.state.video.subsite}</span>
+                                    </React.Fragment>
+                                )}
                             </div>
+                        </div>
 
+                        <div className='col-1 header__next'>
                             <a
-                                className='header__next btn btn-outline-primary float-right'
+                                className='btn btn-sm btn-outline-primary float-right'
                                 id='next'
                                 href={`/video/${this.state.video.nextID}`}
                             >
@@ -541,7 +546,7 @@ class VideoPage extends Component {
                         </div>
                     </header>
 
-                    <div className='video-container' onWheel={this.handleWheel.bind(this)}>
+                    <div className='video-container' onWheel={(e) => this.handleWheel(e)}>
                         <ContextMenuTrigger id='video'>
                             {this.state.loaded.video && (
                                 <PlyrComponent
@@ -550,10 +555,10 @@ class VideoPage extends Component {
                                         controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'fullscreen'],
                                         hideControls: false,
                                         ratio: '21:9',
-                                        keyboard: { global: true },
+                                        keyboard: { global: true }, // TODO Create own keyboard shortcuts/commands
                                         seekTime: this.state.seekSpeed.regular,
                                         previewThumbnails: {
-                                            enabled: true,
+                                            enabled: true, // TODO Check if this should be enabled...perhaps from config.source, or config.api later
                                             src: `${config.source}/vtt/${this.state.video.id}.vtt`,
                                         },
                                     }}
@@ -596,7 +601,7 @@ class VideoPage extends Component {
                                     )
                                 }}
                             >
-                                <i className='far fa-plus' /> Add Bookmark
+                                <i className={`${config.theme.fa} fa-plus`} /> Add Bookmark
                             </MenuItem>
 
                             <MenuItem disabled>
@@ -686,17 +691,17 @@ class VideoPage extends Component {
                                                 )
                                             }}
                                         >
-                                            <i className='far fa-edit' /> Change Category
+                                            <i className={`${config.theme.fa} fa-edit`} /> Change Category
                                         </MenuItem>
 
                                         <MenuItem onClick={() => this.handleBookmark_time(this.state.bookmarks[i].id)}>
-                                            <i className='far fa-clock' /> Change Time
+                                            <i className={`${config.theme.fa} fa-clock`} /> Change Time
                                         </MenuItem>
 
                                         <MenuItem divider />
 
                                         <MenuItem onClick={() => this.handleBookmark_remove(this.state.bookmarks[i].id)}>
-                                            <i className='far fa-trash-alt' /> Delete
+                                            <i className={`${config.theme.fa} fa-trash-alt`} /> Delete
                                         </MenuItem>
                                     </ContextMenu>
                                 </React.Fragment>
@@ -716,9 +721,9 @@ class VideoPage extends Component {
                                             src={`${config.source}/images/stars/${this.state.star.id}`}
                                         />
 
-                                        <a href={`${config.source}/star.php?id=${this.state.star.id}`} className='star__name d-block'>
+                                        <Link to={`/star/${this.state.star.id}`} className='star__name d-block'>
                                             {this.state.star.name}
-                                        </a>
+                                        </Link>
 
                                         {this.state.star.ageInVideo > 0 && (
                                             <span className='ribbon'>

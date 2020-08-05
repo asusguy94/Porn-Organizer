@@ -34,11 +34,13 @@ class StarSearchPage extends Component {
         ],
 
         breasts: [],
+        haircolors: [],
 
         loaded: {
             stars: false,
 
             breasts: false,
+            haircolors: false,
         },
     }
 
@@ -112,25 +114,44 @@ class StarSearchPage extends Component {
         this.setState({ stars })
     }
 
-    sort_asc() {
-        let stars = this.state.stars
-        stars.sort((a, b) => {
-            let valA = a.name.toLowerCase()
-            let valB = b.name.toLowerCase()
+    handleHaircolorFilter(target) {
+        let stars = this.state.stars.map((star) => {
+            star.hidden.haircolor = star.haircolor.toLowerCase() !== target.toLowerCase()
 
-            return valA.localeCompare(valB)
+            return star
+        })
+        this.setState({ stars })
+    }
+
+    handleHaircolorFilter_ALL() {
+        let stars = this.state.stars.map((star) => {
+            star.hidden.haircolor = false
+
+            return star
         })
 
         this.setState({ stars })
     }
 
-    sort_desc() {
+    sort_default_asc() {
         let stars = this.state.stars
         stars.sort((a, b) => {
             let valA = a.name.toLowerCase()
             let valB = b.name.toLowerCase()
 
-            return valB.localeCompare(valA)
+            return valA.localeCompare(valB, 'en')
+        })
+
+        this.setState({ stars })
+    }
+
+    sort_default_desc() {
+        let stars = this.state.stars
+        stars.sort((b, a) => {
+            let valA = a.name.toLowerCase()
+            let valB = b.name.toLowerCase()
+
+            return valA.localeCompare(valB, 'en')
         })
 
         this.setState({ stars })
@@ -145,21 +166,21 @@ class StarSearchPage extends Component {
                     </div>
 
                     <div className='input-wrapper'>
-                        <input type='text' placeholder='Title' autoFocus onChange={this.handleTitleSearch.bind(this)} />
+                        <input type='text' placeholder='Name' autoFocus onChange={this.handleTitleSearch.bind(this)} />
                     </div>
 
                     <h2>Sort</h2>
                     <div className='input-wrapper'>
-                        <input id='alphabetically' type='radio' name='sort' onChange={this.sort_asc.bind(this)} defaultChecked />
+                        <input id='alphabetically' type='radio' name='sort' onChange={this.sort_default_asc.bind(this)} defaultChecked />
                         <label htmlFor='alphabetically'>A-Z</label>
                     </div>
                     <div className='input-wrapper'>
-                        <input id='alphabetically_desc' type='radio' name='sort' onChange={this.sort_desc.bind(this)} />
+                        <input id='alphabetically_desc' type='radio' name='sort' onChange={this.sort_default_desc.bind(this)} />
                         <label htmlFor='alphabetically_desc'>Z-A</label>
                     </div>
 
                     <h2>Breast</h2>
-                    <div id='categories'>
+                    <div id='breasts'>
                         <div className='input-wrapper'>
                             <input
                                 type='radio'
@@ -190,6 +211,35 @@ class StarSearchPage extends Component {
                                         onChange={(e) => this.handleBreastFilter(e, this.state.breasts[i])}
                                     />
                                     <label htmlFor={`category-${this.state.breasts[i]}`}>{this.state.breasts[i]}</label>
+                                </div>
+                            ))}
+                    </div>
+
+                    <h2>Hair Color</h2>
+                    <div id='haircolors'>
+                        <div className='input-wrapper'>
+                            <input
+                                type='radio'
+                                id='haircolor_ALL'
+                                name='haircolor'
+                                defaultChecked
+                                onChange={() => this.handleHaircolorFilter_ALL()}
+                            />
+                            <label htmlFor='haircolor_ALL' className='global-category'>
+                                All
+                            </label>
+                        </div>
+
+                        {this.state.loaded.haircolors &&
+                            Object.keys(this.state.haircolors).map((i) => (
+                                <div className='input-wrapper' key={i}>
+                                    <input
+                                        type='radio'
+                                        name='haircolor'
+                                        id={`haircolor-${this.state.haircolors[i]}`}
+                                        onChange={() => this.handleHaircolorFilter(this.state.haircolors[i])}
+                                    />
+                                    <label htmlFor={`haircolor-${this.state.haircolors[i]}`}>{this.state.haircolors[i]}</label>
                                 </div>
                             ))}
                     </div>
@@ -245,7 +295,10 @@ class StarSearchPage extends Component {
                     stars = stars.map((item) => {
                         item.hidden = {
                             titleSearch: false,
+
                             breast: false,
+                            haircolor: false,
+
                             noBreast: false,
                         }
 
@@ -266,13 +319,15 @@ class StarSearchPage extends Component {
 
         Axios.get(`${config.api}/stardata.php`)
             .then(({ data }) => {
-                const { breast: breasts } = data
-                this.setState({ breasts })
+                const { breast: breasts, haircolor: haircolors } = data
+
+                this.setState({ breasts, haircolors })
             })
             .then(() => {
                 this.setState((prevState) => {
                     let loaded = prevState.loaded
                     loaded.breasts = true
+                    loaded.haircolors = true
                 })
             })
     }

@@ -9,11 +9,7 @@
     .video {
         margin: 5px;
 
-        img {
-            width: inherit;
-        }
-
-        .video {
+        &.video {
             width: $thumbnailWidth + px;
 
             img {
