@@ -2,6 +2,19 @@ import React, { Component } from 'react'
 
 import './styles/modal.scss'
 
+export function handleModal(title = null, data = null) {
+    if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
+
+    this.setState((prevState) => {
+        let modal = prevState.modal
+        modal.title = title
+        modal.data = data
+        modal.visible = !modal.visible
+
+        return { modal }
+    })
+}
+
 class Modal extends Component {
     constructor(props) {
         super(props)

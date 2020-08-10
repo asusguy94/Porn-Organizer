@@ -6,7 +6,7 @@ import { PlyrComponent } from 'plyr-react'
 import Hls from 'hls.js'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 
-import Modal from '../modal'
+import Modal, { handleModal } from '../modal'
 import { DaysToYears } from '../date'
 
 import '../styles/video.scss'
@@ -14,6 +14,11 @@ import '../styles/video.scss'
 import config from '../config'
 
 class VideoPage extends Component {
+    constructor(props) {
+        super(props)
+        this.handleModal = handleModal
+    }
+
     state = {
         video: {
             id: 0,
@@ -123,19 +128,6 @@ class VideoPage extends Component {
 
     handleWheel(e) {
         this.player.player.currentTime += this.state.seekSpeed.wheel * Math.sign(e.deltaY) * -1
-    }
-
-    handleModal(title = null, data = null) {
-        if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
-
-        this.setState((prevState) => {
-            let modal = prevState.modal
-            modal.title = title
-            modal.data = data
-            modal.visible = !modal.visible
-
-            return { modal }
-        })
     }
 
     handleModal_input(e) {
