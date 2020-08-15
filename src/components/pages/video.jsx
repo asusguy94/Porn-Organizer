@@ -444,7 +444,7 @@ class VideoPage extends Component {
                                             )
                                         }}
                                     >
-                                        <i className='far fa-tag' /> Add Attribute
+                                        <i className={`${config.theme.fa} fa-tag`} /> Add Attribute
                                     </MenuItem>
 
                                     <MenuItem
@@ -468,30 +468,30 @@ class VideoPage extends Component {
                                             )
                                         }}
                                     >
-                                        <i className='far fa-map-marker-alt' /> Add Location
+                                        <i className={`${config.theme.fa} fa-map-marker-alt`} /> Add Location
                                     </MenuItem>
 
                                     <MenuItem divider />
 
                                     <MenuItem onClick={() => this.handleTitle_copy()}>
-                                        <i className='far fa-copy' /> Copy Title
+                                        <i className={`${config.theme.fa} fa-copy`} /> Copy Title
                                     </MenuItem>
 
                                     <MenuItem onClick={() => this.handleStar_copy()}>
-                                        <i className='far fa-user' /> Copy Star
+                                        <i className={`${config.theme.fa} fa-user`} /> Copy Star
                                     </MenuItem>
                                 </ContextMenu>
                             </h1>
 
                             <div className='header__date btn btn-sm btn-outline-primary'>
                                 <ContextMenuTrigger id='menu__date'>
-                                    <i className='far fa-calendar-check' />
+                                    <i className={`${config.theme.fa} fa-calendar-check`} />
                                     {this.state.video.date.published}
                                 </ContextMenuTrigger>
 
                                 <ContextMenu id='menu__date'>
                                     <MenuItem onClick={() => this.handleDate_fix()}>
-                                        <i className='far fa-edit' /> Fix Date
+                                        <i className={`${config.theme.fa} fa-edit`} /> Fix Date
                                     </MenuItem>
                                 </ContextMenu>
                             </div>
@@ -501,13 +501,13 @@ class VideoPage extends Component {
                                     Object.keys(this.state.video.locations).map((i) => (
                                         <div key={i} className='btn btn-sm btn-outline-danger location'>
                                             <ContextMenuTrigger id={`location-${i}`}>
-                                                <i className='far fa-map-marker-alt' />
+                                                <i className={`${config.theme.fa} fa-map-marker-alt`} />
                                                 {this.state.video.locations[i].name}
                                             </ContextMenuTrigger>
 
                                             <ContextMenu id={`location-${i}`}>
                                                 <MenuItem onClick={() => this.handleLocation_remove(this.state.video.locations[i])}>
-                                                    <i className='far fa-trash-alt' /> Remove
+                                                    <i className={`${config.theme.fa} fa-trash-alt`} /> Remove
                                                 </MenuItem>
                                             </ContextMenu>
                                         </div>
@@ -519,13 +519,13 @@ class VideoPage extends Component {
                                     Object.keys(this.state.video.attributes).map((i) => (
                                         <div key={i} className='btn btn-sm btn-outline-primary attribute'>
                                             <ContextMenuTrigger id={`attribute-${i}`}>
-                                                <i className='far fa-tag' />
+                                                <i className={`${config.theme.fa} fa-tag`} />
                                                 {this.state.video.attributes[i].name}
                                             </ContextMenuTrigger>
 
                                             <ContextMenu id={`attribute-${i}`}>
                                                 <MenuItem onClick={() => this.handleAttribute_remove(this.state.video.attributes[i])}>
-                                                    <i className='far fa-trash-alt' /> Remove
+                                                    <i className={`${config.theme.fa} fa-trash-alt`} /> Remove
                                                 </MenuItem>
                                             </ContextMenu>
                                         </div>
@@ -613,11 +613,11 @@ class VideoPage extends Component {
                             </MenuItem>
 
                             <MenuItem disabled>
-                                <i className='far fa-plus' /> Set Age
+                                <i className={`${config.theme.fa} fa-plus`} /> Set Age
                             </MenuItem>
 
                             <MenuItem disabled>
-                                <i className='far fa-edit' /> Toggle Controls
+                                <i className={`${config.theme.fa} fa-edit`} /> Toggle Controls
                             </MenuItem>
 
                             <MenuItem disabled>
@@ -763,13 +763,13 @@ class VideoPage extends Component {
                                             )
                                         }}
                                     >
-                                        <i className='far fa-plus' /> Add Bookmark
+                                        <i className={`${config.theme.fa} fa-plus`} /> Add Bookmark
                                     </MenuItem>
 
                                     <MenuItem divider />
 
                                     <MenuItem onClick={() => this.handleStar_remove(this.state.star.id)}>
-                                        <i className='far fa-trash-alt' /> Remove
+                                        <i className={`${config.theme.fa} fa-trash-alt`} /> Remove
                                     </MenuItem>
                                 </ContextMenu>
                             </div>

@@ -274,7 +274,9 @@ class StarImageDropbox extends Component {
                     </ContextMenuTrigger>
 
                     <ContextMenu id='star__image'>
-                        <MenuItem onClick={this.removeImage}>Delete Image</MenuItem>
+                        <MenuItem onClick={this.removeImage}>
+                            <i className={`${config.theme.fa} fa-trash-alt`} /> Delete Image
+                        </MenuItem>
                     </ContextMenu>
                 </React.Fragment>
             )
@@ -294,7 +296,9 @@ class StarImageDropbox extends Component {
                     </ContextMenuTrigger>
 
                     <ContextMenu id='star__dropbox'>
-                        <MenuItem onClick={this.removeStar}>Remove Star</MenuItem>
+                        <MenuItem onClick={this.removeStar} disabled>
+                            <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Star
+                        </MenuItem>
                     </ContextMenu>
                 </React.Fragment>
             )
@@ -429,7 +433,7 @@ class Star extends Component {
 
                         <ContextMenu id='title'>
                             <MenuItem disabled onClick={(e) => this.handleStar_rename(e)}>
-                                <i className='far fa-edit' /> Rename
+                                <i className={`${config.theme.fa} fa-edit`} /> Rename
                             </MenuItem>
 
                             <MenuItem disabled>
