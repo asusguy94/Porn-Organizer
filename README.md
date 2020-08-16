@@ -17,3 +17,7 @@ and should work flawlessly.
 ## Features
 
 Status of features can be found here [features.md](FEATURES.md)
+
+## Known Bugs
+
+This app has a requirement of cors-requests, but sometimes they just don't work as intended. You can install a browser extension to fix it. I usually use **`Allow CORS`** extension on Google Chrome
