@@ -9,6 +9,35 @@ import './star.scss'
 
 import config from '../config'
 
+class Ribbon extends Component {
+    render() {
+        const { isFirst, isLast, align, label } = this.props
+
+        let className
+        switch (align) {
+            case 'left':
+                className = 'ribbon ribbon-left ribbon-purple'
+                break
+            case undefined:
+            case 'right':
+                className = 'ribbon'
+                break
+            default:
+                return null
+        }
+
+        if (isFirst) {
+            return <span className={className}>First</span>
+        } else if (isLast) {
+            return <span className={className}>Latest</span>
+        } else {
+            if (label) return <span className={className}>{label}</span>
+        }
+
+        return null
+    }
+}
+
 class StarVideo extends Component {
     constructor(props) {
         super(props)
@@ -91,10 +120,10 @@ class StarVideo extends Component {
     }
 
     render() {
-        const { video } = this.props
+        const { video, isFirst, isLast } = this.props
 
         return (
-            <a className='video card' href={`/video/${video.id}`}>
+            <a className='video ribbon-container card' href={`/video/${video.id}`}>
                 <video
                     className='card-img-top'
                     src={this.state.src}
@@ -107,6 +136,10 @@ class StarVideo extends Component {
                 />
 
                 <span className='title card-title text-center'>{video.name}</span>
+
+                <Ribbon isFirst={isFirst} isLast={isLast} align='left' />
+
+                {video.ageInVideo && <Ribbon label={video.ageInVideo} />}
             </a>
         )
     }
@@ -118,8 +151,13 @@ class StarVideos extends Component {
 
         return (
             <div id='videos' className={this.props.className}>
-                {Object.keys(videos).map((i) => (
-                    <StarVideo video={videos[i]} key={i} />
+                {videos.map((item, i) => (
+                    <StarVideo
+                        video={item}
+                        key={i}
+                        isFirst={videos.length > 1 && i === 0}
+                        isLast={videos.length > 1 && i === videos.length - 1}
+                    />
                 ))}
             </div>
         )
