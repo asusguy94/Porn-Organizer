@@ -110,7 +110,11 @@ class VideoPage extends Component {
         },
 
         newVideo: false,
-        modalInput: '',
+        input: {
+            video: '',
+            age: '',
+            title: '',
+        },
     }
 
     handleBadge(variation = null) {
@@ -130,18 +134,28 @@ class VideoPage extends Component {
         this.player.player.currentTime += this.state.seekSpeed.wheel * Math.sign(e.deltaY) * -1
     }
 
-    handleModal_input(e) {
-        let modalInput = e.target.value
+    handleInput(e, field) {
+        let inputValue = e.target.value
 
-        this.setState({ modalInput })
+        this.setState((prevState) => {
+            let input = prevState.input
+            input[field] = inputValue
+
+            return { input }
+        })
     }
 
-    handleModal_reset(e) {
-        this.setState({ modalInput: '' })
+    handleInput_reset(field) {
+        this.setState((prevState) => {
+            let input = prevState.input
+            input[field] = ''
+
+            return { input }
+        })
     }
 
     handleTitle_rename() {
-        let title = this.state.modalInput
+        let title = this.state.input.title
 
         Axios.get(`${config.api}/settitle.php?videoID=${this.state.video.id}&title=${title}`).then(({ data }) => {
             if (data.success) {
@@ -154,7 +168,7 @@ class VideoPage extends Component {
             }
         })
 
-        this.handleModal_reset()
+        this.handleInput_reset('title')
     }
 
     async handleTitle_copy() {
@@ -179,23 +193,31 @@ class VideoPage extends Component {
     }
 
     handleVideo_rename() {
-        console.log(`${config.source}/ajax/file_rename.php?videoID=${this.state.video.id}&videoPath=${this.state.input.video}`)
+        const { video, input } = this.state
+
+        Axios.get(`${config.source}/ajax/rename_file.php?videoID=${video.id}&videoPath=${input.video}`).then(({ data }) => {
+            if (data.success) {
+                window.location.reload()
+            }
+        })
+
+        this.handleInput_reset('video')
     }
 
     handleVideo_setAge() {
-        const { video, modalInput } = this.state
+        const { video, input } = this.state
 
-        Axios.get(`${config.api}/setage.php?videoID=${video.id}&age=${modalInput}`).then(({ data }) => {
+        Axios.get(`${config.api}/setage.php?videoID=${video.id}&age=${input.age}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
                     let star = prevState.star
-                    star.ageInVideo = Number(modalInput) * 365
+                    star.ageInVideo = Number(input.age) * 365
 
                     return { star }
                 })
             }
         })
-        this.handleModal_reset()
+        this.handleInput_reset('age')
     }
 
     /* Bookmarks - own class? */
@@ -428,15 +450,13 @@ class VideoPage extends Component {
                                 <ContextMenu id='title'>
                                     <MenuItem
                                         onClick={() => {
-                                            this.setState({ modalInput: this.state.video.name })
-
                                             this.handleModal(
                                                 'Change Title',
                                                 <input
                                                     type='text'
                                                     className='text-center'
                                                     defaultValue={this.state.video.name}
-                                                    onChange={this.handleModal_input.bind(this)}
+                                                    onChange={(e) => this.handleInput(e, 'title')}
                                                     ref={(input) => input && input.focus()}
                                                     onKeyDown={(e) => {
                                                         if (e.key === 'Enter') {
@@ -650,7 +670,7 @@ class VideoPage extends Component {
                                         <input
                                             type='number'
                                             className='text-center'
-                                            onChange={this.handleModal_input.bind(this)}
+                                            onChange={(e) => this.handleInput(e, 'age')}
                                             ref={(input) => input && input.focus()}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') {
@@ -675,7 +695,16 @@ class VideoPage extends Component {
                                             type='text'
                                             className='text-center'
                                             defaultValue={this.state.video.path.file}
+                                            onChange={(e) => this.handleInput(e, 'video')}
                                             ref={(input) => input && input.focus()}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault()
+
+                                                    this.handleModal()
+                                                    this.handleVideo_rename()
+                                                }
+                                            }}
                                         />
                                     )
                                 }}
