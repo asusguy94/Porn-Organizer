@@ -335,7 +335,7 @@ class StarImageDropbox extends Component {
                     </ContextMenuTrigger>
 
                     <ContextMenu id='star__dropbox'>
-                        <MenuItem onClick={this.removeStar} disabled>
+                        <MenuItem onClick={this.removeStar}>
                             <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Star
                         </MenuItem>
                     </ContextMenu>
@@ -419,8 +419,13 @@ class Star extends Component {
     }
 
     handleStar_remove() {
-        console.log(`remove star WHERE starID=${this.state.star.id}`)
-        // TODO remove star
+        const { star } = this.state
+
+        Axios.get(`${config.api}/removestar.php?starID=${star.id}`).then(({ data }) => {
+            if (data.success) {
+                window.location.href = '/stars'
+            }
+        })
     }
 
     async handleStar_copy() {
