@@ -76,8 +76,7 @@ List of planned & completed features
 | Name             | Status             |               Priority                |
 | ---------------- | ------------------ | :-----------------------------------: |
 | Add Bookmark     | :heavy_check_mark: |
-| Set Age          | :x:                |                 HIGH                  |
-| Toggle Controls  | :x:                |     LOW _difficult to implement_      |
+| Set Age          | :heavy_check_mark: |                                       |
 | Rename File      | :x:                |                 HIGH                  |
 | Fix Thumbnails   | :x:                | LOW _not working in previous version_ |
 | Remove Bookmarks | :heavy_check_mark: |

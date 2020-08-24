@@ -6,10 +6,10 @@ import { PlyrComponent } from 'plyr-react'
 import Hls from 'hls.js'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 
-import Modal, { handleModal } from '../modal'
-import { DaysToYears } from '../date'
+import Modal, { handleModal } from '../modal/modal'
+import { DaysToYears } from '../date/date'
 
-import '../styles/video.scss'
+import './video.scss'
 
 import config from '../config'
 
@@ -136,6 +136,10 @@ class VideoPage extends Component {
         this.setState({ modalInput })
     }
 
+    handleModal_reset(e) {
+        this.setState({ modalInput: '' })
+    }
+
     handleTitle_rename() {
         let title = this.state.modalInput
 
@@ -150,7 +154,7 @@ class VideoPage extends Component {
             }
         })
 
-        this.setState({ modalInput: '' })
+        this.handleModal_reset()
     }
 
     async handleTitle_copy() {
@@ -161,11 +165,37 @@ class VideoPage extends Component {
         await navigator.clipboard.writeText(this.state.video.star)
     }
 
+    handleVideo_pause() {
+        const { player } = this.player
+
+        player.pause()
+    }
+
     handleVideo_play(time) {
         const { player } = this.player
 
         player.currentTime = Number(time)
         player.play()
+    }
+
+    handleVideo_rename() {
+        console.log(`${config.source}/ajax/file_rename.php?videoID=${this.state.video.id}&videoPath=${this.state.input.video}`)
+    }
+
+    handleVideo_setAge() {
+        const { video, modalInput } = this.state
+
+        Axios.get(`${config.api}/setage.php?videoID=${video.id}&age=${modalInput}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    let star = prevState.star
+                    star.ageInVideo = Number(modalInput) * 365
+
+                    return { star }
+                })
+            }
+        })
+        this.handleModal_reset()
     }
 
     /* Bookmarks - own class? */
@@ -612,30 +642,59 @@ class VideoPage extends Component {
                                 <i className={`${config.theme.fa} fa-plus`} /> Add Bookmark
                             </MenuItem>
 
-                            <MenuItem disabled>
+                            <MenuItem
+                                disabled={!!this.state.star.ageInVideo}
+                                onClick={() => {
+                                    this.handleModal(
+                                        'Set Age',
+                                        <input
+                                            type='number'
+                                            className='text-center'
+                                            onChange={this.handleModal_input.bind(this)}
+                                            ref={(input) => input && input.focus()}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault()
+
+                                                    this.handleModal()
+                                                    this.handleVideo_setAge()
+                                                }
+                                            }}
+                                        />
+                                    )
+                                }}
+                            >
                                 <i className={`${config.theme.fa} fa-plus`} /> Set Age
                             </MenuItem>
 
-                            <MenuItem disabled>
-                                <i className={`${config.theme.fa} fa-edit`} /> Toggle Controls
+                            <MenuItem
+                                onClick={() => {
+                                    this.handleModal(
+                                        'Rename Video',
+                                        <input
+                                            type='text'
+                                            className='text-center'
+                                            defaultValue={this.state.video.path.file}
+                                            ref={(input) => input && input.focus()}
+                                        />
+                                    )
+                                }}
+                            >
+                                <i className={`${config.theme.fa} fa-edit`} /> Rename File
                             </MenuItem>
 
                             <MenuItem disabled>
-                                <i className='far fa-edit' /> Rename File
-                            </MenuItem>
-
-                            <MenuItem disabled>
-                                <i className='far fa-edit' /> Fix Thumbnails
+                                <i className={`${config.theme.fa} fa-edit`} /> Fix Thumbnails
                             </MenuItem>
 
                             <MenuItem divider />
 
                             <MenuItem onClick={() => this.handleBookmark_clear()}>
-                                <i className='far fa-trash-alt' /> Remove Bookmarks
+                                <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Bookmarks
                             </MenuItem>
 
                             <MenuItem onClick={() => this.handlePlays_reset()}>
-                                <i className='far fa-trash-alt' /> Remove Plays
+                                <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Plays
                             </MenuItem>
 
                             <MenuItem divider />
@@ -794,6 +853,10 @@ class VideoPage extends Component {
         if (this.state.loaded.video) {
             /* Event Handler */
             if (!this.state.loaded.videoEvents) {
+                if (Number(localStorage.video) !== this.state.video.id) {
+                    localStorage.playing = 0
+                }
+
                 this.player.player.on('timeupdate', () => {
                     if (this.player.player.currentTime) {
                         localStorage.bookmark = Math.round(this.player.player.currentTime)
@@ -848,17 +911,17 @@ class VideoPage extends Component {
 
                     if (Number(localStorage.video) === this.state.video.id) {
                         hls.startLoad(Number(localStorage.bookmark))
-
-                        if (Boolean(Number(localStorage.playing))) this.handleVideo_play(localStorage.bookmark)
+                        if (Number(localStorage.playing)) this.handleVideo_play(localStorage.bookmark)
 
                         this.setState({ newVideo: false })
                     } else {
                         localStorage.video = this.state.video.id
                         localStorage.bookmark = 0
 
-                        this.setState({ newVideo: true })
-
                         hls.startLoad()
+                        this.handleVideo_pause()
+
+                        this.setState({ newVideo: true })
                     }
                 })
 
@@ -911,73 +974,86 @@ class VideoPage extends Component {
     }
 
     getData() {
-        let { id } = this.props.match.params
+        const { id } = this.props.match.params
+        const { loaded } = this.state
 
-        Axios.get(`${config.api}/video.php?id=${id}`)
-            .then(({ data: video }) => this.setState({ video }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.video = true
+        if (!loaded.video) {
+            Axios.get(`${config.api}/video.php?id=${id}`)
+                .then(({ data: video }) => this.setState({ video }))
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.video = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
 
-        Axios.get(`${config.api}/bookmarks.php?id=${id}`)
-            .then(({ data: bookmarks }) => this.setState({ bookmarks }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.bookmarks = true
+        if (!loaded.bookmarks) {
+            Axios.get(`${config.api}/bookmarks.php?id=${id}`)
+                .then(({ data: bookmarks }) => this.setState({ bookmarks }))
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.bookmarks = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
 
-        Axios.get(`${config.api}/stars.php?videoID=${id}`)
-            .then(({ data: star }) => this.setState({ star }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.star = true
+        if (!loaded.star) {
+            Axios.get(`${config.api}/stars.php?videoID=${id}`)
+                .then(({ data: star }) => this.setState({ star }))
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.star = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
 
-        Axios.get(`${config.api}/categories.php`)
-            .then(({ data: categories }) => this.setState({ categories }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.categories = true
+        if (!loaded.categories) {
+            Axios.get(`${config.api}/categories.php`)
+                .then(({ data: categories }) => this.setState({ categories }))
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.categories = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
 
-        Axios.get(`${config.api}/attributes.php`)
-            .then(({ data: attributes }) => this.setState({ attributes }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.attributes = true
+        if (!loaded.attributes) {
+            Axios.get(`${config.api}/attributes.php`)
+                .then(({ data: attributes }) => this.setState({ attributes }))
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.attributes = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
 
-        Axios.get(`${config.api}/locations.php`)
-            .then(({ data: locations }) => this.setState({ locations }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.locations = true
+        if (!loaded.locations) {
+            Axios.get(`${config.api}/locations.php`)
+                .then(({ data: locations }) => this.setState({ locations }))
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.locations = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
     }
 }
 

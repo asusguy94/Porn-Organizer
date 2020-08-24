@@ -6,8 +6,8 @@
 /* Star */
 .star {
     &__image {
-        max-height: 275px;
-        max-width: 200px;
+        max-height: $starHeight + px;
+        width: $starWidth + px;
     }
 }
 
@@ -65,7 +65,8 @@
 }
 
 .unselectable,
-input[disabled] + label {
+label,
+.react-contextmenu-item {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;

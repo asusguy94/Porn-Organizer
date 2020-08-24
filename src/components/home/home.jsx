@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import Axios from 'axios'
 
-import '../styles/home.scss'
+import './home.scss'
 
 import config from '../config'
 
@@ -70,20 +70,18 @@ class HomePage extends Component {
 
     render() {
         return (
-            <div className='home-page'>
-                <HomeColumn obj={this.state.recent} />
-                <HomeColumn obj={this.state.newest} />
-                <HomeColumn obj={this.state.random} />
-                <HomeColumn obj={this.state.popular} />
+            <div id='home-page'>
+                {Object.keys(this.state).map((item, i) => (
+                    <HomeColumn obj={this.state[item]} key={i} />
+                ))}
             </div>
         )
     }
 
     componentDidMount() {
-        if (this.state.recent.enabled) this.getData('recent')
-        if (this.state.newest.enabled) this.getData('newest')
-        if (this.state.popular.enabled) this.getData('popular')
-        if (this.state.random.enabled) this.getData('random')
+        Object.keys(this.state).forEach((item) => {
+            if (this.state[item].enabled) this.getData(item)
+        })
     }
 
     getData(type, limit = this.state[type].limit) {

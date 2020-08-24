@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 
-import './styles/navbar.scss'
+import './navbar.scss'
 
-import config from './config.json'
+import config from '../config.json'
 
 class NavBar extends Component {
     render() {

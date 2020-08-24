@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
+
 import Axios from 'axios'
 
-import { DaysToYears } from '../date'
+import { DaysToYears } from '../date/date'
 
 import config from '../config'
 
@@ -21,9 +23,9 @@ class VideosPage extends Component {
                                 <DaysToYears>{this.state.data[key].age}</DaysToYears>
                             </span>
 
-                            <a className='col-11' href={`video/${this.state.data[key].id}`}>
+                            <Link className='col-11' to={`video/${this.state.data[key].id}`}>
                                 {this.state.data[key].name}
-                            </a>
+                            </Link>
                         </li>
                     ))}
                 </div>

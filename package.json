@@ -1,10 +1,10 @@
 {
     "name": "pornjs",
-    "version": "0.0.4",
+    "version": "0.1.0",
     "license": "MIT",
     "dependencies": {
-        "axios": "^0.19.2",
-        "hls.js": "^0.14.7",
+        "axios": "^0.20.0",
+        "hls.js": "^0.14.9",
         "node-sass": "^4.14.1",
         "plyr-react": "^2.2.0",
         "react": "^16.13.1",
@@ -12,7 +12,7 @@
         "react-dom": "^16.13.1",
         "react-lazyload": "^3.0.0",
         "react-router-dom": "^5.2.0",
-        "react-scripts": "3.4.1",
+        "react-scripts": "3.4.3",
         "react-scroll-to-top": "^1.0.5"
     },
     "devDependencies": {
@@ -20,8 +20,9 @@
         "@types/react-router-dom": "^5.1.5"
     },
     "scripts": {
-        "start": "react-scripts start",
-        "build": "react-scripts build"
+        "start": "npx cross-env PORT=3001 react-scripts start",
+        "build": "react-scripts build",
+        "server": "npx serve -l 5001 -s build"
     },
     "eslintConfig": {
         "extends": "react-app"

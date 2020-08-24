@@ -12,8 +12,7 @@ export default class RenderDate extends Component {
 
         return (
             <React.Fragment>
-                {date.getDate()} {this.getFullMonth(date.getMonth())}{' '}
-                {date.getFullYear()}
+                {date.getDate()} {this.getFullMonth(date.getMonth())} {date.getFullYear()}
             </React.Fragment>
         )
     }
@@ -30,7 +29,7 @@ export default class RenderDate extends Component {
             'August',
             'September',
             'October',
-            'Nove mber',
+            'November',
             'December',
         ]
 

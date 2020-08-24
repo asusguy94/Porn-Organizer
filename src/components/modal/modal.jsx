@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import './styles/modal.scss'
+import './modal.scss'
 
 export function handleModal(title = null, data = null) {
     if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
@@ -34,9 +34,9 @@ class Modal extends Component {
                     <div id='modal' className='card'>
                         <div className='card-body'>
                             <h3 className='card-title'>{this.props.title}</h3>
-                            <div className='content'>{this.props.children}</div>
+                            <div className='content text-center'>{this.props.children}</div>
                             <div className='actions'>
-                                <div className='btn btn-sm btn-danger' onClick={this.props.onClose}>
+                                <div className='btn btn-sm btn-secondary' onClick={this.props.onClose}>
                                     Close
                                 </div>
                             </div>

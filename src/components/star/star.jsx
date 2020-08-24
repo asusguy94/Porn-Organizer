@@ -3,9 +3,9 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
-import Modal, { handleModal } from '../modal'
+import Modal, { handleModal } from '../modal/modal'
 
-import '../styles/star.scss'
+import './star.scss'
 
 import config from '../config'
 
@@ -40,6 +40,7 @@ class StarVideo extends Component {
 
     playFrom(video, time = 0) {
         if (time) video.currentTime = Number(time)
+
         video.play()
     }
 
@@ -384,6 +385,10 @@ class Star extends Component {
         // TODO remove star
     }
 
+    async handleStar_copy() {
+        await navigator.clipboard.writeText(this.state.star.name)
+    }
+
     handleStar_removeImage() {
         Axios.get(`${config.source}/ajax/remove_star_image.php?id=${this.state.star.id}`).then(({ data }) => {
             if (data.success) {
@@ -402,7 +407,7 @@ class Star extends Component {
             if (data.success) {
                 this.setState((prevState) => {
                     let star = prevState.star
-                    star.image = `${this.state.star.id}.${data.ext}`
+                    star.image = `${this.state.star.id}.${data.ext}?v=${Date.now()}`
 
                     return { star }
                 })
@@ -446,7 +451,7 @@ class Star extends Component {
 
                             <MenuItem divider />
 
-                            <MenuItem disabled>
+                            <MenuItem onClick={() => this.handleStar_copy()}>
                                 <i className={`${config.theme.fa} fa-copy`} /> Copy Star
                             </MenuItem>
                         </ContextMenu>

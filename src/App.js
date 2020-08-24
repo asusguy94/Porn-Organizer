@@ -2,18 +2,19 @@ import React, { Component } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
 /* Custom Components */
-import NavBar from './components/navbar'
+import NavBar from './components/navbar/navbar'
 
 /* Page Components */
-import HomePage from './components/pages/home'
-import VideosPage from './components/pages/videos'
-import VideoPage from './components/pages/video'
-import StarPage from './components/pages/star'
-import VideoSearchPage from './components/pages/videosearch'
-import StarSearchPage from './components/pages/starsearch'
+import HomePage from './components/home/home'
+import VideosPage from './components/videos/videos'
+import VideoPage from './components/video/video'
+import StarPage from './components/star/star'
+import VideoSearchPage from './components/search/videosearch'
+import StarSearchPage from './components/search/starsearch'
 
 /* Style */
 import './components/styles/main.scss'
+import './components/styles/flag.scss'
 
 class App extends Component {
     render() {

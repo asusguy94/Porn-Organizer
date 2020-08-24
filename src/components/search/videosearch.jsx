@@ -3,9 +3,9 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 
-import { DaysToYears } from '../date'
+import { DaysToYears } from '../date/date'
 
-import '../styles/search.scss'
+import './search.scss'
 
 import config from '../config.json'
 
@@ -29,6 +29,7 @@ class VideoSearchPage extends Component {
                     titleSearch: false,
                     noCategory: false,
                     pov: false,
+                    website: false,
                 },
                 pov: false,
             },
@@ -48,7 +49,14 @@ class VideoSearchPage extends Component {
             },
         ],
 
-        location: [
+        locations: [
+            {
+                id: 0,
+                name: '',
+            },
+        ],
+
+        websites: [
             {
                 id: 0,
                 name: '',
@@ -60,6 +68,7 @@ class VideoSearchPage extends Component {
 
             categories: false,
             attributes: false,
+            websites: false,
         },
     }
 
@@ -215,6 +224,22 @@ class VideoSearchPage extends Component {
         this.setState({ videos })
     }
 
+    handleWebsiteFilter(e) {
+        const targetLower = e.target.value.toLowerCase()
+
+        let videos = this.state.videos.map((video) => {
+            if (targetLower === 'all') {
+                video.hidden.website = false
+            } else {
+                video.hidden.website = !(video.website.toLowerCase() === targetLower)
+            }
+
+            return video
+        })
+
+        this.setState({ videos })
+    }
+
     sort_default_asc() {
         let videos = this.state.videos
         videos.sort((a, b) => {
@@ -341,6 +366,18 @@ class VideoSearchPage extends Component {
                         <label htmlFor='popularity_asc'>Least Popular</label>
                     </div>
 
+                    <h2>Websites</h2>
+                    <div className='websites'>
+                        {this.state.loaded.websites && (
+                            <select className='form-control' onChange={(e) => this.handleWebsiteFilter(e)}>
+                                <option className='global-category'>ALL</option>
+                                {Object.keys(this.state.websites).map((i) => (
+                                    <option key={i}>{this.state.websites[i].name}</option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
+
                     <h2>Categories</h2>
                     <div id='categories'>
                         <div className='input-wrapper'>
@@ -445,73 +482,97 @@ class VideoSearchPage extends Component {
     }
 
     getData() {
-        Axios.get(`${config.api}/videosearch.php`)
-            .then(({ data: { videos } }) => {
-                this.setState(() => {
-                    videos = videos.map((item) => {
-                        item.hidden = {
-                            category: [],
-                            attribute: [],
-                            location: [],
-                            titleSearch: false,
-                            noCategory: false,
-                            pov: false,
-                        }
+        const { loaded } = this.state
 
-                        let match = 0
-                        item.categories.forEach((category) => {
-                            match += category.includes('(POV)')
+        if (!loaded.videos) {
+            Axios.get(`${config.api}/videosearch.php`)
+                .then(({ data: { videos } }) => {
+                    this.setState(() => {
+                        videos = videos.map((item) => {
+                            item.hidden = {
+                                category: [],
+                                attribute: [],
+                                location: [],
+                                titleSearch: false,
+                                noCategory: false,
+                                pov: false,
+                                website: false,
+                            }
+
+                            let match = 0
+                            item.categories.forEach((category) => {
+                                match += category.includes('(POV)')
+                            })
+
+                            item.pov = match && match === item.categories.length
+
+                            return item
                         })
 
-                        item.pov = match && match === item.categories.length
-
-                        return item
+                        return { videos }
                     })
-
-                    return { videos }
                 })
-            })
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.videos = true
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.videos = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
 
-        Axios.get(`${config.api}/categories.php`)
-            .then(({ data: categories }) => this.setState({ categories }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.categories = true
+        if (!loaded.categories) {
+            Axios.get(`${config.api}/categories.php`)
+                .then(({ data: categories }) => this.setState({ categories }))
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.categories = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
 
-        Axios.get(`${config.api}/attributes.php`)
-            .then(({ data: attributes }) => this.setState({ attributes }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.attributes = true
+        if (!loaded.attributes) {
+            Axios.get(`${config.api}/attributes.php`)
+                .then(({ data: attributes }) => this.setState({ attributes }))
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.attributes = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
 
-        Axios.get(`${config.api}/locations.php`)
-            .then(({ data: locations }) => this.setState({ locations }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.locations = true
+        if (!loaded.locations) {
+            Axios.get(`${config.api}/locations.php`)
+                .then(({ data: locations }) => this.setState({ locations }))
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.locations = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
+
+        if (!loaded.websites) {
+            Axios.get(`${config.api}/websites.php`)
+                .then(({ data: websites }) => this.setState({ websites }))
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.websites = true
+
+                        return { loaded }
+                    })
+                })
+        }
     }
 }
 

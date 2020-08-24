@@ -3,9 +3,9 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 
-import { DaysToYears } from '../date'
+import { DaysToYears } from '../date/date'
 
-import '../styles/search.scss'
+import './search.scss'
 
 import config from '../config.json'
 
@@ -27,7 +27,11 @@ class StarSearchPage extends Component {
                 sites: [],
                 hidden: {
                     titleSearch: [],
+
                     breast: false,
+                    haircolor: false,
+                    ethnicity: false,
+
                     noBreast: false,
                 },
             },
@@ -35,12 +39,14 @@ class StarSearchPage extends Component {
 
         breasts: [],
         haircolors: [],
+        ethnicities: [],
 
         loaded: {
             stars: false,
 
             breasts: false,
             haircolors: false,
+            ethnicities: false,
         },
     }
 
@@ -90,6 +96,7 @@ class StarSearchPage extends Component {
     handleBreastFilter(e, target) {
         let stars = this.state.stars.map((star) => {
             star.hidden.breast = false
+            star.hidden.noBreast = false
             if (target === null) {
                 star.hidden.noBreast = e.target.checked && star.breast.length
             } else {
@@ -131,6 +138,29 @@ class StarSearchPage extends Component {
         })
 
         this.setState({ stars })
+    }
+
+    handleEthnicityFilter(target) {
+        let stars = this.state.stars.map((star) => {
+            star.hidden.ethnicity = star.ethnicity.toLowerCase() !== target.toLowerCase()
+
+            return star
+        })
+        this.setState({ stars })
+    }
+
+    handleEthnicityFilter_ALL() {
+        let stars = this.state.stars.map((star) => {
+            star.hidden.ethnicity = false
+
+            return star
+        })
+
+        this.setState({ stars })
+    }
+
+    handleCountryFilter(country) {
+        console.log(country)
     }
 
     sort_default_asc() {
@@ -243,6 +273,35 @@ class StarSearchPage extends Component {
                                 </div>
                             ))}
                     </div>
+
+                    <h2>Ethnicity</h2>
+                    <div id='ethnicities'>
+                        <div className='input-wrapper'>
+                            <input
+                                type='radio'
+                                id='ethnicity_ALL'
+                                name='ethnicity'
+                                defaultChecked
+                                onChange={() => this.handleEthnicityFilter_ALL()}
+                            />
+                            <label htmlFor='ethnicity_ALL' className='global-category'>
+                                All
+                            </label>
+                        </div>
+
+                        {this.state.loaded.ethnicities &&
+                            Object.keys(this.state.ethnicities).map((i) => (
+                                <div className='input-wrapper' key={i}>
+                                    <input
+                                        type='radio'
+                                        name='ethnicity'
+                                        id={`ethnicity-${this.state.ethnicities[i]}`}
+                                        onChange={() => this.handleEthnicityFilter(this.state.ethnicities[i])}
+                                    />
+                                    <label htmlFor={`ethnicity-${this.state.ethnicities[i]}`}>{this.state.ethnicities[i]}</label>
+                                </div>
+                            ))}
+                    </div>
                 </aside>
 
                 <section id='stars' className='col-10'>
@@ -289,47 +348,57 @@ class StarSearchPage extends Component {
     }
 
     getData() {
-        Axios.get(`${config.api}/starsearch.php`)
-            .then(({ data: { stars } }) => {
-                this.setState(() => {
-                    stars = stars.map((item) => {
-                        item.hidden = {
-                            titleSearch: false,
+        const { loaded } = this.state
 
-                            breast: false,
-                            haircolor: false,
+        if (!loaded.stars) {
+            Axios.get(`${config.api}/starsearch.php`)
+                .then(({ data: { stars } }) => {
+                    this.setState(() => {
+                        stars = stars.map((item) => {
+                            item.hidden = {
+                                titleSearch: false,
 
-                            noBreast: false,
-                        }
+                                breast: false,
+                                haircolor: false,
+                                ethnicity: false,
 
-                        return item
+                                noBreast: false,
+                            }
+
+                            return item
+                        })
+
+                        return { stars }
                     })
-
-                    return { stars }
                 })
-            })
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.stars = true
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.stars = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
 
-        Axios.get(`${config.api}/stardata.php`)
-            .then(({ data }) => {
-                const { breast: breasts, haircolor: haircolors } = data
+        if (!loaded.breasts || !loaded.haircolors || !loaded.ethnicities) {
+            Axios.get(`${config.api}/stardata.php`)
+                .then(({ data }) => {
+                    const { breast: breasts, haircolor: haircolors, ethnicity: ethnicities } = data
 
-                this.setState({ breasts, haircolors })
-            })
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.breasts = true
-                    loaded.haircolors = true
+                    this.setState({ breasts, haircolors, ethnicities })
                 })
-            })
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.breasts = true
+                        loaded.haircolors = true
+                        loaded.ethnicities = true
+
+                        return { loaded }
+                    })
+                })
+        }
     }
 }
 

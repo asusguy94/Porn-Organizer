@@ -1,4 +1,4 @@
-@import 'functions';
+@import '../styles/functions';
 
 .search-page {
     h2 {
@@ -75,28 +75,16 @@
         margin-right: 5px;
     }
 
-    .prettydropdown {
-        li {
-            padding-left: 0.3rem !important;
-        }
-
-        .color {
-            display: inline-block;
-            margin-right: 5px;
-
-            $width: 12px;
-            width: $width;
-            height: $width;
-
-            border: 1px solid black;
-        }
-    }
-
     .count {
         color: blue;
     }
 
+    // Global Category
     .global-category {
         text-decoration: underline;
+    }
+
+    option.global-category {
+        font-weight: bolder;
     }
 }
