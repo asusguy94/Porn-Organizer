@@ -220,6 +220,16 @@ class VideoPage extends Component {
         this.handleInput_reset('age')
     }
 
+    handleVideo_delete() {
+        const { video } = this.state
+
+        Axios.get(`${config.source}/ajax/remove_video.php?videoID=${video.id}`).then(({ data }) => {
+            if (data.success) {
+                window.location.href = '/videos'
+            }
+        })
+    }
+
     /* Bookmarks - own class? */
     handleBookmark_add(category) {
         let time = Math.round(this.player.player.currentTime)
@@ -724,6 +734,10 @@ class VideoPage extends Component {
 
                             <MenuItem onClick={() => this.handlePlays_reset()}>
                                 <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Plays
+                            </MenuItem>
+
+                            <MenuItem disabled={this.state.star.id > 0} onClick={() => this.handleVideo_delete()}>
+                                <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Video
                             </MenuItem>
 
                             <MenuItem divider />
