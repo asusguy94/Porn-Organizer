@@ -360,6 +360,7 @@ class Star extends Component {
             id: 0,
             name: '',
             image: '',
+            ignored: 0,
             info: {
                 breast: '',
                 eyecolor: '',
@@ -462,6 +463,25 @@ class Star extends Component {
         console.log('Adding local file is not yet supported')
     }
 
+    handleStar_ingore() {
+        const status = +!this.state.star.ignored
+
+        Axios.get(`${config.api}/ignore.php?starID=${this.state.star.id}&status=${status}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    let star = prevState.star
+                    star.ignored = status
+
+                    return { star }
+                })
+            }
+        })
+    }
+
+    isIgnored() {
+        return this.state.star.ignored === 1
+    }
+
     render() {
         return (
             <div className='star-page col-12'>
@@ -476,7 +496,7 @@ class Star extends Component {
                         />
 
                         <ContextMenuTrigger id='title'>
-                            <h2>{this.state.star.name}</h2>
+                            <h2 className={this.isIgnored() ? 'ignored' : ''}>{this.state.star.name}</h2>
                         </ContextMenuTrigger>
 
                         <ContextMenu id='title'>
@@ -488,8 +508,9 @@ class Star extends Component {
                                 <i className={`${config.theme.fa} fa-plus`} /> Add Alias
                             </MenuItem>
 
-                            <MenuItem disabled>
-                                <i className={`${config.theme.fa} fa-ban`} /> Ignore Star
+                            <MenuItem onClick={() => this.handleStar_ingore()}>
+                                <i className={`${config.theme.fa} ${this.isIgnored() ? 'fa-check' : 'fa-ban'}`} />{' '}
+                                {this.isIgnored() ? 'Enable Star' : 'Ignore Star'}
                             </MenuItem>
 
                             <MenuItem divider />
