@@ -125,9 +125,9 @@ List of planned & completed features
 
 ## :x: Country Editor
 
-## :x:Generate Thumbnails
+## :x: Generate Thumbnails
 
-## :x:Generate WebVTT
+## :x: Generate WebVTT
 
 ## :x: Video Page
 
@@ -159,3 +159,45 @@ List of planned & completed features
 | ------------ | ------------------ |
 | Add Bookmark | :heavy_check_mark: |
 | Remove Star  | :heavy_check_mark: |
+
+## :x: Star Page
+
+### :heavy_check_mark: Dropbox
+
+| Name        | Status             |
+| ----------- | ------------------ |
+| Add Image   | :heavy_check_mark: |
+| Remove Star | :heavy_check_mark: |
+
+### :heavy_check_mark: Image
+
+| Name         | Status             |
+| ------------ | ------------------ |
+| Remove Image | :heavy_check_mark: |
+
+### :heavy_check_mark: Header
+
+| Name            | Status             | Priority |
+| --------------- | ------------------ | :------: |
+| Rename          | :x:                |   HIGH   |
+| Add Alias       | :x:                |   HIGH   |
+| Ignore / Enable | :heavy_check_mark: |          |
+| Copy Star       | :heavy_check_mark: |          |
+
+### :x: Form
+
+| Name               | Status                                             |  Priority  |
+| ------------------ | -------------------------------------------------- | :--------: |
+| GetData            | :x:                                                |    HIGH    |
+| ResetData          | :x:                                                |    HIGH    |
+| Input autocomplete | :heavy_check_mark:                                 | FUNCTIONAL |
+| Country            | :x: _Content and flag not updating without reload_ |    HIGH    |
+
+### :x: Videos
+
+| Name                     | Status             | Priority |
+| ------------------------ | ------------------ | :------: |
+| Video                    | :heavy_check_mark: |          |
+| [Hover] Play/Pause Video | :heavy_check_mark: |          |
+| Ribbon First/Latest      | :heavy_check_mark  |          |
+| Ribbon AgeInVideo        | :x:                |   HIGH   |
