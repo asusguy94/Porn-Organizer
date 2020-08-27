@@ -8,9 +8,9 @@
     },
     "hls": {
         "enabled": true,
-        "levels": { "1080": 3, "720": 2, "480": 1, "360": 0 },
-        "maxLevel": 1080,
-        "maxStartLevel": 720
+        "levels": { "2160": 5, "1440": 4, "1080": 3, "720": 2, "480": 1, "360": 0 },
+        "maxLevel": 2160,
+        "maxStartLevel": 360
     },
     "theme": {
         "fa": "far"
