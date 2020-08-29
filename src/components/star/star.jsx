@@ -135,7 +135,17 @@ class StarVideo extends Component {
                     onMouseLeave={this.handleMouseLeave.bind(this)}
                 />
 
-                <span className='title card-title text-center'>{video.name}</span>
+                <span className='title card-title'>{video.name}</span>
+                <span className='info card-subtitle'>
+                    <span className='wsite'>{video.website}</span>
+
+                    {video.site !== null && (
+                        <React.Fragment>
+                            <span className='divider'>/</span>
+                            <span className='site'>{video.site}</span>
+                        </React.Fragment>
+                    )}
+                </span>
 
                 <Ribbon isFirst={isFirst} isLast={isLast} align='left' />
 
@@ -389,6 +399,8 @@ class Star extends Component {
                 id: 0,
                 name: '',
                 fname: '',
+                website: '',
+                site: null,
             },
         ],
         loaded: {

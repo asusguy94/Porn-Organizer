@@ -30,16 +30,6 @@
     }
 }
 
-.divider {
-    color: grey;
-    font-weight: bold;
-
-    &:before,
-    &:after {
-        content: ' ';
-    }
-}
-
 [data-badge] {
     &:after {
         content: attr(data-badge);

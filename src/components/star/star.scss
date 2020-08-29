@@ -58,5 +58,26 @@
     .video {
         margin: 0 5px 10px;
         width: $thumbnailWidth + px;
+
+        span {
+            text-align: center;
+        }
+
+        .info {
+            .wsite {
+                color: green;
+            }
+
+            .site {
+                color: red;
+            }
+
+            .divider {
+                &::before,
+                &::after {
+                    content: ' ';
+                }
+            }
+        }
     }
 }
