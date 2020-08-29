@@ -5,6 +5,7 @@ import Axios from 'axios'
 import { PlyrComponent } from 'plyr-react'
 import Hls from 'hls.js'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
+import KeyboardEventHandler from 'react-keyboard-event-handler'
 
 import Modal, { handleModal } from '../modal/modal'
 import { DaysToYears } from '../date/date'
@@ -179,17 +180,41 @@ class VideoPage extends Component {
         await navigator.clipboard.writeText(this.state.video.star)
     }
 
+    handleVideo_isPlaying() {
+        const { player } = this.player
+
+        return player.playing
+    }
+
     handleVideo_pause() {
         const { player } = this.player
 
         player.pause()
     }
 
-    handleVideo_play(time) {
+    handleVideo_play(time = null) {
         const { player } = this.player
 
+        if (time === null) time = player.currentTime
         player.currentTime = Number(time)
         player.play()
+    }
+
+    handleVideo_playpause() {
+        if (this.handleVideo_isPlaying()) this.handleVideo_pause()
+        else this.handleVideo_play()
+    }
+
+    handleVideo_forward(time = this.state.seekSpeed.regular) {
+        const { player } = this.player
+
+        player.currentTime += Number(time)
+    }
+
+    handleVideo_rewind(time = this.state.seekSpeed.regular) {
+        const { player } = this.player
+
+        player.currentTime -= Number(time)
     }
 
     handleVideo_rename() {
@@ -446,6 +471,31 @@ class VideoPage extends Component {
         })
     }
 
+    handleKeyPress(key, e) {
+        e.preventDefault()
+
+        switch (key) {
+            case 'left':
+                this.handleVideo_rewind()
+                break
+            case 'right':
+                this.handleVideo_forward()
+                break
+            case 'space':
+                this.handleVideo_playpause()
+                break
+            case 'tab':
+                // TODO use state instead of window
+                if (this.state.video.nextID) {
+                    window.location.href = this.state.video.nextID
+                }
+
+                break
+            default:
+                console.log(`${key} was pressed`)
+        }
+    }
+
     render() {
         return (
             <div className='video-page col-12 row'>
@@ -623,8 +673,7 @@ class VideoPage extends Component {
                                         controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'fullscreen'],
                                         hideControls: false,
                                         ratio: '21:9',
-                                        keyboard: { global: true }, // TODO Create own keyboard shortcuts/commands
-                                        seekTime: this.state.seekSpeed.regular,
+                                        keyboard: { focused: false },
                                         previewThumbnails: {
                                             enabled: true, // TODO Check if this should be enabled...perhaps from config.source, or config.api later
                                             src: `${config.source}/vtt/${this.state.video.id}.vtt`,
@@ -882,6 +931,13 @@ class VideoPage extends Component {
                 <Modal visible={this.state.modal.visible} onClose={() => this.handleModal()} title={this.state.modal.title}>
                     {this.state.modal.data}
                 </Modal>
+
+                <KeyboardEventHandler
+                    handleKeys={['left', 'right', 'space', 'tab']}
+                    onKeyEvent={(key, e) => this.handleKeyPress(key, e)}
+                    handleFocusableElements={true}
+                    isDisabled={this.state.modal.visible}
+                />
             </div>
         )
     }
