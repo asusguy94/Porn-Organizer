@@ -537,20 +537,29 @@ class VideoPage extends Component {
                                         onClick={() => {
                                             this.handleModal(
                                                 'Add Attribute',
-                                                this.state.attributes.map((item, i) => {
-                                                    return (
-                                                        <div
-                                                            key={i}
-                                                            className='btn btn-sm btn-outline-primary d-block'
-                                                            onClick={() => {
-                                                                this.handleModal()
-                                                                this.handleAttribute_add(item)
-                                                            }}
-                                                        >
-                                                            {item.name}
-                                                        </div>
-                                                    )
-                                                })
+                                                this.state.attributes
+                                                    .filter((item) => {
+                                                        let match = this.state.video.attributes.some(
+                                                            (videoAttribute) => videoAttribute.name === item.name
+                                                        )
+
+                                                        if (!match) return item
+                                                        return null
+                                                    })
+                                                    .map((item, i) => {
+                                                        return (
+                                                            <div
+                                                                key={i}
+                                                                className='btn btn-sm btn-outline-primary d-block'
+                                                                onClick={() => {
+                                                                    this.handleModal()
+                                                                    this.handleAttribute_add(item)
+                                                                }}
+                                                            >
+                                                                {item.name}
+                                                            </div>
+                                                        )
+                                                    })
                                             )
                                         }}
                                     >
@@ -561,20 +570,29 @@ class VideoPage extends Component {
                                         onClick={() => {
                                             this.handleModal(
                                                 'Add Location',
-                                                this.state.locations.map((item, i) => {
-                                                    return (
-                                                        <div
-                                                            key={i}
-                                                            className='btn btn-sm btn-outline-primary d-block'
-                                                            onClick={() => {
-                                                                this.handleModal()
-                                                                this.handleLocation_add(item)
-                                                            }}
-                                                        >
-                                                            {item.name}
-                                                        </div>
-                                                    )
-                                                })
+                                                this.state.locations
+                                                    .filter((item) => {
+                                                        let match = this.state.video.locations.some(
+                                                            (videoLocation) => videoLocation.name === item.name
+                                                        )
+
+                                                        if (!match) return item
+                                                        return null
+                                                    })
+                                                    .map((item, i) => {
+                                                        return (
+                                                            <div
+                                                                key={i}
+                                                                className='btn btn-sm btn-outline-primary d-block'
+                                                                onClick={() => {
+                                                                    this.handleModal()
+                                                                    this.handleLocation_add(item)
+                                                                }}
+                                                            >
+                                                                {item.name}
+                                                            </div>
+                                                        )
+                                                    })
                                             )
                                         }}
                                     >
