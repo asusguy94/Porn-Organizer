@@ -4,6 +4,7 @@ import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
 import Modal, { handleModal } from '../modal/modal'
+import { DaysToYears } from '../date/date'
 
 import './star.scss'
 
@@ -149,7 +150,7 @@ class StarVideo extends Component {
 
                 <Ribbon isFirst={isFirst} isLast={isLast} align='left' />
 
-                {video.ageInVideo && <Ribbon label={video.ageInVideo} />}
+                {video.age && <Ribbon label={<DaysToYears>{video.age}</DaysToYears>} />}
             </a>
         )
     }
@@ -401,6 +402,7 @@ class Star extends Component {
                 fname: '',
                 website: '',
                 site: null,
+                age: 0,
             },
         ],
         loaded: {
@@ -496,56 +498,58 @@ class Star extends Component {
 
     render() {
         return (
-            <div className='star-page col-12'>
-                {this.state.loaded.star && (
-                    <div id='star'>
-                        <StarImageDropbox
-                            star={this.state.star}
-                            removeStar={() => this.handleStar_remove()}
-                            removeImage={() => this.handleStar_removeImage()}
-                            addImage={(image) => this.handleStar_addImage(image)}
-                            addImage_local={(image) => this.handleStar_addLocalImage(image)}
-                        />
+            <div id='star-page' className='col-12 row'>
+                <section className='col-7'>
+                    {this.state.loaded.star && (
+                        <div id='star'>
+                            <StarImageDropbox
+                                star={this.state.star}
+                                removeStar={() => this.handleStar_remove()}
+                                removeImage={() => this.handleStar_removeImage()}
+                                addImage={(image) => this.handleStar_addImage(image)}
+                                addImage_local={(image) => this.handleStar_addLocalImage(image)}
+                            />
 
-                        <ContextMenuTrigger id='title'>
-                            <h2 className={this.isIgnored() ? 'ignored' : ''}>{this.state.star.name}</h2>
-                        </ContextMenuTrigger>
+                            <ContextMenuTrigger id='title'>
+                                <h2 className={this.isIgnored() ? 'ignored' : ''}>{this.state.star.name}</h2>
+                            </ContextMenuTrigger>
 
-                        <ContextMenu id='title'>
-                            <MenuItem disabled onClick={(e) => this.handleStar_rename(e)}>
-                                <i className={`${config.theme.fa} fa-edit`} /> Rename
-                            </MenuItem>
+                            <ContextMenu id='title'>
+                                <MenuItem disabled onClick={(e) => this.handleStar_rename(e)}>
+                                    <i className={`${config.theme.fa} fa-edit`} /> Rename
+                                </MenuItem>
 
-                            <MenuItem disabled>
-                                <i className={`${config.theme.fa} fa-plus`} /> Add Alias
-                            </MenuItem>
+                                <MenuItem disabled>
+                                    <i className={`${config.theme.fa} fa-plus`} /> Add Alias
+                                </MenuItem>
 
-                            <MenuItem onClick={() => this.handleStar_ingore()}>
-                                <i className={`${config.theme.fa} ${this.isIgnored() ? 'fa-check' : 'fa-ban'}`} />{' '}
-                                {this.isIgnored() ? 'Enable Star' : 'Ignore Star'}
-                            </MenuItem>
+                                <MenuItem onClick={() => this.handleStar_ingore()}>
+                                    <i className={`${config.theme.fa} ${this.isIgnored() ? 'fa-check' : 'fa-ban'}`} />{' '}
+                                    {this.isIgnored() ? 'Enable Star' : 'Ignore Star'}
+                                </MenuItem>
 
-                            <MenuItem divider />
+                                <MenuItem divider />
 
-                            <MenuItem onClick={() => this.handleStar_copy()}>
-                                <i className={`${config.theme.fa} fa-copy`} /> Copy Star
-                            </MenuItem>
-                        </ContextMenu>
+                                <MenuItem onClick={() => this.handleStar_copy()}>
+                                    <i className={`${config.theme.fa} fa-copy`} /> Copy Star
+                                </MenuItem>
+                            </ContextMenu>
 
-                        <StarForm
-                            update={(label, value) => this.handleStar_updateInfo(label, value)}
-                            data={this.state.star.info}
-                            starData={this.state.starData}
-                        />
-                    </div>
-                )}
+                            <StarForm
+                                update={(label, value) => this.handleStar_updateInfo(label, value)}
+                                data={this.state.star.info}
+                                starData={this.state.starData}
+                            />
+                        </div>
+                    )}
 
-                <h3>Videos</h3>
-                {this.state.loaded.videos && <StarVideos className='row col-12' videos={this.state.videos} />}
+                    <h3>Videos</h3>
+                    {this.state.loaded.videos && <StarVideos className='row' videos={this.state.videos} />}
 
-                <Modal visible={this.state.modal.visible} onClose={() => this.handleModal()} title={this.state.modal.title}>
-                    {this.state.modal.data}
-                </Modal>
+                    <Modal visible={this.state.modal.visible} onClose={() => this.handleModal()} title={this.state.modal.title}>
+                        {this.state.modal.data}
+                    </Modal>
+                </section>
             </div>
         )
     }

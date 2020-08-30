@@ -643,11 +643,11 @@ class VideoPage extends Component {
                             </div>
 
                             <div className='header__site'>
-                                <span id='wsite'>{this.state.video.website}</span>
+                                <span className='wsite'>{this.state.video.website}</span>
                                 {this.state.video.subsite && (
                                     <React.Fragment>
                                         <span className='divider'>-</span>
-                                        <span id='site'>{this.state.video.subsite}</span>
+                                        <span className='site'>{this.state.video.subsite}</span>
                                     </React.Fragment>
                                 )}
                             </div>

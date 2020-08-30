@@ -1,10 +1,10 @@
 @import '../styles/functions';
-.star-page {
+#star-page {
     aside {
-        #relations {
+        #similar {
             text-align: center;
 
-            a.relation {
+            a.similar-star {
                 display: inline-block;
                 width: 200px;
 
@@ -56,28 +56,11 @@
     }
 
     .video {
-        margin: 0 5px 10px;
+        margin: 0 10px 10px 5px;
         width: $thumbnailWidth + px;
 
         span {
             text-align: center;
-        }
-
-        .info {
-            .wsite {
-                color: green;
-            }
-
-            .site {
-                color: red;
-            }
-
-            .divider {
-                &::before,
-                &::after {
-                    content: ' ';
-                }
-            }
         }
     }
 }
