@@ -387,6 +387,13 @@ class Star extends Component {
                 start: 0,
                 end: 0,
             },
+            similar: [
+                {
+                    id: [],
+                    name: [],
+                    match: [],
+                },
+            ],
         },
         starData: {
             breast: [],
@@ -421,6 +428,7 @@ class Star extends Component {
                 this.setState((prevState) => {
                     let star = prevState.star
                     star.info[label] = value
+                    star.similar = data.similar
 
                     return { star }
                 })
@@ -550,6 +558,26 @@ class Star extends Component {
                         {this.state.modal.data}
                     </Modal>
                 </section>
+
+                <aside className='col-5'>
+                    <div className='card'>
+                        <h2 className='card-header text-center'>Similar Stars</h2>
+
+                        <div className='card-body'>
+                            <div id='similar'>
+                                {this.state.loaded.star &&
+                                    this.state.star.similar.id.map((item, i) => (
+                                        <a key={i} href={item} className='similar-star ribbon-container card'>
+                                            <img src={`${config.source}/images/stars/${item}`} className='card-img-top' alt='similar' />
+                                            <h3 className='card-title'>{this.state.star.similar.name[i]}</h3>
+
+                                            <Ribbon label={`${this.state.star.similar.match[i]}%`} />
+                                        </a>
+                                    ))}
+                            </div>
+                        </div>
+                    </div>
+                </aside>
             </div>
         )
     }
