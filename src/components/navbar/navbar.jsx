@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import './navbar.scss'
 
-import config from '../config.json'
+import config from '../config'
 
 class NavBar extends Component {
     render() {

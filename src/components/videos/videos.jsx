@@ -17,14 +17,14 @@ class VideosPage extends Component {
         return (
             <div className='col'>
                 <div className='list-group'>
-                    {Object.keys(this.state.data).map((key, i) => (
+                    {this.state.data.map((item, i) => (
                         <li key={i} className='list-group-item list-group-item-action'>
                             <span className='badge badge-primary badge-pill'>
-                                <DaysToYears>{this.state.data[key].age}</DaysToYears>
+                                <DaysToYears>{item.age}</DaysToYears>
                             </span>
 
-                            <Link className='col-11' to={`video/${this.state.data[key].id}`}>
-                                {this.state.data[key].name}
+                            <Link className='col-11' to={`video/${item.id}`}>
+                                {item.name}
                             </Link>
                         </li>
                     ))}

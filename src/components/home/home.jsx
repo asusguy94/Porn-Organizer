@@ -19,17 +19,17 @@ class HomeColumn extends Component {
                     </h2>
 
                     <div className='row'>
-                        {Object.keys(obj.data).map((i) => (
-                            <Link className='video col-1 px-0 mx-3 ribbon-container' to={`/video/${obj.data[i].id}`} key={i}>
+                        {obj.data.map((item, i) => (
+                            <Link className='video col-1 px-0 mx-3 ribbon-container' to={`/video/${item.id}`} key={i}>
                                 <img
                                     className='mx-auto img-thumbnail'
                                     alt='video'
-                                    src={`${config.source}/images/videos/${obj.data[i].id}-290`}
+                                    src={`${config.source}/images/videos/${item.id}-290`}
                                 />
 
-                                <span className='video__title mx-auto d-block'>{obj.data[i].name}</span>
+                                <span className='video__title mx-auto d-block'>{item.name}</span>
 
-                                {obj.data[i].plays > 0 && <span className='ribbon'>{obj.data[i].plays}</span>}
+                                {obj.data[i].plays > 0 && <span className='ribbon'>{item.plays}</span>}
                             </Link>
                         ))}
                     </div>
@@ -71,16 +71,16 @@ class HomePage extends Component {
     render() {
         return (
             <div id='home-page'>
-                {Object.keys(this.state).map((item, i) => (
-                    <HomeColumn obj={this.state[item]} key={i} />
+                {Object.keys(this.state).map((key, i) => (
+                    <HomeColumn obj={this.state[key]} key={i} />
                 ))}
             </div>
         )
     }
 
     componentDidMount() {
-        Object.keys(this.state).forEach((item) => {
-            if (this.state[item].enabled) this.getData(item)
+        Object.keys(this.state).forEach((key) => {
+            if (this.state[key].enabled) this.getData(key)
         })
     }
 

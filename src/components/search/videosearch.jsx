@@ -7,7 +7,7 @@ import { DaysToYears } from '../date/date'
 
 import './search.scss'
 
-import config from '../config.json'
+import config from '../config'
 
 class VideoSearchPage extends Component {
     state = {
@@ -371,8 +371,8 @@ class VideoSearchPage extends Component {
                         {this.state.loaded.websites && (
                             <select className='form-control' onChange={(e) => this.handleWebsiteFilter(e)}>
                                 <option className='global-category'>ALL</option>
-                                {Object.keys(this.state.websites).map((i) => (
-                                    <option key={i}>{this.state.websites[i].name}</option>
+                                {this.state.websites.map((item, i) => (
+                                    <option key={i}>{item.name}</option>
                                 ))}
                             </select>
                         )}
@@ -395,14 +395,14 @@ class VideoSearchPage extends Component {
                         </div>
 
                         {this.state.loaded.categories &&
-                            Object.keys(this.state.categories).map((i) => (
+                            this.state.categories.map((item, i) => (
                                 <div className='input-wrapper' key={i}>
                                     <input
                                         type='checkbox'
-                                        id={`category-${this.state.categories[i].name}`}
-                                        onChange={(e) => this.handleCategoryFilter(e, this.state.categories[i])}
+                                        id={`category-${item.name}`}
+                                        onChange={(e) => this.handleCategoryFilter(e, item)}
                                     />
-                                    <label htmlFor={`category-${this.state.categories[i].name}`}>{this.state.categories[i].name}</label>
+                                    <label htmlFor={`category-${item.name}`}>{item.name}</label>
                                 </div>
                             ))}
                     </div>
@@ -410,14 +410,14 @@ class VideoSearchPage extends Component {
                     <h2>Attributes</h2>
                     <div id='attributes'>
                         {this.state.loaded.attributes &&
-                            Object.keys(this.state.attributes).map((i) => (
+                            this.state.attributes.map((item, i) => (
                                 <div className='input-wrapper' key={i}>
                                     <input
                                         type='checkbox'
-                                        id={`attribute-${this.state.attributes[i].name}`}
-                                        onChange={(e) => this.handleAttributeFilter(e, this.state.attributes[i])}
+                                        id={`attribute-${item.name}`}
+                                        onChange={(e) => this.handleAttributeFilter(e, item)}
                                     />
-                                    <label htmlFor={`attribute-${this.state.attributes[i].name}`}>{this.state.attributes[i].name}</label>
+                                    <label htmlFor={`attribute-${item.name}`}>{item.name}</label>
                                 </div>
                             ))}
                     </div>
@@ -425,14 +425,14 @@ class VideoSearchPage extends Component {
                     <h2>Locations</h2>
                     <div id='attributes'>
                         {this.state.loaded.locations &&
-                            Object.keys(this.state.locations).map((i) => (
+                            this.state.locations.map((item, i) => (
                                 <div className='input-wrapper' key={i}>
                                     <input
                                         type='checkbox'
-                                        id={`attribute-${this.state.locations[i].name}`}
-                                        onChange={(e) => this.handleLocationFilter(e, this.state.locations[i])}
+                                        id={`attribute-${item.name}`}
+                                        onChange={(e) => this.handleLocationFilter(e, item)}
                                     />
-                                    <label htmlFor={`attribute-${this.state.locations[i].name}`}>{this.state.locations[i].name}</label>
+                                    <label htmlFor={`attribute-${item.name}`}>{item.name}</label>
                                 </div>
                             ))}
                     </div>
@@ -447,22 +447,18 @@ class VideoSearchPage extends Component {
 
                     <div className='row justify-content-center'>
                         {this.state.loaded.videos && this.state.videos[0].id !== 0 ? (
-                            Object.keys(this.state.videos).map((i) => (
+                            this.state.videos.map((item, i) => (
                                 <a
                                     key={i}
-                                    className={`video ribbon-container card ${this.isHidden(this.state.videos[i]) ? 'd-none' : ''}`}
+                                    className={`video ribbon-container card ${this.isHidden(item) ? 'd-none' : ''}`}
                                     href={`/video/${this.state.videos[i].id}`}
                                 >
-                                    <img
-                                        className='card-img-top'
-                                        src={`${config.source}/images/videos/${this.state.videos[i].id}-290`}
-                                        alt='video'
-                                    />
+                                    <img className='card-img-top' src={`${config.source}/images/videos/${item.id}-290`} alt='video' />
 
-                                    <span className='title card-title text-center'>{this.state.videos[i].name}</span>
+                                    <span className='title card-title text-center'>{item.name}</span>
 
                                     <span className='ribbon'>
-                                        <DaysToYears>{this.state.videos[i].ageInVideo}</DaysToYears>
+                                        <DaysToYears>{item.ageInVideo}</DaysToYears>
                                     </span>
                                 </a>
                             ))

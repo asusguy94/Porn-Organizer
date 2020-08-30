@@ -7,7 +7,7 @@ import { DaysToYears } from '../date/date'
 
 import './search.scss'
 
-import config from '../config.json'
+import config from '../config'
 
 class StarSearchPage extends Component {
     state = {
@@ -313,22 +313,18 @@ class StarSearchPage extends Component {
 
                     <div className='row justify-content-center'>
                         {this.state.loaded.stars && this.state.stars[0].id !== 0 ? (
-                            Object.keys(this.state.stars).map((i) => (
+                            this.state.stars.map((item, i) => (
                                 <a
                                     key={i}
                                     href={`/star/${this.state.stars[i].id}`}
-                                    className={`star ribbon-container card ${this.isHidden(this.state.stars[i]) ? 'd-none' : ''}`}
+                                    className={`star ribbon-container card ${this.isHidden(item) ? 'd-none' : ''}`}
                                 >
-                                    <img
-                                        className='card-img-top'
-                                        src={`${config.source}/images/stars/${this.state.stars[i].image}`}
-                                        alt='star'
-                                    />
+                                    <img className='card-img-top' src={`${config.source}/images/stars/${item.image}`} alt='star' />
 
-                                    <span className='title card-title text-center'>{this.state.stars[i].name}</span>
+                                    <span className='title card-title text-center'>{item.name}</span>
 
                                     <span className='ribbon'>
-                                        <DaysToYears>{this.state.stars[i].age}</DaysToYears>
+                                        <DaysToYears>{item.age}</DaysToYears>
                                     </span>
                                 </a>
                             ))
