@@ -28,15 +28,20 @@ class Modal extends Component {
     }
 
     render() {
+        const { props } = this
+
         return (
             <React.Fragment>
-                {this.props.visible && (
+                {props.visible && (
                     <div id='modal' className='card'>
+                        <div className='card-header'>
+                            <h3>{props.title}</h3>
+                        </div>
+
                         <div className='card-body'>
-                            <h3 className='card-title'>{this.props.title}</h3>
-                            <div className='content text-center'>{this.props.children}</div>
+                            <div className='content'>{props.children}</div>
                             <div className='actions'>
-                                <div className='btn btn-sm btn-secondary' onClick={this.props.onClose}>
+                                <div className='btn btn-sm btn-secondary' onClick={props.onClose}>
                                     Close
                                 </div>
                             </div>

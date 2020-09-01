@@ -2,21 +2,25 @@
     position: absolute;
     left: 40%;
 
+    .card-header {
+        padding-bottom: 0;
+    }
+
     .card-body {
-        .btn {
-            margin-bottom: 3px;
-            font-size: 1em;
+        padding: 10px;
 
-            padding: 3px;
-        }
+        .content {
+            .btn {
+                margin-bottom: 3px;
+                font-size: 1em;
 
-        .card-title {
-            border-bottom: 1px solid lightgrey;
+                padding: 3px 10px;
+            }
         }
     }
 
     .actions {
-        margin-top: 5px;
+        margin-top: 10px;
         text-align: center;
     }
 }
