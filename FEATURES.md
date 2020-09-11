@@ -142,16 +142,15 @@ List of planned & completed features
 | Remove Location, Remove Attribute | :heavy_check_mark: |
 | Next Video Button                 | :heavy_check_mark: |
 
-### :x: Video
+### :heavy_check_mark: Video
 
-| Name             | Status             |               Priority                |
-| ---------------- | ------------------ | :-----------------------------------: |
-| Add Bookmark     | :heavy_check_mark: |                                       |
-| Set Age          | :heavy_check_mark: |                                       |
-| Rename File      | :x:                |                 HIGH                  |
-| Fix Thumbnails   | :x:                | LOW _not working in previous version_ |
-| Remove Bookmarks | :heavy_check_mark: |                                       |
-| Remove Plays     | :heavy_check_mark: |                                       |
+| Name             | Status             |
+| ---------------- | ------------------ |
+| Add Bookmark     | :heavy_check_mark: |
+| Set Age          | :heavy_check_mark: |
+| Rename File      | :heavy_check_mark: |
+| Remove Bookmarks | :heavy_check_mark: |
+| Remove Plays     | :heavy_check_mark: |
 
 ### :heavy_check_mark: Star
 
@@ -193,11 +192,18 @@ List of planned & completed features
 | Input autocomplete | :heavy_check_mark:                                 | FUNCTIONAL |
 | Country            | :x: _Content and flag not updating without reload_ |    HIGH    |
 
-### :x: Videos
+### :heavy_check_mark: Videos
 
-| Name                     | Status             | Priority |
-| ------------------------ | ------------------ | :------: |
-| Video                    | :heavy_check_mark: |          |
-| [Hover] Play/Pause Video | :heavy_check_mark: |          |
-| Ribbon First/Latest      | :heavy_check_mark  |          |
-| Ribbon AgeInVideo        | :x:                |   HIGH   |
+| Name                     | Status             |
+| ------------------------ | ------------------ |
+| Video                    | :heavy_check_mark: |
+| [Hover] Play/Pause Video | :heavy_check_mark: |
+| Ribbon First/Latest      | :heavy_check_mark  |
+| Ribbon AgeInVideo        | :heavy_check_mark: |
+
+### :heavy_check_mark: Similar Stars
+
+| Name              | Status             |
+| ----------------- | ------------------ |
+| Star              | :heavy_check_mark: |
+| Ribbon Similarity | :heavy_check_mark: |
