@@ -14,6 +14,7 @@ class VideoSearchPage extends Component {
         videos: [
             {
                 id: 0,
+                date: '',
                 name: '',
                 star: '',
                 ageInVideo: 0,
@@ -308,6 +309,54 @@ class VideoSearchPage extends Component {
         this.setState({ videos })
     }
 
+    sort_added_asc() {
+        let videos = this.state.videos
+        videos.sort((a, b) => {
+            let valA = a.id
+            let valB = b.id
+
+            return valA - valB
+        })
+
+        this.setState({ videos })
+    }
+
+    sort_added_desc() {
+        let videos = this.state.videos
+        videos.sort((b, a) => {
+            let valA = a.id
+            let valB = b.id
+
+            return valA - valB
+        })
+
+        this.setState({ videos })
+    }
+
+    sort_date_asc() {
+        let videos = this.state.videos
+        videos.sort((a, b) => {
+            let valA = new Date(a.date)
+            let valB = new Date(b.date)
+
+            return valA - valB
+        })
+
+        this.setState({ videos })
+    }
+
+    sort_date_desc() {
+        let videos = this.state.videos
+        videos.sort((b, a) => {
+            let valA = new Date(a.date)
+            let valB = new Date(b.date)
+
+            return valA - valB
+        })
+
+        this.setState({ videos })
+    }
+
     render() {
         return (
             <div className='search-page col-12 row'>
@@ -330,21 +379,21 @@ class VideoSearchPage extends Component {
                         <label htmlFor='alphabetically_desc'>Z-A</label>
                     </div>
 
-                    <div className='input-wrapper disabled'>
-                        <input id='added_desc' type='radio' name='sort' />
+                    <div className='input-wrapper'>
+                        <input id='added_desc' type='radio' name='sort' onChange={this.sort_added_asc.bind(this)} />
                         <label htmlFor='added_desc'>Old Upload</label>
                     </div>
-                    <div className='input-wrapper disabled'>
-                        <input id='added_asc' type='radio' name='sort' />
+                    <div className='input-wrapper'>
+                        <input id='added_asc' type='radio' name='sort' onChange={this.sort_added_desc.bind(this)} />
                         <label htmlFor='added_asc'>New Upload</label>
                     </div>
 
-                    <div className='input-wrapper disabled'>
-                        <input id='date_desc' type='radio' name='sort' />
+                    <div className='input-wrapper'>
+                        <input id='date_desc' type='radio' name='sort' onChange={this.sort_date_asc.bind(this)} />
                         <label htmlFor='date_desc'>Oldest</label>
                     </div>
-                    <div className='input-wrapper disabled'>
-                        <input id='date_asc' type='radio' name='sort' />
+                    <div className='input-wrapper'>
+                        <input id='date_asc' type='radio' name='sort' onChange={this.sort_date_desc.bind(this)} />
                         <label htmlFor='date_asc'>Newest</label>
                     </div>
 
