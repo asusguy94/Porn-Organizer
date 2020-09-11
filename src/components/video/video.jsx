@@ -139,7 +139,7 @@ class VideoPage extends Component {
         let inputValue = e.target.value
 
         this.setState((prevState) => {
-            let input = prevState.input
+            let { input } = prevState
             input[field] = inputValue
 
             return { input }
@@ -148,7 +148,7 @@ class VideoPage extends Component {
 
     handleInput_reset(field) {
         this.setState((prevState) => {
-            let input = prevState.input
+            let { input } = prevState
             input[field] = ''
 
             return { input }
@@ -161,7 +161,7 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/settitle.php?videoID=${this.state.video.id}&title=${title}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let video = prevState.video
+                    let { video } = prevState
                     video.name = title
 
                     return { video }
@@ -235,7 +235,7 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/setage.php?videoID=${video.id}&age=${input.age}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let star = prevState.star
+                    let { star } = prevState
                     star.ageInVideo = Number(input.age) * 365
 
                     return { star }
@@ -263,7 +263,7 @@ class VideoPage extends Component {
                 ({ data }) => {
                     if (data.success) {
                         this.setState((prevState) => {
-                            let bookmarks = prevState.bookmarks
+                            let { bookmarks } = prevState
                             bookmarks.push({
                                 id: data.id,
                                 name: category.name,
@@ -376,7 +376,7 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let video = prevState.video
+                    let { video } = prevState
                     video.plays = 0
 
                     return { video }
@@ -390,11 +390,16 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/fixvideodate.php?id=${this.state.video.id}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let date = prevState.video.date
+                    let { date } = prevState.video
                     date.published = data.date
 
-                    return { date }
+                    let { loaded } = prevState
+                    loaded.star = false
+
+                    return { date, loaded }
                 })
+
+                this.getData()
             }
         })
     }
@@ -404,14 +409,14 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/addattribute.php?videoID=${this.state.video.id}&attributeID=${attribute.id}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let attributes = prevState.video.attributes
+                    let { attributes } = prevState.video
                     attributes.push({ id: data.id, name: attribute.name })
 
                     attributes.sort((a, b) => {
                         return a.name.localeCompare(b.name)
                     })
 
-                    let video = prevState.video
+                    let { video } = prevState
                     video.attributes = attributes
 
                     return { video }
@@ -440,14 +445,14 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/addlocation.php?videoID=${this.state.video.id}&locationID=${location.id}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let locations = prevState.video.locations
+                    let { locations } = prevState.video
                     locations.push({ id: data.id, name: location.name })
 
                     locations.sort((a, b) => {
                         return a.name.localeCompare(b.name)
                     })
 
-                    let video = prevState.video
+                    let { video } = prevState
                     video.locations = locations
 
                     return { video }
@@ -988,7 +993,7 @@ class VideoPage extends Component {
                 })
 
                 this.setState((prevState) => {
-                    let loaded = prevState.loaded
+                    let { loaded } = prevState
                     loaded.videoEvents = true
 
                     return { loaded }
@@ -1037,7 +1042,7 @@ class VideoPage extends Component {
                 })
 
                 this.setState((prevState) => {
-                    let loaded = prevState.loaded
+                    let { loaded } = prevState
                     loaded.hls = true
 
                     return { loaded }
@@ -1089,79 +1094,67 @@ class VideoPage extends Component {
         const { loaded } = this.state
 
         if (!loaded.video) {
-            Axios.get(`${config.api}/video.php?id=${id}`)
-                .then(({ data: video }) => this.setState({ video }))
-                .then(() => {
+            Axios.get(`${config.api}/video.php?id=${id}`).then(({ data: video }) => {
                     this.setState((prevState) => {
-                        let loaded = prevState.loaded
+                    let { loaded } = prevState
                         loaded.video = true
 
-                        return { loaded }
+                    return { video, loaded }
                     })
                 })
         }
 
         if (!loaded.bookmarks) {
-            Axios.get(`${config.api}/bookmarks.php?id=${id}`)
-                .then(({ data: bookmarks }) => this.setState({ bookmarks }))
-                .then(() => {
+            Axios.get(`${config.api}/bookmarks.php?id=${id}`).then(({ data: bookmarks }) => {
                     this.setState((prevState) => {
-                        let loaded = prevState.loaded
+                    let { loaded } = prevState
                         loaded.bookmarks = true
 
-                        return { loaded }
+                    return { bookmarks, loaded }
                     })
                 })
         }
 
         if (!loaded.star) {
-            Axios.get(`${config.api}/stars.php?videoID=${id}`)
-                .then(({ data: star }) => this.setState({ star }))
-                .then(() => {
+            Axios.get(`${config.api}/stars.php?videoID=${id}`).then(({ data: star }) => {
                     this.setState((prevState) => {
-                        let loaded = prevState.loaded
+                    let { loaded } = prevState
                         loaded.star = true
 
-                        return { loaded }
+                    return { star, loaded }
                     })
                 })
         }
 
         if (!loaded.categories) {
-            Axios.get(`${config.api}/categories.php`)
-                .then(({ data: categories }) => this.setState({ categories }))
-                .then(() => {
+            Axios.get(`${config.api}/categories.php`).then(({ data: categories }) => {
                     this.setState((prevState) => {
-                        let loaded = prevState.loaded
+                    let { loaded } = prevState
                         loaded.categories = true
 
-                        return { loaded }
+                    return { categories, loaded }
                     })
                 })
         }
 
         if (!loaded.attributes) {
-            Axios.get(`${config.api}/attributes.php`)
-                .then(({ data: attributes }) => this.setState({ attributes }))
-                .then(() => {
+            Axios.get(`${config.api}/attributes.php`).then(({ data: attributes }) => {
                     this.setState((prevState) => {
-                        let loaded = prevState.loaded
+                    let { loaded } = prevState
                         loaded.attributes = true
 
-                        return { loaded }
+                    return { attributes, loaded }
                     })
                 })
         }
 
         if (!loaded.locations) {
-            Axios.get(`${config.api}/locations.php`)
-                .then(({ data: locations }) => this.setState({ locations }))
-                .then(() => {
+            Axios.get(`${config.api}/locations.php`).then(({ data: locations }) => {
                     this.setState((prevState) => {
-                        let loaded = prevState.loaded
+                    let { loaded } = prevState
                         loaded.locations = true
 
-                        return { loaded }
+                    return { locations, loaded }
                     })
                 })
         }
