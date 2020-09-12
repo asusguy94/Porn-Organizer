@@ -1,10 +1,10 @@
 {
     "name": "pornjs",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "license": "MIT",
     "dependencies": {
         "axios": "^0.20.0",
-        "hls.js": "^0.14.11",
+        "hls.js": "^0.14.12",
         "node-sass": "^4.14.1",
         "plyr-react": "^2.2.0",
         "react": "^16.13.1",
