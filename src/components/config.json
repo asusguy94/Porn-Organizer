@@ -14,5 +14,8 @@
     },
     "theme": {
         "fa": "far"
+    },
+    "overlay": {
+        "success": "checkbox.png"
     }
 }

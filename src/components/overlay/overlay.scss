@@ -1,0 +1,32 @@
+.overlay {
+    $yPos: 25%;
+    $xPos: 32%;
+    $size: 300px;
+
+    position: absolute;
+    top: $yPos;
+    left: $xPos;
+
+    &-appear {
+        opacity: 0;
+
+        &-active {
+            opacity: 1;
+            transition: opacity 300ms;
+        }
+
+        &-done {
+            opacity: 0;
+            transition: opacity 300ms;
+        }
+    }
+
+    img {
+        width: $size;
+        height: $size;
+        padding: 4px 8px;
+
+        border-radius: 10px;
+        background-color: grey;
+    }
+}

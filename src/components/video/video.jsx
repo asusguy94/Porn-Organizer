@@ -8,6 +8,7 @@ import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
 import Modal, { handleModal } from '../modal/modal'
+import Overlay, { handleOverlay } from '../overlay/overlay'
 import { DaysToYears } from '../date/date'
 
 import './video.scss'
@@ -18,6 +19,7 @@ class VideoPage extends Component {
     constructor(props) {
         super(props)
         this.handleModal = handleModal
+        this.handleOverlay = handleOverlay
     }
 
     state = {
@@ -110,6 +112,11 @@ class VideoPage extends Component {
             data: null,
         },
 
+        overlay: {
+            visible: false,
+            data: null,
+        },
+
         newVideo: false,
         input: {
             video: '',
@@ -120,7 +127,7 @@ class VideoPage extends Component {
 
     handleBadge(variation = null) {
         let data = ''
-        let { numVideos } = this.state.star
+        const { numVideos } = this.state.star
 
         if (variation === 'data') {
             data = numVideos
@@ -136,10 +143,10 @@ class VideoPage extends Component {
     }
 
     handleInput(e, field) {
-        let inputValue = e.target.value
+        const inputValue = e.target.value
 
         this.setState((prevState) => {
-            let { input } = prevState
+            const { input } = prevState
             input[field] = inputValue
 
             return { input }
@@ -148,7 +155,7 @@ class VideoPage extends Component {
 
     handleInput_reset(field) {
         this.setState((prevState) => {
-            let { input } = prevState
+            const { input } = prevState
             input[field] = ''
 
             return { input }
@@ -156,12 +163,12 @@ class VideoPage extends Component {
     }
 
     handleTitle_rename() {
-        let title = this.state.input.title
+        const title = this.state.input.title
 
         Axios.get(`${config.api}/settitle.php?videoID=${this.state.video.id}&title=${title}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let { video } = prevState
+                    const { video } = prevState
                     video.name = title
 
                     return { video }
@@ -235,7 +242,7 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/setage.php?videoID=${video.id}&age=${input.age}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let { star } = prevState
+                    const { star } = prevState
                     star.ageInVideo = Number(input.age) * 365
 
                     return { star }
@@ -257,13 +264,15 @@ class VideoPage extends Component {
 
     /* Bookmarks - own class? */
     handleBookmark_add(category) {
-        let time = Math.round(this.player.player.currentTime)
+        const time = Math.round(this.player.player.currentTime)
         if (time) {
             Axios.get(`${config.api}/addbookmark.php?videoID=${this.state.video.id}&categoryID=${category.id}&time=${time}`).then(
                 ({ data }) => {
                     if (data.success) {
+                        this.handleOverlay(config.overlay.success)
+
                         this.setState((prevState) => {
-                            let { bookmarks } = prevState
+                            const { bookmarks } = prevState
                             bookmarks.push({
                                 id: data.id,
                                 name: category.name,
@@ -286,26 +295,24 @@ class VideoPage extends Component {
     }
 
     handleBookmark_time(id) {
-        let time = Math.round(this.player.player.currentTime)
+        const time = Math.round(this.player.player.currentTime)
 
         Axios.get(`${config.api}/changebookmarktime.php?id=${id}&time=${time}`).then(({ data }) => {
             if (data.success) {
-                let bookmarks = this.state.bookmarks
-
-                let arr = bookmarks.map((item) => {
+                const bookmarks = this.state.bookmarks
+                    .map((item) => {
                     if (item.id === id) item.start = time
 
                     return item
                 })
-
-                bookmarks.sort((a, b) => {
+                    .sort((a, b) => {
                     let valA = a.start
                     let valB = b.start
 
                     return valA - valB
                 })
 
-                this.setState({ bookmarks: arr })
+                this.setState({ bookmarks })
             }
         })
     }
@@ -313,7 +320,7 @@ class VideoPage extends Component {
     handleBookmark_remove(id) {
         Axios.get(`${config.api}/removebookmark.php?id=${id}`).then(({ data }) => {
             if (data.success) {
-                let bookmarks = this.state.bookmarks.filter((item) => {
+                const bookmarks = this.state.bookmarks.filter((item) => {
                     return item.id !== id
                 })
 
@@ -326,7 +333,7 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/removebookmarks.php?id=${this.state.video.id}`).then(({ data }) => {
             if (data.success) {
                 this.setState(() => {
-                    let bookmarks = []
+                    const bookmarks = []
                     return { bookmarks }
                 })
             }
@@ -336,19 +343,15 @@ class VideoPage extends Component {
     handleBookmark_category(category, bookmark) {
         Axios.get(`${config.api}/changebookmarkcategory.php?id=${bookmark.id}&categoryID=${category.id}`).then(({ data }) => {
             if (data.success) {
-                let bookmarks = this.state.bookmarks
-                let obj = bookmarks.map((bookmarkItem) => {
+                const bookmarks = this.state.bookmarks.map((bookmarkItem) => {
                     if (bookmarkItem.id === bookmark.id) {
-                        let item = bookmarkItem
-                        item.name = category.name
-
-                        return item
+                        bookmarkItem.name = category.name
                     }
 
                     return bookmarkItem
                 })
 
-                this.setState({ bookmarks: obj })
+                this.setState({ bookmarks })
             }
         })
     }
@@ -357,7 +360,7 @@ class VideoPage extends Component {
     handleStar_remove(id) {
         Axios.get(`${config.api}/removevideostar.php?videoID=${this.state.video.id}&starID=${id}`).then(({ data }) => {
             if (data.success) {
-                let star = { id: 0, name: '' }
+                const star = { id: 0, name: '' }
                 this.setState({ star })
             }
         })
@@ -376,7 +379,7 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let { video } = prevState
+                    const { video } = prevState
                     video.plays = 0
 
                     return { video }
@@ -390,10 +393,10 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/fixvideodate.php?id=${this.state.video.id}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let { date } = prevState.video
+                    const { date } = prevState.video
                     date.published = data.date
 
-                    let { loaded } = prevState
+                    const { loaded } = prevState
                     loaded.star = false
 
                     return { date, loaded }
@@ -408,15 +411,17 @@ class VideoPage extends Component {
     handleAttribute_add(attribute) {
         Axios.get(`${config.api}/addattribute.php?videoID=${this.state.video.id}&attributeID=${attribute.id}`).then(({ data }) => {
             if (data.success) {
+                this.handleOverlay(config.overlay.success)
+
                 this.setState((prevState) => {
-                    let { attributes } = prevState.video
+                    const { attributes } = prevState.video
                     attributes.push({ id: data.id, name: attribute.name })
 
                     attributes.sort((a, b) => {
                         return a.name.localeCompare(b.name)
                     })
 
-                    let { video } = prevState
+                    const { video } = prevState
                     video.attributes = attributes
 
                     return { video }
@@ -428,12 +433,11 @@ class VideoPage extends Component {
     handleAttribute_remove(attribute) {
         Axios.get(`${config.api}/removeattribute.php?id=${attribute.id}`).then(({ data }) => {
             if (data.success) {
-                let attributes = this.state.video.attributes.filter((item) => {
+                const video = this.state.video
+
+                video.attributes = this.state.video.attributes.filter((item) => {
                     return item.id !== attribute.id
                 })
-
-                let video = this.state.video
-                video.attributes = attributes
 
                 this.setState({ video })
             }
@@ -444,15 +448,17 @@ class VideoPage extends Component {
     handleLocation_add(location) {
         Axios.get(`${config.api}/addlocation.php?videoID=${this.state.video.id}&locationID=${location.id}`).then(({ data }) => {
             if (data.success) {
+                this.handleOverlay(config.overlay.success)
+
                 this.setState((prevState) => {
-                    let { locations } = prevState.video
+                    const { locations } = prevState.video
                     locations.push({ id: data.id, name: location.name })
 
                     locations.sort((a, b) => {
                         return a.name.localeCompare(b.name)
                     })
 
-                    let { video } = prevState
+                    const { video } = prevState
                     video.locations = locations
 
                     return { video }
@@ -464,12 +470,11 @@ class VideoPage extends Component {
     handleLocation_remove(location) {
         Axios.get(`${config.api}/removelocation.php?id=${location.id}`).then(({ data }) => {
             if (data.success) {
-                let locations = this.state.video.locations.filter((item) => {
+                const video = this.state.video
+
+                video.locations = this.state.video.locations.filter((item) => {
                     return item.id !== location.id
                 })
-
-                let video = this.state.video
-                video.locations = locations
 
                 this.setState({ video })
             }
@@ -519,7 +524,6 @@ class VideoPage extends Component {
                                                 'Change Title',
                                                 <input
                                                     type='text'
-                                                    className='text-center'
                                                     defaultValue={this.state.video.name}
                                                     onChange={(e) => this.handleInput(e, 'title')}
                                                     ref={(input) => input && input.focus()}
@@ -544,7 +548,7 @@ class VideoPage extends Component {
                                                 'Add Attribute',
                                                 this.state.attributes
                                                     .filter((item) => {
-                                                        let match = this.state.video.attributes.some(
+                                                        const match = this.state.video.attributes.some(
                                                             (videoAttribute) => videoAttribute.name === item.name
                                                         )
 
@@ -577,7 +581,7 @@ class VideoPage extends Component {
                                                 'Add Location',
                                                 this.state.locations
                                                     .filter((item) => {
-                                                        let match = this.state.video.locations.some(
+                                                        const match = this.state.video.locations.some(
                                                             (videoLocation) => videoLocation.name === item.name
                                                         )
 
@@ -751,7 +755,6 @@ class VideoPage extends Component {
                                         'Set Age',
                                         <input
                                             type='number'
-                                            className='text-center'
                                             onChange={(e) => this.handleInput(e, 'age')}
                                             ref={(input) => input && input.focus()}
                                             onKeyDown={(e) => {
@@ -775,7 +778,6 @@ class VideoPage extends Component {
                                         'Rename Video',
                                         <input
                                             type='text'
-                                            className='text-center'
                                             defaultValue={this.state.video.path.file}
                                             onChange={(e) => this.handleInput(e, 'video')}
                                             ref={(input) => input && input.focus()}
@@ -949,6 +951,8 @@ class VideoPage extends Component {
                     {this.state.modal.data}
                 </Modal>
 
+                <Overlay visible={this.state.overlay.visible}>{this.state.overlay.data}</Overlay>
+
                 <KeyboardEventHandler
                     handleKeys={['left', 'right', 'space', 'tab']}
                     onKeyEvent={(key, e) => this.handleKeyPress(key, e)}
@@ -993,7 +997,7 @@ class VideoPage extends Component {
                 })
 
                 this.setState((prevState) => {
-                    let { loaded } = prevState
+                    const { loaded } = prevState
                     loaded.videoEvents = true
 
                     return { loaded }
@@ -1042,7 +1046,7 @@ class VideoPage extends Component {
                 })
 
                 this.setState((prevState) => {
-                    let { loaded } = prevState
+                    const { loaded } = prevState
                     loaded.hls = true
 
                     return { loaded }
@@ -1063,8 +1067,8 @@ class VideoPage extends Component {
             for (let i = 1, items = this.bookmarks, LEVEL_MIN = 1, LEVEL_MAX = 10, level = LEVEL_MIN; i < items.length; i++) {
                 let collision = false
 
-                let first = items[i - 1]
-                let second = items[i]
+                const first = items[i - 1]
+                const second = items[i]
 
                 if (first === null || second === null) continue // skip if error
 
@@ -1096,7 +1100,7 @@ class VideoPage extends Component {
         if (!loaded.video) {
             Axios.get(`${config.api}/video.php?id=${id}`).then(({ data: video }) => {
                     this.setState((prevState) => {
-                    let { loaded } = prevState
+                    const { loaded } = prevState
                         loaded.video = true
 
                     return { video, loaded }
@@ -1107,7 +1111,7 @@ class VideoPage extends Component {
         if (!loaded.bookmarks) {
             Axios.get(`${config.api}/bookmarks.php?id=${id}`).then(({ data: bookmarks }) => {
                     this.setState((prevState) => {
-                    let { loaded } = prevState
+                    const { loaded } = prevState
                         loaded.bookmarks = true
 
                     return { bookmarks, loaded }
@@ -1118,7 +1122,7 @@ class VideoPage extends Component {
         if (!loaded.star) {
             Axios.get(`${config.api}/stars.php?videoID=${id}`).then(({ data: star }) => {
                     this.setState((prevState) => {
-                    let { loaded } = prevState
+                    const { loaded } = prevState
                         loaded.star = true
 
                     return { star, loaded }
@@ -1129,7 +1133,7 @@ class VideoPage extends Component {
         if (!loaded.categories) {
             Axios.get(`${config.api}/categories.php`).then(({ data: categories }) => {
                     this.setState((prevState) => {
-                    let { loaded } = prevState
+                    const { loaded } = prevState
                         loaded.categories = true
 
                     return { categories, loaded }
@@ -1140,7 +1144,7 @@ class VideoPage extends Component {
         if (!loaded.attributes) {
             Axios.get(`${config.api}/attributes.php`).then(({ data: attributes }) => {
                     this.setState((prevState) => {
-                    let { loaded } = prevState
+                    const { loaded } = prevState
                         loaded.attributes = true
 
                     return { attributes, loaded }
@@ -1151,7 +1155,7 @@ class VideoPage extends Component {
         if (!loaded.locations) {
             Axios.get(`${config.api}/locations.php`).then(({ data: locations }) => {
                     this.setState((prevState) => {
-                    let { loaded } = prevState
+                    const { loaded } = prevState
                         loaded.locations = true
 
                     return { locations, loaded }
