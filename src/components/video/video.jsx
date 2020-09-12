@@ -212,6 +212,12 @@ class VideoPage extends Component {
         else this.handleVideo_play()
     }
 
+    handleVideo_mute() {
+        const { player } = this.player
+
+        player.muted = !player.muted
+    }
+
     handleVideo_forward(time = this.state.seekSpeed.regular) {
         const { player } = this.player
 
@@ -301,16 +307,16 @@ class VideoPage extends Component {
             if (data.success) {
                 const bookmarks = this.state.bookmarks
                     .map((item) => {
-                    if (item.id === id) item.start = time
+                        if (item.id === id) item.start = time
 
-                    return item
-                })
+                        return item
+                    })
                     .sort((a, b) => {
-                    let valA = a.start
-                    let valB = b.start
+                        let valA = a.start
+                        let valB = b.start
 
-                    return valA - valB
-                })
+                        return valA - valB
+                    })
 
                 this.setState({ bookmarks })
             }
@@ -493,6 +499,9 @@ class VideoPage extends Component {
                 break
             case 'space':
                 this.handleVideo_playpause()
+                break
+            case 'm':
+                this.handleVideo_mute()
                 break
             case 'tab':
                 // TODO use state instead of window
@@ -954,7 +963,7 @@ class VideoPage extends Component {
                 <Overlay visible={this.state.overlay.visible}>{this.state.overlay.data}</Overlay>
 
                 <KeyboardEventHandler
-                    handleKeys={['left', 'right', 'space', 'tab']}
+                    handleKeys={['left', 'right', 'space', 'm', 'tab']}
                     onKeyEvent={(key, e) => this.handleKeyPress(key, e)}
                     handleFocusableElements={true}
                     isDisabled={this.state.modal.visible}
@@ -1099,68 +1108,68 @@ class VideoPage extends Component {
 
         if (!loaded.video) {
             Axios.get(`${config.api}/video.php?id=${id}`).then(({ data: video }) => {
-                    this.setState((prevState) => {
+                this.setState((prevState) => {
                     const { loaded } = prevState
-                        loaded.video = true
+                    loaded.video = true
 
                     return { video, loaded }
-                    })
                 })
+            })
         }
 
         if (!loaded.bookmarks) {
             Axios.get(`${config.api}/bookmarks.php?id=${id}`).then(({ data: bookmarks }) => {
-                    this.setState((prevState) => {
+                this.setState((prevState) => {
                     const { loaded } = prevState
-                        loaded.bookmarks = true
+                    loaded.bookmarks = true
 
                     return { bookmarks, loaded }
-                    })
                 })
+            })
         }
 
         if (!loaded.star) {
             Axios.get(`${config.api}/stars.php?videoID=${id}`).then(({ data: star }) => {
-                    this.setState((prevState) => {
+                this.setState((prevState) => {
                     const { loaded } = prevState
-                        loaded.star = true
+                    loaded.star = true
 
                     return { star, loaded }
-                    })
                 })
+            })
         }
 
         if (!loaded.categories) {
             Axios.get(`${config.api}/categories.php`).then(({ data: categories }) => {
-                    this.setState((prevState) => {
+                this.setState((prevState) => {
                     const { loaded } = prevState
-                        loaded.categories = true
+                    loaded.categories = true
 
                     return { categories, loaded }
-                    })
                 })
+            })
         }
 
         if (!loaded.attributes) {
             Axios.get(`${config.api}/attributes.php`).then(({ data: attributes }) => {
-                    this.setState((prevState) => {
+                this.setState((prevState) => {
                     const { loaded } = prevState
-                        loaded.attributes = true
+                    loaded.attributes = true
 
                     return { attributes, loaded }
-                    })
                 })
+            })
         }
 
         if (!loaded.locations) {
             Axios.get(`${config.api}/locations.php`).then(({ data: locations }) => {
-                    this.setState((prevState) => {
+                this.setState((prevState) => {
                     const { loaded } = prevState
-                        loaded.locations = true
+                    loaded.locations = true
 
                     return { locations, loaded }
-                    })
                 })
+            })
         }
     }
 }
