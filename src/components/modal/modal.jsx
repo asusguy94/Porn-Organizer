@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
 
+import KeyboardEventHandler from 'react-keyboard-event-handler'
+
 import './modal.scss'
 
 export function handleModal(title = null, data = null) {
     if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
 
     this.setState((prevState) => {
-        let modal = prevState.modal
+        const { modal } = prevState
         modal.title = title
         modal.data = data
         modal.visible = !modal.visible
@@ -16,15 +18,10 @@ export function handleModal(title = null, data = null) {
 }
 
 class Modal extends Component {
-    constructor(props) {
-        super(props)
-        this.escFunc = this.escFunc.bind(this)
-    }
+    handleKeyPress(key, e) {
+        e.preventDefault()
 
-    escFunc(e) {
-        if (this.props.visible) {
-            if (e.keyCode === 27) this.props.onClose()
-        }
+        this.props.onClose()
     }
 
     render() {
@@ -48,16 +45,15 @@ class Modal extends Component {
                         </div>
                     </div>
                 )}
+
+                <KeyboardEventHandler
+                    handleKeys={['esc']}
+                    onKeyEvent={(key, e) => this.handleKeyPress(key, e)}
+                    handleFocusableElements={true}
+                    isDisabled={!props.visible}
+                />
             </React.Fragment>
         )
-    }
-
-    componentDidMount() {
-        document.addEventListener('keydown', this.escFunc, false)
-    }
-
-    componentWillUnmount() {
-        document.removeEventListener('keydown', this.escFunc, false)
     }
 }
 
