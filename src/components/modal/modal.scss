@@ -4,6 +4,11 @@
 
     .card-header {
         padding-bottom: 0;
+
+        .query {
+            display: inline-block;
+            padding: 0 3px;
+        }
     }
 
     .card-body {

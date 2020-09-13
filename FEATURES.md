@@ -129,7 +129,7 @@ List of planned & completed features
 
 ## :x: Generate WebVTT
 
-## :x: Video Page
+## :heavy_check_mark: Video Page
 
 ### :heavy_check_mark: Header
 
@@ -158,6 +158,14 @@ List of planned & completed features
 | ------------ | ------------------ |
 | Add Bookmark | :heavy_check_mark: |
 | Remove Star  | :heavy_check_mark: |
+
+### :heavy_check_mark: Popup
+
+| Name                 | Status             |
+| -------------------- | ------------------ |
+| Content              | :heavy_check_mark: |
+| Styling              | :heavy_check_mark: |
+| Search Functionality | :heavy_check_mark: |
 
 ## :x: Star Page
 

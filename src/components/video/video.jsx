@@ -110,6 +110,7 @@ class VideoPage extends Component {
         modal: {
             visible: false,
             data: null,
+            filter: false,
         },
 
         overlay: {
@@ -349,6 +350,8 @@ class VideoPage extends Component {
     handleBookmark_category(category, bookmark) {
         Axios.get(`${config.api}/changebookmarkcategory.php?id=${bookmark.id}&categoryID=${category.id}`).then(({ data }) => {
             if (data.success) {
+                this.handleOverlay(config.overlay.success)
+
                 const bookmarks = this.state.bookmarks.map((bookmarkItem) => {
                     if (bookmarkItem.id === bookmark.id) {
                         bookmarkItem.name = category.name
@@ -750,7 +753,8 @@ class VideoPage extends Component {
                                                     {item.name}
                                                 </div>
                                             )
-                                        })
+                                        }),
+                                        true
                                     )
                                 }}
                             >
@@ -938,7 +942,8 @@ class VideoPage extends Component {
                                                             {item.name}
                                                         </div>
                                                     )
-                                                })
+                                                }),
+                                                true
                                             )
                                         }}
                                     >
@@ -956,7 +961,12 @@ class VideoPage extends Component {
                     </div>
                 </aside>
 
-                <Modal visible={this.state.modal.visible} onClose={() => this.handleModal()} title={this.state.modal.title}>
+                <Modal
+                    visible={this.state.modal.visible}
+                    title={this.state.modal.title}
+                    filter={this.state.modal.filter}
+                    onClose={() => this.handleModal()}
+                >
                     {this.state.modal.data}
                 </Modal>
 
