@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
+import config from '../config'
+
 import './modal.scss'
 
 export function handleModal(title = null, data = null, filter = false) {
@@ -62,21 +64,40 @@ class Modal extends Component {
     render() {
         const { props, state } = this
 
+        let children = props.children
+        if (props.filter) {
+            children = children
+                .filter((item) => {
+                    if (item.props.children.toLowerCase().includes(state.query)) return item
+                    else return null
+                })
+                .sort((a, b) => {
+                    const { query } = state
+
+                    let valA = a.props.children.toLowerCase()
+                    let valB = b.props.children.toLowerCase()
+
+                    if (query.length && config.modal.filter.startsWithOnTop) {
+                        if (valA.startsWith(query) && valB.startsWith(query)) return 0
+                        else if (valA.startsWith(query)) return -1
+                        else if (valB.startsWith(query)) return 1
+                    }
+
+                    return valA.localeCompare(valB)
+                })
+        }
+
         return (
             <React.Fragment>
                 {props.visible && (
                     <div id='modal' className='card'>
                         <div className='card-header text-center'>
                             <h3>{props.title}</h3>
-                            {this.state.query && <h4 className='query bg-warning'>{this.state.query}</h4>}
+                            {state.query && <h4 className='query bg-warning'>{state.query}</h4>}
                         </div>
 
                         <div className='card-body'>
-                            <div className='content'>
-                                {props.filter
-                                    ? props.children.map((item, i) => item.props.children.toLowerCase().includes(state.query) && item)
-                                    : props.children}
-                            </div>
+                            <div className='content'>{children}</div>
                             <div className='actions'>
                                 <div className='btn btn-sm btn-secondary' onClick={props.onClose}>
                                     Close
@@ -87,7 +108,7 @@ class Modal extends Component {
                 )}
 
                 <KeyboardEventHandler
-                    handleKeys={props.filter ? ['alphabetic', 'space', 'backspace', 'esc'] : ['esc']}
+                    handleKeys={props.filter && config.modal.filter.search ? ['alphabetic', 'space', 'backspace', 'esc'] : ['esc']}
                     onKeyEvent={(key, e) => this.handleKeyPress(key, e)}
                     handleFocusableElements={true}
                     isDisabled={!props.visible}
