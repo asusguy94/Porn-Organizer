@@ -31,6 +31,7 @@ class StarSearchPage extends Component {
                     breast: false,
                     haircolor: false,
                     ethnicity: false,
+                    country: false,
 
                     noBreast: false,
                 },
@@ -40,6 +41,7 @@ class StarSearchPage extends Component {
         breasts: [],
         haircolors: [],
         ethnicities: [],
+        countries: [],
 
         loaded: {
             stars: false,
@@ -47,6 +49,7 @@ class StarSearchPage extends Component {
             breasts: false,
             haircolors: false,
             ethnicities: false,
+            countries: false,
         },
     }
 
@@ -56,7 +59,7 @@ class StarSearchPage extends Component {
 
         obj.forEach(({ hidden }) => {
             let value = 0
-            for (let prop in hidden) {
+            for (const prop in hidden) {
                 if (typeof hidden[prop] !== 'object') {
                     value += Number(hidden[prop])
                 } else {
@@ -84,7 +87,7 @@ class StarSearchPage extends Component {
     handleTitleSearch(e) {
         const searchValue = e.target.value.toLowerCase()
 
-        let stars = this.state.stars.map((item) => {
+        const stars = this.state.stars.map((item) => {
             item.hidden.titleSearch = !item.name.toLowerCase().includes(searchValue)
 
             return item
@@ -159,12 +162,24 @@ class StarSearchPage extends Component {
         this.setState({ stars })
     }
 
-    handleCountryFilter(country) {
-        console.log(country)
+    handleCountryFilter(e) {
+        const targetLower = e.target.value.toLowerCase()
+
+        const stars = this.state.stars.map((star) => {
+            if (targetLower === 'all') {
+                star.hidden.country = false
+            } else {
+                star.hidden.country = !(star.country.toLowerCase() === targetLower)
+            }
+
+            return star
+        })
+
+        this.setState({ stars })
     }
 
     sort_default_asc() {
-        let stars = this.state.stars
+        const stars = this.state.stars
         stars.sort((a, b) => {
             let valA = a.name.toLowerCase()
             let valB = b.name.toLowerCase()
@@ -176,7 +191,7 @@ class StarSearchPage extends Component {
     }
 
     sort_default_desc() {
-        let stars = this.state.stars
+        const stars = this.state.stars
         stars.sort((b, a) => {
             let valA = a.name.toLowerCase()
             let valB = b.name.toLowerCase()
@@ -302,6 +317,18 @@ class StarSearchPage extends Component {
                                 </div>
                             ))}
                     </div>
+
+                    <h2 className='h5'>Country</h2>
+                    <div id='countries' className='input-wrapper'>
+                        {this.state.loaded.countries && (
+                            <select className='form-control' onChange={this.handleCountryFilter.bind(this)}>
+                                <option className='global-category'>ALL</option>
+                                {this.state.countries.map((item, i) => (
+                                    <option key={i}>{item.name}</option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
                 </aside>
 
                 <section id='stars' className='col-10'>
@@ -347,53 +374,45 @@ class StarSearchPage extends Component {
         const { loaded } = this.state
 
         if (!loaded.stars) {
-            Axios.get(`${config.api}/starsearch.php`)
-                .then(({ data: { stars } }) => {
-                    this.setState(() => {
-                        stars = stars.map((item) => {
-                            item.hidden = {
-                                titleSearch: false,
+            Axios.get(`${config.api}/starsearch.php`).then(({ data: { stars } }) => {
+                this.setState((prevState) => {
+                    stars = stars.map((item) => {
+                        item.hidden = {
+                            titleSearch: false,
 
-                                breast: false,
-                                haircolor: false,
-                                ethnicity: false,
+                            breast: false,
+                            haircolor: false,
+                            ethnicity: false,
+                            country: false,
 
-                                noBreast: false,
-                            }
+                            noBreast: false,
+                        }
 
-                            return item
-                        })
-
-                        return { stars }
+                        return item
                     })
-                })
-                .then(() => {
-                    this.setState((prevState) => {
-                        let loaded = prevState.loaded
-                        loaded.stars = true
 
-                        return { loaded }
-                    })
+                    const { loaded } = prevState
+                    loaded.stars = true
+
+                    return { stars, loaded }
                 })
+            })
         }
 
-        if (!loaded.breasts || !loaded.haircolors || !loaded.ethnicities) {
-            Axios.get(`${config.api}/stardata.php`)
-                .then(({ data }) => {
-                    const { breast: breasts, haircolor: haircolors, ethnicity: ethnicities } = data
+        if (!loaded.breasts || !loaded.haircolors || !loaded.ethnicities || !loaded.countries) {
+            Axios.get(`${config.api}/stardata.php`).then(({ data }) => {
+                this.setState((prevState) => {
+                    const { breast: breasts, haircolor: haircolors, ethnicity: ethnicities, country: countries } = data
 
-                    this.setState({ breasts, haircolors, ethnicities })
-                })
-                .then(() => {
-                    this.setState((prevState) => {
-                        let loaded = prevState.loaded
-                        loaded.breasts = true
-                        loaded.haircolors = true
-                        loaded.ethnicities = true
+                    const { loaded } = prevState
+                    loaded.breasts = true
+                    loaded.haircolors = true
+                    loaded.ethnicities = true
+                    loaded.countries = true
 
-                        return { loaded }
-                    })
+                    return { breasts, haircolors, ethnicities, countries, loaded }
                 })
+            })
         }
     }
 }
