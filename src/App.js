@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
+import { HelmetProvider } from 'react-helmet-async'
+
 /* Custom Components */
 import NavBar from './components/navbar/navbar'
 
@@ -19,6 +21,7 @@ import './components/styles/flag.scss'
 class App extends Component {
     render() {
         return (
+            <HelmetProvider>
             <Router>
                 <NavBar />
 
@@ -56,6 +59,7 @@ class App extends Component {
                     </div>
                 </main>
             </Router>
+            </HelmetProvider>
         )
     }
 }

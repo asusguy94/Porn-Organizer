@@ -6,6 +6,7 @@ import { PlyrComponent } from 'plyr-react'
 import Hls from 'hls.js'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import KeyboardEventHandler from 'react-keyboard-event-handler'
+import { Helmet } from 'react-helmet-async'
 
 import Modal, { handleModal } from '../modal/modal'
 import Overlay, { handleOverlay } from '../overlay/overlay'
@@ -521,6 +522,10 @@ class VideoPage extends Component {
     render() {
         return (
             <div className='video-page col-12 row'>
+                <Helmet>
+                    <title>{this.state.video.name}</title>
+                </Helmet>
+
                 <section className='col-10'>
                     <header className='header row'>
                         <div className='col-11'>

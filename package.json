@@ -10,6 +10,7 @@
         "react": "^16.13.1",
         "react-contextmenu": "^2.14.0",
         "react-dom": "^16.13.1",
+        "react-helmet-async": "^1.0.7",
         "react-keyboard-event-handler": "^1.5.4",
         "react-lazyload": "^3.0.0",
         "react-router-dom": "^5.2.0",
