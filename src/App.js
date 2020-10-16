@@ -14,6 +14,7 @@ import StarPage from './components/star/star'
 import VideoSearchPage from './components/search/videosearch'
 import StarSearchPage from './components/search/starsearch'
 
+import EditorPage from './components/editor/editor'
 import ErrorPage from './components/404/404'
 
 /* Style */
@@ -37,12 +38,13 @@ class App extends Component {
                             </Route>
 
                             <Route path='/videos' component={VideosPage} />
-
                             <Route path='/video/:id' component={VideoPage} />
 
                             <Route path='/stars/search' component={StarSearchPage} />
 
                             <Route path='/star/:id' component={StarPage} />
+
+                                <Route path='/editor' component={EditorPage} />
 
                             <Route path='/generate/thumbnails'>
                                 <h1>Generate Thumbnails Page</h1>
