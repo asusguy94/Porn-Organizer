@@ -442,6 +442,29 @@ class Star extends Component {
             data: null,
             filter: false,
         },
+        input: {
+            title: '',
+        },
+    }
+
+    handleInput(e, field) {
+        const inputValue = e.target.value
+
+        this.setState((prevState) => {
+            const { input } = prevState
+            input[field] = inputValue
+
+            return { input }
+        })
+    }
+
+    handleInput_reset(field) {
+        this.setState((prevState) => {
+            const { input } = prevState
+            input[field] = ''
+
+            return { input }
+        })
     }
 
     handleStar_updateInfo(value, label) {
@@ -465,8 +488,21 @@ class Star extends Component {
     }
 
     handleStar_rename() {
-        console.log('open modal with input form')
-        //console.log(`rename "${this.state.star.name}" to "${name}"`)
+        const starRef = this.state.star
+        const inputRef = this.state.input.title
+
+        Axios.get(`${config.api}/renamestar.php?starID=${starRef.id}&name=${inputRef}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    const { star } = prevState
+                    star.name = inputRef
+
+                    return { star }
+                })
+            }
+        })
+
+        this.handleInput_reset('title')
     }
 
     handleStar_remove() {
@@ -555,7 +591,27 @@ class Star extends Component {
                             </ContextMenuTrigger>
 
                             <ContextMenu id='title'>
-                                <MenuItem disabled onClick={(e) => this.handleStar_rename(e)}>
+                                <MenuItem
+                                    onClick={() => {
+                                        this.handleModal(
+                                            'Rename',
+                                            <input
+                                                type='text'
+                                                defaultValue={this.state.star.name}
+                                                onChange={(e) => this.handleInput(e, 'title')}
+                                                ref={(input) => input && input.focus()}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault()
+
+                                                        this.handleModal()
+                                                        this.handleStar_rename()
+                                                    }
+                                                }}
+                                            />
+                                        )
+                                    }}
+                                >
                                     <i className={`${config.theme.fa} fa-edit`} /> Rename
                                 </MenuItem>
 
