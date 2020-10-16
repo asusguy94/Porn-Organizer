@@ -26,7 +26,7 @@ class VideoPage extends Component {
     state = {
         video: {
             id: 0,
-            nextID: 0,
+            nextID: null,
             name: '',
             star: '',
             path: {
@@ -510,8 +510,12 @@ class VideoPage extends Component {
                 break
             case 'tab':
                 // TODO use state instead of window
+                if (this.state.video.nextID !== null) {
                 if (this.state.video.nextID) {
                     window.location.href = this.state.video.nextID
+                    } else {
+                        window.location.href = '/videos'
+                }
                 }
 
                 break
