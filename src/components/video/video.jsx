@@ -390,6 +390,8 @@ class VideoPage extends Component {
     handlePlays_reset() {
         Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`).then(({ data }) => {
             if (data.success) {
+                this.handleOverlay(config.overlay.success)
+
                 this.setState((prevState) => {
                     const { video } = prevState
                     video.plays = 0
