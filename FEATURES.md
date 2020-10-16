@@ -34,7 +34,7 @@ List of planned & completed features
 | Existing _TOGGLE_            | :x:                |    LOW     |
 | Added Today/Anytime _TOGGLE_ | :x:                |    LOW     |
 | Sort                         | :x:                | FUNCTIONAL |
-| Website _DROPDOWN_           | :x:                |    HIGH    |
+| Website _DROPDOWN_           | :heavy_check_mark: | FUNCTIONAL |
 | Category _CHECKBOX_          | :heavy_check_mark: |            |
 | Attribute _CHECKBOX_         | :heavy_check_mark: |            |
 | Location _CHECKBOX_          | :heavy_check_mark: |            |
@@ -50,11 +50,11 @@ List of planned & completed features
 
 ### :x: Main Section
 
-| Name         | Status             | Priority |
-| ------------ | ------------------ | :------: |
-| Star         | :heavy_check_mark: |          |
-| Star Ribbon  | :heavy_check_mark: |          |
-| Star Counter | :x:                |   HIGH   |
+| Name          | Status             | Priority |
+| ------------- | ------------------ | :------: |
+| Star          | :heavy_check_mark: |          |
+| Star Ribbon   | :heavy_check_mark: |          |
+| Video Counter | :x:                |   HIGH   |
 
 ### :x: Sidebar
 
@@ -117,13 +117,15 @@ List of planned & completed features
 | ------ | ------ | :------: |
 | Parser | :x:    |   HIGH   |
 
-## :x: Site Editor
+## :x: Editor
 
-## :x: Attribute Editor
+### :x: Site Editor
 
-## :x: Location Editor
+### :x: Attribute Editor
 
-## :x: Country Editor
+### :x: Location Editor
+
+### :x: Country Editor
 
 ## :x: Generate Thumbnails
 
