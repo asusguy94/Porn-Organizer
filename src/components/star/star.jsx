@@ -447,6 +447,11 @@ class Star extends Component {
     handleStar_updateInfo(value, label) {
         Axios.get(`${config.api}/changestarinfo.php?starID=${this.state.star.id}&label=${label}&value=${value}`).then(({ data }) => {
             if (data.success) {
+                if (data.reload) {
+                    window.location.reload()
+                } else {
+                    if (data.content !== null) value = data.content
+
                 this.setState((prevState) => {
                     const { star } = prevState
                     star.info[label] = value
@@ -454,6 +459,7 @@ class Star extends Component {
 
                     return { star }
                 })
+            }
             }
         })
     }
