@@ -590,7 +590,8 @@ class VideoPage extends Component {
                                                                 {item.name}
                                                             </div>
                                                         )
-                                                    })
+                                                    }),
+                                                true
                                             )
                                         }}
                                     >
@@ -623,7 +624,8 @@ class VideoPage extends Component {
                                                                 {item.name}
                                                             </div>
                                                         )
-                                                    })
+                                                    }),
+                                                true
                                             )
                                         }}
                                     >
@@ -888,7 +890,8 @@ class VideoPage extends Component {
                                                                     {categoryItem.name}
                                                                 </div>
                                                             )
-                                                        })
+                                                        }),
+                                                    true
                                                 )
                                             }}
                                         >

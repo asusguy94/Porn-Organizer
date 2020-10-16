@@ -420,6 +420,7 @@ class Star extends Component {
         modal: {
             visible: false,
             data: null,
+            filter: false,
         },
     }
 
@@ -559,7 +560,12 @@ class Star extends Component {
                     <h3>Videos</h3>
                     {this.state.loaded.videos && <StarVideos className='row' videos={this.state.videos} />}
 
-                    <Modal visible={this.state.modal.visible} onClose={() => this.handleModal()} title={this.state.modal.title}>
+                    <Modal
+                        visible={this.state.modal.visible}
+                        title={this.state.modal.title}
+                        filter={this.state.modal.filter}
+                        onClose={() => this.handleModal()}
+                    >
                         {this.state.modal.data}
                     </Modal>
                 </section>
