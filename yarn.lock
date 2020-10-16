@@ -5078,10 +5078,10 @@ history@^4.9.0:
     tiny-warning "^1.0.0"
     value-equal "^1.0.1"
 
-hls.js@^0.14.13:
-  version "0.14.13"
-  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-0.14.13.tgz#824395a0631c8e32bf0e8de06873f1d89774bada"
-  integrity sha512-0u61R0t6DcgJ7Ofr0RUlfrNrkP2gn5pHL+5clKmITY1P7pztyj5aoVw2/9SbeoM6k4shg5iPyuZb+7I32ZzqFQ==
+hls.js@^0.14.15:
+  version "0.14.15"
+  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-0.14.15.tgz#3d41c6a51cef31d2629df2d9ad4333215770febe"
+  integrity sha512-zKOY9PZVeDBu3iXL6Dg8DfUPDEf71lTyy7JFgCOJXkqV48HeDfNoMhcN1trMrYRtMyFnpA7YBiI8c1DzSdLAFA==
   dependencies:
     eventemitter3 "^4.0.3"
     url-toolkit "^2.1.6"
@@ -7848,7 +7848,7 @@ pkg-up@3.1.0, pkg-up@^3.1.0:
   dependencies:
     find-up "^3.0.0"
 
-plyr-react@^2.2.0:
+plyr-react@2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/plyr-react/-/plyr-react-2.2.0.tgz#e8efc50c911115d0a0d5de5a731349ffbe3c4274"
   integrity sha512-nA0cdJf6ER73CRc+XRy+DeXPltuuOomoVtSwrljhQW1JT0trH2w97kE+OQ+O+bXafOKDGgN10PR4BNnLNTowmQ==
@@ -8835,10 +8835,10 @@ react-dev-utils@^10.2.1:
     strip-ansi "6.0.0"
     text-table "0.2.0"
 
-react-dom@^16.13.1:
-  version "16.13.1"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.13.1.tgz#c1bd37331a0486c078ee54c4740720993b2e0e7f"
-  integrity sha512-81PIMmVLnCNLO/fFOQxdQkvEq/+Hfpv24XNJfpyZhTRfO0QcmQIF/PgCa1zCOj2w1hrn12MFLyaJ/G0+Mxtfag==
+react-dom@^16.14.0:
+  version "16.14.0"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.14.0.tgz#7ad838ec29a777fb3c75c3a190f661cf92ab8b89"
+  integrity sha512-1gCeQXDLoIqMgqD3IO2Ah9bnf0w9kzhwN5q4FGnHZ67hBm9yePzB5JJAIQCc8x3pFnNlwFq4RidZggNAAkzWWw==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
@@ -8985,10 +8985,10 @@ react-transition-group@^4.4.1:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-react@^16.13.1:
-  version "16.13.1"
-  resolved "https://registry.yarnpkg.com/react/-/react-16.13.1.tgz#2e818822f1a9743122c063d6410d85c1e3afe48e"
-  integrity sha512-YMZQQq32xHLX0bz5Mnibv1/LHb3Sqzngu7xstSM+vrkE5Kzr9xE0yMByK5kMoTK30YVJE61WfbxIFFvfeDKT1w==
+react@^16.14.0:
+  version "16.14.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.14.0.tgz#94d776ddd0aaa37da3eda8fc5b6b18a4c9a3114d"
+  integrity sha512-0X2CImDkJGApiAlcf0ODKIneSwBPhqJawOa5wCtKbu7ZECrmS26NvtSILynQ66cgkT/RJ4LidJOc3bUESwmU8g==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
@@ -10687,9 +10687,9 @@ url-parse@^1.4.3:
     requires-port "^1.0.0"
 
 url-polyfill@^1.1.8:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/url-polyfill/-/url-polyfill-1.1.9.tgz#2c8d4224889a5c942800f708f5585368085603d9"
-  integrity sha512-q/R5sowGuRfKHm497swkV+s9cPYtZRkHxzpDjRhqLO58FwdWTIkt6Y/fJlznUD/exaKx/XnDzCYXz0V16ND7ow==
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/url-polyfill/-/url-polyfill-1.1.10.tgz#fd5bbcf66c9491fa682b0cb6d6a855e1643a9281"
+  integrity sha512-vSaPpaRgBrf41+Uky1myiSh6gpcbw8FpwHYnEy0abxndojOBnIs+yh/49gKYFLtUMP9qoNWjn6j9aUVy23Ie2A==
 
 url-toolkit@^2.1.6:
   version "2.2.0"
