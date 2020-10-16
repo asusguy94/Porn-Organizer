@@ -635,6 +635,7 @@ class Star extends Component {
                                 update={(label, value) => this.handleStar_updateInfo(label, value)}
                                 data={this.state.star.info}
                                 starData={this.state.starData}
+                                starID={this.state.star.id}
                             />
                         </div>
                     )}
