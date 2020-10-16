@@ -829,7 +829,7 @@ class VideoPage extends Component {
 
                             <MenuItem divider />
 
-                            <MenuItem onClick={() => this.handleBookmark_clear()}>
+                            <MenuItem disabled={!this.state.bookmarks.length} onClick={() => this.handleBookmark_clear()}>
                                 <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Bookmarks
                             </MenuItem>
 
