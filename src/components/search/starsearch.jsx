@@ -202,6 +202,55 @@ class StarSearchPage extends Component {
         this.setState({ stars })
     }
 
+    sort_added_asc() {}
+    sort_added_desc() {}
+
+    sort_age_asc() {
+        const { stars } = this.state
+        stars.sort((a, b) => {
+            let valA = a.age
+            let valB = b.age
+
+            return valA - valB
+        })
+
+        this.setState({ stars })
+    }
+    sort_age_desc() {
+        const { stars } = this.state
+        stars.sort((b, a) => {
+            let valA = a.age
+            let valB = b.age
+
+            return valA - valB
+        })
+
+        this.setState({ stars })
+    }
+
+    sort_videos_asc() {
+        const { stars } = this.state
+        stars.sort((a, b) => {
+            let valA = a.videoCount
+            let valB = b.videoCount
+
+            return valA - valB
+        })
+
+        this.setState({ stars })
+    }
+    sort_videos_desc() {
+        const { stars } = this.state
+        stars.sort((b, a) => {
+            let valA = a.videoCount
+            let valB = b.videoCount
+
+            return valA - valB
+        })
+
+        this.setState({ stars })
+    }
+
     render() {
         return (
             <div className='search-page col-12 row'>
@@ -223,6 +272,39 @@ class StarSearchPage extends Component {
                         <input id='alphabetically_desc' type='radio' name='sort' onChange={this.sort_default_desc.bind(this)} />
                         <label htmlFor='alphabetically_desc'>Z-A</label>
                     </div>
+
+                    <div className='input-wrapper disabled'>
+                        <input id='added' type='radio' name='sort' onChange={this.sort_added_asc.bind(this)} />
+                        <label htmlFor='added'>Old Upload</label>
+                    </div>
+                    <div className='input-wrapper disabled'>
+                        <input id='added_desc' type='radio' name='sort' onChange={this.sort_added_desc.bind(this)} />
+                        <label htmlFor='added_desc'>Recent Upload</label>
+                    </div>
+
+                    <div className='input-wrapper'>
+                        <input id='actor-age' type='radio' name='sort' onChange={this.sort_age_asc.bind(this)} />
+                        <label htmlFor='actor-age'>Teen</label>
+                    </div>
+                    <div className='input-wrapper'>
+                        <input id='actor-age_desc' type='radio' name='sort' onChange={this.sort_age_desc.bind(this)} />
+                        <label htmlFor='actor-age_desc'>Milf</label>
+                    </div>
+
+                    <div className='input-wrapper'>
+                        <input id='videocount' type='radio' name='sort' onChange={this.sort_videos_asc.bind(this)} />
+                        <label htmlFor='videocount'>Least Videos</label>
+                    </div>
+                    <div className='input-wrapper'>
+                        <input id='videocount_desc' type='radio' name='sort' onChange={this.sort_videos_desc.bind(this)} />
+                        <label htmlFor='videocount_desc'>Most Videos</label>
+                    </div>
+
+                    <h2 className='h5'>Websites/Sites</h2>
+                    <div id='websites' className='input-wrapper'></div>
+
+                    <h2 className='h5'>Exclude Websites</h2>
+                    <div id='websites-exclude' className='input-wrapper'></div>
 
                     <h2>Breast</h2>
                     <div id='breasts'>
