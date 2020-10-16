@@ -254,17 +254,37 @@ class StarForm extends Component {
         this.update = (value, label) => props.update(value, label)
     }
 
+    freeones() {
+        Axios.get(`${config.api}/freeones.php?starID=${this.props.starID}`).then(({ data }) => {
+            if (data.success) {
+                window.location.reload()
+
+                // TODO use stateObj
+            }
+        })
+    }
+
+    freeonesReset() {
+        Axios.get(`${config.api}/freeones.php?starID=${this.props.starID}&type=reset`).then(({ data }) => {
+            if (data.success) {
+                window.location.reload()
+
+                // TODO use stateObj
+            }
+        })
+    }
+
     render() {
         const { data, starData } = this.props
 
         return (
             <React.Fragment>
                 <div className='action'>
-                    <div className='btn btn-primary' id='freeones'>
+                    <div className='btn btn-primary' id='freeones' onClick={this.freeones.bind(this)}>
                         Get Data
                     </div>
 
-                    <div className='btn btn-outline-secondary' id='freeones_rs'>
+                    <div className='btn btn-outline-secondary' id='freeones_rs' onClick={this.freeonesReset.bind(this)}>
                         Reset Data
                     </div>
                 </div>
