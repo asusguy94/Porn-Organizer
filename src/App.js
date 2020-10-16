@@ -14,6 +14,8 @@ import StarPage from './components/star/star'
 import VideoSearchPage from './components/search/videosearch'
 import StarSearchPage from './components/search/starsearch'
 
+import ErrorPage from './components/404/404'
+
 /* Style */
 import './components/styles/main.scss'
 import './components/styles/flag.scss'
@@ -54,7 +56,9 @@ class App extends Component {
                                 <h1>Settings Page</h1>
                             </Route>
 
-                            <Route path='/' component={HomePage} />
+                                <Route path='/' exact component={HomePage} />
+
+                                <Route path='*' component={ErrorPage} />
                         </Switch>
                     </div>
                 </main>
