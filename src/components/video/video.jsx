@@ -837,7 +837,10 @@ class VideoPage extends Component {
                                 <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Plays
                             </MenuItem>
 
-                            <MenuItem disabled={this.state.star.id > 0} onClick={() => this.handleVideo_delete()}>
+                            <MenuItem
+                                disabled={this.state.star.id > 0 || !!this.state.bookmarks.length}
+                                onClick={() => this.handleVideo_delete()}
+                            >
                                 <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Video
                             </MenuItem>
 
