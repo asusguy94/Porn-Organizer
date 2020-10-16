@@ -79,7 +79,7 @@ class VideoSearchPage extends Component {
 
         obj.forEach(({ hidden }) => {
             let value = 0
-            for (let prop in hidden) {
+            for (const prop in hidden) {
                 if (typeof hidden[prop] !== 'object') {
                     value += Number(hidden[prop])
                 } else {
@@ -107,7 +107,7 @@ class VideoSearchPage extends Component {
     handleTitleSearch(e) {
         const searchValue = e.target.value.toLowerCase()
 
-        let videos = this.state.videos.map((item) => {
+        const videos = this.state.videos.map((item) => {
             item.hidden.titleSearch = !item.name.toLowerCase().includes(searchValue)
 
             return item
@@ -117,7 +117,7 @@ class VideoSearchPage extends Component {
     }
 
     handleCategoryFilter(e, target) {
-        let videos = this.state.videos.map((video) => {
+        const videos = this.state.videos.map((video) => {
             if (target === null) {
                 video.hidden.noCategory = e.target.checked && video.categories.length
             } else {
@@ -125,18 +125,18 @@ class VideoSearchPage extends Component {
 
                 if (!e.target.checked) {
                     video.hidden.noCategory = false
-                    let match = !video.categories
+                    const match = !video.categories
                         .map((category) => {
                             return category.toLowerCase()
                         })
                         .includes(targetLower)
 
                     if (match) {
-                        let index = video.hidden.category.indexOf(targetLower)
+                        const index = video.hidden.category.indexOf(targetLower)
                         video.hidden.category.splice(index, 1)
                     }
                 } else {
-                    let match = !video.categories
+                    const match = !video.categories
                         .map((category) => {
                             return category.toLowerCase()
                         })
@@ -154,7 +154,7 @@ class VideoSearchPage extends Component {
     }
 
     handleCategoryFilter_POV(e) {
-        let videos = this.state.videos.map((video) => {
+        const videos = this.state.videos.map((video) => {
             video.hidden.pov = e.target.checked && !video.pov
 
             return video
@@ -166,20 +166,20 @@ class VideoSearchPage extends Component {
     handleAttributeFilter(e, target) {
         const targetLower = target.name.toLowerCase()
 
-        let videos = this.state.videos.map((video) => {
+        const videos = this.state.videos.map((video) => {
             if (!e.target.checked) {
-                let match = !video.attributes
+                const match = !video.attributes
                     .map((attribute) => {
                         return attribute.toLowerCase()
                     })
                     .includes(targetLower)
 
                 if (match) {
-                    let index = video.hidden.attribute.indexOf(targetLower)
+                    const index = video.hidden.attribute.indexOf(targetLower)
                     video.hidden.attribute.splice(index, 1)
                 }
             } else {
-                let match = !video.attributes
+                const match = !video.attributes
                     .map((attribute) => {
                         return attribute.toLowerCase()
                     })
@@ -197,20 +197,20 @@ class VideoSearchPage extends Component {
     handleLocationFilter(e, target) {
         const targetLower = target.name.toLowerCase()
 
-        let videos = this.state.videos.map((video) => {
+        const videos = this.state.videos.map((video) => {
             if (!e.target.checked) {
-                let match = !video.locations
+                const match = !video.locations
                     .map((location) => {
                         return location.toLowerCase()
                     })
                     .includes(targetLower)
 
                 if (match) {
-                    let index = video.hidden.location.indexOf(targetLower)
+                    const index = video.hidden.location.indexOf(targetLower)
                     video.hidden.location.splice(index, 1)
                 }
             } else {
-                let match = !video.locations
+                const match = !video.locations
                     .map((location) => {
                         return location.toLowerCase()
                     })
@@ -228,7 +228,7 @@ class VideoSearchPage extends Component {
     handleWebsiteFilter(e) {
         const targetLower = e.target.value.toLowerCase()
 
-        let videos = this.state.videos.map((video) => {
+        const videos = this.state.videos.map((video) => {
             if (targetLower === 'all') {
                 video.hidden.website = false
             } else {
@@ -242,7 +242,7 @@ class VideoSearchPage extends Component {
     }
 
     sort_default_asc() {
-        let videos = this.state.videos
+        const videos = this.state.videos
         videos.sort((a, b) => {
             let valA = a.name.toLowerCase()
             let valB = b.name.toLowerCase()
@@ -254,7 +254,7 @@ class VideoSearchPage extends Component {
     }
 
     sort_default_desc() {
-        let videos = this.state.videos
+        const videos = this.state.videos
         videos.sort((b, a) => {
             let valA = a.name.toLowerCase()
             let valB = b.name.toLowerCase()
@@ -266,7 +266,7 @@ class VideoSearchPage extends Component {
     }
 
     sort_plays_asc() {
-        let videos = this.state.videos
+        const videos = this.state.videos
         videos.sort((a, b) => {
             let valA = a.plays
             let valB = b.plays
@@ -277,7 +277,7 @@ class VideoSearchPage extends Component {
     }
 
     sort_plays_desc() {
-        let videos = this.state.videos
+        const videos = this.state.videos
         videos.sort((b, a) => {
             let valA = a.plays
             let valB = b.plays
@@ -288,7 +288,7 @@ class VideoSearchPage extends Component {
     }
 
     sort_age_asc() {
-        let videos = this.state.videos
+        const videos = this.state.videos
         videos.sort((a, b) => {
             let valA = a.ageInVideo
             let valB = b.ageInVideo
@@ -299,7 +299,7 @@ class VideoSearchPage extends Component {
     }
 
     sort_age_desc() {
-        let videos = this.state.videos
+        const videos = this.state.videos
         videos.sort((b, a) => {
             let valA = a.ageInVideo
             let valB = b.ageInVideo
@@ -310,7 +310,7 @@ class VideoSearchPage extends Component {
     }
 
     sort_added_asc() {
-        let videos = this.state.videos
+        const videos = this.state.videos
         videos.sort((a, b) => {
             let valA = a.id
             let valB = b.id
@@ -322,7 +322,7 @@ class VideoSearchPage extends Component {
     }
 
     sort_added_desc() {
-        let videos = this.state.videos
+        const videos = this.state.videos
         videos.sort((b, a) => {
             let valA = a.id
             let valB = b.id
@@ -334,7 +334,7 @@ class VideoSearchPage extends Component {
     }
 
     sort_date_asc() {
-        let videos = this.state.videos
+        const videos = this.state.videos
         videos.sort((a, b) => {
             let valA = new Date(a.date)
             let valB = new Date(b.date)
@@ -346,7 +346,7 @@ class VideoSearchPage extends Component {
     }
 
     sort_date_desc() {
-        let videos = this.state.videos
+        const videos = this.state.videos
         videos.sort((b, a) => {
             let valA = new Date(a.date)
             let valB = new Date(b.date)
@@ -532,93 +532,74 @@ class VideoSearchPage extends Component {
         const { loaded } = this.state
 
         if (!loaded.videos) {
-            Axios.get(`${config.api}/videosearch.php`)
-                .then(({ data: { videos } }) => {
-                    this.setState(() => {
-                        videos = videos.map((item) => {
-                            item.hidden = {
-                                category: [],
-                                attribute: [],
-                                location: [],
-                                titleSearch: false,
-                                noCategory: false,
-                                pov: false,
-                                website: false,
-                            }
+            Axios.get(`${config.api}/videosearch.php`).then(({ data: { videos } }) => {
+                this.setState((prevState) => {
+                    videos = videos.map((item) => {
+                        item.hidden = {
+                            category: [],
+                            attribute: [],
+                            location: [],
+                            titleSearch: false,
+                            noCategory: false,
+                            pov: false,
+                            website: false,
+                        }
 
-                            let match = 0
-                            item.categories.forEach((category) => {
-                                match += category.includes('(POV)')
-                            })
+                        item.pov = item.categories.length && item.categories.every((category) => category.includes('(POV)'))
 
-                            item.pov = match && match === item.categories.length
-
-                            return item
-                        })
-
-                        return { videos }
+                        return item
                     })
-                })
-                .then(() => {
-                    this.setState((prevState) => {
-                        let loaded = prevState.loaded
-                        loaded.videos = true
 
-                        return { loaded }
-                    })
+                    const { loaded } = prevState
+                    loaded.videos = true
+
+                    return { videos, loaded }
                 })
+            })
         }
 
         if (!loaded.categories) {
-            Axios.get(`${config.api}/categories.php`)
-                .then(({ data: categories }) => this.setState({ categories }))
-                .then(() => {
-                    this.setState((prevState) => {
-                        let loaded = prevState.loaded
-                        loaded.categories = true
+            Axios.get(`${config.api}/categories.php`).then(({ data: categories }) => {
+                this.setState((prevState) => {
+                    const { loaded } = prevState
+                    loaded.categories = true
 
-                        return { loaded }
-                    })
+                    return { categories, loaded }
                 })
+            })
         }
 
         if (!loaded.attributes) {
-            Axios.get(`${config.api}/attributes.php`)
-                .then(({ data: attributes }) => this.setState({ attributes }))
-                .then(() => {
-                    this.setState((prevState) => {
-                        let loaded = prevState.loaded
-                        loaded.attributes = true
+            Axios.get(`${config.api}/attributes.php`).then(({ data: attributes }) => {
+                this.setState((prevState) => {
+                    const { loaded } = prevState
+                    loaded.attributes = true
 
-                        return { loaded }
-                    })
+                    return { attributes, loaded }
                 })
+            })
         }
 
         if (!loaded.locations) {
-            Axios.get(`${config.api}/locations.php`)
-                .then(({ data: locations }) => this.setState({ locations }))
-                .then(() => {
-                    this.setState((prevState) => {
-                        let loaded = prevState.loaded
-                        loaded.locations = true
+            Axios.get(`${config.api}/locations.php`).then(({ data: locations }) => {
+                this.setState((prevState) => {
+                    const { loaded } = prevState
+                    loaded.locations = true
 
-                        return { loaded }
-                    })
+                    return { locations, loaded }
                 })
+            })
         }
 
         if (!loaded.websites) {
-            Axios.get(`${config.api}/websites.php`)
-                .then(({ data: websites }) => this.setState({ websites }))
-                .then(() => {
-                    this.setState((prevState) => {
-                        let loaded = prevState.loaded
-                        loaded.websites = true
+            Axios.get(`${config.api}/websites.php`).then(({ data: websites }) => {
+                this.setState((prevState) => {
+                    const { loaded } = prevState
+                    loaded.websites = true
 
-                        return { loaded }
-                    })
+                    return { websites, loaded }
                 })
+            })
         }
     }
 }

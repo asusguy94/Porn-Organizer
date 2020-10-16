@@ -17,8 +17,8 @@ import './video.scss'
 import config from '../config'
 
 class VideoPage extends Component {
-    constructor(props) {
-        super(props)
+    constructor() {
+        super()
         this.handleModal = handleModal
         this.handleOverlay = handleOverlay
     }
