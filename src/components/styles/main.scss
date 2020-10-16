@@ -1,7 +1,6 @@
 @import 'functions';
 @import 'context-menu';
 @import 'ribbon';
-@import 'dropbox';
 
 /* Star */
 .star {
@@ -85,4 +84,5 @@ label,
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    outline: none;
 }
