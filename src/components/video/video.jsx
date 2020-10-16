@@ -141,7 +141,9 @@ class VideoPage extends Component {
     }
 
     handleWheel(e) {
+        if (!this.state.modal.visible) {
         this.player.player.currentTime += this.state.seekSpeed.wheel * Math.sign(e.deltaY) * -1
+    }
     }
 
     handleInput(e, field) {
