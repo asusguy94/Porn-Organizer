@@ -307,6 +307,10 @@ class StarForm extends Component {
 }
 
 class StarImageDropbox extends Component {
+    state = {
+        hover: false,
+    }
+
     constructor(props) {
         super(props)
         this.removeStar = this.props.removeStar
@@ -318,6 +322,18 @@ class StarImageDropbox extends Component {
     handleDefault(e) {
         e.stopPropagation()
         e.preventDefault()
+    }
+
+    handleEnter(e) {
+        this.handleDefault(e)
+
+        this.setHover()
+    }
+
+    handleLeave(e) {
+        this.handleDefault(e)
+
+        this.clearHover()
     }
 
     handleDrop(e) {
@@ -332,6 +348,22 @@ class StarImageDropbox extends Component {
         } else {
             this.addImage(image)
         }
+
+        setTimeout(() => {
+            this.clearHover()
+        }, 1500)
+    }
+
+    isHover() {
+        return this.state.hover
+    }
+
+    setHover() {
+        this.setState({ hover: true })
+    }
+
+    clearHover() {
+        this.setState({ hover: false })
     }
 
     render() {
@@ -357,12 +389,13 @@ class StarImageDropbox extends Component {
                     <ContextMenuTrigger id='star__dropbox'>
                         <div
                             id='dropbox'
-                            onDragEnter={this.handleDefault.bind(this)}
-                            onDragExit={this.handleDefault.bind(this)}
-                            onDragOver={this.handleDefault.bind(this)}
+                            className={`unselectable ${this.isHover() ? 'hover' : ''}`}
+                            onDragEnter={this.handleEnter.bind(this)}
+                            onDragOver={this.handleEnter.bind(this)}
+                            onDragLeave={this.handleLeave.bind(this)}
                             onDrop={this.handleDrop.bind(this)}
                         >
-                            <div className='unselectable label'>Drop Image Here</div>
+                            <div className='label'>Drop Image Here</div>
                         </div>
                     </ContextMenuTrigger>
 
