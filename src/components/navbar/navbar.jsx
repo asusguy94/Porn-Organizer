@@ -15,12 +15,6 @@ class NavBar extends Component {
                     </li>
 
                     <li>
-                        <a href={`${config.source}/add_videos.php`} target='_blank' rel='noopener noreferrer'>
-                            Add Videos
-                        </a>
-                    </li>
-
-                    <li>
                         <Link to='/videos/search'>Video Search</Link>
                         <ul className='sub-menu'>
                             <li>
@@ -47,6 +41,10 @@ class NavBar extends Component {
                     </li>
 
                     <li>
+                        <Link to='/editor'>DB Editor</Link>
+                    </li>
+
+                    <li>
                         <a href={`${config.db}/phpMyAdmin`} target='_blank' rel='noopener noreferrer'>
                             DB
                         </a>
@@ -54,12 +52,13 @@ class NavBar extends Component {
 
                     <li>
                         <a href={`${config.source}/video_generatethumbnails.php`} target='_blank' rel='noopener noreferrer'>
-                            Generate Thumbnails
+                            Import Videos
                         </a>
+
                         <ul className='sub-menu'>
                             <li>
                                 <a href={`${config.source}/vtt.php`} target='_blank' rel='noopener noreferrer'>
-                                    Generate WebVTT
+                                    Build Previews
                                 </a>
                             </li>
                         </ul>
