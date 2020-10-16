@@ -19,18 +19,20 @@ class HomeColumn extends Component {
                     </h2>
 
                     <div className='row'>
-                        {obj.data.map((item, i) => (
-                            <Link className='video col-1 px-0 mx-3 ribbon-container' to={`/video/${item.id}`} key={i}>
-                                <img
-                                    className='mx-auto img-thumbnail'
-                                    alt='video'
-                                    src={`${config.source}/images/videos/${item.id}-290`}
-                                />
+                        {obj.data.map((video, i) => (
+                            <div className='row mx-0 px-2 col-1' key={i}>
+                                <Link className='video px-0 col-12 ribbon-container' to={`/video/${video.id}`}>
+                                    <img
+                                        className='mx-auto img-thumbnail'
+                                        alt='video'
+                                        src={`${config.source}/images/videos/${video.id}-290`}
+                                    />
 
-                                <span className='video__title mx-auto d-block'>{item.name}</span>
+                                    <span className='video__title mx-auto d-block'>{video.name}</span>
 
-                                {obj.data[i].plays > 0 && <span className='ribbon'>{item.plays}</span>}
-                            </Link>
+                                    {obj.data[i].plays > 0 && <span className='ribbon'>{video.plays}</span>}
+                                </Link>
+                            </div>
                         ))}
                     </div>
                 </section>
@@ -45,25 +47,25 @@ class HomePage extends Component {
         recent: {
             label: 'Recent Added',
             enabled: true,
-            limit: 10,
+            limit: 12,
             data: [],
         },
         newest: {
             label: 'Newest',
             enabled: true,
-            limit: 10,
+            limit: 12,
             data: [],
         },
         popular: {
             label: 'Most Popular',
             enabled: true,
-            limit: 20,
+            limit: 24,
             data: [],
         },
         random: {
             label: 'Random',
             enabled: false,
-            limit: 20,
+            limit: 24,
             data: [],
         },
     }
