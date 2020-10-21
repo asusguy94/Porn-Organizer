@@ -59,7 +59,7 @@ class AttributesPage extends Component {
                     <div className='col-8 mt-1'>
                         <input
                             type='text'
-                            className='col-8 pl-2'
+                            className='col-8 px-1'
                             ref={(input) => (this.input = input)}
                             onChange={this.handleChange.bind(this)}
                             onKeyPress={this.handleKeyPress.bind(this)}
@@ -221,7 +221,7 @@ class CategoriesPage extends Component {
                     <div className='col-8 mt-1'>
                         <input
                             type='text'
-                            className='col-8 pl-2'
+                            className='col-8 px-1'
                             ref={(input) => (this.input = input)}
                             onChange={this.handleChange.bind(this)}
                             onKeyPress={this.handleKeyPress.bind(this)}
@@ -383,7 +383,7 @@ class LocationsPage extends Component {
                     <div className='col-8 mt-1'>
                         <input
                             type='text'
-                            className='col-8 pl-2'
+                            className='col-8 px-1'
                             ref={(input) => (this.input = input)}
                             onChange={this.handleChange.bind(this)}
                             onKeyPress={this.handleKeyPress.bind(this)}
@@ -545,7 +545,7 @@ class CountriesPage extends Component {
                     <div className='col-8 mt-1'>
                         <input
                             type='text'
-                            className='col-8 pl-2'
+                            className='col-8 px-1'
                             ref={(input) => (this.input = input)}
                             onChange={this.handleChange.bind(this)}
                             onKeyPress={this.handleKeyPress.bind(this)}
