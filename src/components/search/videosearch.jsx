@@ -26,10 +26,16 @@ class VideoSearchPage extends Component {
                 locations: [],
                 hidden: {
                     category: [],
+                    notCategory: [],
                     attribute: [],
+                    notAttribute: [],
+                    location: [],
+                    notLocation: [],
                     titleSearch: false,
                     noCategory: false,
+                    notNoCategory: false,
                     pov: false,
+                    notPov: false,
                     website: false,
                 },
                 pov: false,
@@ -81,8 +87,10 @@ class VideoSearchPage extends Component {
             let value = 0
             for (const prop in hidden) {
                 if (typeof hidden[prop] !== 'object') {
+                    // boolean
                     value += Number(hidden[prop])
                 } else {
+                    // array
                     value += Number(hidden[prop].length > 0)
                 }
             }
@@ -95,8 +103,10 @@ class VideoSearchPage extends Component {
         let value = 0
         for (var prop in hidden) {
             if (typeof hidden[prop] !== 'object') {
+                // boolean
                 value += Number(hidden[prop])
             } else {
+                // array
                 value += Number(hidden[prop].length > 0)
             }
         }
@@ -119,21 +129,43 @@ class VideoSearchPage extends Component {
     handleCategoryFilter(e, target) {
         const videos = this.state.videos.map((video) => {
             if (target === null) {
-                video.hidden.noCategory = e.target.checked && video.categories.length
+                if (e.target.indeterminate) {
+                    video.hidden.noCategory = false
+                    video.hidden.notNoCategory = video.categories.length === 0
+                } else if (!e.target.checked) {
+                    video.hidden.notNoCategory = false
+                } else {
+                    video.hidden.noCategory = video.categories.length !== 0
+                }
             } else {
                 const targetLower = target.name.toLowerCase()
 
-                if (!e.target.checked) {
+                if (e.target.indeterminate) {
+                    const match = video.categories.some((category) => {
+                        return category.toLowerCase() === targetLower
+                    })
+
+                    // INDETERMINATE
+                    if (match) {
+                        video.hidden.notCategory.push(targetLower)
+                    } else {
+                        // Remove checked-status from filtering
+                        const index = video.hidden.category.indexOf(targetLower)
+                        video.hidden.category.splice(index, 1)
+                    }
+                } else if (!e.target.checked) {
                     video.hidden.noCategory = false
-                    const match = !video.categories
+                    const match = video.categories
                         .map((category) => {
                             return category.toLowerCase()
                         })
                         .includes(targetLower)
 
+                    // NOT-CHECKED
                     if (match) {
-                        const index = video.hidden.category.indexOf(targetLower)
-                        video.hidden.category.splice(index, 1)
+                        // Remove indeterminate-status from filtering
+                        const index = video.hidden.notCategory.indexOf(targetLower)
+                        video.hidden.notCategory.splice(index, 1)
                     }
                 } else {
                     const match = !video.categories
@@ -142,7 +174,8 @@ class VideoSearchPage extends Component {
                         })
                         .includes(targetLower)
 
-                    if (match && !video.hidden.category.includes(targetLower)) {
+                    // CHECKED
+                    if (match) {
                         video.hidden.category.push(targetLower)
                     }
                 }
@@ -155,7 +188,14 @@ class VideoSearchPage extends Component {
 
     handleCategoryFilter_POV(e) {
         const videos = this.state.videos.map((video) => {
-            video.hidden.pov = e.target.checked && !video.pov
+            if (e.target.indeterminate) {
+                video.hidden.pov = false
+                video.hidden.notPov = video.pov
+            } else if (!e.target.checked) {
+                video.hidden.notPov = false
+            } else {
+                video.hidden.pov = !video.pov
+            }
 
             return video
         })
@@ -167,16 +207,31 @@ class VideoSearchPage extends Component {
         const targetLower = target.name.toLowerCase()
 
         const videos = this.state.videos.map((video) => {
-            if (!e.target.checked) {
-                const match = !video.attributes
+            if (e.target.indeterminate) {
+                const match = video.attributes.some((attribute) => {
+                    return attribute.toLowerCase() === targetLower
+                })
+
+                // INDETERMINATE
+                if (match) {
+                    video.hidden.notAttribute.push(targetLower)
+                } else {
+                    // Remove checked-status from filtering
+                    const index = video.hidden.attribute.indexOf(targetLower)
+                    video.hidden.attribute.splice(index, 1)
+                }
+            } else if (!e.target.checked) {
+                const match = video.attributes
                     .map((attribute) => {
                         return attribute.toLowerCase()
                     })
                     .includes(targetLower)
 
+                // NOT-CHECKED
                 if (match) {
-                    const index = video.hidden.attribute.indexOf(targetLower)
-                    video.hidden.attribute.splice(index, 1)
+                    // Remove indeterminate-status from filtering
+                    const index = video.hidden.notAttribute.indexOf(targetLower)
+                    video.hidden.notAttribute.splice(index, 1)
                 }
             } else {
                 const match = !video.attributes
@@ -185,7 +240,8 @@ class VideoSearchPage extends Component {
                     })
                     .includes(targetLower)
 
-                if (match && !video.hidden.attribute.includes(targetLower)) {
+                // CHECKED
+                if (match) {
                     video.hidden.attribute.push(targetLower)
                 }
             }
@@ -198,16 +254,31 @@ class VideoSearchPage extends Component {
         const targetLower = target.name.toLowerCase()
 
         const videos = this.state.videos.map((video) => {
-            if (!e.target.checked) {
-                const match = !video.locations
+            if (e.target.indeterminate) {
+                const match = video.locations.some((location) => {
+                    return location.toLowerCase() === targetLower
+                })
+
+                // INDETERMINATE
+                if (match) {
+                    video.hidden.notLocation.push(targetLower)
+                } else {
+                    // Remove checked-status from filtering
+                    const index = video.hidden.location.indexOf(targetLower)
+                    video.hidden.location.splice(index, 1)
+                }
+            } else if (!e.target.checked) {
+                const match = video.locations
                     .map((location) => {
                         return location.toLowerCase()
                     })
                     .includes(targetLower)
 
+                // NOT-CHECKED
                 if (match) {
-                    const index = video.hidden.location.indexOf(targetLower)
-                    video.hidden.location.splice(index, 1)
+                    // Remove indeterminate-status from filtering
+                    const index = video.hidden.notLocation.indexOf(targetLower)
+                    video.hidden.notLocation.splice(index, 1)
                 }
             } else {
                 const match = !video.locations
@@ -216,7 +287,8 @@ class VideoSearchPage extends Component {
                     })
                     .includes(targetLower)
 
-                if (match && !video.hidden.location.includes(targetLower)) {
+                // CHECKED
+                if (match) {
                     video.hidden.location.push(targetLower)
                 }
             }
@@ -357,6 +429,41 @@ class VideoSearchPage extends Component {
         this.setState({ videos })
     }
 
+    isIndeterminate(state) {
+        return Number(state) === -1
+    }
+
+    isChecked(state) {
+        return Number(state) === 1
+    }
+
+    setChecked(target, value = false) {
+        target.checked = value
+        target.indeterminate = false
+
+        target.dataset.state = Number(value)
+    }
+
+    setIndeterminate(target, value = false) {
+        target.indeterminate = value
+        target.checked = false
+
+        target.dataset.state = -1
+    }
+
+    handleIndeterminate(e) {
+        const { target } = e
+        const state = target.dataset.state
+
+        if (this.isChecked(state)) {
+            this.setIndeterminate(target, true)
+        } else if (this.isIndeterminate(state)) {
+            this.setChecked(target)
+        } else {
+            this.setChecked(target, true)
+        }
+    }
+
     render() {
         return (
             <div className='search-page col-12 row'>
@@ -430,14 +537,28 @@ class VideoSearchPage extends Component {
                     <h2>Categories</h2>
                     <div id='categories'>
                         <div className='input-wrapper'>
-                            <input type='checkbox' id='category_POV' onChange={(e) => this.handleCategoryFilter_POV(e)} />
+                            <input
+                                type='checkbox'
+                                id='category_POV'
+                                onChange={(e) => {
+                                    this.handleIndeterminate(e)
+                                    this.handleCategoryFilter_POV(e)
+                                }}
+                            />
                             <label htmlFor='category_POV' className='global-category'>
                                 POV
                             </label>
                         </div>
 
                         <div className='input-wrapper'>
-                            <input type='checkbox' id='category_NULL' onChange={(e) => this.handleCategoryFilter(e, null)} />
+                            <input
+                                type='checkbox'
+                                id='category_NULL'
+                                onChange={(e) => {
+                                    this.handleIndeterminate(e)
+                                    this.handleCategoryFilter(e, null)
+                                }}
+                            />
                             <label htmlFor='category_NULL' className='global-category'>
                                 NULL
                             </label>
@@ -449,7 +570,10 @@ class VideoSearchPage extends Component {
                                     <input
                                         type='checkbox'
                                         id={`category-${item.name}`}
-                                        onChange={(e) => this.handleCategoryFilter(e, item)}
+                                        onChange={(e) => {
+                                            this.handleIndeterminate(e)
+                                            this.handleCategoryFilter(e, item)
+                                        }}
                                     />
                                     <label htmlFor={`category-${item.name}`}>{item.name}</label>
                                 </div>
@@ -464,7 +588,10 @@ class VideoSearchPage extends Component {
                                     <input
                                         type='checkbox'
                                         id={`attribute-${item.name}`}
-                                        onChange={(e) => this.handleAttributeFilter(e, item)}
+                                        onChange={(e) => {
+                                            this.handleIndeterminate(e)
+                                            this.handleAttributeFilter(e, item)
+                                        }}
                                     />
                                     <label htmlFor={`attribute-${item.name}`}>{item.name}</label>
                                 </div>
@@ -479,7 +606,10 @@ class VideoSearchPage extends Component {
                                     <input
                                         type='checkbox'
                                         id={`attribute-${item.name}`}
-                                        onChange={(e) => this.handleLocationFilter(e, item)}
+                                        onChange={(e) => {
+                                            this.handleIndeterminate(e)
+                                            this.handleLocationFilter(e, item)
+                                        }}
                                     />
                                     <label htmlFor={`attribute-${item.name}`}>{item.name}</label>
                                 </div>
@@ -537,11 +667,16 @@ class VideoSearchPage extends Component {
                     videos = videos.map((item) => {
                         item.hidden = {
                             category: [],
+                            notCategory: [],
                             attribute: [],
+                            notAttribute: [],
                             location: [],
+                            notLocation: [],
                             titleSearch: false,
                             noCategory: false,
+                            notNoCategory: false,
                             pov: false,
+                            notPov: false,
                             website: false,
                         }
 
