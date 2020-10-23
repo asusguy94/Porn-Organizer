@@ -4,12 +4,18 @@ import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 
 import { DaysToYears } from '../date/date'
+import Indeterminate from '../indeterminate/indeterminate'
 
 import './search.scss'
 
 import config from '../config'
 
 class VideoSearchPage extends Component {
+    constructor() {
+        super()
+        this.indeterminate = new Indeterminate()
+    }
+
     state = {
         videos: [
             {
@@ -429,41 +435,6 @@ class VideoSearchPage extends Component {
         this.setState({ videos })
     }
 
-    isIndeterminate(state) {
-        return Number(state) === -1
-    }
-
-    isChecked(state) {
-        return Number(state) === 1
-    }
-
-    setChecked(target, value = false) {
-        target.checked = value
-        target.indeterminate = false
-
-        target.dataset.state = Number(value)
-    }
-
-    setIndeterminate(target, value = false) {
-        target.indeterminate = value
-        target.checked = false
-
-        target.dataset.state = -1
-    }
-
-    handleIndeterminate(e) {
-        const { target } = e
-        const state = target.dataset.state
-
-        if (this.isChecked(state)) {
-            this.setIndeterminate(target, true)
-        } else if (this.isIndeterminate(state)) {
-            this.setChecked(target)
-        } else {
-            this.setChecked(target, true)
-        }
-    }
-
     render() {
         return (
             <div className='search-page col-12 row'>
@@ -541,7 +512,7 @@ class VideoSearchPage extends Component {
                                 type='checkbox'
                                 id='category_POV'
                                 onChange={(e) => {
-                                    this.handleIndeterminate(e)
+                                    this.indeterminate.handleIndeterminate(e)
                                     this.handleCategoryFilter_POV(e)
                                 }}
                             />
@@ -555,7 +526,7 @@ class VideoSearchPage extends Component {
                                 type='checkbox'
                                 id='category_NULL'
                                 onChange={(e) => {
-                                    this.handleIndeterminate(e)
+                                    this.indeterminate.handleIndeterminate(e)
                                     this.handleCategoryFilter(e, null)
                                 }}
                             />
@@ -571,7 +542,7 @@ class VideoSearchPage extends Component {
                                         type='checkbox'
                                         id={`category-${item.name}`}
                                         onChange={(e) => {
-                                            this.handleIndeterminate(e)
+                                            this.indeterminate.handleIndeterminate(e)
                                             this.handleCategoryFilter(e, item)
                                         }}
                                     />
@@ -589,7 +560,7 @@ class VideoSearchPage extends Component {
                                         type='checkbox'
                                         id={`attribute-${item.name}`}
                                         onChange={(e) => {
-                                            this.handleIndeterminate(e)
+                                            this.indeterminate.handleIndeterminate(e)
                                             this.handleAttributeFilter(e, item)
                                         }}
                                     />
@@ -607,7 +578,7 @@ class VideoSearchPage extends Component {
                                         type='checkbox'
                                         id={`attribute-${item.name}`}
                                         onChange={(e) => {
-                                            this.handleIndeterminate(e)
+                                            this.indeterminate.handleIndeterminate(e)
                                             this.handleLocationFilter(e, item)
                                         }}
                                     />
