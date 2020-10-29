@@ -4,6 +4,7 @@ import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 
 import { DaysToYears } from '../date/date'
+import LabelCount from '../labelcount/labelcount'
 
 import './search.scss'
 
@@ -337,7 +338,16 @@ class StarSearchPage extends Component {
                                         id={`category-${this.state.breasts[i]}`}
                                         onChange={(e) => this.handleBreastFilter(e, this.state.breasts[i])}
                                     />
-                                    <label htmlFor={`category-${this.state.breasts[i]}`}>{this.state.breasts[i]}</label>
+                                    <label htmlFor={`category-${this.state.breasts[i]}`}>
+                                        {this.state.breasts[i]}{' '}
+                                        <LabelCount
+                                            prop='breast'
+                                            label={this.state.breasts[i]}
+                                            obj={this.state.stars}
+                                            isArr={true}
+                                            isHidden={this.isHidden}
+                                        />
+                                    </label>
                                 </div>
                             ))}
                     </div>
@@ -366,7 +376,16 @@ class StarSearchPage extends Component {
                                         id={`haircolor-${this.state.haircolors[i]}`}
                                         onChange={() => this.handleHaircolorFilter(this.state.haircolors[i])}
                                     />
-                                    <label htmlFor={`haircolor-${this.state.haircolors[i]}`}>{this.state.haircolors[i]}</label>
+                                    <label htmlFor={`haircolor-${this.state.haircolors[i]}`}>
+                                        {this.state.haircolors[i]}
+                                        <LabelCount
+                                            prop='haircolor'
+                                            label={this.state.haircolors[i]}
+                                            obj={this.state.stars}
+                                            isArr={true}
+                                            isHidden={this.isHidden}
+                                        />
+                                    </label>
                                 </div>
                             ))}
                     </div>
@@ -395,7 +414,16 @@ class StarSearchPage extends Component {
                                         id={`ethnicity-${this.state.ethnicities[i]}`}
                                         onChange={() => this.handleEthnicityFilter(this.state.ethnicities[i])}
                                     />
-                                    <label htmlFor={`ethnicity-${this.state.ethnicities[i]}`}>{this.state.ethnicities[i]}</label>
+                                    <label htmlFor={`ethnicity-${this.state.ethnicities[i]}`}>
+                                        {this.state.ethnicities[i]}
+                                        <LabelCount
+                                            prop='ethnicity'
+                                            label={this.state.ethnicities[i]}
+                                            obj={this.state.stars}
+                                            isArr={true}
+                                            isHidden={this.isHidden}
+                                        />
+                                    </label>
                                 </div>
                             ))}
                     </div>

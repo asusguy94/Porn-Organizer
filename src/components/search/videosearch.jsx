@@ -5,6 +5,7 @@ import ScrollToTop from 'react-scroll-to-top'
 
 import { DaysToYears } from '../date/date'
 import Indeterminate from '../indeterminate/indeterminate'
+import LabelCount from '../labelcount/labelcount'
 
 import './search.scss'
 
@@ -546,7 +547,15 @@ class VideoSearchPage extends Component {
                                             this.handleCategoryFilter(e, item)
                                         }}
                                     />
-                                    <label htmlFor={`category-${item.name}`}>{item.name}</label>
+                                    <label htmlFor={`category-${item.name}`}>
+                                        {item.name}{' '}
+                                        <LabelCount
+                                            prop='categories'
+                                            label={this.state.categories[i].name}
+                                            obj={this.state.videos}
+                                            isHidden={this.isHidden}
+                                        />
+                                    </label>
                                 </div>
                             ))}
                     </div>
@@ -564,25 +573,41 @@ class VideoSearchPage extends Component {
                                             this.handleAttributeFilter(e, item)
                                         }}
                                     />
-                                    <label htmlFor={`attribute-${item.name}`}>{item.name}</label>
+                                    <label htmlFor={`attribute-${item.name}`}>
+                                        {item.name}{' '}
+                                        <LabelCount
+                                            prop='attributes'
+                                            label={this.state.attributes[i].name}
+                                            obj={this.state.videos}
+                                            isHidden={this.isHidden}
+                                        />
+                                    </label>
                                 </div>
                             ))}
                     </div>
 
                     <h2>Locations</h2>
-                    <div id='attributes'>
+                    <div id='locations'>
                         {this.state.loaded.locations &&
                             this.state.locations.map((item, i) => (
                                 <div className='input-wrapper' key={i}>
                                     <input
                                         type='checkbox'
-                                        id={`attribute-${item.name}`}
+                                        id={`locations-${item.name}`}
                                         onChange={(e) => {
                                             this.indeterminate.handleIndeterminate(e)
                                             this.handleLocationFilter(e, item)
                                         }}
                                     />
-                                    <label htmlFor={`attribute-${item.name}`}>{item.name}</label>
+                                    <label htmlFor={`locations-${item.name}`}>
+                                        {item.name}{' '}
+                                        <LabelCount
+                                            prop='locations'
+                                            label={this.state.locations[i].name}
+                                            obj={this.state.videos}
+                                            isHidden={this.isHidden}
+                                        />
+                                    </label>
                                 </div>
                             ))}
                     </div>
