@@ -648,10 +648,12 @@ class VideoPage extends Component {
                                 </ContextMenu>
                             </h1>
 
-                            <div className='header__date btn btn-sm btn-outline-primary'>
-                                <ContextMenuTrigger id='menu__date'>
-                                    <i className={`${config.theme.fa} fa-calendar-check`} />
-                                    {this.state.video.date.published}
+                            <React.Fragment>
+                                <ContextMenuTrigger id='menu__date' renderTag='span'>
+                                    <div className='header__date btn btn-sm btn-outline-primary'>
+                                        <i className={`${config.theme.fa} fa-calendar-check`} />
+                                        {this.state.video.date.published}
+                                    </div>
                                 </ContextMenuTrigger>
 
                                 <ContextMenu id='menu__date'>
@@ -659,7 +661,7 @@ class VideoPage extends Component {
                                         <i className={`${config.theme.fa} fa-edit`} /> Fix Date
                                     </MenuItem>
                                 </ContextMenu>
-                            </div>
+                            </React.Fragment>
 
                             <div className='header__locations'>
                                 {this.state.loaded.video &&
@@ -863,17 +865,21 @@ class VideoPage extends Component {
                             this.state.loaded.video &&
                             this.state.bookmarks.map((bookmarkItem, i) => (
                                 <React.Fragment key={i}>
-                                    <div
-                                        className='btn btn-sm btn-outline-primary bookmark'
-                                        style={{
-                                            left: `${((bookmarkItem.start * 100) / this.state.video.duration) * config.timeline.offset}%`,
-                                        }}
-                                        onClick={() => this.handleVideo_play(bookmarkItem.start)}
-                                        ref={(bookmark) => (this.bookmarks[i] = bookmark)}
-                                        data-level={i}
-                                    >
-                                        <ContextMenuTrigger id={`bookmark-${i}`}>{bookmarkItem.name}</ContextMenuTrigger>
-                                    </div>
+                                    <ContextMenuTrigger id={`bookmark-${i}`}>
+                                        <div
+                                            className='btn btn-sm btn-outline-primary bookmark'
+                                            style={{
+                                                left: `${
+                                                    ((bookmarkItem.start * 100) / this.state.video.duration) * config.timeline.offset
+                                                }%`,
+                                            }}
+                                            onClick={() => this.handleVideo_play(bookmarkItem.start)}
+                                            ref={(bookmark) => (this.bookmarks[i] = bookmark)}
+                                            data-level={i}
+                                        >
+                                            {bookmarkItem.name}
+                                        </div>
+                                    </ContextMenuTrigger>
 
                                     <ContextMenu id={`bookmark-${i}`}>
                                         <MenuItem
