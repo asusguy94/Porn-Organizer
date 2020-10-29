@@ -666,10 +666,12 @@ class VideoPage extends Component {
                             <div className='header__locations'>
                                 {this.state.loaded.video &&
                                     this.state.video.locations.map((item, i) => (
-                                        <div key={i} className='btn btn-sm btn-outline-danger location'>
-                                            <ContextMenuTrigger id={`location-${i}`}>
+                                        <React.Fragment key={i}>
+                                            <ContextMenuTrigger id={`location-${i}`} renderTag='span'>
+                                                <div className='btn btn-sm btn-outline-danger location'>
                                                 <i className={`${config.theme.fa} fa-map-marker-alt`} />
                                                 {item.name}
+                                                </div>
                                             </ContextMenuTrigger>
 
                                             <ContextMenu id={`location-${i}`}>
@@ -677,17 +679,19 @@ class VideoPage extends Component {
                                                     <i className={`${config.theme.fa} fa-trash-alt`} /> Remove
                                                 </MenuItem>
                                             </ContextMenu>
-                                        </div>
+                                        </React.Fragment>
                                     ))}
                             </div>
 
                             <div className='header__attributes'>
                                 {this.state.loaded.video &&
                                     this.state.video.attributes.map((item, i) => (
-                                        <div key={i} className='btn btn-sm btn-outline-primary attribute'>
-                                            <ContextMenuTrigger id={`attribute-${i}`}>
-                                                <i className={`${config.theme.fa} fa-tag`} />
-                                                {item.name}
+                                        <React.Fragment key={i}>
+                                            <ContextMenuTrigger id={`attribute-${i}`} renderTag='span'>
+                                                <div className='btn btn-sm btn-outline-primary attribute'>
+                                                    <i className={`${config.theme.fa} fa-tag`} />
+                                                    {item.name}
+                                                </div>
                                             </ContextMenuTrigger>
 
                                             <ContextMenu id={`attribute-${i}`}>
@@ -695,7 +699,7 @@ class VideoPage extends Component {
                                                     <i className={`${config.theme.fa} fa-trash-alt`} /> Remove
                                                 </MenuItem>
                                             </ContextMenu>
-                                        </div>
+                                        </React.Fragment>
                                     ))}
                             </div>
 
