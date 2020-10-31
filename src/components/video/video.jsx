@@ -125,6 +125,18 @@ class VideoPage extends Component {
             age: '',
             title: '',
         },
+
+        fileCheck: false,
+    }
+
+    fileCheck(url) {
+        Axios.head(url)
+            .then(() => {
+                this.setState({ fileCheck: true })
+            })
+            .catch(() => {
+                this.setState({ fileCheck: false })
+            })
     }
 
     handleBadge(variation = null) {
@@ -736,7 +748,7 @@ class VideoPage extends Component {
                                         ratio: '21:9',
                                         keyboard: { focused: false },
                                         previewThumbnails: {
-                                            enabled: true, // TODO Check if this should be enabled...perhaps from config.source, or config.api later
+                                            enabled: this.state.fileCheck,
                                             src: `${config.source}/vtt/${this.state.video.id}.vtt`,
                                         },
                                     }}
@@ -1013,8 +1025,13 @@ class VideoPage extends Component {
     }
 
     componentDidMount() {
+        // Initialize Bookmarks
         this.bookmarks = []
 
+        // Check if thumbnails are created
+        this.fileCheck(`${config.source}/vtt/${this.props.match.params.id}.vtt`)
+
+        // Load data
         this.getData()
     }
 
