@@ -181,7 +181,7 @@ class VideoPage extends Component {
     handleTitle_rename() {
         const title = this.state.input.title
 
-        Axios.get(`${config.api}/settitle.php?videoID=${this.state.video.id}&title=${title}`).then(({ data }) => {
+        Axios.get(`${config.api}/settitle.php?videoID=${this.state.video.id}&title=${encodeURIComponent(title)}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
                     const { video } = prevState
@@ -249,11 +249,13 @@ class VideoPage extends Component {
     handleVideo_rename() {
         const { video, input } = this.state
 
-        Axios.get(`${config.source}/ajax/rename_file.php?videoID=${video.id}&videoPath=${input.video}`).then(({ data }) => {
+        Axios.get(`${config.source}/ajax/rename_file.php?videoID=${video.id}&videoPath=${encodeURIComponent(input.video)}`).then(
+            ({ data }) => {
             if (data.success) {
                 window.location.reload()
             }
-        })
+            }
+        )
 
         this.handleInput_reset('video')
     }
