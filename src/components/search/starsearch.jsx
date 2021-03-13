@@ -362,24 +362,22 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 	</>
 )
 
-const FilterDropdown = ({ data, label, labelPlural, callback }) => {
-	return (
-		<>
-			<h2>{capitalize(label, true)}</h2>
+const FilterDropdown = ({ data, label, labelPlural, callback }) => (
+	<>
+		<h2>{capitalize(label, true)}</h2>
 
-			<div id={label}>
-				<div className='input-wrapper'>
-					<select className='form-select' name={labelPlural} onChange={callback}>
-						<option defaultValue>All</option>
+		<div id={label}>
+			<div className='input-wrapper'>
+				<select className='form-select' name={labelPlural} onChange={callback}>
+					<option defaultValue>All</option>
 
-						{data.map(item => (
-							<option key={item.name}>{item.name}</option>
-						))}
-					</select>
-				</div>
+					{data.map(item => (
+						<option key={item.name}>{item.name}</option>
+					))}
+				</select>
 			</div>
-		</>
-	)
-}
+		</div>
+	</>
+)
 
 export default StarSearchPage

@@ -361,14 +361,7 @@ const Filter = ({ videoData, videos, update }) => {
 
 	return (
 		<>
-			<FilterObj
-				type='dropdown'
-				data={videoData.website}
-				obj={videos}
-				label='website'
-				labelPlural='websites'
-				callback={website}
-			/>
+			<FilterDropdown data={videoData.website} label='website' labelPlural='websites' callback={website} />
 
 			<FilterObj
 				data={videoData.categories}
@@ -416,8 +409,7 @@ const FilterObj = ({
 	callback,
 	nullCallback = null,
 	otherCallback = null,
-	otherCallbackLabel = '',
-	type = 'checkbox'
+	otherCallbackLabel = ''
 }) => {
 	const indeterminate = new Indeterminate()
 
@@ -425,72 +417,76 @@ const FilterObj = ({
 		<>
 			<h2>{capitalize(label, true)}</h2>
 
-			{type === 'checkbox' ? (
-				<div id={label}>
-					{nullCallback !== null ? (
-						<div className='input-wrapper'>
-							<input
-								type='checkbox'
-								name={label}
-								id={`${label}_NULL`}
-								onChange={e => {
-									indeterminate.handleIndeterminate(e)
-									nullCallback(e)
-								}}
-							/>
-							<label className='global-category' htmlFor={`${label}_NULL`}>
-								NULL
-							</label>
-						</div>
-					) : null}
+			<div id={label}>
+				{nullCallback !== null ? (
+					<div className='input-wrapper'>
+						<input
+							type='checkbox'
+							name={label}
+							id={`${label}_NULL`}
+							onChange={e => {
+								indeterminate.handleIndeterminate(e)
+								nullCallback(e)
+							}}
+						/>
+						<label className='global-category' htmlFor={`${label}_NULL`}>
+							NULL
+						</label>
+					</div>
+				) : null}
 
-					{otherCallback !== null ? (
-						<div className='input-wrapper'>
-							<input
-								type='checkbox'
-								name={label}
-								id={`${label}_OTHER`}
-								onChange={e => {
-									indeterminate.handleIndeterminate(e)
-									nullCallback(e)
-								}}
-							/>
-							<label className='global-category' htmlFor={`${label}_OTHER`}>
-								{otherCallbackLabel.toUpperCase()}
-							</label>
-						</div>
-					) : null}
+				{otherCallback !== null ? (
+					<div className='input-wrapper'>
+						<input
+							type='checkbox'
+							name={label}
+							id={`${label}_OTHER`}
+							onChange={e => {
+								indeterminate.handleIndeterminate(e)
+								nullCallback(e)
+							}}
+						/>
+						<label className='global-category' htmlFor={`${label}_OTHER`}>
+							{otherCallbackLabel.toUpperCase()}
+						</label>
+					</div>
+				) : null}
 
-					{data.map(item => (
-						<div className='input-wrapper' key={item.id}>
-							<input
-								type='checkbox'
-								name={label}
-								id={`${label}-${item.name}`}
-								onChange={e => {
-									indeterminate.handleIndeterminate(e)
-									callback(e, item)
-								}}
-							/>
-							<label htmlFor={`${label}-${item.name}`}>
-								{item.name} <LabelCount prop={labelPlural} label={item.name} obj={obj} />
-							</label>
-						</div>
-					))}
-				</div>
-			) : type === 'dropdown' ? (
-				<div className='input-wrapper'>
-					<select className='form-select' name={labelPlural} onChange={callback}>
-						<option selected>All</option>
-
-						{data.map(item => (
-							<option key={item.id}>{item.name}</option>
-						))}
-					</select>
-				</div>
-			) : null}
+				{data.map(item => (
+					<div className='input-wrapper' key={item.id}>
+						<input
+							type='checkbox'
+							name={label}
+							id={`${label}-${item.name}`}
+							onChange={e => {
+								indeterminate.handleIndeterminate(e)
+								callback(e, item)
+							}}
+						/>
+						<label htmlFor={`${label}-${item.name}`}>
+							{item.name} <LabelCount prop={labelPlural} label={item.name} obj={obj} />
+						</label>
+					</div>
+				))}
+			</div>
 		</>
 	)
 }
+
+const FilterDropdown = ({ data, label, labelPlural, callback }) => (
+	<>
+		<h2>{capitalize(label, true)}</h2>
+
+		<div className='input-wrapper'>
+			<select className='form-select' name={labelPlural} onChange={callback}>
+				<option selected>All</option>
+
+				{data.map(item => (
+					<option key={item.id}>{item.name}</option>
+				))}
+			</select>
+		</div>
+	</>
+)
 
 export default VideoSearchPage
