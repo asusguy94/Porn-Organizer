@@ -1,6 +1,19 @@
-# Warning
+# PornJS
 
-This is early alpha version of the next version, only use this if you're interested to see how far the project is coming!
+## Frontend Requirements
+
+1. NodeJS
+2. Modern Web Browser
+3. Browser resolution set to 1920x1080 (not a hard requirement, but some stuff might be visually bugged otherwise)
+
+## Backend Requirements (API & SERVER)
+
+1. NodeJS
+2. Database (preferable mariaDB) with known _port_, _username_, _password_, _Database Name_
+3. FFMPEG and FFPROBE (one of the following) ([more info](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg#prerequisites))
+    1. Installed to the server-computer and added to path
+    2. Installed to the server-computer and added to ENV
+    3. Installed to the server-computer in the root folder of the SERVER-project
 
 ## Installation
 
@@ -14,26 +27,20 @@ This is early alpha version of the next version, only use this if you're interes
 
 2. Install NPM and then Yarn
 3. Make sure the backend scripts are running, _scroll down for more info_
-4. Run `yarn start` within the project
-5. Open [http://localhost:3000](http://localhost:3000) on the browser, to open the app
 
-## Backend scripts
+## Backend START
 
-> Backend scripts can be found in the **_releases_** section. The backend script version needs to match the version of the app
+1. Navigate to the backend-scripts folder (where _app.js_ is located)
+2. Run `npm i` to install the packages
+3. Run `node app.js` to start the backend-scripts
 
-1. Run the backend scripts on a separate web-path. Using WAMP / LAMP / XAMP should work fine.
-2. Make sure the previous branch (@v2) of this app is running in the background
+## Frontend START
 
-3. The backend scripts uses uses the same database structure as the current version, and should work without issues.
+1. Navigate to the scripts folder (where _app.js_ is located)
+2. Run `yarn` to install the packages
+3. Run `yarn build` to build the scripts
+4. Run `yarn server` to start the app
 
 ## Features
 
 Status of functionality can be found at [features.md](FEATURES.md)
-
-## Special Requirements
-
--   video-thumbnails(WebVTT) to be generated, which can be done with the previous version.
-
-## Known Bugs
-
-This app has a requirement of cors-requests, but sometimes they just don't work as intended. You can install a browser extension to fix it. I usually use **`Allow CORS`** extension on Google Chrome
