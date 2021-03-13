@@ -1,66 +1,67 @@
 .ribbon-container {
-    position: relative;
-    overflow: hidden;
+	position: relative;
+	overflow: hidden;
 
-    .ribbon {
-        background: red;
-        color: white;
-        padding: 7px 0;
-        position: absolute;
-        top: 0;
-        right: 0;
-        transform: translateX(30%) translateY(0%) rotate(45deg);
-        transform-origin: top left;
+	.ribbon {
+		background: red;
+		color: white;
+		padding: 7px 0;
+		position: absolute;
+		top: 0;
+		right: 0;
+		transform: translateX(30%) translateY(0%) rotate(45deg);
+		transform-origin: top left;
 
-        font-weight: bold;
-        font-size: 0.9em;
-        min-width: 20px;
-        text-align: center;
+		font-weight: bold;
+		font-size: 0.9em;
+		min-width: 20px;
+		text-align: center;
 
-        &:before,
-        &:after {
-            content: '';
-            position: absolute;
-            top: 0;
-            margin: 0 -1px; // tweak
-            width: 300%;
-            height: 100%;
-            background: red;
-        }
+		&:before,
+		&:after {
+			content: '';
+			position: absolute;
+			top: 0;
+			margin: 0 -1px; // tweak
+			width: 300%;
+			height: 100%;
+			background: red;
+		}
 
-        &:before {
-            right: 100%;
-        }
+		&:before {
+			right: 100%;
+		}
 
-        &:after {
-            left: 100%;
-        }
+		&:after {
+			left: 100%;
+		}
 
-        &.ribbon-left {
-            top: -2px;
-            left: -10px;
-            right: auto;
-            transform: rotate(-45deg);
-            transform-origin: top right;
-        }
+		&.ribbon-left {
+			top: -2px;
+			left: -10px;
+			right: auto;
+			transform: rotate(-45deg);
+			transform-origin: top right;
+		}
 
-        &.ribbon-purple {
-            $color: purple;
-            background-color: $color !important;
+		&.ribbon-purple {
+			$color: purple;
+			background-color: $color !important;
 
-            &:before,
-            &:after {
-                background-color: $color !important;
-            }
-        }
+			&:before,
+			&:after {
+				background-color: $color !important;
+			}
+		}
 
-        .ribbon-green {
-            background-color: green !important;
+		.ribbon-green {
+			$color: green;
+			background-color: $color !important;
 
-            &:before,
-            &:after {
-                background-color: green !important;
-            }
-        }
-    }
+			&:before,
+			&:after {
+				background-color: $color !important;
+			}
+		}
+	}
 }

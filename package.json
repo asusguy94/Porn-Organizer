@@ -1,41 +1,53 @@
 {
-    "name": "pornjs",
-    "version": "0.2.3",
-    "license": "MIT",
-    "dependencies": {
-        "axios": "^0.20.0",
-        "hls.js": "^0.14.15",
-        "node-sass": "^4.14.1",
-        "plyr-react": "2.2.0",
-        "react": "^16.14.0",
-        "react-contextmenu": "^2.14.0",
-        "react-dom": "^16.14.0",
-        "react-helmet-async": "^1.0.7",
-        "react-keyboard-event-handler": "^1.5.4",
-        "react-lazyload": "^3.0.0",
-        "react-router-dom": "^5.2.0",
-        "react-scripts": "3.4.3",
-        "react-scroll-to-top": "^1.0.5",
-        "react-transition-group": "^4.4.1"
-    },
-    "scripts": {
-        "start": "npx cross-env PORT=3001 react-scripts start",
-        "build": "react-scripts build",
-        "server": "npx serve -l 5001 -s build"
-    },
-    "eslintConfig": {
-        "extends": "react-app"
-    },
-    "browserslist": {
-        "production": [
-            ">0.2%",
-            "not dead",
-            "not op_mini all"
-        ],
-        "development": [
-            "last 1 chrome version",
-            "last 1 firefox version",
-            "last 1 safari version"
-        ]
-    }
+	"name": "pornjs",
+	"version": "1.0.0",
+	"license": "MIT",
+	"dependencies": {
+		"@testing-library/jest-dom": "^5.11.9",
+		"@testing-library/react": "^11.2.5",
+		"@testing-library/user-event": "^12.8.3",
+		"axios": "^0.21.1",
+		"capitalize": "^2.0.3",
+		"dayjs": "^1.10.4",
+		"hls.js": "^0.14.17",
+		"node-sass": "^4.14.1",
+		"plyr-react": "2.2.1-0",
+		"react": "^17.0.1",
+		"react-contextmenu": "^2.14.0",
+		"react-dom": "^17.0.1",
+		"react-keyboard-event-handler": "^1.5.4",
+		"react-lazyload": "^3.2.0",
+		"react-router-dom": "^5.2.0",
+		"react-scripts": "4.0.3",
+		"react-scroll-to-top": "^1.0.5",
+		"react-transition-group": "^4.4.1",
+		"web-vitals": "^1.0.1"
+	},
+	"scripts": {
+		"start": "npx cross-env browser=NONE PORT=3001 react-scripts start",
+		"start:browser": "npx cross-env PORT=3001 react-scripts start",
+		"build": "react-scripts build",
+		"server": "serve -l 5001 -s build"
+	},
+	"eslintConfig": {
+		"extends": [
+			"react-app",
+			"react-app/jest"
+		],
+		"rules": {
+			"react-hooks/exhaustive-deps": "off"
+		}
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	}
 }

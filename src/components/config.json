@@ -1,27 +1,27 @@
 {
-    "api": "http://api.porn.ds1517",
-    "source": "https://porn.ds1517",
-    "db": "https://ds1517",
-    "timeline": {
-        "offset": 0.89,
-        "spacing": 2
-    },
-    "hls": {
-        "enabled": true,
-        "levels": { "2160": 5, "1440": 4, "1080": 3, "720": 2, "480": 1, "360": 0 },
-        "maxLevel": 2160,
-        "maxStartLevel": 360
-    },
-    "theme": {
-        "fa": "far"
-    },
-    "overlay": {
-        "success": "checkbox.png"
-    },
-    "modal": {
-        "filter": {
-            "search": true,
-            "startsWithOnTop": true
-        }
-    }
+	"api": "http://192.168.1.200:8090/api",
+	"source": "http://192.168.1.200:8090",
+	"db": "http://192.168.1.100:8080",
+	"timeline": {
+		"offset": 0.89,
+		"spacing": 2
+	},
+	"hls": {
+		"enabled": true,
+		"levels": { "2160": 5, "1440": 4, "1080": 3, "720": 2, "480": 1, "360": 0 },
+		"maxLevel": 720,
+		"maxStartLevel": 360
+	},
+	"theme": {
+		"fa": "far"
+	},
+	"overlay": {
+		"success": "checkbox.png"
+	},
+	"modal": {
+		"filter": {
+			"search": true,
+			"startsWithOnTop": true
+		}
+	}
 }

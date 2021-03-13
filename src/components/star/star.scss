@@ -1,82 +1,89 @@
 @import '../styles/functions';
 #star-page {
-    aside {
-        #similar {
-            text-align: center;
+	aside {
+		#similar {
+			text-align: center;
 
-            a.similar-star {
-                display: inline-block;
-                width: 200px;
+			a.similar-star {
+				display: inline-block;
+				width: 200px;
 
-                margin: 10px;
-                text-decoration: none;
-                color: inherit;
+				margin: 10px;
+				text-decoration: none;
+				color: inherit;
 
-                &:hover {
-                    text-decoration: underline;
-                }
+				&:hover {
+					text-decoration: underline;
+				}
 
-                img {
-                    width: inherit;
-                }
-            }
-        }
-    }
+				img {
+					width: inherit;
+				}
+			}
+		}
+	}
 
-    #star {
-        #dropbox {
-            width: 200px;
-            height: 275px;
-            border: 2px dashed rgba(255, 0, 0, 0.3);
+	#star {
+		#dropbox {
+			width: 200px;
+			height: 275px;
+			border: 2px dashed rgba(255, 0, 0, 0.3);
 
-            &.hover {
-                border-color: rgba(255, 0, 0, 1);
-            }
+			&.hover {
+				border-color: rgba(255, 0, 0, 1);
+			}
 
-            .label {
-                position: relative;
-                text-align: center;
-                top: 50%;
-            }
-        }
+			.label {
+				position: relative;
+				text-align: center;
+				top: 50%;
+			}
+		}
 
-        h2.ignored {
-            color: red;
-        }
+		.star {
+			&__image {
+				max-height: $starHeight + px;
+				width: $starWidth + px;
+			}
+		}
 
-        .action {
-            .btn {
-                margin-right: 10px;
+		h2.ignored {
+			color: red;
+		}
 
-                margin-bottom: 10px;
-            }
-        }
+		.action {
+			.btn {
+				margin-right: 10px;
 
-        label {
-            margin-right: 9px;
+				margin-bottom: 10px;
+			}
+		}
 
-            &.bold {
-                font-weight: 600;
-                margin-right: 7px;
-            }
-        }
+		label {
+			margin-right: 9px;
 
-        input {
-            text-transform: capitalize;
-        }
+			&.bold {
+				font-weight: 600;
+				margin-right: 7px;
+			}
+		}
 
-        .flag {
-            margin-left: 5px;
-            margin-bottom: -5px;
-        }
-    }
+		input {
+			text-transform: capitalize;
+		}
 
-    .video {
-        margin: 0 10px 10px 5px;
-        width: $thumbnailWidth + px;
+		.flag {
+			margin-left: 5px;
+			margin-bottom: -5px;
+		}
+	}
 
-        span {
-            text-align: center;
-        }
-    }
+	.video {
+		margin: 0 10px 10px 5px;
+		width: $thumbnailWidth + px;
+
+		span {
+			text-align: center;
+		}
+	}
 }

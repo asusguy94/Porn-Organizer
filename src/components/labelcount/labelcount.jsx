@@ -1,41 +1,25 @@
-import React, { Component } from 'react'
+import { isHidden } from '../search/helper'
 
-class LabelCount extends Component {
-    constructor(props) {
-        super(props)
+const LabelCount = ({ obj, isArr = false, label, prop }) => {
+	const getPropCount = (prop, label, visibleOnly = false) => {
+		const arr = obj.filter(item => item[prop].includes(label) && !(isHidden(item) && visibleOnly))
 
-        this.isArr = props.isArr || false
-        this.isHidden = props.isHidden
+		return arr.length
+	}
 
-        this.label = props.label
-        this.prop = props.prop
-    }
+	const getArrCount = (prop, label, visibleOnly = false) => {
+		const arr = obj.filter(item => item[prop].includes(label) && !(isHidden(item) && visibleOnly))
 
-    getPropCount(prop, label, visibleOnly = false) {
-        const arr = this.props.obj.filter((item) => {
-            return item[prop].includes(label) && !(this.isHidden(item) && visibleOnly)
-        })
+		return arr.length
+	}
 
-        return arr.length
-    }
-
-    getArrCount(prop, label, visibleOnly = false) {
-        const arr = this.props.obj.filter((item) => {
-            return item[prop].includes(label) && !(this.isHidden(item) && visibleOnly)
-        })
-
-        return arr.length
-    }
-
-    render() {
-        return (
-            <React.Fragment>
-                ({this.isArr ? this.getArrCount(this.prop, this.label, true) : this.getPropCount(this.prop, this.label, true)}
-                <span className='divider'>|</span>
-                {this.isArr ? this.getArrCount(this.prop, this.label) : this.getPropCount(this.prop, this.label)})
-            </React.Fragment>
-        )
-    }
+	return (
+		<>
+			({isArr ? getArrCount(prop, label, true) : getPropCount(prop, label, true)}
+			<span className='divider'>|</span>
+			{isArr ? getArrCount(prop, label) : getPropCount(prop, label)})
+		</>
+	)
 }
 
 export default LabelCount

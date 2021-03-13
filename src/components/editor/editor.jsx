@@ -1,754 +1,397 @@
-import React, { Component } from 'react'
+import { Component, useState, useEffect } from 'react'
 
 import Axios from 'axios'
+import capitalize from 'capitalize'
 
 import './editor.scss'
 
 import config from '../config.json'
 
-export default class EditorPage extends Component {
-    render() {
-        return (
-            <div id='editor-page' className='col-12 row'>
-                <AttributesPage className='col-3' />
-                <CategoriesPage className='col-3' />
-                <LocationsPage className='col-3' />
-                <CountriesPage className='col-3' />
-            </div>
-        )
-    }
+//TODO pass down to child using cloneElement
+//TODO implement country
+
+const EditorPage = () => (
+	<div id='editor-page' className='col-12 row'>
+		<Wrapper label='attributes' name='attribute'>
+			<WrapperItem label='attribute' />
+		</Wrapper>
+
+		<Wrapper label='categories' name='category'>
+			<WrapperItem label='category' />
+		</Wrapper>
+
+		<Wrapper label='locations' name='location'>
+			<WrapperItem label='location' />
+		</Wrapper>
+
+		<CountriesPage />
+	</div>
+)
+
+const Wrapper = ({ label, name, children }) => {
+	const [input, setInput] = useState('')
+
+	const handleChange = e => setInput(e.target.value)
+
+	const handleSubmit = () => {
+		if (input.length) {
+			if (input.toLowerCase() === input) return false
+
+			Axios.post(`${config.api}/${name}`, { name: input }).then(() => {
+				window.location.reload()
+
+				//TODO use stateObj instead
+			})
+		}
+	}
+
+	const handleKeyPress = e => {
+		if (e.key === 'Enter') {
+			e.preventDefault()
+			handleSubmit()
+		}
+	}
+
+	return (
+		<div className='col-3'>
+			<header className='row'>
+				<h2 className='col-4'>{capitalize(label)}</h2>
+
+				<div className='col-8 mt-1'>
+					<input type='text' className='col-8' onChange={handleChange} onKeyPress={handleKeyPress} />
+					<div className='btn btn-sm btn-primary ms-1 mb-1' onClick={handleSubmit}>
+						Add {capitalize(name)}
+					</div>
+				</div>
+			</header>
+
+			{children}
+		</div>
+	)
 }
 
-class AttributesPage extends Component {
-    state = {
-        input: '',
-    }
+const WrapperItem = ({ label }) => {
+	const [data, setData] = useState([])
 
-    handleChange(e) {
-        this.setState({ input: e.target.value })
-    }
+	useEffect(() => {
+		Axios.get(`${config.api}/${label}`).then(({ data }) => {
+			data.sort((a, b) => a.id - b.id)
 
-    handleSubmit() {
-        const { input } = this.state
+			setData(data)
+		})
+	}, [])
 
-        if (input.length) {
-            // lower case is not allowed -- make red border and display notice
-            if (input.toLowerCase() === input) return false
+	const updateItem = (ref, value) => {
+		Axios.put(`${config.api}/attribute/${ref.id}`, { value }).then(() => {
+			setData(
+				data.filter(item => {
+					if (ref.id === item.id) item.name = value
 
-            Axios.get(`${config.api}/attributes.php?type=add&name=${input}`).then(() => {
-                window.location.reload()
+					return item
+				})
+			)
+		})
+	}
 
-                // TODO use stateObj instead
-            })
-        }
-    }
+	return (
+		<table className='table table-striped'>
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>{capitalize(label)}</th>
+				</tr>
+			</thead>
 
-    handleKeyPress(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault()
-            this.handleSubmit()
-        }
-    }
-
-    render() {
-        return (
-            <div className={this.props.className}>
-                <header className='row'>
-                    <h2 className='col-4'>Attributes</h2>
-
-                    <div className='col-8 mt-1'>
-                        <input
-                            type='text'
-                            className='col-8 px-1'
-                            ref={(input) => (this.input = input)}
-                            onChange={this.handleChange.bind(this)}
-                            onKeyPress={this.handleKeyPress.bind(this)}
-                        />
-                        <div className='btn btn-sm btn-primary float-right' onClick={this.handleSubmit.bind(this)}>
-                            Add Attribute
-                        </div>
-                    </div>
-                </header>
-
-                <Attributes />
-            </div>
-        )
-    }
+			<tbody>
+				{data.map(item => (
+					<Item key={item.id} data={item} update={(ref, value) => updateItem(ref, value)} />
+				))}
+			</tbody>
+		</table>
+	)
 }
 
-class Attributes extends Component {
-    state = {
-        attributes: [],
-    }
+const Item = ({ update, data }) => {
+	const [edit, setEdit] = useState(false)
+	const [value, setValue] = useState(null)
 
-    componentDidMount() {
-        this.getData()
-    }
+	const save = () => {
+		setEdit(false)
 
-    updateAttribute(ref, value) {
-        Axios.get(`${config.api}/editattribute.php?attributeID=${ref.id}&value=${value}`).then(({ data }) => {
-            if (data.success) {
-                this.setState(
-                    this.state.attributes.filter((attribute) => {
-                        if (ref.id === attribute.id) {
-                            attribute.name = value
-                        }
+		if (value) update(data, value)
+	}
 
-                        return attribute
-                    })
-                )
-            }
-        })
-    }
+	const handleKeyPress = e => {
+		if (e.key === 'Enter') {
+			e.preventDefault()
+			save()
+		}
+	}
 
-    render() {
-        return (
-            <table className='table table-striped'>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Attribute</th>
-                    </tr>
-                </thead>
+	const clickHandler = () => setEdit(true)
+	const changeHandler = e => setValue(e.target.value)
 
-                <tbody>
-                    {this.state.attributes.map((attribute, i) => (
-                        <Attribute key={i} data={attribute} updateAttribute={(ref, value) => this.updateAttribute(ref, value)} />
-                    ))}
-                </tbody>
-            </table>
-        )
-    }
-
-    getData() {
-        Axios.get(`${config.api}/attributes.php`).then(({ data: attributes }) => {
-            attributes.sort((a, b) => a.id - b.id)
-            this.setState({ attributes })
-        })
-    }
-}
-
-class Attribute extends Component {
-    constructor() {
-        super()
-        this.state = { edit: false, value: null }
-    }
-
-    saveAttribute() {
-        this.setState({ edit: false })
-
-        if (this.state.value) {
-            this.props.updateAttribute(this.props.data, this.state.value)
-        }
-    }
-
-    render() {
-        const { id, name } = this.props.data
-
-        return (
-            <tr>
-                <th>{id}</th>
-                <td
-                    className='btn-link'
-                    onClick={() => {
-                        this.setState({ edit: true })
-                    }}
-                >
-                    {this.state.edit ? (
-                        <input
-                            type='text'
-                            defaultValue={name}
-                            ref={(input) => input && input.focus()}
-                            onBlur={this.saveAttribute.bind(this)}
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault()
-                                    this.saveAttribute()
-                                }
-                            }}
-                            onChange={(e) => {
-                                this.setState({ value: e.target.value })
-                            }}
-                        />
-                    ) : (
-                        <span>{name}</span>
-                    )}
-                </td>
-            </tr>
-        )
-    }
-}
-
-class CategoriesPage extends Component {
-    state = {
-        input: '',
-    }
-
-    handleChange(e) {
-        this.setState({ input: e.target.value })
-    }
-
-    handleSubmit() {
-        const { input } = this.state
-
-        if (input.length) {
-            // lower case is not allowed -- make red border and display notice
-            if (input.toLowerCase() === input) return false
-
-            Axios.get(`${config.api}/categories.php?type=add&name=${input}`).then(({ data }) => {
-                if (data.success) {
-                    window.location.reload()
-                }
-
-                // TODO use stateObj instead
-            })
-        }
-    }
-
-    handleKeyPress(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault()
-            this.handleSubmit()
-        }
-    }
-
-    render() {
-        return (
-            <div className={this.props.className}>
-                <header className='row'>
-                    <h2 className='col-4'>Categories</h2>
-
-                    <div className='col-8 mt-1'>
-                        <input
-                            type='text'
-                            className='col-8 px-1'
-                            ref={(input) => (this.input = input)}
-                            onChange={this.handleChange.bind(this)}
-                            onKeyPress={this.handleKeyPress.bind(this)}
-                        />
-                        <div className='btn btn-sm btn-primary float-right' onClick={this.handleSubmit.bind(this)}>
-                            Add Category
-                        </div>
-                    </div>
-                </header>
-
-                <Categories />
-            </div>
-        )
-    }
-}
-
-class Categories extends Component {
-    state = {
-        categories: [],
-    }
-
-    componentDidMount() {
-        this.getData()
-    }
-
-    updateCategory(ref, value) {
-        Axios.get(`${config.api}/editcategory.php?categoryID=${ref.id}&value=${value}`).then(({ data }) => {
-            if (data.success) {
-                this.setState(
-                    this.state.categories.filter((category) => {
-                        if (ref.id === category.id) {
-                            category.name = value
-                        }
-
-                        return category
-                    })
-                )
-            }
-        })
-    }
-
-    render() {
-        return (
-            <table className='table table-striped'>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Category</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {this.state.categories.map((category, i) => (
-                        <Category key={i} data={category} updateCategory={(ref, value) => this.updateCategory(ref, value)} />
-                    ))}
-                </tbody>
-            </table>
-        )
-    }
-
-    getData() {
-        Axios.get(`${config.api}/categories.php`).then(({ data: categories }) => {
-            categories.sort((a, b) => a.id - b.id)
-            this.setState({ categories })
-        })
-    }
-}
-
-class Category extends Component {
-    constructor() {
-        super()
-        this.state = { edit: false, value: null }
-    }
-
-    saveCategory() {
-        this.setState({ edit: false })
-
-        if (this.state.value) {
-            this.props.updateCategory(this.props.data, this.state.value)
-        }
-    }
-
-    render() {
-        const { id, name } = this.props.data
-
-        return (
-            <tr>
-                <th>{id}</th>
-                <td
-                    className='btn-link'
-                    onClick={() => {
-                        this.setState({ edit: true })
-                    }}
-                >
-                    {this.state.edit ? (
-                        <input
-                            type='text'
-                            defaultValue={name}
-                            ref={(input) => input && input.focus()}
-                            onBlur={this.saveCategory.bind(this)}
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault()
-                                    this.saveCategory()
-                                }
-                            }}
-                            onChange={(e) => {
-                                this.setState({ value: e.target.value })
-                            }}
-                        />
-                    ) : (
-                        <span>{name}</span>
-                    )}
-                </td>
-            </tr>
-        )
-    }
-}
-
-class LocationsPage extends Component {
-    state = {
-        input: '',
-    }
-
-    handleChange(e) {
-        this.setState({ input: e.target.value })
-    }
-
-    handleSubmit() {
-        const { input } = this.state
-
-        if (input.length) {
-            // lower case is not allowed -- make red border and display notice
-            if (input.toLowerCase() === input) return false
-
-            Axios.get(`${config.api}/locations.php?type=add&name=${input}`).then(({ data }) => {
-                if (data.success) {
-                    window.location.reload()
-                }
-
-                // TODO use stateObj instead
-            })
-        }
-    }
-
-    handleKeyPress(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault()
-            this.handleSubmit()
-        }
-    }
-
-    render() {
-        return (
-            <div className={this.props.className}>
-                <header className='row'>
-                    <h2 className='col-4'>Locations</h2>
-
-                    <div className='col-8 mt-1'>
-                        <input
-                            type='text'
-                            className='col-8 px-1'
-                            ref={(input) => (this.input = input)}
-                            onChange={this.handleChange.bind(this)}
-                            onKeyPress={this.handleKeyPress.bind(this)}
-                        />
-                        <div className='btn btn-sm btn-primary float-right' onClick={this.handleSubmit.bind(this)}>
-                            Add Location
-                        </div>
-                    </div>
-                </header>
-
-                <Locations />
-            </div>
-        )
-    }
-}
-
-class Locations extends Component {
-    state = {
-        locations: [],
-    }
-
-    componentDidMount() {
-        this.getData()
-    }
-
-    updateLocation(ref, value) {
-        Axios.get(`${config.api}/editlocation.php?locationID=${ref.id}&value=${value}`).then(({ data }) => {
-            if (data.success) {
-                this.setState(
-                    this.state.locations.filter((location) => {
-                        if (ref.id === location.id) {
-                            location.name = value
-                        }
-
-                        return location
-                    })
-                )
-            }
-        })
-    }
-
-    render() {
-        return (
-            <table className='table table-striped'>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Location</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {this.state.locations.map((location, i) => (
-                        <Location key={i} data={location} updateLocation={(ref, value) => this.updateLocation(ref, value)} />
-                    ))}
-                </tbody>
-            </table>
-        )
-    }
-
-    getData() {
-        Axios.get(`${config.api}/locations.php`).then(({ data: locations }) => {
-            locations.sort((a, b) => a.id - b.id)
-            this.setState({ locations })
-        })
-    }
-}
-
-class Location extends Component {
-    constructor() {
-        super()
-        this.state = { edit: false, value: null }
-    }
-
-    saveLocation() {
-        this.setState({ edit: false })
-
-        if (this.state.value) {
-            this.props.updateLocation(this.props.data, this.state.value)
-        }
-    }
-
-    render() {
-        const { id, name } = this.props.data
-
-        return (
-            <tr>
-                <th>{id}</th>
-                <td
-                    className='btn-link'
-                    onClick={() => {
-                        this.setState({ edit: true })
-                    }}
-                >
-                    {this.state.edit ? (
-                        <input
-                            type='text'
-                            defaultValue={name}
-                            ref={(input) => input && input.focus()}
-                            onBlur={this.saveLocation.bind(this)}
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault()
-                                    this.saveLocation()
-                                }
-                            }}
-                            onChange={(e) => {
-                                this.setState({ value: e.target.value })
-                            }}
-                        />
-                    ) : (
-                        <span>{name}</span>
-                    )}
-                </td>
-            </tr>
-        )
-    }
+	return (
+		<tr>
+			<th>{data.id}</th>
+			<td className='btn-link' onClick={clickHandler}>
+				{edit ? (
+					<input
+						type='text'
+						defaultValue={data.name}
+						autoFocus
+						onBlur={save}
+						onKeyPress={handleKeyPress}
+						onChange={changeHandler}
+					/>
+				) : (
+					<span>{data.name}</span>
+				)}
+			</td>
+		</tr>
+	)
 }
 
 class CountriesPage extends Component {
-    state = {
-        input: '',
-    }
+	state = {
+		input: ''
+	}
 
-    handleChange(e) {
-        this.setState({ input: e.target.value })
-    }
+	handleChange(e) {
+		this.setState({ input: e.target.value })
+	}
 
-    handleSubmit() {
-        const { input } = this.state
+	handleSubmit() {
+		const { input } = this.state
 
-        if (input.length) {
-            // lower case is not allowed -- make red border and display notice
-            if (input.toLowerCase() === input) return false
+		if (input.length) {
+			// lower case is not allowed -- make red border and display notice
+			if (input.toLowerCase() === input) return false
 
-            Axios.get(`${config.api}/countries.php?type=add&name=${input}`).then(({ data }) => {
-                if (data.success) {
-                    window.location.reload()
-                }
+			Axios.get(`${config.api}/countries.php?type=add&name=${input}`).then(({ data }) => {
+				window.location.reload()
 
-                // TODO use stateObj instead
-            })
-        }
-    }
+				// TODO use stateObj instead
+			})
+		}
+	}
 
-    handleKeyPress(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault()
-            this.handleSubmit()
-        }
-    }
+	handleKeyPress(e) {
+		if (e.key === 'Enter') {
+			e.preventDefault()
+			this.handleSubmit()
+		}
+	}
 
-    render() {
-        return (
-            <div className={this.props.className}>
-                <header className='row'>
-                    <h2 className='col-4'>Countries</h2>
+	render() {
+		return (
+			<div className='col-3'>
+				<header className='row'>
+					<h2 className='col-4'>Countries</h2>
 
-                    <div className='col-8 mt-1'>
-                        <input
-                            type='text'
-                            className='col-8 px-1'
-                            ref={(input) => (this.input = input)}
-                            onChange={this.handleChange.bind(this)}
-                            onKeyPress={this.handleKeyPress.bind(this)}
-                        />
-                        <div className='btn btn-sm btn-primary float-right' onClick={this.handleSubmit.bind(this)}>
-                            Add Country
-                        </div>
-                    </div>
-                </header>
+					<div className='col-8 mt-1'>
+						<input
+							type='text'
+							className='col-8'
+							ref={input => (this.input = input)}
+							onChange={this.handleChange.bind(this)}
+							onKeyPress={this.handleKeyPress.bind(this)}
+						/>
+						<div className='btn btn-sm btn-primary ms-1 mb-1' onClick={this.handleSubmit.bind(this)}>
+							Add Country
+						</div>
+					</div>
+				</header>
 
-                <Countries />
-            </div>
-        )
-    }
+				<Countries />
+			</div>
+		)
+	}
 }
 
 class Countries extends Component {
-    state = {
-        countries: [],
-    }
+	state = {
+		countries: []
+	}
 
-    componentDidMount() {
-        this.getData()
-    }
+	componentDidMount() {
+		this.getData()
+	}
 
-    updateCountry(ref, value, label) {
-        Axios.get(`${config.api}/editcountry.php?countryID=${ref.id}&label=${label}&value=${value}`).then(({ data }) => {
-            if (data.success) {
-                this.setState(
-                    this.state.countries.filter((country) => {
-                        if (ref.id === country.id) {
-                            country.name = data.name
-                            country.code = data.code
-                        }
+	updateCountry(ref, value, label) {
+		Axios.get(`${config.api}/editcountry.php?countryID=${ref.id}&label=${label}&value=${value}`).then(
+			({ data }) => {
+				this.setState(
+					this.state.countries.filter(country => {
+						if (ref.id === country.id) {
+							country.name = data.name
+							country.code = data.code
+						}
 
-                        return country
-                    })
-                )
-            }
-        })
-    }
+						return country
+					})
+				)
+			}
+		)
+	}
 
-    render() {
-        return (
-            <table className='table table-striped'>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Country</th>
-                        <th>Code</th>
-                        <th>Flag</th>
-                    </tr>
-                </thead>
+	render() {
+		return (
+			<table className='table table-striped'>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Country</th>
+						<th>Code</th>
+						<th>Flag</th>
+					</tr>
+				</thead>
 
-                <tbody>
-                    {this.state.countries.map((country, i) => (
-                        <Country
-                            key={i}
-                            data={country}
-                            updateCountry={(ref, value, label = 'country') => this.updateCountry(ref, value, label)}
-                            updateCode={(ref, value, label = 'code') => this.updateCountry(ref, value, label)}
-                        />
-                    ))}
-                </tbody>
-            </table>
-        )
-    }
+				<tbody>
+					{this.state.countries.map(country => (
+						<Country
+							key={country.id}
+							data={country}
+							updateCountry={(ref, value, label = 'country') => this.updateCountry(ref, value, label)}
+							updateCode={(ref, value, label = 'code') => this.updateCountry(ref, value, label)}
+						/>
+					))}
+				</tbody>
+			</table>
+		)
+	}
 
-    getData() {
-        Axios.get(`${config.api}/countries.php`).then(({ data: countries }) => {
-            countries.sort((a, b) => a.id - b.id)
-            this.setState({ countries })
-        })
-    }
+	getData() {
+		Axios.get(`${config.api}/country`).then(({ data: countries }) => {
+			countries.sort((a, b) => a.id - b.id)
+			this.setState({ countries })
+		})
+	}
 }
 
 class Country extends Component {
-    constructor() {
-        super()
-        this.state = {
-            country: {
-                edit: false,
-                value: null,
-            },
-            code: {
-                edit: false,
-                value: null,
-            },
-        }
-    }
+	constructor() {
+		super()
+		this.state = {
+			country: {
+				edit: false,
+				value: null
+			},
+			code: {
+				edit: false,
+				value: null
+			}
+		}
+	}
 
-    saveCountry() {
-        this.setState((prevState) => {
-            const { country } = prevState
-            country.edit = false
+	saveCountry() {
+		this.setState(({ country }) => {
+			country.edit = false
 
-            return { country }
-        })
+			return { country }
+		})
 
-        if (this.state.country.value) {
-            this.props.updateCountry(this.props.data, this.state.country.value)
-        }
-    }
+		if (this.state.country.value) {
+			this.props.updateCountry(this.props.data, this.state.country.value)
+		}
+	}
 
-    saveCode() {
-        this.setState((prevState) => {
-            const { code } = prevState
-            code.edit = false
+	saveCode() {
+		this.setState(({ code }) => {
+			code.edit = false
 
-            return { code }
-        })
+			return { code }
+		})
 
-        if (this.state.code.value) {
-            this.props.updateCode(this.props.data, this.state.code.value)
-        }
-    }
+		if (this.state.code.value) {
+			this.props.updateCode(this.props.data, this.state.code.value)
+		}
+	}
 
-    render() {
-        const { id, name, code } = this.props.data
+	render() {
+		const { id, name, code } = this.props.data
 
-        return (
-            <tr>
-                <th>{id}</th>
-                <td
-                    className='btn-link'
-                    onClick={() => {
-                        this.setState((prevState) => {
-                            const { country } = prevState
-                            country.edit = true
+		return (
+			<tr>
+				<th>{id}</th>
+				<td
+					className='btn-link'
+					onClick={() => {
+						this.setState(({ country }) => {
+							country.edit = true
 
-                            return { country }
-                        })
-                    }}
-                >
-                    {this.state.country.edit ? (
-                        <input
-                            type='text'
-                            defaultValue={name}
-                            ref={(input) => input && input.focus()}
-                            onBlur={this.saveCountry.bind(this)}
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault()
-                                    this.saveCountry()
-                                }
-                            }}
-                            onChange={(e) => {
-                                let value = e.target.value
-                                this.setState((prevState) => {
-                                    const { country } = prevState
-                                    country.value = value
+							return { country }
+						})
+					}}
+				>
+					{this.state.country.edit ? (
+						<input
+							type='text'
+							defaultValue={name}
+							autoFocus
+							onBlur={this.saveCountry.bind(this)}
+							onKeyPress={e => {
+								if (e.key === 'Enter') {
+									e.preventDefault()
+									this.saveCountry()
+								}
+							}}
+							onChange={e => {
+								let value = e.target.value
+								this.setState(({ country }) => {
+									country.value = value
 
-                                    return { country }
-                                })
-                            }}
-                        />
-                    ) : (
-                        <span>{name}</span>
-                    )}
-                </td>
-                <td
-                    className='btn-link'
-                    onClick={() => {
-                        this.setState((prevState) => {
-                            const { code } = prevState
-                            code.edit = true
+									return { country }
+								})
+							}}
+						/>
+					) : (
+						<span>{name}</span>
+					)}
+				</td>
+				<td
+					className='btn-link'
+					onClick={() => {
+						this.setState(({ code }) => {
+							code.edit = true
 
-                            return { code }
-                        })
-                    }}
-                >
-                    {this.state.code.edit ? (
-                        <input
-                            type='text'
-                            defaultValue={code}
-                            ref={(input) => input && input.focus()}
-                            onBlur={this.saveCode.bind(this)}
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault()
-                                    this.saveCode()
-                                }
-                            }}
-                            onChange={(e) => {
-                                let value = e.target.value
-                                this.setState((prevState) => {
-                                    const { code } = prevState
-                                    code.value = value
+							return { code }
+						})
+					}}
+				>
+					{this.state.code.edit ? (
+						<input
+							type='text'
+							defaultValue={code}
+							autoFocus
+							onBlur={this.saveCode.bind(this)}
+							onKeyPress={e => {
+								if (e.key === 'Enter') {
+									e.preventDefault()
+									this.saveCode()
+								}
+							}}
+							onChange={e => {
+								let value = e.target.value
+								this.setState(({ code }) => {
+									code.value = value
 
-                                    return { code }
-                                })
-                            }}
-                            maxLength={2}
-                        />
-                    ) : (
-                        <span>{code}</span>
-                    )}
-                </td>
+									return { code }
+								})
+							}}
+							maxLength={2}
+						/>
+					) : (
+						<span>{code}</span>
+					)}
+				</td>
 
-                <td>
-                    <i className={`flag flag-${code}`} />
-                </td>
-            </tr>
-        )
-    }
+				<td>
+					<i className={`flag flag-${code}`} />
+				</td>
+			</tr>
+		)
+	}
 }
+
+export default EditorPage

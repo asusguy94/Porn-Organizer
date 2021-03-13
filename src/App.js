@@ -1,15 +1,14 @@
-import React, { Component } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
-
-import { HelmetProvider } from 'react-helmet-async'
 
 /* Custom Components */
 import NavBar from './components/navbar/navbar'
 
 /* Page Components */
 import HomePage from './components/home/home'
-import VideosPage from './components/videos/videos'
+import VideosPage from './components/video/videos'
 import VideoPage from './components/video/video'
+import AddVideoPage from './components/video/add'
+import StarsPage from './components/star/stars'
 import StarPage from './components/star/star'
 import VideoSearchPage from './components/search/videosearch'
 import StarSearchPage from './components/search/starsearch'
@@ -21,53 +20,30 @@ import ErrorPage from './components/404/404'
 import './components/styles/main.scss'
 import './components/styles/flag.scss'
 
-class App extends Component {
-    render() {
-        return (
-            <HelmetProvider>
-            <Router>
-                <NavBar />
+const App = () => (
+	<Router>
+		<NavBar />
 
-                <main className='container-fluid'>
-                    <div className='row'>
-                        <Switch>
-                            <Route path='/videos/search' component={VideoSearchPage} />
+		<main className='container-fluid'>
+			<div className='row'>
+				<Switch>
+					<Route path='/video/add' component={AddVideoPage} />
+					<Route path='/video/search' component={VideoSearchPage} />
+					<Route path='/video/:id' component={VideoPage} />
+					<Route path='/video' component={VideosPage} />
 
-                            <Route path='/videos/add'>
-                                <p>Add Videos Page</p>
-                            </Route>
+					<Route path='/star/search' component={StarSearchPage} />
+					<Route path='/star/:id' component={StarPage} />
+					<Route path='/star' component={StarsPage} />
 
-                            <Route path='/videos' component={VideosPage} />
-                            <Route path='/video/:id' component={VideoPage} />
+					<Route path='/editor' component={EditorPage} />
 
-                            <Route path='/stars/search' component={StarSearchPage} />
-
-                            <Route path='/star/:id' component={StarPage} />
-
-                                <Route path='/editor' component={EditorPage} />
-
-                            <Route path='/generate/thumbnails'>
-                                <h1>Generate Thumbnails Page</h1>
-                            </Route>
-
-                            <Route path='/generate/vtt'>
-                                <h1>VTT Page</h1>
-                            </Route>
-
-                            <Route path='/settings'>
-                                <h1>Settings Page</h1>
-                            </Route>
-
-                                <Route path='/' exact component={HomePage} />
-
-                                <Route path='*' component={ErrorPage} />
-                        </Switch>
-                    </div>
-                </main>
-            </Router>
-            </HelmetProvider>
-        )
-    }
-}
+					<Route path='/' exact component={HomePage} />
+					<Route path='*' component={ErrorPage} />
+				</Switch>
+			</div>
+		</main>
+	</Router>
+)
 
 export default App

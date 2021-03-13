@@ -1,56 +1,60 @@
 @import '../styles/functions';
 
 .video-page {
-    .header {
-        margin-bottom: 15px;
+	.header {
+		margin-bottom: 15px;
 
-        &__title,
-        &__locations,
-        &__attributes {
-            display: inline-block;
-        }
+		&__title,
+		&__locations,
+		&__attributes {
+			display: inline-block;
+		}
 
-        &__site {
-            color: green;
-            font-weight: 600;
-        }
+		&__site {
+			color: green;
+			font-weight: 600;
+		}
 
-        &__next {
-            margin-top: 0.6em;
-        }
+		&__next {
+			margin-top: 0.6em;
+		}
 
-        .btn {
-            margin-left: 15px;
-            color: black;
+		.btn {
+			margin-left: 15px;
+			color: black;
 
-            &:hover {
-                color: white;
-            }
+			&:hover {
+				color: white;
+			}
 
-            i {
-                margin-right: 5px;
-            }
-        }
-    }
+			i {
+				margin-right: 5px;
+			}
+		}
+	}
 
-    #timeline {
-        position: relative;
-        left: 95px;
-        margin-top: 5px;
+	#timeline {
+		position: relative;
+		left: 95px;
+		margin-top: 5px;
 
-        .bookmark {
-            position: absolute;
-            white-space: nowrap;
+		.bookmark {
+			position: absolute;
+			white-space: nowrap;
 
-            @include bookmarkPosition();
-        }
-    }
+			@include bookmarkPosition();
+		}
+	}
 
-    aside {
-        margin-top: 5.25em;
+	aside {
+		margin-top: 5.45em;
 
-        #stars {
-            text-align: center;
-        }
-    }
+		#stars {
+			text-align: center;
+
+			.star {
+				width: 70%;
+			}
+		}
+	}
 }

@@ -2,87 +2,86 @@
 @import 'context-menu';
 @import 'ribbon';
 
-/* Star */
-.star {
-    &__image {
-        max-height: $starHeight + px;
-        width: $starWidth + px;
-    }
-}
-
 .divider {
-    color: grey;
+	color: grey;
 
-    &::before,
-    &::after {
-        content: ' ';
-    }
+	&::before,
+	&::after {
+		content: ' ';
+	}
 }
 
 .info,
 .header__site {
-    .wsite {
-        color: green;
-    }
+	.wsite {
+		color: green;
+	}
 
-    .site {
-        color: red;
-    }
+	.site {
+		color: red;
+	}
 }
 
 .video {
-    text-decoration: none !important;
-    color: black;
+	text-decoration: none !important;
+	color: black;
 
-    &__title {
-        text-align: center;
-    }
+	&__title {
+		text-align: center;
+	}
 }
 
 .btn {
-    cursor: default !important;
+	cursor: default !important;
 }
 
 @for $i from 1 through 6 {
-    h#{$i} {
-        font-family: 'Roboto', sans-serif;
-    }
+	h#{$i} {
+		font-family: 'Roboto', sans-serif;
+	}
 }
 
 [data-badge] {
-    &:after {
-        content: attr(data-badge);
-        position: absolute;
-        @include circle(5px);
-        background: green;
-        color: white;
-        text-align: center;
-        border-radius: 50%;
-        box-shadow: 0 0 1px #333;
+	&:after {
+		content: attr(data-badge);
+		position: absolute;
+		@include circle(5px);
+		background: green;
+		color: white;
+		text-align: center;
+		border-radius: 50%;
+		box-shadow: 0 0 1px #333;
 
-        left: 4px;
-        top: 2px;
-    }
+		left: 4px;
+		top: 2px;
+	}
 
-    // 1-9 Videos
-    &.badge-x:after {
-        @include circle(23px);
-    }
+	// 1-9 Videos
+	&.badge-x:after {
+		@include circle(23px);
+	}
 
-    // 10-99 videos
-    &.badge-xx:after {
-        @include circle(23px, 26px);
-    }
-
-    // TODO 99+ is an unexpected high number, might add this later if needed
+	// 10-99 videos
+	&.badge-xx:after {
+		@include circle(23px, 26px);
+	}
 }
 
 .unselectable,
 label,
 .react-contextmenu-item {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    outline: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	outline: none;
+}
+
+.btn-link,
+a {
+	text-decoration: none;
+}
+
+.card {
+	padding: 0;
 }

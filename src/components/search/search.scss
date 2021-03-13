@@ -1,90 +1,68 @@
 @import '../styles/functions';
 
 .search-page {
-    h2 {
-        margin-bottom: 0;
-    }
+	h2 {
+		margin-bottom: 0;
+	}
 
-    .star,
-    .video {
-        margin: 5px;
+	.star,
+	.video {
+		margin: 5px;
 
-        &.video {
-            width: $thumbnailWidth + px;
+		&.video {
+			width: $thumbnailWidth + px;
 
-            img {
-                height: $thumbnailHeight + px;
-            }
-        }
+			img {
+				height: $thumbnailHeight + px;
+			}
+		}
 
-        &.star {
-            width: $starWidth + px;
+		&.star {
+			width: $starWidth + px;
 
-            img {
-                height: $starHeight + px;
-            }
-        }
-    }
+			img {
+				height: $starHeight + px;
+			}
+		}
+	}
 
-    .input-wrapper {
-        margin-bottom: 4%;
+	.input-wrapper {
+		margin-bottom: 4%;
 
-        & > input[type='text'] {
-            width: 100%;
-            padding: 10px;
-        }
+		& > input[type='text'] {
+			width: 100%;
+			padding: 10px;
+		}
 
-        & > input[type='checkbox'],
-        & > input[type='radio'] {
-            transform: scale(1.5);
-        }
+		& > input[type='checkbox'],
+		& > input[type='radio'] {
+			transform: scale(1.5);
+		}
 
-        & > label {
-            margin-left: 5px;
-        }
+		& > label {
+			margin-left: 5px;
+		}
 
-        &.disabled {
-            pointer-events: none;
-            opacity: 0.4;
-        }
-    }
+		&.disabled {
+			pointer-events: none;
+			opacity: 0.4;
+		}
+	}
 
-    #loader {
-        border: 16px solid #f3f3f3;
-        border-top-color: $spinnerBlue;
-        border-bottom-color: $spinnerBlue;
-        border-radius: 50%;
-        width: 120px;
-        height: 120px;
-        animation: spin 2s linear infinite;
+	.flag {
+		margin-right: 5px;
+	}
 
-        margin: 0 auto;
-    }
+	.count {
+		color: blue;
+	}
 
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
+	// Global Category
+	.global-category {
+		text-decoration: underline;
+	}
 
-        100% {
-            transform: rotate(360deg);
-        }
-    }
-
-    .flag {
-        margin-right: 5px;
-    }
-
-    .count {
-        color: blue;
-    }
-
-    // Global Category
-    .global-category {
-        text-decoration: underline;
-    }
-
-    option.global-category {
-        font-weight: bolder;
-    }
+	option.global-category {
+		font-weight: bolder;
+	}
 }

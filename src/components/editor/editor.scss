@@ -1,35 +1,36 @@
 #editor-page {
-    table {
-        $theadColor: darkgrey;
+	table {
+		$theadColor: darkgrey;
 
-        thead {
-            background-color: $theadColor;
+		thead {
+			background-color: $theadColor;
 
-            th {
-                position: sticky;
-                top: 0;
-                z-index: 1;
-                background-color: $theadColor;
-            }
-        }
+			th {
+				position: sticky;
+				top: 0;
+				z-index: 1;
+				background-color: $theadColor;
+				border-bottom: none;
+			}
+		}
 
-        th {
-            cursor: default;
-        }
+		th {
+			cursor: default;
+		}
 
-        td {
-            position: relative;
-            height: 0;
+		td {
+			position: relative;
+			height: 0;
 
-            input[type='text'] {
-                position: absolute;
-                display: block;
-                top: 0;
-                left: 0;
-                border: none;
-                padding: 10px;
-                box-sizing: border-box;
-            }
-        }
-    }
+			input[type='text'] {
+				position: absolute;
+				display: block;
+				top: 0;
+				left: 0;
+				border: none;
+				padding: 10px;
+				box-sizing: border-box;
+			}
+		}
+	}
 }

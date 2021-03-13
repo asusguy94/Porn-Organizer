@@ -1,72 +1,41 @@
-import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 
 import './navbar.scss'
 
-import config from '../config'
+import config from '../config.json'
 
-class NavBar extends Component {
-    render() {
-        return (
-            <nav>
-                <ul className='main-menu'>
-                    <li>
-                        <Link to='/'>Home</Link>
-                    </li>
+const NavBar = () => (
+	<nav>
+		<ul className='main-menu'>
+			<NavBarItem name='Home' path='/' />
 
-                    <li>
-                        <Link to='/videos/search'>Video Search</Link>
-                        <ul className='sub-menu'>
-                            <li>
-                                <Link to='/videos'>Videos</Link>
-                            </li>
-                        </ul>
-                    </li>
+			<NavBarItem name='Video Search' path='/video/search'>
+				<NavBarItem name='Videos' path='/video' />
+			</NavBarItem>
 
-                    <li>
-                        <Link to='/stars/search'>Star Search</Link>
-                        <ul className='sub-menu'>
-                            <li>
-                                <a href={`${config.source}/stars.php`} target='_blank' rel='noopener noreferrer'>
-                                    Stars
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+			<NavBarItem name='Star Search' path='/star/search'>
+				<NavBarItem name='Stars' path='/star' />
+			</NavBarItem>
 
-                    <li>
-                        <Link to='/settings' className='d-none'>
-                            Settings
-                        </Link>
-                    </li>
+			<NavBarItem name='DB Editor' path='/editor' />
 
-                    <li>
-                        <Link to='/editor'>DB Editor</Link>
-                    </li>
+			<NavBarItem name='DB' path={config.db} remote={true} />
+			<NavBarItem name='Import Videos' path='/video/add' />
+		</ul>
+	</nav>
+)
 
-                    <li>
-                        <a href={`${config.db}/phpMyAdmin`} target='_blank' rel='noopener noreferrer'>
-                            DB
-                        </a>
-                    </li>
+const NavBarItem = ({ name, path, children, disabled = false, remote = false }) => {
+	if (!disabled) {
+		return (
+			<li>
+				{!remote ? <Link to={path}>{name}</Link> : <a href={path}>{name}</a>}
+				{children ? <ul className='sub-menu'>{children}</ul> : null}
+			</li>
+		)
+	}
 
-                    <li>
-                        <a href={`${config.source}/video_generatethumbnails.php`} target='_blank' rel='noopener noreferrer'>
-                            Import Videos
-                        </a>
-
-                        <ul className='sub-menu'>
-                            <li>
-                                <a href={`${config.source}/vtt.php`} target='_blank' rel='noopener noreferrer'>
-                                    Build Previews
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </nav>
-        )
-    }
+	return null
 }
 
 export default NavBar

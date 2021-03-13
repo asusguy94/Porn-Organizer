@@ -1,54 +1,54 @@
 @import '../styles/variables';
 
 nav {
-    li {
-        list-style-type: none;
-    }
+	li {
+		list-style-type: none;
+	}
 
-    .main-menu {
-        background-color: green;
-        padding: 0;
+	.main-menu {
+		background-color: green;
+		padding: 0;
 
-        & > li {
-            display: inline-block;
+		& > li {
+			display: inline-block;
 
-            &:nth-last-of-type(-n + #{$navElementsRight}) {
-                float: right;
-            }
-        }
+			&:nth-last-of-type(-n + #{$navElementsRight}) {
+				float: right;
+			}
+		}
 
-        .sub-menu {
-            display: none;
-            position: absolute;
-            background-color: green;
-            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-            z-index: 1;
-            padding-left: 0;
+		.sub-menu {
+			display: none;
+			position: absolute;
+			background-color: green;
+			box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+			z-index: 1;
+			padding-left: 0;
 
-            & > li {
-                padding: 0 8px;
-            }
-        }
+			& > li {
+				padding: 0 8px;
+			}
+		}
 
-        li:hover {
-            background-color: forestgreen;
-        }
-    }
+		li:hover {
+			background-color: forestgreen;
+		}
+	}
 
-    .main-menu {
-        &,
-        .sub-menu {
-            & > li > a {
-                display: inline-block;
+	.main-menu {
+		&,
+		.sub-menu {
+			& > li > a {
+				display: inline-block;
 
-                color: white;
-                text-decoration: none;
-                padding: 12px;
-            }
-        }
+				color: white;
+				text-decoration: none;
+				padding: 12px;
+			}
+		}
 
-        li:hover .sub-menu {
-            display: block;
-        }
-    }
+		li:hover .sub-menu {
+			display: block;
+		}
+	}
 }
