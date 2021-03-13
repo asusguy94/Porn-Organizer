@@ -3,7 +3,7 @@
     "version": "0.2.3",
     "license": "MIT",
     "dependencies": {
-        "axios": "^0.20.0",
+        "axios": "^0.21.1",
         "hls.js": "^0.14.15",
         "node-sass": "^4.14.1",
         "plyr-react": "2.2.0",
