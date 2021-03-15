@@ -78,9 +78,9 @@ const Button = ({ label, callback, disabled = false }) => {
 
 	const clickHandler = () => {
 		if (!isDisabled) {
-			callback()
-
 			setIsDisabled(true)
+
+			callback()
 		}
 	}
 
