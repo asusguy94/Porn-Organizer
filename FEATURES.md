@@ -1,19 +1,38 @@
-## Feature implementation status
+# Feature implementation status
 
-List of planned & completed features
+## Priority Explanation
 
-## :heavy_check_mark: Home Page
+|  Priority  | Explanation                                                   |
+| :--------: | ------------------------------------------------------------- |
+|    HIGH    | Feature will be implemented as soon as possible               |
+|    LOW     | Feature will take some time to implement, or might be removed |
+| FUNCTIONAL | Feature is working, but not optimal                           |
 
-| Name           | Status             |
-| -------------- | ------------------ |
-| Recent Videos  | :heavy_check_mark: |
-| Newest Videos  | :heavy_check_mark: |
-| Random Videos  | :heavy_check_mark: |
-| Popular Videos | :heavy_check_mark: |
+## Issue Explanation
 
-## :x: Add Videos
+| Name            | Description                                                              |
+| --------------- | ------------------------------------------------------------------------ |
+| VideoFileRename | Solution breaks the VideoPlayer, so reloading is still the best solution |
+| StarVideosHover | Throws an error when hovering, still works though                        |
 
-## :x: Video Search
+## :x: Home Page
+
+| Name           | Status             | Priority |
+| -------------- | ------------------ | :------: |
+| Recent Videos  | :heavy_check_mark: |          |
+| Newest Videos  | :heavy_check_mark: |          |
+| Popular Videos | :x: Missing Count  |   LOW    |
+| Random Videos  | :heavy_check_mark: |          |
+
+## :x: Import Videos
+
+| Name                | Status             | Priority |
+| ------------------- | ------------------ | :------: |
+| Import Videos       | :heavy_check_mark: |          |
+| Generate Thumbnails | :heavy_check_mark: |          |
+| Generate WebVTT     | :x:                |   LOW    |
+
+## :warning: Video Search
 
 ### :heavy_check_mark: Main Section
 
@@ -23,197 +42,126 @@ List of planned & completed features
 | Video Ribbon  | :heavy_check_mark: |
 | Video Counter | :heavy_check_mark: |
 
-### :x: Sidebar
+### :warning: Sidebar
 
-| Name                         | Status             |  Priority  |
-| ---------------------------- | ------------------ | :--------: |
-| Include/Exclude _TOGGLE_     | :x:                |    LOW     |
-| Title Search _INPUT_         | :heavy_check_mark: |            |
-| Special Chars _TOGGLE_       | :x:                |    LOW     |
-| Star Search _INPUT_          | :x:                |    HIGH    |
-| Existing _TOGGLE_            | :x:                |    LOW     |
-| Added Today/Anytime _TOGGLE_ | :x:                |    LOW     |
-| Sort                         | :x:                | FUNCTIONAL |
-| Website _DROPDOWN_           | :heavy_check_mark: | FUNCTIONAL |
-| Category _CHECKBOX_          | :heavy_check_mark: |            |
-| Attribute _CHECKBOX_         | :heavy_check_mark: |            |
-| Location _CHECKBOX_          | :heavy_check_mark: |            |
+| Name                 | Status                               | Priority |
+| -------------------- | ------------------------------------ | :------: |
+| Title Search _INPUT_ | :heavy_check_mark:                   |          |
+| Sort                 | :heavy_check_mark:                   |          |
+| Website _DROPDOWN_   | :x: Should filter websites and sites |   LOW    |
+| Category _CHECKBOX_  | :heavy_check_mark:                   |          |
+| Attribute _CHECKBOX_ | :heavy_check_mark:                   |          |
+| Location _CHECKBOX_  | :heavy_check_mark:                   |          |
 
-## :heavy_check_mark: Videos
+## :heavy_check_mark: Star Search
 
-| Name        | Status             |
-| ----------- | ------------------ |
-| Age Counter | :heavy_check_mark: |
-| Video Title | :heavy_check_mark: |
-
-## :x: Star Search
-
-### :x: Main Section
-
-| Name          | Status             | Priority |
-| ------------- | ------------------ | :------: |
-| Star          | :heavy_check_mark: |          |
-| Star Ribbon   | :heavy_check_mark: |          |
-| Video Counter | :x:                |   HIGH   |
-
-### :x: Sidebar
-
-| Name                       | Status             |  Priority  |
-| -------------------------- | ------------------ | :--------: |
-| Include/Exclude _TOGGLE_   | :x:                |    LOW     |
-| Name Search _INPUT_        | :heavy_check_mark: |            |
-| Sort                       | :x:                | FUNCTIONAL |
-| Website _DROPDOWN_         | :x:                |    HIGH    |
-| Exclude Website _DROPDOWN_ | :x:                |    HIGH    |
-| Country _DROPDOWN_         | :x:                |    HIGH    |
-| Breast _RADIO_             | :heavy_check_mark: |            |
-| Haircolor _RADIO_          | :heavy_check_mark: |            |
-| Ethnicity _RADIO_          | :heavy_check_mark: |            |
-
-## :x: Stars
-
-| Name          | Status | Priority |
-| ------------- | ------ | :------: |
-| Star _INPUT_  | :x:    |   HIGH   |
-| Auto _BUTTON_ | :x:    |   HIGH   |
-| Star List     | :x:    |   HIGH   |
-
-## :x: Settings
-
-| Name         | Status | Priority |
-| ------------ | ------ | :------: |
-| HTTP / HTTPS | :x:    |   HIGH   |
-| CDN          | :x:    |   HIGH   |
-| Similar Star | :x:    |   HIGH   |
-| FontAwesome  | :x:    |   HIGH   |
-| WebM         | :x:    |   HIGH   |
-| MKV          | :x:    |   HIGH   |
-| DASH         | :x:    |   HIGH   |
-| HLS          | :x:    |   HIGH   |
-
-### :x: Similar
-
-| Name               | Status | Priority |
-| ------------------ | ------ | :------: |
-| Default Similarity | :x:    |   HIGH   |
-| Max Similarity     | :x:    |   HIGH   |
-
-### :x: Thumbnail
-
-| Name   | Status | Priority |
-| ------ | ------ | :------: |
-| Height | :x:    |   HIGH   |
-| Start  | :x:    |   HIGH   |
-
-### :x: CDN
-
-| Name      | Status | Priority |
-| --------- | ------ | :------: |
-| CDN LIMIT | :x:    |   HIGH   |
-
-### :x: Star
-
-| Name   | Status | Priority |
-| ------ | ------ | :------: |
-| Parser | :x:    |   HIGH   |
-
-## :x: Editor
-
-### :x: Site Editor
-
-### :x: Attribute Editor
-
-### :x: Location Editor
-
-### :x: Country Editor
-
-## :x: Generate Thumbnails
-
-## :x: Generate WebVTT
-
-## :heavy_check_mark: Video Page
-
-### :heavy_check_mark: Header
-
-| Name                              | Status             |
-| --------------------------------- | ------------------ |
-| Rename Title                      | :heavy_check_mark: |
-| Add Attribute, Add Location       | :heavy_check_mark: |
-| Copy Title, Copy Star             | :heavy_check_mark: |
-| Fix Date                          | :heavy_check_mark: |
-| Remove Location, Remove Attribute | :heavy_check_mark: |
-| Next Video Button                 | :heavy_check_mark: |
-
-### :heavy_check_mark: Video
-
-| Name             | Status             |
-| ---------------- | ------------------ |
-| Add Bookmark     | :heavy_check_mark: |
-| Set Age          | :heavy_check_mark: |
-| Rename File      | :heavy_check_mark: |
-| Remove Bookmarks | :heavy_check_mark: |
-| Remove Plays     | :heavy_check_mark: |
-
-### :heavy_check_mark: Star
+### :heavy_check_mark: Main Section
 
 | Name         | Status             |
 | ------------ | ------------------ |
-| Add Bookmark | :heavy_check_mark: |
-| Remove Star  | :heavy_check_mark: |
+| Star         | :heavy_check_mark: |
+| Star Counter | :heavy_check_mark: |
 
-### :heavy_check_mark: Popup
+### :heavy_check_mark: Sidebar
 
-| Name                 | Status             |
-| -------------------- | ------------------ |
-| Content              | :heavy_check_mark: |
-| Styling              | :heavy_check_mark: |
-| Search Functionality | :heavy_check_mark: |
+| Name                | Status             |
+| ------------------- | ------------------ |
+| Name Search _INPUT_ | :heavy_check_mark: |
+| Sort                | :heavy_check_mark: |
+| Breast _RADIO_      | :heavy_check_mark: |
+| Haircolor _RADIO_   | :heavy_check_mark: |
+| Ethnicity _RADIO_   | :heavy_check_mark: |
+| Country _DROPDOWN_  | :heavy_check_mark: |
 
-## :x: Star Page
+## :warning: Video Page
 
-### :heavy_check_mark: Dropbox
+### :heavy_check_mark: Heading
+
+| Name             | Status             |
+| ---------------- | ------------------ |
+| Rename Title     | :heavy_check_mark: |
+| Add Attribute    | :heavy_check_mark: |
+| Add Location     | :heavy_check_mark: |
+| Copy Title       | :heavy_check_mark: |
+| Copy Star        | :heavy_check_mark: |
+| Remove Attribute | :heavy_check_mark: |
+| Remove Location  | :heavy_check_mark: |
+| Fix Date         | :heavy_check_mark: |
+| Next ID          | :heavy_check_mark: |
+
+### :heavy_check_mark: Video
+
+| Name             | Status                                        |  Priority  |
+| ---------------- | --------------------------------------------- | :--------: |
+| Add Bookmark     | :heavy_check_mark:                            |            |
+| Set Age          | :heavy_check_mark:                            |            |
+| Rename File      | :heavy_check_mark: [Info](#issue-explanation) | FUNCTIONAL |
+| Remove Bookmarks | :heavy_check_mark:                            |            |
+| Remove Plays     | :heavy_check_mark:                            |            |
+| Delete Video     | :heavy_check_mark:                            |            |
+
+### :heavy_check_mark: Bookmark
+
+| Name            | Status             |
+| --------------- | ------------------ |
+| Change Category | :heavy_check_mark: |
+| Change Time     | :heavy_check_mark: |
+| Delete Bookmark | :heavy_check_mark: |
+
+### :heavy_check_mark: Star
 
 | Name        | Status             |
 | ----------- | ------------------ |
-| Add Image   | :heavy_check_mark: |
 | Remove Star | :heavy_check_mark: |
+| [Hover]     | :heavy_check_mark: |
+
+### :x: Star-Form
+
+| Name             | Status | Priority |
+| ---------------- | ------ | :------: |
+| Add Star _INPUT_ | :x:    |   LOW    |
+
+## :heavy_check_mark: Star Page
+
+### :heavy_check_mark: Dropbox
+
+| Name         | Status             |
+| ------------ | ------------------ |
+| Drop Area    | :heavy_check_mark: |
+| Delete Star  | :heavy_check_mark: |
+| [ImageHover] | :heavy_check_mark: |
 
 ### :heavy_check_mark: Image
 
 | Name         | Status             |
 | ------------ | ------------------ |
-| Remove Image | :heavy_check_mark: |
+| Delete Image | :heavy_check_mark: |
 
-### :heavy_check_mark: Header
+### :heavy_check_mark: Star Name
 
-| Name            | Status             | Priority |
-| --------------- | ------------------ | :------: |
-| Rename          | :x:                |   HIGH   |
-| Add Alias       | :x:                |   HIGH   |
-| Ignore / Enable | :heavy_check_mark: |          |
-| Copy Star       | :heavy_check_mark: |          |
+| Name   | Status             |
+| ------ | ------------------ |
+| Rename | :heavy_check_mark: |
 
-### :x: Form
+### :heavy_check_mark: Input Fields
 
-| Name               | Status                                             |  Priority  |
-| ------------------ | -------------------------------------------------- | :--------: |
-| GetData            | :x:                                                |    HIGH    |
-| ResetData          | :x:                                                |    HIGH    |
-| Input autocomplete | :heavy_check_mark:                                 | FUNCTIONAL |
-| Country            | :x: _Content and flag not updating without reload_ |    HIGH    |
+| Name               | Status             |
+| ------------------ | ------------------ |
+| Breast _INPUT_     | :heavy_check_mark: |
+| Eye Color _INPUT_  | :heavy_check_mark: |
+| Hair Color _INPUT_ | :heavy_check_mark: |
+| Ethnicity _INPUT_  | :heavy_check_mark: |
+| Country _INPUT_    | :heavy_check_mark: |
+| Birthdate _INPUT_  | :heavy_check_mark: |
+| Height _INPUT_     | :heavy_check_mark: |
+| Weight _INPUT_     | :heavy_check_mark: |
+| Start _INPUT_      | :heavy_check_mark: |
+| End _INPUT_        | :heavy_check_mark: |
 
-### :heavy_check_mark: Videos
+### :heavy_check_mark: Video list
 
-| Name                     | Status             |
-| ------------------------ | ------------------ |
-| Video                    | :heavy_check_mark: |
-| [Hover] Play/Pause Video | :heavy_check_mark: |
-| Ribbon First/Latest      | :heavy_check_mark  |
-| Ribbon AgeInVideo        | :heavy_check_mark: |
-
-### :heavy_check_mark: Similar Stars
-
-| Name              | Status             |
-| ----------------- | ------------------ |
-| Star              | :heavy_check_mark: |
-| Ribbon Similarity | :heavy_check_mark: |
+| Name            | Status                                        |  Priority  |
+| --------------- | --------------------------------------------- | :--------: |
+| Video Thumbnail | :heavy_check_mark:                            |            |
+| Video Title     | :heavy_check_mark:                            |            |
+| [Hover]         | :heavy_check_mark: [Info](#issue-explanation) | FUNCTIONAL |
