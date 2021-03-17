@@ -1,11 +1,8 @@
 {
 	"name": "pornjs",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"license": "MIT",
 	"dependencies": {
-		"@testing-library/jest-dom": "^5.11.9",
-		"@testing-library/react": "^11.2.5",
-		"@testing-library/user-event": "^12.8.3",
 		"axios": "^0.21.1",
 		"capitalize": "^2.0.3",
 		"dayjs": "^1.10.4",
@@ -22,6 +19,11 @@
 		"react-scroll-to-top": "^1.0.5",
 		"react-transition-group": "^4.4.1",
 		"web-vitals": "^1.0.1"
+	},
+	"devDependencies": {
+		"@testing-library/jest-dom": "^5.11.9",
+		"@testing-library/react": "^11.2.5",
+		"@testing-library/user-event": "^13.0.0"
 	},
 	"scripts": {
 		"start": "npx cross-env browser=NONE PORT=3001 react-scripts start",
