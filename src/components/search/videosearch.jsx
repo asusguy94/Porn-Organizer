@@ -218,7 +218,7 @@ const Filter = ({ videoData, videos, update }) => {
 			if (targetLower === 'all') {
 				video.hidden.website = false
 			} else {
-				video.hidden.website = !(video.website.toLowerCase() === targetLower)
+				video.hidden.website = !(video.website?.toLowerCase() === targetLower)
 			}
 
 			return video
