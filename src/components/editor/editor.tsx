@@ -28,10 +28,10 @@ const EditorPage = () => (
 	</div>
 )
 
-const Wrapper = ({ label, name, children }) => {
+const Wrapper = ({ label, name, children }: any) => {
 	const [input, setInput] = useState('')
 
-	const handleChange = e => setInput(e.target.value)
+	const handleChange = (e: any) => setInput(e.target.value)
 
 	const handleSubmit = () => {
 		if (input.length) {
@@ -45,7 +45,7 @@ const Wrapper = ({ label, name, children }) => {
 		}
 	}
 
-	const handleKeyPress = e => {
+	const handleKeyPress = (e: any) => {
 		if (e.key === 'Enter') {
 			e.preventDefault()
 			handleSubmit()
@@ -70,21 +70,21 @@ const Wrapper = ({ label, name, children }) => {
 	)
 }
 
-const WrapperItem = ({ label }) => {
+const WrapperItem = ({ label }: any) => {
 	const [data, setData] = useState([])
 
 	useEffect(() => {
 		Axios.get(`${config.api}/${label}`).then(({ data }) => {
-			data.sort((a, b) => a.id - b.id)
+			data.sort((a: any, b: any) => a.id - b.id)
 
 			setData(data)
 		})
 	}, [])
 
-	const updateItem = (ref, value) => {
+	const updateItem = (ref: any, value: any) => {
 		Axios.put(`${config.api}/attribute/${ref.id}`, { value }).then(() => {
 			setData(
-				data.filter(item => {
+				data.filter((item: any) => {
 					if (ref.id === item.id) item.name = value
 
 					return item
@@ -103,15 +103,15 @@ const WrapperItem = ({ label }) => {
 			</thead>
 
 			<tbody>
-				{data.map(item => (
-					<Item key={item.id} data={item} update={(ref, value) => updateItem(ref, value)} />
+				{data.map((item: any) => (
+					<Item key={item.id} data={item} update={(ref: any, value: any) => updateItem(ref, value)} />
 				))}
 			</tbody>
 		</table>
 	)
 }
 
-const Item = ({ update, data }) => {
+const Item = ({ update, data }: any) => {
 	const [edit, setEdit] = useState(false)
 	const [value, setValue] = useState(null)
 
@@ -121,7 +121,7 @@ const Item = ({ update, data }) => {
 		if (value) update(data, value)
 	}
 
-	const handleKeyPress = e => {
+	const handleKeyPress = (e: any) => {
 		if (e.key === 'Enter') {
 			e.preventDefault()
 			save()
@@ -129,7 +129,7 @@ const Item = ({ update, data }) => {
 	}
 
 	const clickHandler = () => setEdit(true)
-	const changeHandler = e => setValue(e.target.value)
+	const changeHandler = (e: any) => setValue(e.target.value)
 
 	return (
 		<tr>
@@ -157,7 +157,7 @@ class CountriesPage extends Component {
 		input: ''
 	}
 
-	handleChange(e) {
+	handleChange(e: any) {
 		this.setState({ input: e.target.value })
 	}
 
@@ -168,15 +168,13 @@ class CountriesPage extends Component {
 			// lower case is not allowed -- make red border and display notice
 			if (input.toLowerCase() === input) return false
 
-			Axios.get(`${config.api}/countries.php?type=add&name=${input}`).then(({ data }) => {
+			Axios.post(`${config.api}/country`, { name: input }).then(() => {
 				window.location.reload()
-
-				// TODO use stateObj instead
 			})
 		}
 	}
 
-	handleKeyPress(e) {
+	handleKeyPress(e: any) {
 		if (e.key === 'Enter') {
 			e.preventDefault()
 			this.handleSubmit()
@@ -193,7 +191,8 @@ class CountriesPage extends Component {
 						<input
 							type='text'
 							className='col-8'
-							ref={input => (this.input = input)}
+							//@ts-ignore
+							ref={(input: any) => (this.input = input)}
 							onChange={this.handleChange.bind(this)}
 							onKeyPress={this.handleKeyPress.bind(this)}
 						/>
@@ -218,21 +217,19 @@ class Countries extends Component {
 		this.getData()
 	}
 
-	updateCountry(ref, value, label) {
-		Axios.get(`${config.api}/editcountry.php?countryID=${ref.id}&label=${label}&value=${value}`).then(
-			({ data }) => {
-				this.setState(
-					this.state.countries.filter(country => {
-						if (ref.id === country.id) {
-							country.name = data.name
-							country.code = data.code
-						}
+	updateCountry(ref: any, value: any, label: any) {
+		Axios.put(`${config.api}/country/${ref.id}`, { label, value }).then(({ data }) => {
+			this.setState(
+				this.state.countries.filter((country: any) => {
+					if (ref.id === country.id) {
+						country.name = data.name
+						country.code = data.code
+					}
 
-						return country
-					})
-				)
-			}
-		)
+					return country
+				})
+			)
+		})
 	}
 
 	render() {
@@ -248,12 +245,14 @@ class Countries extends Component {
 				</thead>
 
 				<tbody>
-					{this.state.countries.map(country => (
+					{this.state.countries.map((country: any) => (
 						<Country
 							key={country.id}
 							data={country}
-							updateCountry={(ref, value, label = 'country') => this.updateCountry(ref, value, label)}
-							updateCode={(ref, value, label = 'code') => this.updateCountry(ref, value, label)}
+							updateCountry={(ref: any, value: any, label = 'country') =>
+								this.updateCountry(ref, value, label)
+							}
+							updateCode={(ref: any, value: any, label = 'code') => this.updateCountry(ref, value, label)}
 						/>
 					))}
 				</tbody>
@@ -263,29 +262,20 @@ class Countries extends Component {
 
 	getData() {
 		Axios.get(`${config.api}/country`).then(({ data: countries }) => {
-			countries.sort((a, b) => a.id - b.id)
+			countries.sort((a: any, b: any) => a.id - b.id)
 			this.setState({ countries })
 		})
 	}
 }
 
-class Country extends Component {
-	constructor() {
-		super()
-		this.state = {
-			country: {
-				edit: false,
-				value: null
-			},
-			code: {
-				edit: false,
-				value: null
-			}
-		}
+class Country extends Component<any> {
+	state = {
+		country: { edit: false, value: null },
+		code: { edit: false, value: null }
 	}
 
 	saveCountry() {
-		this.setState(({ country }) => {
+		this.setState(({ country }: any) => {
 			country.edit = false
 
 			return { country }
@@ -297,7 +287,7 @@ class Country extends Component {
 	}
 
 	saveCode() {
-		this.setState(({ code }) => {
+		this.setState(({ code }: any) => {
 			code.edit = false
 
 			return { code }
@@ -317,7 +307,7 @@ class Country extends Component {
 				<td
 					className='btn-link'
 					onClick={() => {
-						this.setState(({ country }) => {
+						this.setState(({ country }: any) => {
 							country.edit = true
 
 							return { country }
@@ -330,15 +320,15 @@ class Country extends Component {
 							defaultValue={name}
 							autoFocus
 							onBlur={this.saveCountry.bind(this)}
-							onKeyPress={e => {
+							onKeyPress={(e) => {
 								if (e.key === 'Enter') {
 									e.preventDefault()
 									this.saveCountry()
 								}
 							}}
-							onChange={e => {
+							onChange={(e) => {
 								let value = e.target.value
-								this.setState(({ country }) => {
+								this.setState(({ country }: any) => {
 									country.value = value
 
 									return { country }
@@ -352,7 +342,7 @@ class Country extends Component {
 				<td
 					className='btn-link'
 					onClick={() => {
-						this.setState(({ code }) => {
+						this.setState(({ code }: any) => {
 							code.edit = true
 
 							return { code }
@@ -365,15 +355,15 @@ class Country extends Component {
 							defaultValue={code}
 							autoFocus
 							onBlur={this.saveCode.bind(this)}
-							onKeyPress={e => {
+							onKeyPress={(e) => {
 								if (e.key === 'Enter') {
 									e.preventDefault()
 									this.saveCode()
 								}
 							}}
-							onChange={e => {
+							onChange={(e) => {
 								let value = e.target.value
-								this.setState(({ code }) => {
+								this.setState(({ code }: any) => {
 									code.value = value
 
 									return { code }

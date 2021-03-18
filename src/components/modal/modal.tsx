@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 
+//@ts-ignore
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
 import config from '../config.json'
@@ -9,10 +10,10 @@ import './modal.scss'
 
 //TODO improve children, props.children, pros.filter, children=chilren.filter
 
-const Modal = props => {
+const Modal = (props: any) => {
 	const [query, setQuery] = useState('')
 
-	const handleKeyPress = (key, e) => {
+	const handleKeyPress = (key: any, e: any) => {
 		e.preventDefault()
 
 		switch (key) {
@@ -33,8 +34,8 @@ const Modal = props => {
 	let children = props.children
 	if (props.filter) {
 		children = children
-			.filter(item => item.props.children.toLowerCase().includes(query))
-			.sort((a, b) => {
+			.filter((item: any) => item.props.children.toLowerCase().includes(query))
+			.sort((a: any, b: any) => {
 				let valA = a.props.children.toLowerCase()
 				let valB = b.props.children.toLowerCase()
 
@@ -71,11 +72,12 @@ const Modal = props => {
 				handleKeys={
 					props.filter && config.modal.filter.search ? ['alphabetic', 'space', 'backspace', 'esc'] : ['esc']
 				}
-				onKeyEvent={(key, e) => handleKeyPress(key, e)}
+				onKeyEvent={(key: any, e: any) => handleKeyPress(key, e)}
 				handleFocusableElements={true}
 				isDisabled={!props.visible}
 			/>
 		</>,
+		//@ts-ignore
 		document.getElementById('portal')
 	)
 }

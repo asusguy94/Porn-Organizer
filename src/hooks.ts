@@ -7,6 +7,6 @@ export const useRefWithEffect = () => {
 	return [ref, refValue]
 }
 
-export const setFocus = input => input && input.focus()
+export const setFocus = (input: any) => input && input.focus()
 
 //TODO must be used with Modal-<Input/>

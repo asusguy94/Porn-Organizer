@@ -25,7 +25,14 @@ const NavBar = () => (
 	</nav>
 )
 
-const NavBarItem = ({ name, path, children, disabled = false, remote = false }) => {
+interface NavBarItemProps {
+	name: string
+	path: string
+	children?: any
+	disabled?: boolean
+	remote?: boolean
+}
+const NavBarItem = ({ name, path, children, disabled = false, remote = false }: NavBarItemProps) => {
 	if (!disabled) {
 		return (
 			<li>

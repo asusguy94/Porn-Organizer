@@ -1,4 +1,4 @@
-export const isHidden = ({ hidden }) => {
+export const isHidden = ({ hidden }: any) => {
 	let value = 0
 	for (var prop in hidden) {
 		if (typeof hidden[prop] !== 'object') {
@@ -11,10 +11,10 @@ export const isHidden = ({ hidden }) => {
 	return value
 }
 
-export const getCount = obj => {
+export const getCount = (obj: any) => {
 	let count = obj.length
 
-	obj.forEach(({ hidden }) => {
+	obj.forEach(({ hidden }: any) => {
 		let value = 0
 		for (const prop in hidden) {
 			if (typeof hidden[prop] !== 'object') {

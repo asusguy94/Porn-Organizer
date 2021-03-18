@@ -41,7 +41,7 @@ const AddVideoPage = () => {
 							</thead>
 
 							<tbody>
-								{videos.map(video => {
+								{videos.map((video: any) => {
 									return (
 										<tr key={video.path}>
 											<td>{video.website}</td>
@@ -73,7 +73,7 @@ const AddVideoPage = () => {
 	)
 }
 
-const Button = ({ label, callback, disabled = false }) => {
+const Button = ({ label, callback, disabled = false }: any) => {
 	const [isDisabled, setIsDisabled] = useState(disabled)
 
 	const clickHandler = () => {

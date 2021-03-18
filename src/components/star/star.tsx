@@ -12,8 +12,8 @@ import './star.scss'
 
 import config from '../config.json'
 
-const ModalContext = createContext(null)
-const UpdateContext = createContext({ star: null })
+const ModalContext = createContext((...args: any): void => {})
+const UpdateContext = createContext({ star: (star: any): void => {} })
 
 //TODO state is very complex
 class StarPage extends Component {
@@ -59,7 +59,7 @@ class StarPage extends Component {
 	handleModal(title = null, data = null, filter = false) {
 		if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
 
-		this.setState(({ modal }) => {
+		this.setState(({ modal }: any) => {
 			modal.title = title
 			modal.data = data
 			modal.visible = !modal.visible
@@ -75,11 +75,13 @@ class StarPage extends Component {
 				<section className='col-7'>
 					{this.state.star.id !== 0 ? (
 						<div id='star'>
-							<UpdateContext.Provider value={{ star: star => this.setState({ star }) }}>
+							<UpdateContext.Provider value={{ star: (star: any) => this.setState({ star }) }}>
 								<StarImageDropbox star={this.state.star} />
 
 								<ModalContext.Provider
-									value={(title, data, filter) => this.handleModal(title, data, filter)}
+									value={(title: any, data: any, filter: any) =>
+										this.handleModal(title, data, filter)
+									}
 								>
 									<StarTitle star={this.state.star} />
 								</ModalContext.Provider>
@@ -107,7 +109,8 @@ class StarPage extends Component {
 	}
 
 	componentDidMount() {
-		const { id } = this.props.match.params
+		const props: any = this.props
+		const { id } = props.match.params
 
 		Axios.get(`${config.api}/star/${id}`).then(({ data: star }) => this.setState({ star }))
 		Axios.get(`${config.api}/star/${id}/video`).then(({ data: videos }) => this.setState({ videos }))
@@ -116,15 +119,15 @@ class StarPage extends Component {
 }
 
 // Wrapper
-const StarTitle = ({ star }) => {
+const StarTitle = ({ star }: any) => {
 	const handleModal = useContext(ModalContext)
 	const update = useContext(UpdateContext).star
 
 	const copy = async () => await navigator.clipboard.writeText(star.name)
 	const isIgnored = () => star.ignored === 1
 
-	const renameStar = value => {
-		Axios.get(`${config.api}/renamestar.php?starID=${star.id}&name=${value}`).then(() => {
+	const renameStar = (value: any) => {
+		Axios.put(`${config.api}/star/${star.id}`, { name: value }).then(() => {
 			star.name = value
 
 			update(star)
@@ -140,10 +143,12 @@ const StarTitle = ({ star }) => {
 	}
 
 	return (
-		<>
-			<ContextMenuTrigger id='title'>
-				<h2 className={isIgnored() ? 'ignored' : ''}>{star.name}</h2>
-			</ContextMenuTrigger>
+		<div>
+			<div className='d-inline-block'>
+				<ContextMenuTrigger id='title' renderTag='span'>
+					<h2 className={isIgnored() ? 'ignored' : ''}>{star.name}</h2>
+				</ContextMenuTrigger>
+			</div>
 
 			<ContextMenu id='title'>
 				<MenuItem
@@ -154,7 +159,7 @@ const StarTitle = ({ star }) => {
 								type='text'
 								defaultValue={star.name}
 								ref={setFocus}
-								onKeyDown={e => {
+								onKeyDown={(e: any) => {
 									if (e.key === 'Enter') {
 										e.preventDefault()
 
@@ -184,18 +189,18 @@ const StarTitle = ({ star }) => {
 					<i className={`${config.theme.fa} fa-copy`} /> Copy Star
 				</MenuItem>
 			</ContextMenu>
-		</>
+		</div>
 	)
 }
 
-const Sidebar = ({ similar }) => (
+const Sidebar = ({ similar }: any) => (
 	<aside className='col-5'>
 		<div className='card'>
 			<h2 className='card-header text-center'>Similar Stars</h2>
 
 			<div className='card-body'>
 				<div id='similar'>
-					{similar.map(similarStar => (
+					{similar.map((similarStar: any) => (
 						<a key={similarStar.id} href={similarStar.id} className='similar-star ribbon-container card'>
 							<img
 								src={`${config.source}/images/stars/${similarStar.image}`}
@@ -213,12 +218,12 @@ const Sidebar = ({ similar }) => (
 	</aside>
 )
 
-const StarImageDropbox = ({ star }) => {
+const StarImageDropbox = ({ star }: any) => {
 	const update = useContext(UpdateContext).star
 
 	const [hover, setHover] = useState(false)
 
-	const addLocalImage = image => console.log('Adding local file is not yet supported', image)
+	const addLocalImage = (image: any) => console.log('Adding local file is not yet supported', image)
 
 	const removeStar = () => {
 		Axios.delete(`${config.api}/star/${star.id}`).then(() => {
@@ -233,7 +238,7 @@ const StarImageDropbox = ({ star }) => {
 			update(star)
 		})
 	}
-	const addImage = url => {
+	const addImage = (url: any) => {
 		Axios.post(`${config.source}/star/${star.id}/image`, { url }).then(({ data }) => {
 			star.image = data.image
 
@@ -241,24 +246,24 @@ const StarImageDropbox = ({ star }) => {
 		})
 	}
 
-	const handleDefault = e => {
+	const handleDefault = (e: any) => {
 		e.stopPropagation()
 		e.preventDefault()
 	}
 
-	const handleEnter = e => {
+	const handleEnter = (e: any) => {
 		handleDefault(e)
 
 		setHover(true)
 	}
 
-	const handleLeave = e => {
+	const handleLeave = (e: any) => {
 		handleDefault(e)
 
 		setHover(false)
 	}
 
-	const handleDrop = e => {
+	const handleDrop = (e: any) => {
 		handleDefault(e)
 
 		let image = e.dataTransfer.getData('text')
@@ -276,53 +281,53 @@ const StarImageDropbox = ({ star }) => {
 		setHover(false)
 	}
 
-	const isLocalFile = path => !(path.indexOf('http://') > -1 || path.indexOf('https://') > -1)
+	const isLocalFile = (path: any) => !(path.indexOf('http://') > -1 || path.indexOf('https://') > -1)
 
-	if (star.image !== null) {
-		return (
-			<>
-				<ContextMenuTrigger id='star__image'>
-					<img className='star__image' src={`${config.source}/images/stars/${star.image}`} alt='star' />
-				</ContextMenuTrigger>
+	return (
+		<div className='d-inline-block'>
+			{star.image !== null ? (
+				<>
+					<ContextMenuTrigger id='star__image' renderTag='span'>
+						<img className='star__image' src={`${config.source}/images/stars/${star.image}`} alt='star' />
+					</ContextMenuTrigger>
 
-				<ContextMenu id='star__image'>
-					<MenuItem onClick={removeImage}>
-						<i className={`${config.theme.fa} fa-trash-alt`} /> Delete Image
-					</MenuItem>
-				</ContextMenu>
-			</>
-		)
-	} else {
-		return (
-			<>
-				<ContextMenuTrigger id='star__dropbox'>
-					<div
-						id='dropbox'
-						className={`unselectable ${hover ? 'hover' : ''}`}
-						onDragEnter={handleEnter}
-						onDragOver={handleEnter}
-						onDragLeave={handleLeave}
-						onDrop={handleDrop}
-					>
-						<div className='label'>Drop Image Here</div>
-					</div>
-				</ContextMenuTrigger>
+					<ContextMenu id='star__image'>
+						<MenuItem onClick={removeImage}>
+							<i className={`${config.theme.fa} fa-trash-alt`} /> Delete Image
+						</MenuItem>
+					</ContextMenu>
+				</>
+			) : (
+				<>
+					<ContextMenuTrigger id='star__dropbox'>
+						<div
+							id='dropbox'
+							className={`unselectable ${hover ? 'hover' : ''}`}
+							onDragEnter={handleEnter}
+							onDragOver={handleEnter}
+							onDragLeave={handleLeave}
+							onDrop={handleDrop}
+						>
+							<div className='label'>Drop Image Here</div>
+						</div>
+					</ContextMenuTrigger>
 
-				<ContextMenu id='star__dropbox'>
-					<MenuItem onClick={removeStar}>
-						<i className={`${config.theme.fa} fa-trash-alt`} /> Remove Star
-					</MenuItem>
-				</ContextMenu>
-			</>
-		)
-	}
+					<ContextMenu id='star__dropbox'>
+						<MenuItem onClick={removeStar}>
+							<i className={`${config.theme.fa} fa-trash-alt`} /> Remove Star
+						</MenuItem>
+					</ContextMenu>
+				</>
+			)}
+		</div>
+	)
 }
 
 // Container
-const StarForm = ({ star, starData }) => {
+const StarForm = ({ star, starData }: any) => {
 	const update = useContext(UpdateContext).star
 
-	const updateInfo = (value, label) => {
+	const updateInfo = (value: any, label: any) => {
 		Axios.put(`${config.api}/star/${star.id}`, { label, value }).then(({ data }) => {
 			if (data.reload) {
 				window.location.reload()
@@ -381,11 +386,11 @@ const StarForm = ({ star, starData }) => {
 	)
 }
 
-const StarVideos = ({ videos }) => (
+const StarVideos = ({ videos }: any) => (
 	<>
 		<h3>Videos</h3>
 		<div id='videos' className='row'>
-			{videos.map((video, i) => {
+			{videos.map((video: any, i: number) => {
 				return (
 					<StarVideo
 						key={video.id}
@@ -400,16 +405,16 @@ const StarVideos = ({ videos }) => (
 )
 
 // ContainerItem
-const StarInputForm = ({ update, value, name, type, list, children }) => {
+const StarInputForm = ({ update, value, name, type, list, children }: any) => {
 	const [inputID, setInputID] = useState('')
 	const [inputValue, setInputValue] = useState(value)
 
-	const updateValue = e => {
+	const updateValue = (e: any) => {
 		setInputID(e.target.id)
 		setInputValue(e.target.value)
 	}
 
-	const keyPress = e => {
+	const keyPress = (e: any) => {
 		if (e.key === 'Enter') {
 			if (inputID.length) {
 				update(inputValue, inputID)
@@ -441,7 +446,7 @@ const StarInputForm = ({ update, value, name, type, list, children }) => {
 
 			{list ? (
 				<datalist id={`${name.toLowerCase()}s`}>
-					{list.map(item =>
+					{list.map((item: any) =>
 						typeof item === 'object' ? (
 							<option key={item.name} value={item.name} />
 						) : (
@@ -456,11 +461,11 @@ const StarInputForm = ({ update, value, name, type, list, children }) => {
 	)
 }
 
-const StarVideo = ({ video, isFirst, isLast }) => {
+const StarVideo = ({ video, isFirst, isLast }: any) => {
 	const [src, setSrc] = useState('')
 	const [dataSrc, setDataSrc] = useState(`${config.source}/videos/${video.fname}`)
 
-	const thumbnail = useRef()
+	const thumbnail: any = useRef()
 
 	const reload = async () => {
 		setSrc(dataSrc)
@@ -472,19 +477,19 @@ const StarVideo = ({ video, isFirst, isLast }) => {
 		setSrc('')
 	}
 
-	const playFrom = (video, time = 0) => {
+	const playFrom = (video: any, time = 0) => {
 		if (time) video.currentTime = time
 
 		video.play()
 	}
 
-	const stopFrom = (video, time = 0) => {
+	const stopFrom = (video: any, time = 0) => {
 		if (time) video.currentTime = time
 
 		video.pause()
 	}
 
-	const startThumbnailPlayback = async video => {
+	const startThumbnailPlayback = async (video: any) => {
 		let time = 100
 		const offset = 60
 		const duration = 1.5
@@ -499,19 +504,19 @@ const StarVideo = ({ video, isFirst, isLast }) => {
 		}, duration * 1000)
 	}
 
-	const stopThumbnailPlayback = async video => {
+	const stopThumbnailPlayback = async (video: any) => {
 		stopFrom(video)
 
 		clearInterval(thumbnail.current)
 	}
 
-	const handleMouseEnter = ({ target }) => {
+	const handleMouseEnter = ({ target }: any) => {
 		if (dataSrc.length && !src.length) {
 			reload().then(() => startThumbnailPlayback(target))
 		}
 	}
 
-	const handleMouseLeave = ({ target }) => {
+	const handleMouseLeave = ({ target }: any) => {
 		if (!dataSrc.length && src.length) {
 			stopThumbnailPlayback(target).then(() => unload())
 		}
@@ -544,6 +549,7 @@ const StarVideo = ({ video, isFirst, isLast }) => {
 
 			<Ribbon isFirst={isFirst} isLast={isLast} align='left' />
 
+			{/* @ts-ignore */}
 			{video.age ? <Ribbon label={<DaysToYears days={video.age} />} /> : null}
 		</a>
 	)
