@@ -2,6 +2,10 @@
 @import 'context-menu';
 @import 'ribbon';
 
+body {
+	font-family: 'Roboto', sans-serif;
+}
+
 .divider {
 	color: grey;
 
@@ -33,12 +37,6 @@
 
 .btn {
 	cursor: default !important;
-}
-
-@for $i from 1 through 6 {
-	h#{$i} {
-		font-family: 'Roboto', sans-serif;
-	}
 }
 
 [data-badge] {
