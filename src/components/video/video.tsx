@@ -740,11 +740,16 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 				localStorage.playing = 1
 
 				if (newVideo && !playAdded) {
-					Axios.put(`${config.api}/video/${video.id}`, { plays: 1 }).then(() => {
-						console.log('Play Added')
+					playAdded = true
 
-						playAdded = true
-					})
+					Axios.put(`${config.api}/video/${video.id}`, { plays: 1 })
+						.then(() => {
+							console.log('Play Added')
+							playAdded = true
+						})
+						.catch(() => {
+							playAdded = false
+						})
 				}
 			})
 			player.on('pause', () => (localStorage.playing = 0))
