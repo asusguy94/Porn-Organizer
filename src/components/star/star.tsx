@@ -1,10 +1,10 @@
-import { Component, useState, useRef, createContext, useContext } from 'react'
+import { Component, useState, useRef, createContext, useContext, useEffect } from 'react'
 
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
 import Modal from '../modal/modal'
-import { DaysToYears } from '../date/date'
+import { DaysToYears, dateToYears } from '../date/date'
 import Ribbon from '../ribbon/ribbon'
 import { setFocus } from '../../hooks'
 
@@ -91,7 +91,10 @@ class StarPage extends Component {
 						</div>
 					) : null}
 
-					<StarVideos videos={this.state.videos} />
+					<StarVideos
+						videos={this.state.videos}
+						years={{ start: this.state.star.info.start, end: this.state.star.info.end }}
+					/>
 
 					<Modal
 						visible={this.state.modal.visible}
@@ -386,23 +389,50 @@ const StarForm = ({ star, starData }: any) => {
 	)
 }
 
-const StarVideos = ({ videos }: any) => (
-	<>
-		<h3>Videos</h3>
-		<div id='videos' className='row'>
-			{videos.map((video: any, i: number) => {
-				return (
-					<StarVideo
-						key={video.id}
-						video={video}
-						isFirst={videos.length > 1 && i === 0}
-						isLast={videos.length > 1 && i === videos.length - 1}
-					/>
-				)
-			})}
-		</div>
-	</>
-)
+const StarVideos = ({ videos, years }: any) => {
+	const [inRange, setInRange] = useState(true)
+
+	const endYear = years.end ?? null
+	const startYear = years.start ?? null
+
+	// Reset "Out of range"
+	useEffect(() => setInRange(true), [years])
+
+	return (
+		<>
+			{!inRange ? (
+				<div className='alert alert-danger text-center h4' style={{ width: 280 }}>
+					Out of Range
+				</div>
+			) : null}
+			<h3>Videos</h3>
+			<div id='videos' className='row'>
+				{videos.map((video: any, i: number) => {
+					const parsedYear = dateToYears(video.date)
+
+					if (inRange) {
+						if (startYear && endYear) {
+							if (parsedYear < startYear || parsedYear > endYear) setInRange(false)
+						} else if (startYear) {
+							if (parsedYear < startYear) setInRange(false)
+						} else if (endYear) {
+							if (parsedYear > endYear) setInRange(false)
+						}
+					}
+
+					return (
+						<StarVideo
+							key={video.id}
+							video={video}
+							isFirst={videos.length > 1 && i === 0}
+							isLast={videos.length > 1 && i === videos.length - 1}
+						/>
+					)
+				})}
+			</div>
+		</>
+	)
+}
 
 // ContainerItem
 const StarInputForm = ({ update, value, name, type, list, children }: any) => {
