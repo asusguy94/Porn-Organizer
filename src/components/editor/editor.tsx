@@ -82,7 +82,7 @@ const WrapperItem = ({ label }: any) => {
 	}, [])
 
 	const updateItem = (ref: any, value: any) => {
-		Axios.put(`${config.api}/attribute/${ref.id}`, { value }).then(() => {
+		Axios.put(`${config.api}/${label}/${ref.id}`, { value }).then(() => {
 			setData(
 				data.filter((item: any) => {
 					if (ref.id === item.id) item.name = value
