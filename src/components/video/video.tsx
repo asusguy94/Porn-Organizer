@@ -78,8 +78,8 @@ class VideoPage extends Component {
 		}
 	}
 
-	handleKeyPress(key: any, e: any) {
-		if (e.target === 'INPUT') return
+	handleKeyPress(key: string, e: IKeyPress) {
+		if (e.target.tagName === 'INPUT') return
 		e.preventDefault()
 
 		if (key === 'tab') {
@@ -184,7 +184,7 @@ const Section = ({ video, locations, attributes, categories, bookmarks, star }: 
 
 	// Helper script for getting the player
 	//@ts-ignore
-	const getPlayer = () => ref.player
+	const getPlayer = () => ref?.player
 
 	const playVideo = (time = null) => {
 		const player = getPlayer()

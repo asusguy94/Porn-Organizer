@@ -128,7 +128,7 @@ const Sidebar = ({ videoData, videos, update }: any) => (
 
 const TitleSearch = ({ update, videos }: any) => {
 	const callback = (e: any) => {
-		const searchValue = e.target.value.toLowerCase()
+		const searchValue = e.currentTarget.value.toLowerCase()
 
 		videos = videos.map((video: any) => {
 			video.hidden.titleSearch = !video.name.toLowerCase().includes(searchValue)
