@@ -47,7 +47,7 @@ const HomeColumn = ({ enabled = true, label, limit = 12 }: IHomeColumn) => {
 
 								<span className='video__title mx-auto d-block'>{video.name}</span>
 
-								{video.plays > 0 ? <span className='ribbon'>{video.plays}</span> : null}
+								{video.total > 0 ? <span className='ribbon'>{video.total}</span> : null}
 							</Link>
 						</div>
 					))}

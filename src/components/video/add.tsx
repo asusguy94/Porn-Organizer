@@ -85,7 +85,7 @@ const Button = ({ label, callback, disabled = false }: any) => {
 	}
 
 	return (
-		<div className={`btn btn-info ${isDisabled ? 'disabled' : ''}`} onClick={clickHandler}>
+		<div className={`btn btn-info mx-1 ${isDisabled ? 'disabled' : ''}`} onClick={clickHandler}>
 			{label}
 		</div>
 	)

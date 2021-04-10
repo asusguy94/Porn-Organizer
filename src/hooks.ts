@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 
 export const useRefWithEffect = () => {
 	const [refValue, setRefValue] = useState()
-	const ref = useCallback(node => setRefValue(node), [])
+	const ref = useCallback((node) => setRefValue(node), [])
 
 	return [ref, refValue]
 }

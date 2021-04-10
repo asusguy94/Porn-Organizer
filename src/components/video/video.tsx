@@ -1,4 +1,4 @@
-import { Component, Fragment, useEffect, useState, createContext, useContext } from 'react'
+import React, { Component, Fragment, useEffect, useState, createContext, useContext } from 'react'
 import { Link } from 'react-router-dom'
 
 import Axios from 'axios'
@@ -429,7 +429,7 @@ const HeaderDate = ({ video }: IHeaderDate) => {
 	const update = useContext(UpdateContext).video
 
 	const fixDate = () => {
-		Axios.get(`${config.api}/fixvideodate.php?id=${video.id}`).then(({ data }) => {
+		Axios.put(`${config.source}/video/${video.id}`, { date: true }).then(({ data }) => {
 			video.date.published = data.date
 
 			update(video)

@@ -243,7 +243,7 @@ const StarImageDropbox = ({ star }: any) => {
 	}
 	const addImage = (url: string) => {
 		Axios.post(`${config.source}/star/${star.id}/image`, { url }).then(({ data }) => {
-			star.image = data.image
+			star.image = `${data.image}?v=${new Date().getTime()}`
 
 			update(star)
 		})
@@ -269,11 +269,11 @@ const StarImageDropbox = ({ star }: any) => {
 	const handleDrop = (e: React.DragEvent) => {
 		handleDefault(e)
 
-		let image = e.dataTransfer.getData('text')
+		const image = e.dataTransfer.getData('text')
 		if (isLocalFile(image)) {
-			image = e.dataTransfer.files
-			if (image.length === 1) {
-				addLocalImage(image[0])
+			let imageRef = e.dataTransfer.files
+			if (imageRef.length === 1) {
+				addLocalImage(imageRef[0])
 			} else {
 				console.log('Adding multiple images is not supported')
 			}
@@ -514,9 +514,9 @@ const StarInputForm: React.FC<IStarInputForm> = ({ update, value, name, type = '
 				list={`${name.toLowerCase()}s`}
 			/>
 
-			{list ? (
+			{list.length ? (
 				<datalist id={`${name.toLowerCase()}s`}>
-					{list.map((item: any) =>
+					{list.map((item) =>
 						typeof item === 'object' ? (
 							<option key={item.name} value={item.name} />
 						) : (

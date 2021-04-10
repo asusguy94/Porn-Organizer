@@ -290,7 +290,12 @@ const Sort = ({ stars, update }: ISort) => {
 		update(stars)
 	}
 
-	const sortAdded = (reverse = false) => {}
+	const sortAdded = (reverse = false) => {
+		stars.sort((a: IStar, b: IStar) => a.id - b.id)
+
+		if (reverse) stars.reverse()
+		update(stars)
+	}
 
 	const sortAge = (reverse = false) => {
 		stars.sort((a: IStar, b: IStar) => a.age - b.age)
@@ -313,8 +318,8 @@ const Sort = ({ stars, update }: ISort) => {
 			<SortItem name='A-Z' label='alphabetically' callback={() => sortDefault()} checked={true} />
 			<SortItem name='Z-A' label='alphabetically_desc' callback={() => sortDefault(true)} />
 
-			<SortItem name='Old Upload' label='added' callback={() => sortAdded()} disabled={true} />
-			<SortItem name='Recent Upload' label='added_desc' callback={() => sortAdded(true)} disabled={true} />
+			<SortItem name='Old Upload' label='added' callback={() => sortAdded()} />
+			<SortItem name='Recent Upload' label='added_desc' callback={() => sortAdded(true)} />
 
 			<SortItem name='Teen' label='star-age' callback={() => sortAge()} />
 			<SortItem name='Milf' label='star-age_desc' callback={() => sortAge(true)} />
@@ -379,13 +384,7 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 		<div id={label}>
 			{globalCallback !== null ? (
 				<div className='input-wrapper'>
-					<input
-						type='radio'
-						name={label}
-						id={`${label}_ALL`}
-						onChange={() => globalCallback()}
-						defaultChecked
-					/>
+					<input type='radio' name={label} id={`${label}_ALL`} onChange={globalCallback} defaultChecked />
 					<label className='global-category' htmlFor={`${label}_ALL`}>
 						ALL
 					</label>
@@ -394,7 +393,7 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 
 			{nullCallback !== null ? (
 				<div className='input-wrapper'>
-					<input type='radio' name={label} id={`${label}_NULL`} onChange={(e) => nullCallback(e)} />
+					<input type='radio' name={label} id={`${label}_NULL`} onChange={nullCallback} />
 					<label className='global-category' htmlFor={`${label}_NULL`}>
 						NULL
 					</label>
@@ -426,7 +425,7 @@ const FilterDropdown = ({ data, label, labelPlural, callback }: IFilterDropdown)
 		<div id={label}>
 			<div className='input-wrapper'>
 				<select className='form-select' name={labelPlural} onChange={callback}>
-					<option selected>All</option>
+					<option>All</option>
 
 					{data.map((item: { code: string; name: string }) => (
 						<option key={item.name}>{item.name}</option>

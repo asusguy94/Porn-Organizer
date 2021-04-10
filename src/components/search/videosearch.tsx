@@ -484,7 +484,7 @@ const FilterDropdown = ({ data, label, labelPlural, callback }: any) => (
 
 		<div className='input-wrapper'>
 			<select className='form-select' name={labelPlural} onChange={callback}>
-				<option selected>All</option>
+				<option>All</option>
 
 				{data.map((item: any) => (
 					<option key={item.id}>{item.name}</option>
