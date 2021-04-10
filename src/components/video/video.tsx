@@ -32,7 +32,10 @@ const UpdateContext = createContext({
 	star: (star: IVideoStar): void => {},
 	bookmarks: (bookmarks: IVideoBookmark[]): void => {}
 })
-const ModalContext = createContext((...args: any): void => {})
+const ModalContext = createContext({
+	method: (...args: any): void => {},
+	data: { visible: false, title: null, data: null, filter: false }
+})
 
 class VideoPage extends Component {
 	state = {
@@ -109,7 +112,12 @@ class VideoPage extends Component {
 						bookmarks: (bookmarks: IVideoBookmark[]) => this.setState({ bookmarks })
 					}}
 				>
-					<ModalContext.Provider value={(title, data, filter) => this.handleModal(title, data, filter)}>
+					<ModalContext.Provider
+						value={{
+							method: (title, data, filter) => this.handleModal(title, data, filter),
+							data: this.state.modal
+						}}
+					>
 						<Section
 							video={this.state.video}
 							locations={this.state.locations}
@@ -452,6 +460,7 @@ interface IHeaderTitle {
 	locations: ILocation[]
 }
 const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
+	const handleModal = useContext(ModalContext).method
 	const update = useContext(UpdateContext).video
 
 	const addLocation = (location: ILocation) => {
@@ -601,6 +610,7 @@ interface ITimeline {
 	duration: number
 }
 const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeline) => {
+	const handleModal = useContext(ModalContext).method
 	const update = useContext(UpdateContext).bookmarks
 
 	let bookmarksArr: any = []
@@ -757,6 +767,9 @@ interface IVideoPlayer {
 	updateDuration: any
 }
 const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValue, updateDuration }: IVideoPlayer) => {
+	const handleModal = useContext(ModalContext).method
+	const modalData = useContext(ModalContext).data
+
 	const update = useContext(UpdateContext).video
 	const updateStar = useContext(UpdateContext).star
 	const updateBookmarks = useContext(UpdateContext).bookmarks
@@ -1042,6 +1055,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 				handleKeys={['left', 'right', 'up', 'down', 'space', 'm']}
 				onKeyEvent={handleKeyPress}
 				handleFocusableElements={true}
+				isDisabled={modalData.visible}
 			/>
 		</div>
 	)
