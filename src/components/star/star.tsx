@@ -4,7 +4,7 @@ import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
 import Modal from '../modal/modal'
-import { DaysToYears, dateToYears } from '../date/date'
+import { DaysToYears, dateToYears, daysToYears } from '../date/date'
 import Ribbon from '../ribbon/ribbon'
 import { setFocus } from '../../hooks'
 
@@ -438,7 +438,9 @@ const StarVideos = ({ videos, years }: IStarVideos) => {
 					const parsedYear = dateToYears(video.date)
 
 					if (inRange) {
-						if (startYear && endYear) {
+						if (video.age !== null && daysToYears(video.age) < 18) {
+							setInRange(false)
+						} else if (startYear && endYear) {
 							if (parsedYear < startYear || parsedYear > endYear) setInRange(false)
 						} else if (startYear) {
 							if (parsedYear < startYear) setInRange(false)
