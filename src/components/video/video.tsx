@@ -941,6 +941,11 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 		e.preventDefault()
 
 		const player = getPlayer()
+		const volumeConfig = {
+			offset: 0.1,
+			max: 1,
+			min: 0
+		}
 
 		switch (key) {
 			case 'left':
@@ -955,6 +960,12 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 				break
 			case 'm':
 				player.muted = !player.muted
+				break
+			case 'up':
+				player.volume = Math.ceil((player.volume + volumeConfig.offset) * 10) / 10
+				break
+			case 'down':
+				player.volume = Math.floor((player.volume - volumeConfig.offset) * 10) / 10
 				break
 			default:
 				console.log(`${key} was pressed`)
