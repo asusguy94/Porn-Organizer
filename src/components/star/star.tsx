@@ -405,7 +405,23 @@ const StarVideos = ({ videos, years }: any) => {
 					Out of Range
 				</div>
 			) : null}
-			<h3>Videos</h3>
+			<h3>
+				Videos
+				{websites.length > 1
+					? websites.map((website) => (
+							<div
+								key={website}
+								className='btn btn-sm btn-info mx-1'
+								onMouseOver={() => {
+									setWebsiteFocus(website)
+								}}
+								onMouseLeave={() => setWebsiteFocus('')}
+							>
+								{website}
+							</div>
+					  ))
+					: null}
+			</h3>
 			<div id='videos' className='row'>
 				{videos.map((video: any, i: number) => {
 					const parsedYear = dateToYears(video.date)
@@ -420,12 +436,18 @@ const StarVideos = ({ videos, years }: any) => {
 						}
 					}
 
+					if (!websites.includes(video.website)) {
+						websites.push(video.website)
+						setWebsites(websites)
+					}
+
 					return (
 						<StarVideo
 							key={video.id}
 							video={video}
 							isFirst={videos.length > 1 && i === 0}
 							isLast={videos.length > 1 && i === videos.length - 1}
+							hidden={websiteFocus.length > 0 && websiteFocus !== video.website}
 						/>
 					)
 				})}
@@ -491,7 +513,7 @@ const StarInputForm = ({ update, value, name, type, list, children }: any) => {
 	)
 }
 
-const StarVideo = ({ video, isFirst, isLast }: any) => {
+const StarVideo = ({ video, isFirst, isLast, hidden }: any) => {
 	const [src, setSrc] = useState('')
 	const [dataSrc, setDataSrc] = useState(`${config.source}/videos/${video.fname}`)
 
@@ -553,7 +575,7 @@ const StarVideo = ({ video, isFirst, isLast }: any) => {
 	}
 
 	return (
-		<a className='video ribbon-container card' href={`/video/${video.id}`}>
+		<a className={`video ribbon-container card ${hidden ? 'hidden' : ''}`} href={`/video/${video.id}`}>
 			<video
 				className='card-img-top'
 				src={src}

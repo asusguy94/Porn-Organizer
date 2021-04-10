@@ -81,6 +81,12 @@
 	.video {
 		margin: 0 10px 10px 5px;
 		width: $thumbnailWidth + px;
+		transition: opacity 250ms ease-in;
+
+		&.hidden {
+			transition-timing-function: ease-out;
+			opacity: 0.2;
+		}
 
 		span {
 			text-align: center;
