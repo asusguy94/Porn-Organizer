@@ -683,23 +683,22 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 	useEffect(() => {
 		//console.log('#timeline UPDATED')
 
-		for (let i = 1, items = bookmarksArr, LEVEL_MIN = 1, LEVEL_MAX = 10, level = LEVEL_MIN; i < items.length; i++) {
+		for (let i = 0, items = bookmarksArr, LEVEL_MIN = 1, LEVEL_MAX = 10, level = LEVEL_MIN; i < items.length; i++) {
 			let collision = false
 
-			const first = items[i - 1]
-			const second = items[i]
+			const prev = items[i - 1]
+			const current = items[i]
 
-			// skip if error
-			if (first === null || second === null) continue
-
-			if (collisionCheck(first, second)) {
+			if (collisionCheck(prev, current)) {
 				collision = true
 			} else {
-				collision = false
+				// TODO else statement might be unnecessary
+				//>> code might run when 'level' is greater than 'LEVEL_MAX'
+				/*collision = false
 
 				for (let j = 1; j < i; j++) {
-					if (collisionCheck(items[j], second)) collision = true
-				}
+					if (collisionCheck(items[j], current)) collision = true
+				}*/
 			}
 
 			if (collision && level < LEVEL_MAX) {
@@ -708,7 +707,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 				level = LEVEL_MIN
 			}
 
-			second.setAttribute('data-level', level)
+			current.setAttribute('data-level', `${level}`)
 		}
 	}, [bookmarksArr])
 
