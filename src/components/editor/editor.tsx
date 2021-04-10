@@ -1,4 +1,4 @@
-import { Component, useState, useEffect } from 'react'
+import { Component, useState, useEffect, FC, ChangeEvent, KeyboardEvent } from 'react'
 
 import Axios from 'axios'
 import capitalize from 'capitalize'
@@ -28,10 +28,10 @@ const EditorPage = () => (
 	</div>
 )
 
-const Wrapper = ({ label, name, children }: any) => {
+const Wrapper: FC<{ label: string; name: string }> = ({ label, name, children }) => {
 	const [input, setInput] = useState('')
 
-	const handleChange = (e: any) => setInput(e.target.value)
+	const handleChange = (e: ChangeEvent<HTMLInputElement>) => setInput(e.currentTarget.value)
 
 	const handleSubmit = () => {
 		if (input.length) {
@@ -45,7 +45,7 @@ const Wrapper = ({ label, name, children }: any) => {
 		}
 	}
 
-	const handleKeyPress = (e: any) => {
+	const handleKeyPress = (e: KeyboardEvent) => {
 		if (e.key === 'Enter') {
 			e.preventDefault()
 			handleSubmit()
@@ -70,12 +70,12 @@ const Wrapper = ({ label, name, children }: any) => {
 	)
 }
 
-const WrapperItem = ({ label }: any) => {
+const WrapperItem = ({ label }: { label: string }) => {
 	const [data, setData] = useState([])
 
 	useEffect(() => {
 		Axios.get(`${config.api}/${label}`).then(({ data }) => {
-			data.sort((a: any, b: any) => a.id - b.id)
+			data.sort((a: { id: number; name: string }, b: { id: number; name: string }) => a.id - b.id)
 
 			setData(data)
 		})
@@ -121,7 +121,7 @@ const Item = ({ update, data }: any) => {
 		if (value) update(data, value)
 	}
 
-	const handleKeyPress = (e: any) => {
+	const handleKeyPress = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter') {
 			e.preventDefault()
 			save()
@@ -129,7 +129,7 @@ const Item = ({ update, data }: any) => {
 	}
 
 	const clickHandler = () => setEdit(true)
-	const changeHandler = (e: any) => setValue(e.target.value)
+	const changeHandler = (e: any) => setValue(e.currentTarget.value)
 
 	return (
 		<tr>
@@ -158,7 +158,7 @@ class CountriesPage extends Component {
 	}
 
 	handleChange(e: any) {
-		this.setState({ input: e.target.value })
+		this.setState({ input: e.currentTarget.value })
 	}
 
 	handleSubmit() {
@@ -174,7 +174,7 @@ class CountriesPage extends Component {
 		}
 	}
 
-	handleKeyPress(e: any) {
+	handleKeyPress(e: React.KeyboardEvent) {
 		if (e.key === 'Enter') {
 			e.preventDefault()
 			this.handleSubmit()
@@ -262,12 +262,17 @@ class Countries extends Component {
 
 	getData() {
 		Axios.get(`${config.api}/country`).then(({ data: countries }) => {
-			countries.sort((a: any, b: any) => a.id - b.id)
+			countries.sort((a: ICountry, b: ICountry) => a.id - b.id)
 			this.setState({ countries })
 		})
 	}
 }
 
+interface ICountry {
+	id: number
+	name: string
+	code: string
+}
 class Country extends Component<any> {
 	state = {
 		country: { edit: false, value: null },
@@ -320,14 +325,14 @@ class Country extends Component<any> {
 							defaultValue={name}
 							autoFocus
 							onBlur={this.saveCountry.bind(this)}
-							onKeyPress={(e) => {
+							onKeyPress={(e: React.KeyboardEvent) => {
 								if (e.key === 'Enter') {
 									e.preventDefault()
 									this.saveCountry()
 								}
 							}}
 							onChange={(e) => {
-								let value = e.target.value
+								let value = e.currentTarget.value
 								this.setState(({ country }: any) => {
 									country.value = value
 
@@ -355,14 +360,14 @@ class Country extends Component<any> {
 							defaultValue={code}
 							autoFocus
 							onBlur={this.saveCode.bind(this)}
-							onKeyPress={(e) => {
+							onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
 								if (e.key === 'Enter') {
 									e.preventDefault()
 									this.saveCode()
 								}
 							}}
 							onChange={(e) => {
-								let value = e.target.value
+								let value = e.currentTarget.value
 								this.setState(({ code }: any) => {
 									code.value = value
 

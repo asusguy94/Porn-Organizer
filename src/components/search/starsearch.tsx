@@ -1,4 +1,4 @@
-import { Component } from 'react'
+import React, { Component } from 'react'
 
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
@@ -15,6 +15,29 @@ import config from '../config.json'
 
 //TODO use children-prop instead of coded-children inside component
 
+interface IStar {
+	id: number
+	name: string
+	image: string
+	age: number
+	breast: string
+	country: string
+	ethnicity: string
+	eyecolor: string
+	haircolor: string
+	websites: string[]
+	sites: string[]
+	videoCount: number
+	hidden: {
+		titleSearch: boolean
+		breast: boolean
+		haircolor: boolean
+		ethnicity: boolean
+		country: boolean
+		noBreast: boolean
+	}
+}
+
 class StarSearchPage extends Component {
 	state = {
 		stars: [],
@@ -29,7 +52,7 @@ class StarSearchPage extends Component {
 		// Stars
 		Axios.get(`${config.api}/search/star`).then(({ data: stars }) => {
 			this.setState(() => {
-				stars = stars.map((star: any) => {
+				stars = stars.map((star: IStar) => {
 					star.hidden = {
 						titleSearch: false,
 
@@ -70,7 +93,7 @@ class StarSearchPage extends Component {
 						countries: this.state.countries
 					}}
 					stars={this.state.stars}
-					update={(stars: any) => this.setState({ stars })}
+					update={(stars: IStar[]) => this.setState({ stars })}
 				/>
 
 				<Stars stars={this.state.stars} />
@@ -82,7 +105,7 @@ class StarSearchPage extends Component {
 }
 
 // Wrapper
-const Stars = ({ stars }: any) => (
+const Stars = ({ stars }: { stars: IStar[] }) => (
 	<section id='stars' className='col-10'>
 		<h2 className='text-center'>
 			<span className='count'>{getCount(stars)}</span> Stars
@@ -90,7 +113,7 @@ const Stars = ({ stars }: any) => (
 
 		<div className='row justify-content-center'>
 			{stars.length ? (
-				stars.map((star: any) => (
+				stars.map((star) => (
 					<a
 						key={star.id}
 						href={`/star/${star.id}`}
@@ -112,7 +135,12 @@ const Stars = ({ stars }: any) => (
 	</section>
 )
 
-const Sidebar = ({ starData, stars, update }: any) => (
+interface ISidebar {
+	starData: any
+	stars: IStar[]
+	update: any
+}
+const Sidebar = ({ starData, stars, update }: ISidebar) => (
 	<aside className='col-2'>
 		<TitleSearch stars={stars} update={update} />
 
@@ -123,9 +151,14 @@ const Sidebar = ({ starData, stars, update }: any) => (
 )
 
 // Container
-const Filter = ({ stars, starData, update }: any) => {
-	const breast = (target: any) => {
-		stars = stars.map((star: any) => {
+interface IFilter {
+	stars: IStar[]
+	starData: any
+	update: any
+}
+const Filter = ({ stars, starData, update }: IFilter) => {
+	const breast = (target: string) => {
+		stars = stars.map((star) => {
 			star.hidden.noBreast = false
 			star.hidden.breast = star.breast.toLowerCase() !== target.toLowerCase()
 
@@ -135,8 +168,8 @@ const Filter = ({ stars, starData, update }: any) => {
 		update(stars)
 	}
 
-	const haircolor = (target: any) => {
-		stars = stars.map((star: any) => {
+	const haircolor = (target: string) => {
+		stars = stars.map((star) => {
 			star.hidden.haircolor = star.haircolor.toLowerCase() !== target.toLowerCase()
 
 			return star
@@ -145,8 +178,8 @@ const Filter = ({ stars, starData, update }: any) => {
 		update(stars)
 	}
 
-	const ethnicity = (target: any) => {
-		stars = stars.map((star: any) => {
+	const ethnicity = (target: string) => {
+		stars = stars.map((star) => {
 			star.hidden.ethnicity = star.ethnicity.toLowerCase() !== target.toLowerCase()
 
 			return star
@@ -155,10 +188,10 @@ const Filter = ({ stars, starData, update }: any) => {
 		update(stars)
 	}
 
-	const country_DROP = (e: any) => {
-		const targetLower = e.target.value.toLowerCase()
+	const country_DROP = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const targetLower = e.currentTarget.value.toLowerCase()
 
-		stars = stars.map((star: any) => {
+		stars = stars.map((star) => {
 			if (targetLower === 'all') {
 				star.hidden.country = false
 			} else {
@@ -171,9 +204,9 @@ const Filter = ({ stars, starData, update }: any) => {
 		update(stars)
 	}
 
-	const breast_NULL = (e: any) => {
-		stars = stars.map((star: any) => {
-			star.hidden.noBreast = e.target.checked && star.breast.length
+	const breast_NULL = (e: React.ChangeEvent<HTMLFormElement>) => {
+		stars = stars.map((star) => {
+			star.hidden.noBreast = e.currentTarget.checked && star.breast.length
 			star.hidden.breast = false
 
 			return star
@@ -183,7 +216,7 @@ const Filter = ({ stars, starData, update }: any) => {
 	}
 
 	const breast_ALL = () => {
-		stars = stars.map((star: any) => {
+		stars = stars.map((star) => {
 			star.hidden.breast = false
 			star.hidden.noBreast = false
 
@@ -194,7 +227,7 @@ const Filter = ({ stars, starData, update }: any) => {
 	}
 
 	const haircolor_ALL = () => {
-		stars = stars.map((star: any) => {
+		stars = stars.map((star) => {
 			star.hidden.haircolor = false
 
 			return star
@@ -204,7 +237,7 @@ const Filter = ({ stars, starData, update }: any) => {
 	}
 
 	const ethnicity_ALL = () => {
-		stars = stars.map((star: any) => {
+		stars = stars.map((star) => {
 			star.hidden.ethnicity = false
 
 			return star
@@ -245,14 +278,13 @@ const Filter = ({ stars, starData, update }: any) => {
 	)
 }
 
-const Sort = ({ stars, update }: any) => {
+interface ISort {
+	stars: IStar[]
+	update: any
+}
+const Sort = ({ stars, update }: ISort) => {
 	const sortDefault = (reverse = false) => {
-		stars.sort((a: any, b: any) => {
-			let valA = a.name.toLowerCase()
-			let valB = b.name.toLowerCase()
-
-			return valA.localeCompare(valB, 'en')
-		})
+		stars.sort((a: IStar, b: IStar) => a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en'))
 
 		if (reverse) stars.reverse()
 		update(stars)
@@ -261,14 +293,14 @@ const Sort = ({ stars, update }: any) => {
 	const sortAdded = (reverse = false) => {}
 
 	const sortAge = (reverse = false) => {
-		stars.sort((a: any, b: any) => a.age - b.age)
+		stars.sort((a: IStar, b: IStar) => a.age - b.age)
 
 		if (reverse) stars.reverse()
 		update(stars)
 	}
 
 	const sortVideos = (reverse = false) => {
-		stars.sort((a: any, b: any) => a.videoCount - b.videoCount)
+		stars.sort((a: IStar, b: IStar) => a.videoCount - b.videoCount)
 
 		if (reverse) stars.reverse()
 		update(stars)
@@ -293,11 +325,15 @@ const Sort = ({ stars, update }: any) => {
 	)
 }
 
-const TitleSearch = ({ stars, update }: any) => {
-	const callback = (e: any) => {
-		const searchValue = e.target.value.toLowerCase()
+interface ITitleSearch {
+	stars: IStar[]
+	update: any
+}
+const TitleSearch = ({ stars, update }: ITitleSearch) => {
+	const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const searchValue = e.currentTarget.value.toLowerCase()
 
-		stars = stars.map((item: any) => {
+		stars = stars.map((item) => {
 			item.hidden.titleSearch = !item.name.toLowerCase().includes(searchValue)
 
 			return item
@@ -314,14 +350,29 @@ const TitleSearch = ({ stars, update }: any) => {
 }
 
 // ContainerItem
-const SortItem = ({ callback, label, name, checked = false, disabled = false }: any) => (
+interface ISortItem {
+	callback: any
+	label: string
+	name: string
+	checked?: boolean
+	disabled?: boolean
+}
+const SortItem = ({ callback, label, name, checked = false, disabled = false }: ISortItem) => (
 	<div className={`input-wrapper ${disabled ? 'disabled' : ''}`}>
 		<input type='radio' name='sort' id={label} onChange={callback} defaultChecked={checked} />
 		<label htmlFor={label}>{name}</label>
 	</div>
 )
 
-const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCallback = null }: any) => (
+interface IFilterItem {
+	data: any[]
+	label: string
+	obj: any
+	callback: any
+	globalCallback?: any
+	nullCallback?: any
+}
+const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCallback = null }: IFilterItem) => (
 	<>
 		<h2>{capitalize(label, true)}</h2>
 
@@ -362,7 +413,13 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 	</>
 )
 
-const FilterDropdown = ({ data, label, labelPlural, callback }: any) => (
+interface IFilterDropdown {
+	data: any[]
+	label: string
+	labelPlural: string
+	callback: any
+}
+const FilterDropdown = ({ data, label, labelPlural, callback }: IFilterDropdown) => (
 	<>
 		<h2>{capitalize(label, true)}</h2>
 
@@ -371,7 +428,7 @@ const FilterDropdown = ({ data, label, labelPlural, callback }: any) => (
 				<select className='form-select' name={labelPlural} onChange={callback}>
 					<option selected>All</option>
 
-					{data.map((item: any) => (
+					{data.map((item: { code: string; name: string }) => (
 						<option key={item.name}>{item.name}</option>
 					))}
 				</select>

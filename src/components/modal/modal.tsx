@@ -10,6 +10,13 @@ import './modal.scss'
 
 //TODO improve children, props.children, pros.filter, children=chilren.filter
 
+export interface IModal {
+	title: string
+	data: any
+	filter?: boolean
+	visible: boolean
+}
+
 const Modal = (props: any) => {
 	const [query, setQuery] = useState('')
 

@@ -1,4 +1,4 @@
-import { Component } from 'react'
+import React, { Component } from 'react'
 
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
@@ -216,8 +216,8 @@ const Sort = ({ videos, update }: any) => {
 }
 
 const Filter = ({ videoData, videos, update }: any) => {
-	const website = (e: any) => {
-		const targetLower = e.target.value.toLowerCase()
+	const website = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const targetLower = e.currentTarget.value.toLowerCase()
 
 		videos = videos.map((video: any) => {
 			if (targetLower === 'all') {
@@ -232,11 +232,11 @@ const Filter = ({ videoData, videos, update }: any) => {
 		update(videos)
 	}
 
-	const category = (e: any, target: any) => {
+	const category = (e: React.ChangeEvent<HTMLInputElement>, target: any) => {
 		const targetLower = target.name.toLowerCase()
 
 		videos = videos.map((video: any) => {
-			if (e.target.indeterminate) {
+			if (e.currentTarget.indeterminate) {
 				const match = video.categories.some((category: any) => category.toLowerCase() === targetLower)
 
 				if (match) {
@@ -245,7 +245,7 @@ const Filter = ({ videoData, videos, update }: any) => {
 					// Remove checked-status from filtering
 					video.hidden.category.splice(video.hidden.category.indexOf(targetLower), 1)
 				}
-			} else if (!e.target.checked) {
+			} else if (!e.currentTarget.checked) {
 				video.hidden.noCategory = false
 
 				const match = video.categories.map((category: any) => category.toLowerCase()).includes(targetLower)
@@ -266,12 +266,12 @@ const Filter = ({ videoData, videos, update }: any) => {
 		update(videos)
 	}
 
-	const attribute = (e: any, target: any) => {
+	const attribute = (e: React.ChangeEvent<HTMLInputElement>, target: any) => {
 		const targetLower = target.name.toLowerCase()
 
 		videos = videos.map((video: any) => {
-			if (e.target.indeterminate) {
-				const match = video.attributes.some((location: any) => location.toLowerCase() === targetLower)
+			if (e.currentTarget.indeterminate) {
+				const match = video.attributes.some((attribute: any) => attribute.toLowerCase() === targetLower)
 
 				if (match) {
 					video.hidden.notAttribute.push(targetLower)
@@ -279,7 +279,7 @@ const Filter = ({ videoData, videos, update }: any) => {
 					// Remove checked-status from filtering
 					video.hidden.attribute.splice(video.hidden.attribute.indexOf(targetLower), 1)
 				}
-			} else if (!e.target.checked) {
+			} else if (!e.currentTarget.checked) {
 				const match = video.attributes.map((attribute: any) => attribute.toLowerCase()).includes(targetLower)
 
 				if (match) {
@@ -298,11 +298,11 @@ const Filter = ({ videoData, videos, update }: any) => {
 		update(videos)
 	}
 
-	const location = (e: any, target: any) => {
+	const location = (e: React.ChangeEvent<HTMLInputElement>, target: any) => {
 		const targetLower = target.name.toLowerCase()
 
 		videos = videos.map((video: any) => {
-			if (e.target.indeterminate) {
+			if (e.currentTarget.indeterminate) {
 				const match = video.locations.some((location: any) => location.toLowerCase() === targetLower)
 
 				if (match) {
@@ -311,7 +311,7 @@ const Filter = ({ videoData, videos, update }: any) => {
 					// Remove checked-status from filtering
 					video.hidden.location.splice(video.hidden.location.indexOf(targetLower), 1)
 				}
-			} else if (!e.target.checked) {
+			} else if (!e.currentTarget.checked) {
 				const match = video.locations.map((location: any) => location.toLowerCase()).includes(targetLower)
 
 				if (match) {
@@ -330,12 +330,12 @@ const Filter = ({ videoData, videos, update }: any) => {
 		update(videos)
 	}
 
-	const category_NULL = (e: any) => {
+	const category_NULL = (e: React.ChangeEvent<HTMLInputElement>) => {
 		videos = videos.map((video: any) => {
-			if (e.target.indeterminate) {
+			if (e.currentTarget.indeterminate) {
 				video.hidden.noCategory = false
 				video.hidden.notNoCategory = video.categories.length === 0
-			} else if (!e.target.checked) {
+			} else if (!e.currentTarget.checked) {
 				video.hidden.notNoCategory = false
 			} else {
 				video.hidden.noCategory = video.categories.length !== 0
@@ -347,12 +347,12 @@ const Filter = ({ videoData, videos, update }: any) => {
 		update(videos)
 	}
 
-	const category_POV = (e: any) => {
+	const category_POV = (e: React.ChangeEvent<HTMLInputElement>) => {
 		videos = videos.map((video: any) => {
-			if (e.target.indeterminate) {
+			if (e.currentTarget.indeterminate) {
 				video.hidden.pov = false
 				video.hidden.notPov = false
-			} else if (!e.target.checked) {
+			} else if (!e.currentTarget.checked) {
 				video.hidden.notPov = false
 			} else {
 				video.hidden.pov = !video.hidden.pov

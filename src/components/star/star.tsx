@@ -1,4 +1,4 @@
-import { Component, useState, useRef, createContext, useContext, useEffect } from 'react'
+import React, { Component, useState, useRef, createContext, useContext, useEffect } from 'react'
 
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
@@ -162,12 +162,12 @@ const StarTitle = ({ star }: any) => {
 								type='text'
 								defaultValue={star.name}
 								ref={setFocus}
-								onKeyDown={(e: any) => {
+								onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
 									if (e.key === 'Enter') {
 										e.preventDefault()
 
 										handleModal()
-										renameStar(e.target.value)
+										renameStar(e.currentTarget.value)
 									}
 								}}
 							/>
@@ -241,7 +241,7 @@ const StarImageDropbox = ({ star }: any) => {
 			update(star)
 		})
 	}
-	const addImage = (url: any) => {
+	const addImage = (url: string) => {
 		Axios.post(`${config.source}/star/${star.id}/image`, { url }).then(({ data }) => {
 			star.image = data.image
 
@@ -249,24 +249,24 @@ const StarImageDropbox = ({ star }: any) => {
 		})
 	}
 
-	const handleDefault = (e: any) => {
+	const handleDefault = (e: React.DragEvent) => {
 		e.stopPropagation()
 		e.preventDefault()
 	}
 
-	const handleEnter = (e: any) => {
+	const handleEnter = (e: React.DragEvent) => {
 		handleDefault(e)
 
 		setHover(true)
 	}
 
-	const handleLeave = (e: any) => {
+	const handleLeave = (e: React.DragEvent) => {
 		handleDefault(e)
 
 		setHover(false)
 	}
 
-	const handleDrop = (e: any) => {
+	const handleDrop = (e: React.DragEvent) => {
 		handleDefault(e)
 
 		let image = e.dataTransfer.getData('text')
@@ -284,7 +284,7 @@ const StarImageDropbox = ({ star }: any) => {
 		setHover(false)
 	}
 
-	const isLocalFile = (path: any) => !(path.indexOf('http://') > -1 || path.indexOf('https://') > -1)
+	const isLocalFile = (path: string) => !(path.indexOf('http://') > -1 || path.indexOf('https://') > -1)
 
 	return (
 		<div className='d-inline-block'>
@@ -327,7 +327,11 @@ const StarImageDropbox = ({ star }: any) => {
 }
 
 // Container
-const StarForm = ({ star, starData }: any) => {
+interface IStarForm {
+	star: any
+	starData: any
+}
+const StarForm = ({ star, starData }: IStarForm) => {
 	const update = useContext(UpdateContext).star
 
 	const updateInfo = (value: any, label: any) => {
@@ -389,8 +393,15 @@ const StarForm = ({ star, starData }: any) => {
 	)
 }
 
-const StarVideos = ({ videos, years }: any) => {
+interface IStarVideos {
+	videos: any
+	years: any
+}
+const StarVideos = ({ videos, years }: IStarVideos) => {
 	const [inRange, setInRange] = useState(true)
+	const [websites, setWebsites] = useState<any[]>([])
+
+	const [websiteFocus, setWebsiteFocus] = useState('')
 
 	const endYear = years.end ?? null
 	const startYear = years.start ?? null
@@ -457,16 +468,23 @@ const StarVideos = ({ videos, years }: any) => {
 }
 
 // ContainerItem
-const StarInputForm = ({ update, value, name, type, list, children }: any) => {
+interface IStarInputForm {
+	update: any
+	value: any
+	name: any
+	type?: any
+	list?: any[]
+}
+const StarInputForm: React.FC<IStarInputForm> = ({ update, value, name, type = 'text', list = [], children }) => {
 	const [inputID, setInputID] = useState('')
 	const [inputValue, setInputValue] = useState(value)
 
-	const updateValue = (e: any) => {
-		setInputID(e.target.id)
-		setInputValue(e.target.value)
+	const updateValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setInputID(e.currentTarget.id)
+		setInputValue(e.currentTarget.value)
 	}
 
-	const keyPress = (e: any) => {
+	const keyPress = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter') {
 			if (inputID.length) {
 				update(inputValue, inputID)
@@ -513,7 +531,13 @@ const StarInputForm = ({ update, value, name, type, list, children }: any) => {
 	)
 }
 
-const StarVideo = ({ video, isFirst, isLast, hidden }: any) => {
+interface IStarVideo {
+	video: any
+	isFirst: boolean
+	isLast: boolean
+	hidden: boolean
+}
+const StarVideo = ({ video, isFirst, isLast, hidden }: IStarVideo) => {
 	const [src, setSrc] = useState('')
 	const [dataSrc, setDataSrc] = useState(`${config.source}/videos/${video.fname}`)
 
@@ -562,13 +586,13 @@ const StarVideo = ({ video, isFirst, isLast, hidden }: any) => {
 		clearInterval(thumbnail.current)
 	}
 
-	const handleMouseEnter = ({ target }: any) => {
+	const handleMouseEnter = ({ target }: { target: React.ReactNode }) => {
 		if (dataSrc.length && !src.length) {
 			reload().then(() => startThumbnailPlayback(target))
 		}
 	}
 
-	const handleMouseLeave = ({ target }: any) => {
+	const handleMouseLeave = ({ target }: { target: React.ReactNode }) => {
 		if (!dataSrc.length && src.length) {
 			stopThumbnailPlayback(target).then(() => unload())
 		}

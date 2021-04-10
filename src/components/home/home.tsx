@@ -8,13 +8,20 @@ import './home.scss'
 
 import config from '../config.json'
 
-interface HomeColumnProps {
+interface IHomeColumn {
 	enabled?: boolean
 	label: string
 	limit?: number
 }
 
-const HomeColumn = ({ enabled = true, label, limit = 12 }: HomeColumnProps) => {
+interface IVideo {
+	id: number
+	image: string
+	name: string
+	total: number
+}
+
+const HomeColumn = ({ enabled = true, label, limit = 12 }: IHomeColumn) => {
 	const [data, setData] = useState([])
 
 	useEffect(() => {
@@ -29,7 +36,7 @@ const HomeColumn = ({ enabled = true, label, limit = 12 }: HomeColumnProps) => {
 				</h2>
 
 				<div className='row'>
-					{data.map((video: any) => (
+					{data.map((video: IVideo) => (
 						<div key={video.id} className='row mx-0 px-2 col-1'>
 							<Link className='video px-0 col-12 ribbon-container' to={`/video/${video.id}`}>
 								<img

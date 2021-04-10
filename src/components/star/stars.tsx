@@ -1,28 +1,30 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import Axios from 'axios'
 
 import config from '../config.json'
 
-interface Star {
+interface IStar {
 	id: number
 	name: string
 	image: string
 }
-interface MissingStar {
+
+interface IMissing {
 	videoID: number
 	name: string
 }
 
 const StarsPage = () => {
-	const [stars, setStars] = useState<Star[]>([])
-	const [missing, setMissing] = useState<MissingStar[]>([])
+	const [stars, setStars] = useState<IStar[]>([])
+	const [missing, setMissing] = useState<IMissing[]>([])
+	const [videoStars, setVideoStars] = useState<IMissing[]>([])
 
 	useEffect(() => {
 		Axios.get(`${config.api}/star/missing`).then(({ data }) => {
-			const imported = data.stars.map((item: any) => item.name)
+			const imported = data.stars.map((item: IStar) => item.name)
 
-			const filtered = data.missing.filter((star: any, index: any, self: any) => {
+			const filtered = data.missing.filter((star: IStar, index: any, self: any) => {
 				return index === self.findIndex((item: any) => item.name === star.name && !imported.includes(star.name))
 			})
 
@@ -31,10 +33,10 @@ const StarsPage = () => {
 		})
 	}, [])
 
-	const handleSubmit = (e: any) => {
+	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 
-		const target = e.target.querySelector('input[type="text"]')
+		const target: any = e.currentTarget.querySelector('input[type="text"]')
 		if (target.value) {
 			Axios.post(`${config.api}/star`, { name: target.value }).finally(() => {
 				window.location.reload()
@@ -63,8 +65,8 @@ const StarsPage = () => {
 
 			<div className='stars__no-image row justify-content-center'>
 				{stars
-					.sort((a: any, b: any) => a.name.localeCompare(b.name))
-					.map((star: any) => (
+					.sort((a, b) => a.name.localeCompare(b.name))
+					.map((star) => (
 						<a key={star.id} className='col-1' href={`/star/${star.id}`}>
 							<div className='card mb-2'>
 								{star.image ? (

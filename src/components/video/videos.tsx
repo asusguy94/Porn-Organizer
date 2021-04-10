@@ -7,6 +7,12 @@ import { DaysToYears } from '../date/date'
 
 import config from '../config.json'
 
+interface IVideo {
+	id: number
+	name: string
+	ageInVideo: number
+}
+
 const VideosPage = () => {
 	const [videos, setVideos] = useState([])
 
@@ -17,7 +23,7 @@ const VideosPage = () => {
 	return (
 		<div className='col-12'>
 			<div className='list-group'>
-				{videos.map((video: any) => (
+				{videos.map((video: IVideo) => (
 					<li key={video.id} className='list-group-item list-group-item-action'>
 						<span className='badge bg-primary rounded-pill me-2'>
 							<DaysToYears days={video.ageInVideo} />
