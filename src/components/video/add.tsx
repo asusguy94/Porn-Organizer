@@ -26,6 +26,10 @@ const AddVideoPage = () => {
 							label='Generate Thumbnails'
 							callback={() => Axios.post(`${config.source}/generate/thumb`)}
 						/>
+						<Button
+							label='Generate Metadata'
+							callback={() => Axios.post(`${config.source}/generate/meta`)}
+						/>
 						<Button label='Generate VTT' disabled={true} />
 					</div>
 				) : (
