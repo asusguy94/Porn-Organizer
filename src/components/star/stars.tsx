@@ -30,6 +30,7 @@ const StarsPage = () => {
 
 			setStars(data.stars)
 			setMissing(filtered)
+			setVideoStars(data.missing)
 		})
 	}, [])
 
@@ -80,6 +81,22 @@ const StarsPage = () => {
 							</div>
 						</a>
 					))}
+			</div>
+
+			<div className='videos__no-star row justify-content-center'>
+				{videoStars.map((star) => (
+					<div className='col-1'>
+						<div key={star.videoID} className='card mb-2'>
+							<div className='card-body'>
+								<p className='card-text'>{star.name}</p>
+
+								<a className='card-link' href={`/video/${star.videoID}`}>
+									{star.videoID}
+								</a>
+							</div>
+						</div>
+					</div>
+				))}
 			</div>
 		</div>
 	)
