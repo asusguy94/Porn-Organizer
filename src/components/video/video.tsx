@@ -979,10 +979,13 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 					<PlyrComponent
 						ref={playerRef}
 						options={{
-							controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'fullscreen'],
+							controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'settings'],
+							settings: ['speed'],
+							speed: { selected: 1, options: [0.5, 1, 1.5, 2] },
 							hideControls: false,
 							ratio: '21:9',
-							keyboard: { focused: false }
+							keyboard: { focused: false },
+							fullscreen: { enabled: false }
 						}}
 						sources={{
 							type: 'video',
