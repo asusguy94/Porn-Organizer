@@ -180,6 +180,7 @@ interface ISection {
 }
 const Section = ({ video, locations, attributes, categories, bookmarks, star }: ISection) => {
 	const [playerRef, ref] = useRefWithEffect()
+	const [duration, setDuration] = useState(0)
 
 	// Helper script for getting the player
 	//@ts-ignore
@@ -203,9 +204,16 @@ const Section = ({ video, locations, attributes, categories, bookmarks, star }: 
 				star={star}
 				playerRef={playerRef}
 				playerValue={ref}
+				updateDuration={setDuration}
 			/>
 
-			<Timeline bookmarks={bookmarks} video={video} categories={categories} playVideo={playVideo} />
+			<Timeline
+				bookmarks={bookmarks}
+				video={video}
+				categories={categories}
+				playVideo={playVideo}
+				duration={duration}
+			/>
 		</section>
 	)
 }
@@ -613,7 +621,16 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 	const handleModal = useContext(ModalContext).method
 	const update = useContext(UpdateContext).bookmarks
 
-	let bookmarksArr: any = []
+	if (duration && video.duration) {
+		if (Math.abs(duration - video.duration) >= 1) {
+			alert('invalid video-duration')
+
+			console.log('dur', duration)
+			console.log('vDur', video.duration)
+
+			console.log('Re-Transcode to fix this issue')
+		}
+	}
 
 	const bookmarksArr: HTMLElement[] = []
 
@@ -704,7 +721,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 								<div
 									className='btn btn-sm btn-outline-primary bookmark'
 									style={{
-										left: `${((bookmark.start * 100) / video.duration) * config.timeline.offset}%`
+										left: `${((bookmark.start * 100) / duration) * config.timeline.offset}%`
 									}}
 									onClick={() => playVideo(bookmark.start)}
 									ref={(bookmark: HTMLDivElement) => (bookmarksArr[i] = bookmark)}
@@ -864,6 +881,10 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 						player.pause()
 					}
 				})
+
+				hls.on(Hls.Events.LEVEL_LOADED, (e, data) => updateDuration(data.details.totalduration))
+			} else {
+				player.media.ondurationchange = (e: any) => updateDuration(e.target.duration)
 			}
 		}
 	}, [events])
