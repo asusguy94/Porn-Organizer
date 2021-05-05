@@ -134,19 +134,23 @@ const Stars = ({ stars }: { stars: IStar[] }) => (
 
 		<Grid container>
 			{stars.length ? (
-				stars.map((star) => (
-					<a key={star.id} href={`/star/${star.id}`} className={isHidden(star) ? 'd-none' : ''}>
-						<Card className='star ribbon-container'>
-							<CardActionArea>
-								<CardMedia component='img' src={`${config.source}/images/stars/${star.image}`} />
+				stars.map((star) => {
+					if (isHidden(star)) return null
 
-								<Typography className='text-center'>{star.name}</Typography>
+					return (
+						<a key={star.id} href={`/star/${star.id}`}>
+							<Card className='star ribbon-container'>
+								<CardActionArea>
+									<CardMedia component='img' src={`${config.source}/images/stars/${star.image}`} />
 
-								<Ribbon label={daysToYears(star.age)} />
-							</CardActionArea>
-						</Card>
-					</a>
-				))
+									<Typography className='text-center'>{star.name}</Typography>
+
+									<Ribbon label={daysToYears(star.age)} />
+								</CardActionArea>
+							</Card>
+						</a>
+					)
+				})
 			) : (
 				<Spinner />
 			)}

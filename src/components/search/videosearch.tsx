@@ -113,19 +113,23 @@ const Videos = ({ videos }: any) => (
 
 		<Grid container>
 			{videos.length ? (
-				videos.map((video: any) => (
-					<a key={video.id} href={`/video/${video.id}`} className={isHidden(video) ? 'd-none' : ''}>
-						<Card className='video ribbon-container'>
-							<CardActionArea>
-								<CardMedia component='img' src={`${config.source}/images/videos/${video.image}`} />
+				videos.map((video: any) => {
+					if (isHidden(video)) return null
 
-								<Typography className='text-center'>{video.name}</Typography>
+					return (
+						<a key={video.id} href={`/video/${video.id}`}>
+							<Card className='video ribbon-container'>
+								<CardActionArea>
+									<CardMedia component='img' src={`${config.source}/images/videos/${video.image}`} />
 
-								<Ribbon label={daysToYears(video.ageInVideo)} />
-							</CardActionArea>
-						</Card>
-					</a>
-				))
+									<Typography className='text-center'>{video.name}</Typography>
+
+									<Ribbon label={daysToYears(video.ageInVideo)} />
+								</CardActionArea>
+							</Card>
+						</a>
+					)
+				})
 			) : (
 				<Spinner />
 			)}
