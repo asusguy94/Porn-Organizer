@@ -14,6 +14,8 @@ import {
 
 import Axios from 'axios'
 
+import './stars.scss'
+
 import config from '../config.json'
 
 interface IStar {
@@ -31,6 +33,7 @@ const StarsPage = () => {
 	const [stars, setStars] = useState<IStar[]>([])
 	const [missing, setMissing] = useState<IMissing[]>([])
 	const [videoStars, setVideoStars] = useState<IMissing[]>([])
+	const [input, setInput] = useState('')
 
 	useEffect(() => {
 		Axios.get(`${config.api}/star/missing`).then(({ data }) => {
@@ -46,12 +49,13 @@ const StarsPage = () => {
 		})
 	}, [])
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault()
+	useEffect(() => {
+		if (missing.length) setInput(missing[0].name)
+	}, [missing])
 
-		const target: any = e.currentTarget.querySelector('input[type="text"]')
-		if (target.value) {
-			Axios.post(`${config.api}/star`, { name: target.value }).finally(() => {
+	const handleSubmit = () => {
+		if (input.length) {
+			Axios.post(`${config.api}/star`, { name: input }).finally(() => {
 				window.location.reload()
 			})
 		}
@@ -60,7 +64,7 @@ const StarsPage = () => {
 	return (
 		<Grid container justify='center' spacing={3} id='stars-page'>
 			<form noValidate>
-				<TextField defaultValue={missing.length ? missing[0].name : ''} />
+				<TextField value={input} onChange={(e) => setInput(e.currentTarget.value)} />
 
 				<Button
 					size='small'
