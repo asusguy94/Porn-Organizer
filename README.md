@@ -44,3 +44,7 @@
 ## Features
 
 Status of functionality can be found at [features.md](FEATURES.md)
+
+## Known issues
+
+-   Search-pages are a bit slow
