@@ -1,12 +1,15 @@
 {
 	"name": "pornts",
-	"version": "1.0.2",
+	"version": "2.0.0",
 	"license": "MIT",
 	"dependencies": {
+		"@material-ui/core": "^4.11.4",
+		"@material-ui/icons": "^4.11.2",
+		"@material-ui/lab": "^4.0.0-alpha.58",
 		"axios": "^0.21.1",
 		"capitalize": "^2.0.3",
 		"dayjs": "^1.10.4",
-		"hls.js": "^1.0.0",
+		"hls.js": "^1.0.2",
 		"node-sass": "^4.14.1",
 		"plyr-react": "2.2.1-0",
 		"react": "^17.0.2",
@@ -21,13 +24,13 @@
 		"web-vitals": "^1.1.1"
 	},
 	"devDependencies": {
-		"@testing-library/jest-dom": "^5.11.10",
+		"@testing-library/jest-dom": "^5.12.0",
 		"@testing-library/react": "^11.2.6",
 		"@testing-library/user-event": "^13.1.1",
 		"@types/capitalize": "^2.0.0",
-		"@types/jest": "^26.0.22",
+		"@types/jest": "^26.0.23",
 		"@types/node": "^14.14.37",
-		"@types/react": "^17.0.3",
+		"@types/react": "^17.0.5",
 		"@types/react-dom": "^17.0.3",
 		"@types/react-router-dom": "^5.1.7",
 		"typescript": "^4.2.3"

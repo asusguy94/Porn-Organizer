@@ -1,6 +1,8 @@
 import React, { Component, Fragment, useEffect, useState, createContext, useContext } from 'react'
 import { Link } from 'react-router-dom'
 
+import { Grid, Button, Card, CardMedia, Box, Typography } from '@material-ui/core'
+
 import Axios from 'axios'
 //@ts-ignore
 import { PlyrComponent } from 'plyr-react'
@@ -10,7 +12,8 @@ import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
 import Modal from '../modal/modal'
-import { DaysToYears } from '../date/date'
+import Ribbon from '../ribbon/ribbon'
+import { daysToYears } from '../date/date'
 import { setFocus, useRefWithEffect } from '../../hooks'
 
 import './video.scss'
@@ -104,7 +107,7 @@ class VideoPage extends Component {
 
 	render() {
 		return (
-			<div className='video-page col-12 row'>
+			<Grid container id='video-page'>
 				<UpdateContext.Provider
 					value={{
 						video: (video: IVideo) => this.setState({ video }),
@@ -128,13 +131,13 @@ class VideoPage extends Component {
 						/>
 					</ModalContext.Provider>
 
-					<aside className='col-2'>
-						<div id='stars' className='row justify-content-center'>
+					<Grid item xs={2} id='sidebar'>
+						<Box id='stars'>
 							<Star video={this.state.video} star={this.state.star} />
 
 							<StarInput video={this.state.video} disabled={this.state.star.id !== 0} />
-						</div>
-					</aside>
+						</Box>
+					</Grid>
 				</UpdateContext.Provider>
 
 				<Modal
@@ -151,7 +154,7 @@ class VideoPage extends Component {
 					onKeyEvent={(key: string, e: IKeyPress) => this.handleKeyPress(key, e)}
 					handleFocusableElements={true}
 				/>
-			</div>
+			</Grid>
 		)
 	}
 
@@ -194,8 +197,8 @@ const Section = ({ video, locations, attributes, categories, bookmarks, star }: 
 	}
 
 	return (
-		<section className='col-10'>
-			<Header video={video} locations={locations} attributes={attributes} />
+		<Grid item xs={10}>
+			<Header video={video} locations={locations} attributes={attributes} star={star} />
 
 			<VideoPlayer
 				video={video}
@@ -214,7 +217,7 @@ const Section = ({ video, locations, attributes, categories, bookmarks, star }: 
 				playVideo={playVideo}
 				duration={duration}
 			/>
-		</section>
+		</Grid>
 	)
 }
 
@@ -250,33 +253,29 @@ const Star = ({ star, video }: IStar) => {
 	return (
 		<>
 			{star.id !== 0 && (
-				<div className='star'>
-					<div className={`card mb-2 ribbon-container ${handleBadge()}`} data-badge={handleBadge('data')}>
+				<Box className='star'>
+					<Card className={`ribbon-container ${handleBadge()}`} data-badge={handleBadge('data')}>
 						<ContextMenuTrigger id='star'>
-							<img
-								className='star__image card-img-top'
-								alt='star'
+							<CardMedia
+								component='img'
 								src={`${config.source}/images/stars/${star.image}`}
+								className='star__image'
 							/>
 
-							<Link to={`/star/${star.id}`} className='star__name d-block'>
-								{star.name}
+							<Link to={`/star/${star.id}`} className='star__name'>
+								<Typography>{star.name}</Typography>
 							</Link>
 
-							{star.ageInVideo > 0 ? (
-								<span className='ribbon'>
-									<DaysToYears days={star.ageInVideo} />
-								</span>
-							) : null}
+							{star.ageInVideo > 0 ? <Ribbon label={daysToYears(star.ageInVideo)} /> : null}
 						</ContextMenuTrigger>
-					</div>
+					</Card>
 
 					<ContextMenu id='star'>
 						<MenuItem onClick={removeStar}>
 							<i className={`${config.theme.fa} fa-trash-alt`} /> Remove
 						</MenuItem>
 					</ContextMenu>
-				</div>
+				</Box>
 			)}
 		</>
 	)
@@ -303,15 +302,10 @@ const StarInput = ({ video, disabled = false }: IStarInput) => {
 
 	if (!disabled) {
 		return (
-			<div className='row justify-content-center align-items-center'>
-				<label htmlFor='add-star' className='col-2 col-form-label'>
-					Star
-				</label>
-
-				<div className='col-10 px-0'>
-					<input type='text' id='add-star' className='form-control' onKeyDown={handleKeyPress} />
-				</div>
-			</div>
+			<>
+				<label htmlFor='add-star'>Star</label>
+				<input id='add-star' onKeyDown={handleKeyPress} />
+			</>
 		)
 	}
 
@@ -322,27 +316,30 @@ interface IHeader {
 	video: IVideo
 	attributes: IAttribute[]
 	locations: ILocation[]
+	star: IVideoStar
 }
-const Header = ({ video, attributes, locations }: IHeader) => (
-	<header className='header row'>
-		<div className='col-11'>
+const Header = ({ video, attributes, locations, star }: IHeader) => (
+	<Grid container component='header' id='header'>
+		<Grid item xs={11}>
 			<HeaderTitle video={video} attributes={attributes} locations={locations} />
 
-			<HeaderDate video={video} />
+			<HeaderDate video={video} star={star} />
 
 			<HeaderLocations video={video} />
 
 			<HeaderAttributes video={video} />
 
 			<HeaderSite video={video} />
-		</div>
+		</Grid>
 
-		<HeaderNext video={video} />
-	</header>
+		<Grid item xs={1}>
+			<HeaderNext video={video} />
+		</Grid>
+	</Grid>
 )
 
 const HeaderSite = ({ video }: { video: IVideo }) => (
-	<div className='header__site'>
+	<Box id='header__site'>
 		<span className='wsite'>{video.website}</span>
 		{video.subsite ? (
 			<>
@@ -350,15 +347,17 @@ const HeaderSite = ({ video }: { video: IVideo }) => (
 				<span className='site'>{video.subsite}</span>
 			</>
 		) : null}
-	</div>
+	</Box>
 )
 
 const HeaderNext = ({ video }: { video: IVideo }) => (
-	<div className='col-1 header__next'>
-		<a className='btn btn-sm btn-outline-primary float-end' id='next' href={`/video/${video.nextID ?? ''}`}>
-			Next
+	<Box id='header__next'>
+		<a id='next' href={`/video/${video.nextID ?? ''}`}>
+			<Button size='small' variant='outlined'>
+				Next
+			</Button>
 		</a>
-	</div>
+	</Box>
 )
 
 const HeaderLocations = ({ video }: { video: IVideo }) => {
@@ -373,15 +372,15 @@ const HeaderLocations = ({ video }: { video: IVideo }) => {
 	}
 
 	return (
-		<div className='header__locations'>
+		<Box id='header__locations'>
 			{video.id !== 0
 				? video.locations.map((item) => (
 						<Fragment key={item.id}>
 							<ContextMenuTrigger id={`location-${item.id}`} renderTag='span'>
-								<div className='btn btn-sm btn-outline-danger location'>
+								<Button size='small' variant='outlined' color='secondary' className='location'>
 									<i className={`${config.theme.fa} fa-map-marker-alt`} />
 									{item.name}
-								</div>
+								</Button>
 							</ContextMenuTrigger>
 
 							<ContextMenu id={`location-${item.id}`}>
@@ -392,7 +391,7 @@ const HeaderLocations = ({ video }: { video: IVideo }) => {
 						</Fragment>
 				  ))
 				: null}
-		</div>
+		</Box>
 	)
 }
 
@@ -408,15 +407,15 @@ const HeaderAttributes = ({ video }: { video: IVideo }) => {
 	}
 
 	return (
-		<div className='header__attributes'>
+		<Box id='header__attributes'>
 			{video.id !== 0 &&
 				video.attributes.map((item) => (
 					<Fragment key={item.id}>
 						<ContextMenuTrigger id={`attribute-${item.id}`} renderTag='span'>
-							<div className='btn btn-sm btn-outline-primary attribute'>
+							<Button size='small' variant='outlined' color='primary' className='attribute'>
 								<i className={`${config.theme.fa} fa-tag`} />
 								{item.name}
-							</div>
+							</Button>
 						</ContextMenuTrigger>
 
 						<ContextMenu id={`attribute-${item.id}`}>
@@ -426,20 +425,23 @@ const HeaderAttributes = ({ video }: { video: IVideo }) => {
 						</ContextMenu>
 					</Fragment>
 				))}
-		</div>
+		</Box>
 	)
 }
 
 interface IHeaderDate {
 	video: IVideo
+	star: IVideoStar
 }
-const HeaderDate = ({ video }: IHeaderDate) => {
-	const update = useContext(UpdateContext).video
+const HeaderDate = ({ video, star }: IHeaderDate) => {
+	const { video: update, star: updateStar } = useContext(UpdateContext)
 
 	const fixDate = () => {
 		Axios.put(`${config.source}/video/${video.id}`, { date: true }).then(({ data }) => {
-			video.date.published = data.date
+			star.ageInVideo = data.age
+			updateStar(star)
 
+			video.date.published = data.date
 			update(video)
 		})
 	}
@@ -447,10 +449,10 @@ const HeaderDate = ({ video }: IHeaderDate) => {
 	return (
 		<>
 			<ContextMenuTrigger id='menu__date' renderTag='span'>
-				<div className='header__date btn btn-sm btn-outline-primary'>
+				<Button size='small' variant='outlined' id='header__date'>
 					<i className={`${config.theme.fa} fa-calendar-check`} />
 					{video.date.published}
-				</div>
+				</Button>
 			</ContextMenuTrigger>
 
 			<ContextMenu id='menu__date'>
@@ -503,8 +505,8 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 	const copyStar = async () => await navigator.clipboard.writeText(video.star)
 
 	return (
-		<h1 className='header__title h2 align-middle'>
-			<div className='d-inline-block align-middle'>
+		<Typography variant='h4' id='header__title'>
+			<div className='d-inline-block'>
 				<ContextMenuTrigger id='title'>{video.name}</ContextMenuTrigger>
 			</div>
 
@@ -546,16 +548,17 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 									return null
 								})
 								.map((item) => (
-									<div
+									<Button
+										variant='outlined'
+										color='primary'
 										key={item.id}
-										className='btn btn-sm btn-outline-primary d-block'
 										onClick={() => {
 											handleModal()
 											addAttribute(item)
 										}}
 									>
 										{item.name}
-									</div>
+									</Button>
 								)),
 							true
 						)
@@ -578,16 +581,17 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 									return null
 								})
 								.map((item) => (
-									<div
+									<Button
+										variant='outlined'
+										color='primary'
 										key={item.id}
-										className='btn btn-sm btn-outline-primary d-block'
 										onClick={() => {
 											handleModal()
 											addLocation(item)
 										}}
 									>
 										{item.name}
-									</div>
+									</Button>
 								)),
 							true
 						)
@@ -606,7 +610,7 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 					<i className={`${config.theme.fa} fa-user`} /> Copy Star
 				</MenuItem>
 			</ContextMenu>
-		</h1>
+		</Typography>
 	)
 }
 
@@ -621,16 +625,19 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 	const handleModal = useContext(ModalContext).method
 	const update = useContext(UpdateContext).bookmarks
 
-	if (duration && video.duration) {
-		if (Math.abs(duration - video.duration) >= 1) {
-			alert('invalid video-duration')
+	// Only show warning once
+	useEffect(() => {
+		if (duration && video.duration) {
+			if (Math.abs(duration - video.duration) >= config.maxDurationDiff) {
+				alert('invalid video-duration')
 
-			console.log('dur', duration)
-			console.log('vDur', video.duration)
+				console.log('dur', duration)
+				console.log('vDur', video.duration)
 
-			console.log('Re-Transcode to fix this issue')
+				console.log('Re-Transcode to fix this issue')
+			}
 		}
-	}
+	}, [duration, video.duration])
 
 	const bookmarksArr: HTMLElement[] = []
 
@@ -640,15 +647,15 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 		const time = Math.round(player.currentTime)
 
 		Axios.put(`${config.api}/bookmark/${id}`, { time }).then(() => {
-			bookmarks = bookmarks
-				.map((bookmark) => {
-					if (bookmark.id === id) bookmark.start = time
+			update(
+				bookmarks
+					.map((bookmark) => {
+						if (bookmark.id === id) bookmark.start = time
 
-					return bookmark
-				})
-				.sort((a, b) => a.start - b.start)
-
-			update(bookmarks)
+						return bookmark
+					})
+					.sort((a, b) => a.start - b.start)
+			)
 		})
 	}
 
@@ -681,26 +688,12 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 	}
 
 	useEffect(() => {
-		//console.log('#timeline UPDATED')
-
 		for (let i = 0, items = bookmarksArr, LEVEL_MIN = 1, LEVEL_MAX = 10, level = LEVEL_MIN; i < items.length; i++) {
-			let collision = false
-
+			const prePrev = items[i - 2]
 			const prev = items[i - 1]
 			const current = items[i]
 
-			if (collisionCheck(prev, current)) {
-				collision = true
-			} else {
-				// TODO else statement might be unnecessary
-				//>> code might run when 'level' is greater than 'LEVEL_MAX'
-				/*collision = false
-
-				for (let j = 1; j < i; j++) {
-					if (collisionCheck(items[j], current)) collision = true
-				}*/
-			}
-
+			const collision = collisionCheck(prev, current) || collisionCheck(prePrev, current)
 			if (collision && level < LEVEL_MAX) {
 				level++
 			} else {
@@ -712,22 +705,25 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 	}, [bookmarksArr])
 
 	return (
-		<div className='col-12' id='timeline'>
+		<Grid id='timeline'>
 			{bookmarks.length && video.id !== 0
 				? bookmarks.map((bookmark, i) => (
 						<Fragment key={bookmark.id}>
 							<ContextMenuTrigger id={`bookmark-${bookmark.id}`}>
-								<div
-									className='btn btn-sm btn-outline-primary bookmark'
+								<Button
+									className='bookmark'
+									size='small'
+									variant='outlined'
+									color='primary'
 									style={{
 										left: `${((bookmark.start * 100) / duration) * config.timeline.offset}%`
 									}}
 									onClick={() => playVideo(bookmark.start)}
-									ref={(bookmark: HTMLDivElement) => (bookmarksArr[i] = bookmark)}
+									ref={(bookmark: HTMLButtonElement) => (bookmarksArr[i] = bookmark)}
 									data-level={1}
 								>
 									{bookmark.name}
-								</div>
+								</Button>
 							</ContextMenuTrigger>
 
 							<ContextMenu id={`bookmark-${bookmark.id}`}>
@@ -738,16 +734,17 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 											categories
 												.filter((category) => category.name !== bookmark.name)
 												.map((category) => (
-													<div
+													<Button
+														variant='outlined'
+														color='primary'
 														key={category.id}
-														className='btn btn-sm btn-outline-primary d-block w-auto'
 														onClick={() => {
 															handleModal()
 															changeCategory(category, bookmark)
 														}}
 													>
 														{category.name}
-													</div>
+													</Button>
 												)),
 											true
 										)
@@ -769,7 +766,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 						</Fragment>
 				  ))
 				: null}
-		</div>
+		</Grid>
 	)
 }
 
@@ -912,9 +909,8 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 				time
 			}).then(({ data }) => {
 				bookmarks.push({ id: data.id, name: category.name, start: time })
-				bookmarks.sort((a, b) => a.start - b.start)
 
-				updateBookmarks(bookmarks)
+				updateBookmarks(bookmarks.sort((a, b) => a.start - b.start))
 			})
 		}
 	}
@@ -1006,16 +1002,17 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 						handleModal(
 							'Add Bookmark',
 							categories.map((category) => (
-								<div
+								<Button
+									variant='outlined'
+									color='primary'
 									key={category.id}
-									className='btn btn-sm btn-outline-primary d-block'
 									onClick={() => {
 										handleModal()
 										addBookmark(category)
 									}}
 								>
 									{category.name}
-								</div>
+								</Button>
 							)),
 							true
 						)

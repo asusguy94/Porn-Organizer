@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
+import { Grid, List, ListItem, ListItemText, Badge } from '@material-ui/core'
+
 import Axios from 'axios'
 
-import { DaysToYears } from '../date/date'
+import { daysToYears } from '../date/date'
 
 import config from '../config.json'
 
@@ -21,21 +23,23 @@ const VideosPage = () => {
 	}, [])
 
 	return (
-		<div className='col-12'>
-			<div className='list-group'>
+		<Grid item id='videos-page'>
+			<List>
 				{videos.map((video: IVideo) => (
-					<li key={video.id} className='list-group-item list-group-item-action'>
-						<span className='badge bg-primary rounded-pill me-2'>
-							<DaysToYears days={video.ageInVideo} />
-						</span>
+					<ListItem button divider key={video.id}>
+						<Badge
+							color='primary'
+							badgeContent={daysToYears(video.ageInVideo)}
+							style={{ marginRight: '2em' }}
+						/>
 
-						<Link className='col-11' to={`/video/${video.id}`}>
-							{video.name}
+						<Link to={`/video/${video.id}`}>
+							<ListItemText>{video.name}</ListItemText>
 						</Link>
-					</li>
+					</ListItem>
 				))}
-			</div>
-		</div>
+			</List>
+		</Grid>
 	)
 }
 

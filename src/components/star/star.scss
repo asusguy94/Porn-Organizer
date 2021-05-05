@@ -1,24 +1,20 @@
 @import '../styles/functions';
 #star-page {
-	aside {
-		#similar {
-			text-align: center;
+	.alert {
+		margin: 0.5em 0;
+	}
 
-			a.similar-star {
-				display: inline-block;
-				width: 200px;
+	#similar {
+		text-align: center;
 
-				margin: 10px;
-				text-decoration: none;
-				color: inherit;
+		a.similar-star {
+			display: inline-block;
+			width: 200px;
 
-				&:hover {
-					text-decoration: underline;
-				}
+			margin: 10px;
 
-				img {
-					width: inherit;
-				}
+			&:hover {
+				text-decoration: underline !important;
 			}
 		}
 	}
@@ -52,20 +48,20 @@
 		}
 
 		.action {
-			.btn {
+			&__item {
 				margin-right: 10px;
 
 				margin-bottom: 10px;
 			}
 		}
 
-		label {
-			margin-right: 9px;
+		label.Mui-error {
+			font-weight: bold;
+			color: black;
+		}
 
-			&.bold {
-				font-weight: 600;
-				margin-right: 7px;
-			}
+		.MuiInput-underline.Mui-error::after {
+			border-bottom-color: black;
 		}
 
 		input {
@@ -81,15 +77,28 @@
 	.video {
 		margin: 0 10px 10px 5px;
 		width: $thumbnailWidth + px;
-		transition: opacity 250ms ease-in;
 
+		transition: opacity 250ms ease-in;
 		&.hidden {
 			transition-timing-function: ease-out;
 			opacity: 0.2;
 		}
 
-		span {
+		&__info {
+			padding: 2px 8px;
+		}
+
+		.site-info {
 			text-align: center;
+			margin-top: 10px;
+
+			&__wsite {
+				color: green;
+			}
+
+			&__site {
+				color: red;
+			}
 		}
 	}
 }

@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from 'react'
 
+import {
+	Grid,
+	TextField,
+	Card,
+	CardMedia,
+	CardActionArea,
+	CardContent,
+	Button,
+	Link,
+	Typography
+} from '@material-ui/core'
+
 import Axios from 'axios'
 
 import config from '../config.json'
@@ -46,59 +58,62 @@ const StarsPage = () => {
 	}
 
 	return (
-		<div className='col-12 text-center'>
-			<div className='stars__missing row mb-4'>
-				<div className='col'>
-					<form onSubmit={handleSubmit}>
-						<input
-							type='text'
-							className='col-1 px-1'
-							defaultValue={missing.length ? missing[0].name : ''}
-						/>
-						<input
-							type='submit'
-							className='btn btn-primary btn-sm mb-1 ms-1'
-							value={`Add Star ${missing.length ? `(1 of ${missing.length})` : ''}`}
-						/>
-					</form>
-				</div>
-			</div>
+		<Grid container justify='center' spacing={3} id='stars-page'>
+			<form noValidate>
+				<TextField defaultValue={missing.length ? missing[0].name : ''} />
 
-			<div className='stars__no-image row justify-content-center'>
+				<Button
+					size='small'
+					variant='contained'
+					color='primary'
+					onClick={handleSubmit}
+					style={{ marginLeft: 5, marginTop: 1 }}
+				>{`Add Star ${missing.length ? `(1 of ${missing.length})` : ''}`}</Button>
+			</form>
+
+			<Grid container justify='center' spacing={3} className='stars__no-image'>
 				{stars
 					.sort((a, b) => a.name.localeCompare(b.name))
 					.map((star) => (
-						<a key={star.id} className='col-1' href={`/star/${star.id}`}>
-							<div className='card mb-2'>
-								{star.image ? (
-									<img
-										className='card-img-top'
-										src={`${config.source}/images/stars/${star.image}`}
-										alt='star'
-									/>
-								) : null}
-								<div className='card-body'>{star.name}</div>
-							</div>
-						</a>
+						<Grid item key={star.id} lg={1} md={2} xs={3}>
+							<Link href={`/star/${star.id}`}>
+								<Card className='text-center'>
+									<CardActionArea>
+										{star.image ? (
+											<CardMedia
+												src={`${config.source}/images/stars/${star.image}`}
+												component='img'
+											/>
+										) : null}
+
+										<CardContent>
+											<Typography>{star.name}</Typography>
+										</CardContent>
+									</CardActionArea>
+								</Card>
+							</Link>
+						</Grid>
 					))}
-			</div>
+			</Grid>
 
-			<div className='videos__no-star row justify-content-center'>
-				{videoStars.map((star) => (
-					<div className='col-1'>
-						<div key={star.videoID} className='card mb-2'>
-							<div className='card-body'>
-								<p className='card-text'>{star.name}</p>
+			<Grid container justify='center' spacing={3} className='videos__no-star'>
+				{videoStars
+					.sort((a, b) => a.name.localeCompare(b.name))
+					.map((star) => (
+						<Grid item key={star.videoID} lg={1} md={2} xs={3}>
+							<Card className='text-center'>
+								<CardContent>
+									<Typography>{star.name}</Typography>
 
-								<a className='card-link' href={`/video/${star.videoID}`}>
-									{star.videoID}
-								</a>
-							</div>
-						</div>
-					</div>
-				))}
-			</div>
-		</div>
+									<CardActionArea>
+										<Link href={`/video/${star.videoID}`}>{star.videoID}</Link>
+									</CardActionArea>
+								</CardContent>
+							</Card>
+						</Grid>
+					))}
+			</Grid>
+		</Grid>
 	)
 }
 

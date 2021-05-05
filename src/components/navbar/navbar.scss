@@ -1,6 +1,11 @@
 @import '../styles/variables';
 
 nav {
+	margin-bottom: 1em;
+
+	ul {
+		margin: 0;
+	}
 	li {
 		list-style-type: none;
 	}

@@ -1,4 +1,19 @@
 import React, { Component, useState, useRef, createContext, useContext, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+
+import {
+	Box,
+	Grid,
+	Card,
+	CardActionArea,
+	CardContent,
+	CardMedia,
+	Typography,
+	Button,
+	TextField
+} from '@material-ui/core'
+
+import { Autocomplete, Alert, AlertTitle } from '@material-ui/lab'
 
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
@@ -71,10 +86,10 @@ class StarPage extends Component {
 
 	render() {
 		return (
-			<div id='star-page' className='col-12 row'>
-				<section className='col-7'>
+			<Grid container id='star-page'>
+				<Grid item xs={7}>
 					{this.state.star.id !== 0 ? (
-						<div id='star'>
+						<Grid item xs={3} id='star'>
 							<UpdateContext.Provider value={{ star: (star: any) => this.setState({ star }) }}>
 								<StarImageDropbox star={this.state.star} />
 
@@ -88,13 +103,15 @@ class StarPage extends Component {
 
 								<StarForm starData={this.state.starData} star={this.state.star} />
 							</UpdateContext.Provider>
-						</div>
+						</Grid>
 					) : null}
 
-					<StarVideos
-						videos={this.state.videos}
-						years={{ start: this.state.star.info.start, end: this.state.star.info.end }}
-					/>
+					{this.state.videos.length ? (
+						<StarVideos
+							videos={this.state.videos}
+							years={{ start: this.state.star.info.start, end: this.state.star.info.end }}
+						/>
+					) : null}
 
 					<Modal
 						visible={this.state.modal.visible}
@@ -104,10 +121,12 @@ class StarPage extends Component {
 					>
 						{this.state.modal.data}
 					</Modal>
-				</section>
+				</Grid>
 
-				<Sidebar similar={this.state.star.similar} />
-			</div>
+				<Grid item xs={5}>
+					<Sidebar similar={this.state.star.similar} />
+				</Grid>
+			</Grid>
 		)
 	}
 
@@ -146,12 +165,12 @@ const StarTitle = ({ star }: any) => {
 	}
 
 	return (
-		<div>
-			<div className='d-inline-block'>
+		<Box>
+			<Box className='d-inline-block'>
 				<ContextMenuTrigger id='title' renderTag='span'>
 					<h2 className={isIgnored() ? 'ignored' : ''}>{star.name}</h2>
 				</ContextMenuTrigger>
-			</div>
+			</Box>
 
 			<ContextMenu id='title'>
 				<MenuItem
@@ -192,33 +211,30 @@ const StarTitle = ({ star }: any) => {
 					<i className={`${config.theme.fa} fa-copy`} /> Copy Star
 				</MenuItem>
 			</ContextMenu>
-		</div>
+		</Box>
 	)
 }
 
 const Sidebar = ({ similar }: any) => (
-	<aside className='col-5'>
-		<div className='card'>
-			<h2 className='card-header text-center'>Similar Stars</h2>
+	<Card>
+		<Typography className='text-center'>Similar Stars</Typography>
 
-			<div className='card-body'>
-				<div id='similar'>
-					{similar.map((similarStar: any) => (
-						<a key={similarStar.id} href={similarStar.id} className='similar-star ribbon-container card'>
-							<img
-								src={`${config.source}/images/stars/${similarStar.image}`}
-								className='card-img-top'
-								alt='similar'
-							/>
-							<h3 className='card-title'>{similarStar.name}</h3>
+		<CardContent>
+			<Grid id='similar'>
+				{similar.map((similarStar: any) => (
+					<a key={similarStar.id} href={similarStar.id} className='similar-star ribbon-container'>
+						<Card className='star'>
+							<CardMedia component='img' src={`${config.source}/images/stars/${similarStar.image}`} />
+
+							<Typography>{similarStar.name}</Typography>
 
 							<Ribbon label={`${similarStar.match}%`} />
-						</a>
-					))}
-				</div>
-			</div>
-		</div>
-	</aside>
+						</Card>
+					</a>
+				))}
+			</Grid>
+		</CardContent>
+	</Card>
 )
 
 const StarImageDropbox = ({ star }: any) => {
@@ -287,7 +303,7 @@ const StarImageDropbox = ({ star }: any) => {
 	const isLocalFile = (path: string) => !(path.indexOf('http://') > -1 || path.indexOf('https://') > -1)
 
 	return (
-		<div className='d-inline-block'>
+		<Box className='d-inline-block'>
 			{star.image !== null ? (
 				<>
 					<ContextMenuTrigger id='star__image' renderTag='span'>
@@ -303,7 +319,7 @@ const StarImageDropbox = ({ star }: any) => {
 			) : (
 				<>
 					<ContextMenuTrigger id='star__dropbox'>
-						<div
+						<Box
 							id='dropbox'
 							className={`unselectable ${hover ? 'hover' : ''}`}
 							onDragEnter={handleEnter}
@@ -311,8 +327,8 @@ const StarImageDropbox = ({ star }: any) => {
 							onDragLeave={handleLeave}
 							onDrop={handleDrop}
 						>
-							<div className='label'>Drop Image Here</div>
-						</div>
+							<Box className='label'>Drop Image Here</Box>
+						</Box>
 					</ContextMenuTrigger>
 
 					<ContextMenu id='star__dropbox'>
@@ -322,7 +338,7 @@ const StarImageDropbox = ({ star }: any) => {
 					</ContextMenu>
 				</>
 			)}
-		</div>
+		</Box>
 	)
 }
 
@@ -366,16 +382,22 @@ const StarForm = ({ star, starData }: IStarForm) => {
 	}
 
 	return (
-		<div>
-			<div className='action'>
-				<div id='freeones' className='btn btn-primary' onClick={freeones}>
+		<Box>
+			<Box className='action'>
+				<Button variant='contained' color='primary' id='freeones' className='action__item' onClick={freeones}>
 					Get Data
-				</div>
+				</Button>
 
-				<div id='freeones_rs' className='btn btn-outline-secondary' onClick={freeonesReset}>
+				<Button
+					variant='contained'
+					color='secondary'
+					id='freeones_rs'
+					className='action__item'
+					onClick={freeonesReset}
+				>
 					Reset Data
-				</div>
-			</div>
+				</Button>
+			</Box>
 
 			<StarInputForm update={updateInfo} name='Breast' value={star.info.breast} list={starData.breast} />
 			<StarInputForm update={updateInfo} name='EyeColor' value={star.info.eyecolor} list={starData.eyecolor} />
@@ -389,7 +411,7 @@ const StarForm = ({ star, starData }: IStarForm) => {
 			<StarInputForm update={updateInfo} name='Weight' value={star.info.weight} />
 			<StarInputForm update={updateInfo} name='Start' value={star.info.start} />
 			<StarInputForm update={updateInfo} name='End' value={star.info.end} />
-		</div>
+		</Box>
 	)
 }
 
@@ -399,46 +421,51 @@ interface IStarVideos {
 }
 const StarVideos = ({ videos, years }: IStarVideos) => {
 	const [inRange, setInRange] = useState(true)
-	const [websites, setWebsites] = useState<any[]>([])
+	const [websites, setWebsites] = useState<string[]>([])
 
 	const [websiteFocus, setWebsiteFocus] = useState('')
 
 	const endYear = years.end ?? null
 	const startYear = years.start ?? null
 
-	// Reset "Out of range"
 	useEffect(() => setInRange(true), [years])
 
 	return (
-		<>
+		<Box>
 			{!inRange ? (
-				<div className='alert alert-danger text-center h4' style={{ width: 280 }}>
-					Out of Range
-				</div>
+				<Alert severity='warning' className='alert'>
+					<AlertTitle>Out of Range</AlertTitle>
+					One or more of the video-dates does not match star-activity years
+				</Alert>
 			) : null}
 			<h3>
 				Videos
 				{websites.length > 1
 					? websites.map((website) => (
-							<div
+							<Button
 								key={website}
-								className='btn btn-sm btn-info mx-1'
-								onMouseOver={() => {
-									setWebsiteFocus(website)
-								}}
+								size='small'
+								variant='outlined'
+								color='primary'
+								style={{ marginRight: 8 }}
+								onMouseOver={() => setWebsiteFocus(website)}
 								onMouseLeave={() => setWebsiteFocus('')}
 							>
 								{website}
-							</div>
+							</Button>
 					  ))
 					: null}
 			</h3>
-			<div id='videos' className='row'>
+
+			<Grid container id='videos'>
 				{videos.map((video: any, i: number) => {
 					const parsedYear = dateToYears(video.date)
 
+					// Check if warning is already displayed
+					//>> only display warning once
 					if (inRange) {
 						if (video.age !== null && daysToYears(video.age) < 18) {
+							// if underaged >> probably wrong date
 							setInRange(false)
 						} else if (startYear && endYear) {
 							if (parsedYear < startYear || parsedYear > endYear) setInRange(false)
@@ -450,8 +477,7 @@ const StarVideos = ({ videos, years }: IStarVideos) => {
 					}
 
 					if (!websites.includes(video.website)) {
-						websites.push(video.website)
-						setWebsites(websites)
+						setWebsites([...websites, video.website])
 					}
 
 					return (
@@ -464,8 +490,8 @@ const StarVideos = ({ videos, years }: IStarVideos) => {
 						/>
 					)
 				})}
-			</div>
-		</>
+			</Grid>
+		</Box>
 	)
 }
 
@@ -474,23 +500,23 @@ interface IStarInputForm {
 	update: any
 	value: any
 	name: any
-	type?: any
 	list?: any[]
 }
-const StarInputForm: React.FC<IStarInputForm> = ({ update, value, name, type = 'text', list = [], children }) => {
-	const [inputID, setInputID] = useState('')
+const StarInputForm: React.FC<IStarInputForm> = ({ update, value, name, list = [], children }) => {
+	const [open, setOpen] = useState(false)
 	const [inputValue, setInputValue] = useState(value)
 
-	const updateValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setInputID(e.currentTarget.id)
-		setInputValue(e.currentTarget.value)
+	const label = name.toLowerCase()
+
+	const updateValue = (value: any) => {
+		if (value === '') setOpen(false)
+
+		setInputValue(value)
 	}
 
-	const keyPress = (e: React.KeyboardEvent) => {
-		if (e.key === 'Enter') {
-			if (inputID.length) {
-				update(inputValue, inputID)
-			}
+	const handleKeyPress = (e: React.KeyboardEvent) => {
+		if (!open && e.key === 'Enter') {
+			update(inputValue, label)
 		}
 	}
 
@@ -502,34 +528,33 @@ const StarInputForm: React.FC<IStarInputForm> = ({ update, value, name, type = '
 	}
 
 	return (
-		<div className='input-wrapper mb-2'>
-			<label className={isChanged() ? 'bold' : ''} htmlFor={name.toLowerCase()}>
-				{name}
-			</label>
-
-			<input
-				type={type}
-				id={name.toLowerCase()}
-				defaultValue={value}
-				onChange={updateValue}
-				onKeyDown={keyPress}
-				list={`${name.toLowerCase()}s`}
+		<Box style={{ marginBottom: 4 }}>
+			<Autocomplete
+				id={label}
+				value={value}
+				//
+				// EVENTS
+				onInputChange={(e, val) => updateValue(val)}
+				onKeyPress={handleKeyPress}
+				//
+				// OPTIONS
+				options={list.map((item) => (typeof item === 'object' ? item.name : item))}
+				renderInput={(params) => (
+					<TextField {...params} label={name} error={isChanged()} className='autocomplete' />
+				)}
+				autoHighlight
+				//
+				// open/closed STATUS
+				open={open}
+				onOpen={() => setOpen(true && list.length > 0)}
+				onClose={() => setOpen(false)}
+				//
+				// SIMULATE input instead of dropdown
+				forcePopupIcon={list.length > 0}
 			/>
 
-			{list.length ? (
-				<datalist id={`${name.toLowerCase()}s`}>
-					{list.map((item) =>
-						typeof item === 'object' ? (
-							<option key={item.name} value={item.name} />
-						) : (
-							<option key={item} value={item} />
-						)
-					)}
-				</datalist>
-			) : null}
-
-			{children}
-		</div>
+			{children ? <Box className='d-inline-block'>{children}</Box> : null}
+		</Box>
 	)
 }
 
@@ -601,35 +626,41 @@ const StarVideo = ({ video, isFirst, isLast, hidden }: IStarVideo) => {
 	}
 
 	return (
-		<a className={`video ribbon-container card ${hidden ? 'hidden' : ''}`} href={`/video/${video.id}`}>
-			<video
-				className='card-img-top'
-				src={src}
-				data-src={dataSrc}
-				poster={`${config.source}/images/videos/${video.image}`}
-				preload='metadata'
-				muted
-				onMouseEnter={handleMouseEnter}
-				onMouseLeave={handleMouseLeave}
-			/>
+		<Link className={`video  ${hidden ? 'hidden' : ''}`} to={`/video/${video.id}`}>
+			<Card className='ribbon-container'>
+				<CardActionArea>
+					<CardMedia
+						component='video'
+						src={src}
+						data-src={dataSrc}
+						poster={`${config.source}/images/videos/${video.image}`}
+						preload='metadata'
+						muted
+						onMouseEnter={handleMouseEnter}
+						onMouseLeave={handleMouseLeave}
+					/>
 
-			<span className='title card-title'>{video.name}</span>
-			<span className='info card-subtitle'>
-				<span className='wsite'>{video.website}</span>
+					<CardContent className='video__info'>
+						<Typography className='video__title'>{video.name}</Typography>
+						<Typography className='video__site-info site-info'>
+							<span className='site-info__wsite'>{video.website}</span>
 
-				{video.site !== '' ? (
-					<>
-						<span className='divider'>/</span>
-						<span className='site'>{video.site}</span>
-					</>
-				) : null}
-			</span>
+							{video.site !== '' ? (
+								<>
+									<span className='divider'>/</span>
+									<span className='site-info__site'>{video.site}</span>
+								</>
+							) : null}
+						</Typography>
 
-			<Ribbon isFirst={isFirst} isLast={isLast} align='left' />
+						<Ribbon isFirst={isFirst} isLast={isLast} align='left' />
 
-			{/* @ts-ignore */}
-			{video.age ? <Ribbon label={<DaysToYears days={video.age} />} /> : null}
-		</a>
+						{/* @ts-ignore */}
+						{video.age ? <Ribbon label={<DaysToYears days={video.age} />} /> : null}
+					</CardContent>
+				</CardActionArea>
+			</Card>
+		</Link>
 	)
 }
 

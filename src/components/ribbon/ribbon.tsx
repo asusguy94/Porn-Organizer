@@ -2,7 +2,7 @@ interface IRibbon {
 	isFirst?: boolean
 	isLast?: boolean
 	align?: string
-	label?: string
+	label?: string | number
 }
 
 const Ribbon = ({ isFirst = false, isLast = false, align, label }: IRibbon) => {

@@ -1,14 +1,20 @@
 import { Link } from 'react-router-dom'
 
-const ErrorPage = () => (
-	<div id='error-page' className='col text-center'>
-		<h1>Oops!</h1>
-		<h3>Seems like this page is not created yet</h3>
+import { Button, Grid } from '@material-ui/core'
 
-		<Link className='btn btn-primary mt-4' to='/'>
-			Go Back
-		</Link>
-	</div>
-)
+const ErrorPage = () => {
+	return (
+		<Grid item id='error-page' className='text-center'>
+			<h1>Title</h1>
+			<h3>Seems like this page is not created yet</h3>
+
+			<Link to='/'>
+				<Button variant='contained' color='primary'>
+					Go Back
+				</Button>
+			</Link>
+		</Grid>
+	)
+}
 
 export default ErrorPage

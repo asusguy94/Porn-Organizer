@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 
+import { Card, CardContent, Button, Typography, Box } from '@material-ui/core'
+
 //@ts-ignore
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
@@ -8,7 +10,7 @@ import config from '../config.json'
 
 import './modal.scss'
 
-//TODO improve children, props.children, pros.filter, children=chilren.filter
+//TODO improve children, props.children, pros.filter, children=children.filter
 
 export interface IModal {
 	title: string
@@ -58,21 +60,23 @@ const Modal = (props: any) => {
 	return ReactDOM.createPortal(
 		<>
 			{props.visible ? (
-				<div id='modal' className='card'>
-					<div className='card-header text-center'>
-						<h3>{props.title}</h3>
-						{query ? <h4 className='query bg-warning'>{query}</h4> : null}
-					</div>
+				<Card id='modal'>
+					<Box id='modal__header'>
+						<Typography variant='h5' className='label'>
+							{props.title}
+						</Typography>
+						{query ? <Typography className='query'>{query}</Typography> : null}
+					</Box>
 
-					<div className='card-body'>
-						<div className='content'>{children}</div>
-						<div className='actions'>
-							<div className='btn btn-sm btn-secondary' onClick={props.onClose}>
+					<CardContent id='modal__body'>
+						<Box className='content'>{children}</Box>
+						<Box className='actions'>
+							<Button size='small' variant='contained' color='secondary' onClick={props.onClose}>
 								Close
-							</div>
-						</div>
-					</div>
-				</div>
+							</Button>
+						</Box>
+					</CardContent>
+				</Card>
 			) : null}
 
 			<KeyboardEventHandler

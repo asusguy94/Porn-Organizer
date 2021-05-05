@@ -15,14 +15,14 @@
 | VideoFileRename | Solution breaks the VideoPlayer, so reloading is still the best solution |
 | StarVideosHover | Throws an error when hovering, still works though                        |
 
-## :x: Home Page
+## :heavy_check_mark: Home Page
 
-| Name           | Status             | Priority |
-| -------------- | ------------------ | :------: |
-| Recent Videos  | :heavy_check_mark: |          |
-| Newest Videos  | :heavy_check_mark: |          |
-| Popular Videos | :x: Missing Count  |   LOW    |
-| Random Videos  | :heavy_check_mark: |          |
+| Name           | Status             |
+| -------------- | ------------------ |
+| Recent Videos  | :heavy_check_mark: |
+| Newest Videos  | :heavy_check_mark: |
+| Popular Videos | :heavy_check_mark: |
+| Random Videos  | :heavy_check_mark: |
 
 ## :x: Import Videos
 

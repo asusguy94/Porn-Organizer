@@ -1,0 +1,27 @@
+.text-center {
+	text-align: center;
+}
+
+.img-thumbnail {
+	width: 100%;
+	padding: 0.25rem;
+	border: 1px solid #dee2e6;
+	border-radius: 0.25rem;
+}
+
+.border {
+	border: 1px solid red;
+}
+
+.d {
+	&-none {
+		display: none;
+	}
+	&-inline-block {
+		display: inline-block;
+	}
+}
+
+.float-right {
+	float: right;
+}

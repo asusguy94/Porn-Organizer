@@ -1,0 +1,17 @@
+.MuiButton-root {
+	cursor: default !important;
+}
+
+.MuiGrid-item {
+	img {
+		width: 100%;
+	}
+}
+
+#search-page {
+	.MuiCardMedia-img {
+		// Required to fix oddly shaped images
+		//> omitting this, causes only the center of the image to be displayed
+		object-fit: inherit;
+	}
+}

@@ -1,4 +1,17 @@
-import { Component, useState, useEffect, FC, ChangeEvent, KeyboardEvent } from 'react'
+import React, { FC, Component, useState, useEffect, ChangeEvent, KeyboardEvent } from 'react'
+
+import {
+	Grid,
+	Button,
+	Table,
+	TableContainer,
+	TableHead,
+	TableRow,
+	TableCell,
+	TableBody,
+	TextField,
+	Paper
+} from '@material-ui/core'
 
 import Axios from 'axios'
 import capitalize from 'capitalize'
@@ -11,7 +24,7 @@ import config from '../config.json'
 //TODO implement country
 
 const EditorPage = () => (
-	<div id='editor-page' className='col-12 row'>
+	<Grid container id='editor-page'>
 		<Wrapper label='attributes' name='attribute'>
 			<WrapperItem label='attribute' />
 		</Wrapper>
@@ -25,7 +38,7 @@ const EditorPage = () => (
 		</Wrapper>
 
 		<CountriesPage />
-	</div>
+	</Grid>
 )
 
 const Wrapper: FC<{ label: string; name: string }> = ({ label, name, children }) => {
@@ -53,20 +66,33 @@ const Wrapper: FC<{ label: string; name: string }> = ({ label, name, children })
 	}
 
 	return (
-		<div className='col-3'>
-			<header className='row'>
-				<h2 className='col-4'>{capitalize(label)}</h2>
+		<Grid item xs={3} style={{ paddingLeft: 5, paddingRight: 5, marginTop: 5 }}>
+			<Grid container justify='center' style={{ marginBottom: 10 }} xs={12}>
+				<Grid item component='h2'>
+					{capitalize(label)}
+				</Grid>
 
-				<div className='col-8 mt-1'>
-					<input type='text' className='col-8' onChange={handleChange} onKeyPress={handleKeyPress} />
-					<div className='btn btn-sm btn-primary ms-1 mb-1' onClick={handleSubmit}>
+				<Grid item>
+					<TextField
+						onChange={handleChange}
+						onKeyPress={handleKeyPress}
+						style={{ marginLeft: 5, marginRight: 5 }}
+					/>
+
+					<Button
+						variant='contained'
+						color='primary'
+						size='small'
+						onClick={handleSubmit}
+						style={{ marginTop: 2 }}
+					>
 						Add {capitalize(name)}
-					</div>
-				</div>
-			</header>
+					</Button>
+				</Grid>
+			</Grid>
 
 			{children}
-		</div>
+		</Grid>
 	)
 }
 
@@ -94,20 +120,22 @@ const WrapperItem = ({ label }: { label: string }) => {
 	}
 
 	return (
-		<table className='table table-striped'>
-			<thead>
-				<tr>
-					<th>ID</th>
-					<th>{capitalize(label)}</th>
-				</tr>
-			</thead>
+		<TableContainer component={Paper}>
+			<Table size='small'>
+				<TableHead>
+					<TableRow>
+						<TableCell>ID</TableCell>
+						<TableCell>{capitalize(label)}</TableCell>
+					</TableRow>
+				</TableHead>
 
-			<tbody>
-				{data.map((item: any) => (
-					<Item key={item.id} data={item} update={(ref: any, value: any) => updateItem(ref, value)} />
-				))}
-			</tbody>
-		</table>
+				<TableBody>
+					{data.map((item: any) => (
+						<Item key={item.id} data={item} update={(ref: any, value: any) => updateItem(ref, value)} />
+					))}
+				</TableBody>
+			</Table>
+		</TableContainer>
 	)
 }
 
@@ -132,9 +160,9 @@ const Item = ({ update, data }: any) => {
 	const changeHandler = (e: any) => setValue(e.currentTarget.value)
 
 	return (
-		<tr>
-			<th>{data.id}</th>
-			<td className='btn-link' onClick={clickHandler}>
+		<TableRow>
+			<TableCell>{data.id}</TableCell>
+			<TableCell>
 				{edit ? (
 					<input
 						type='text'
@@ -145,10 +173,10 @@ const Item = ({ update, data }: any) => {
 						onChange={changeHandler}
 					/>
 				) : (
-					<span>{data.name}</span>
+					<span onClick={clickHandler}>{data.name}</span>
 				)}
-			</td>
-		</tr>
+			</TableCell>
+		</TableRow>
 	)
 }
 
@@ -183,27 +211,34 @@ class CountriesPage extends Component {
 
 	render() {
 		return (
-			<div className='col-3'>
-				<header className='row'>
-					<h2 className='col-4'>Countries</h2>
+			<Grid item xs={3} style={{ paddingLeft: 5, paddingRight: 5, marginTop: 5 }}>
+				<Grid container justify='center' style={{ marginBottom: 10 }} xs={12}>
+					<Grid item component='h2'>
+						Countries
+					</Grid>
 
-					<div className='col-8 mt-1'>
-						<input
-							type='text'
-							className='col-8'
+					<Grid item>
+						<TextField
 							//@ts-ignore
 							ref={(input: any) => (this.input = input)}
 							onChange={this.handleChange.bind(this)}
 							onKeyPress={this.handleKeyPress.bind(this)}
+							style={{ marginLeft: 5, marginRight: 5 }}
 						/>
-						<div className='btn btn-sm btn-primary ms-1 mb-1' onClick={this.handleSubmit.bind(this)}>
+						<Button
+							variant='contained'
+							color='primary'
+							size='small'
+							onClick={this.handleSubmit.bind(this)}
+							style={{ marginTop: 2 }}
+						>
 							Add Country
-						</div>
-					</div>
-				</header>
+						</Button>
+					</Grid>
+				</Grid>
 
 				<Countries />
-			</div>
+			</Grid>
 		)
 	}
 }
@@ -214,7 +249,10 @@ class Countries extends Component {
 	}
 
 	componentDidMount() {
-		this.getData()
+		Axios.get(`${config.api}/country`).then(({ data: countries }) => {
+			countries.sort((a: ICountry, b: ICountry) => a.id - b.id)
+			this.setState({ countries })
+		})
 	}
 
 	updateCountry(ref: any, value: any, label: any) {
@@ -234,37 +272,34 @@ class Countries extends Component {
 
 	render() {
 		return (
-			<table className='table table-striped'>
-				<thead>
-					<tr>
-						<th>ID</th>
-						<th>Country</th>
-						<th>Code</th>
-						<th>Flag</th>
-					</tr>
-				</thead>
+			<TableContainer component={Paper}>
+				<Table size='small'>
+					<TableHead>
+						<TableRow>
+							<TableCell>ID</TableCell>
+							<TableCell>Country</TableCell>
+							<TableCell>Code</TableCell>
+							<TableCell>Flag</TableCell>
+						</TableRow>
+					</TableHead>
 
-				<tbody>
-					{this.state.countries.map((country: any) => (
-						<Country
-							key={country.id}
-							data={country}
-							updateCountry={(ref: any, value: any, label = 'country') =>
-								this.updateCountry(ref, value, label)
-							}
-							updateCode={(ref: any, value: any, label = 'code') => this.updateCountry(ref, value, label)}
-						/>
-					))}
-				</tbody>
-			</table>
+					<TableBody>
+						{this.state.countries.map((country: any) => (
+							<Country
+								key={country.id}
+								data={country}
+								updateCountry={(ref: any, value: any, label = 'country') =>
+									this.updateCountry(ref, value, label)
+								}
+								updateCode={(ref: any, value: any, label = 'code') =>
+									this.updateCountry(ref, value, label)
+								}
+							/>
+						))}
+					</TableBody>
+				</Table>
+			</TableContainer>
 		)
-	}
-
-	getData() {
-		Axios.get(`${config.api}/country`).then(({ data: countries }) => {
-			countries.sort((a: ICountry, b: ICountry) => a.id - b.id)
-			this.setState({ countries })
-		})
 	}
 }
 
@@ -307,10 +342,9 @@ class Country extends Component<any> {
 		const { id, name, code } = this.props.data
 
 		return (
-			<tr>
-				<th>{id}</th>
-				<td
-					className='btn-link'
+			<TableRow>
+				<TableCell>{id}</TableCell>
+				<TableCell
 					onClick={() => {
 						this.setState(({ country }: any) => {
 							country.edit = true
@@ -343,9 +377,9 @@ class Country extends Component<any> {
 					) : (
 						<span>{name}</span>
 					)}
-				</td>
-				<td
-					className='btn-link'
+				</TableCell>
+
+				<TableCell
 					onClick={() => {
 						this.setState(({ code }: any) => {
 							code.edit = true
@@ -379,12 +413,11 @@ class Country extends Component<any> {
 					) : (
 						<span>{code}</span>
 					)}
-				</td>
-
-				<td>
+				</TableCell>
+				<TableCell>
 					<i className={`flag flag-${code}`} />
-				</td>
-			</tr>
+				</TableCell>
+			</TableRow>
 		)
 	}
 }

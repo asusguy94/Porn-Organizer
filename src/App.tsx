@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
+import { Container, CssBaseline } from '@material-ui/core'
+
 /* Custom Components */
 import NavBar from './components/navbar/navbar'
 
@@ -23,10 +25,10 @@ import './components/styles/flag.scss'
 const App = () => {
 	return (
 		<Router>
-			<NavBar />
+			<CssBaseline>
+				<NavBar />
 
-			<main className='container-fluid'>
-				<div className='row'>
+				<Container component='main' maxWidth={false}>
 					<Switch>
 						<Route path='/video/add' component={AddVideoPage} />
 						<Route path='/video/search' component={VideoSearchPage} />
@@ -42,8 +44,8 @@ const App = () => {
 						<Route path='/' exact component={HomePage} />
 						<Route path='*' component={ErrorPage} />
 					</Switch>
-				</div>
-			</main>
+				</Container>
+			</CssBaseline>
 		</Router>
 	)
 }

@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
+import { Grid, Box } from '@material-ui/core'
+
 import Axios from 'axios'
 import capitalize from 'capitalize'
+
+import Ribbon from '../ribbon/ribbon'
 
 import './home.scss'
 
@@ -22,7 +26,7 @@ interface IVideo {
 }
 
 const HomeColumn = ({ enabled = true, label, limit = 12 }: IHomeColumn) => {
-	const [data, setData] = useState([])
+	const [data, setData] = useState<IVideo[]>([])
 
 	useEffect(() => {
 		Axios.get(`${config.api}/home/${label}/${limit}`).then(({ data }) => setData(data))
@@ -30,29 +34,31 @@ const HomeColumn = ({ enabled = true, label, limit = 12 }: IHomeColumn) => {
 
 	if (enabled && data.length) {
 		return (
-			<section className='col-12'>
+			<Grid container>
 				<h2>
 					{capitalize(label)} (<span className='count'>{data.length}</span>)
 				</h2>
 
-				<div className='row'>
-					{data.map((video: IVideo) => (
-						<div key={video.id} className='row mx-0 px-2 col-1'>
-							<Link className='video px-0 col-12 ribbon-container' to={`/video/${video.id}`}>
-								<img
-									className='mx-auto img-thumbnail'
-									alt='video'
-									src={`${config.source}/images/videos/${video.image}`}
-								/>
+				<Grid container spacing={2}>
+					{data.map((video) => (
+						<Grid item xs={1} key={video.id}>
+							<Link to={`/video/${video.id}`}>
+								<Box className='video ribbon-container'>
+									<img
+										src={`${config.source}/images/videos/${video.image}`}
+										className='img-thumbnail'
+										alt='video'
+									/>
 
-								<span className='video__title mx-auto d-block'>{video.name}</span>
+									<Box className='video__title'>{video.name}</Box>
 
-								{video.total > 0 ? <span className='ribbon'>{video.total}</span> : null}
+									{video.total > 0 ? <Ribbon label={video.total} /> : null}
+								</Box>
 							</Link>
-						</div>
+						</Grid>
 					))}
-				</div>
-			</section>
+				</Grid>
+			</Grid>
 		)
 	}
 
@@ -60,12 +66,12 @@ const HomeColumn = ({ enabled = true, label, limit = 12 }: IHomeColumn) => {
 }
 
 const HomePage = () => (
-	<div id='home-page'>
+	<Grid container id='home-page'>
 		<HomeColumn label='recent' />
 		<HomeColumn label='newest' />
 		<HomeColumn label='popular' limit={24} />
 		<HomeColumn label='random' enabled={false} />
-	</div>
+	</Grid>
 )
 
 export default HomePage

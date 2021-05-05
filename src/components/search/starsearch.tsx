@@ -1,13 +1,30 @@
 import React, { Component } from 'react'
 
+import {
+	Grid,
+	Card,
+	CardMedia,
+	CardActionArea,
+	Box,
+	Typography,
+	TextField,
+	FormControl,
+	RadioGroup,
+	FormControlLabel,
+	Radio,
+	Select,
+	MenuItem
+} from '@material-ui/core'
+
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
 
-import { DaysToYears } from '../date/date'
+import { daysToYears } from '../date/date'
 import LabelCount from '../labelcount/labelcount'
 import { getCount, isHidden } from './helper'
 import Spinner from '../spinner/spinner'
+import Ribbon from '../ribbon/ribbon'
 
 import './search.scss'
 
@@ -84,55 +101,57 @@ class StarSearchPage extends Component {
 
 	render() {
 		return (
-			<div className='search-page col-12 row'>
-				<Sidebar
-					starData={{
-						breasts: this.state.breasts,
-						haircolors: this.state.haircolors,
-						ethnicities: this.state.ethnicities,
-						countries: this.state.countries
-					}}
-					stars={this.state.stars}
-					update={(stars: IStar[]) => this.setState({ stars })}
-				/>
+			<Grid container id='search-page'>
+				<Grid item xs={2}>
+					<Sidebar
+						starData={{
+							breasts: this.state.breasts,
+							haircolors: this.state.haircolors,
+							ethnicities: this.state.ethnicities,
+							countries: this.state.countries
+						}}
+						stars={this.state.stars}
+						update={(stars: IStar[]) => this.setState({ stars })}
+					/>
+				</Grid>
 
-				<Stars stars={this.state.stars} />
+				<Grid item container xs={10} justify='center'>
+					<Stars stars={this.state.stars} />
+				</Grid>
 
 				<ScrollToTop smooth />
-			</div>
+			</Grid>
 		)
 	}
 }
 
 // Wrapper
 const Stars = ({ stars }: { stars: IStar[] }) => (
-	<section id='stars' className='col-10'>
-		<h2 className='text-center'>
+	<Box id='stars'>
+		<Typography variant='h6' className='text-center'>
 			<span className='count'>{getCount(stars)}</span> Stars
-		</h2>
+		</Typography>
 
-		<div className='row justify-content-center'>
+		<Grid container>
 			{stars.length ? (
 				stars.map((star) => (
-					<a
-						key={star.id}
-						href={`/star/${star.id}`}
-						className={`star ribbon-container card ${isHidden(star) ? 'd-none' : ''}`}
-					>
-						<img className='card-img-top' src={`${config.source}/images/stars/${star.image}`} alt='star' />
+					<a key={star.id} href={`/star/${star.id}`} className={isHidden(star) ? 'd-none' : ''}>
+						<Card className='star ribbon-container'>
+							<CardActionArea>
+								<CardMedia component='img' src={`${config.source}/images/stars/${star.image}`} />
 
-						<span className='title card-title text-center'>{star.name}</span>
+								<Typography className='text-center'>{star.name}</Typography>
 
-						<span className='ribbon'>
-							<DaysToYears days={star.age} />
-						</span>
+								<Ribbon label={daysToYears(star.age)} />
+							</CardActionArea>
+						</Card>
 					</a>
 				))
 			) : (
 				<Spinner />
 			)}
-		</div>
-	</section>
+		</Grid>
+	</Box>
 )
 
 interface ISidebar {
@@ -141,13 +160,13 @@ interface ISidebar {
 	update: any
 }
 const Sidebar = ({ starData, stars, update }: ISidebar) => (
-	<aside className='col-2'>
+	<>
 		<TitleSearch stars={stars} update={update} />
 
 		<Sort stars={stars} update={update} />
 
 		<Filter starData={starData} stars={stars} update={update} />
-	</aside>
+	</>
 )
 
 // Container
@@ -189,7 +208,7 @@ const Filter = ({ stars, starData, update }: IFilter) => {
 	}
 
 	const country_DROP = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const targetLower = e.currentTarget.value.toLowerCase()
+		const targetLower = e.target.value.toLowerCase()
 
 		stars = stars.map((star) => {
 			if (targetLower === 'all') {
@@ -284,28 +303,28 @@ interface ISort {
 }
 const Sort = ({ stars, update }: ISort) => {
 	const sortDefault = (reverse = false) => {
-		stars.sort((a: IStar, b: IStar) => a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en'))
+		stars.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en'))
 
 		if (reverse) stars.reverse()
 		update(stars)
 	}
 
 	const sortAdded = (reverse = false) => {
-		stars.sort((a: IStar, b: IStar) => a.id - b.id)
+		stars.sort((a, b) => a.id - b.id)
 
 		if (reverse) stars.reverse()
 		update(stars)
 	}
 
 	const sortAge = (reverse = false) => {
-		stars.sort((a: IStar, b: IStar) => a.age - b.age)
+		stars.sort((a, b) => a.age - b.age)
 
 		if (reverse) stars.reverse()
 		update(stars)
 	}
 
 	const sortVideos = (reverse = false) => {
-		stars.sort((a: IStar, b: IStar) => a.videoCount - b.videoCount)
+		stars.sort((a, b) => a.videoCount - b.videoCount)
 
 		if (reverse) stars.reverse()
 		update(stars)
@@ -315,17 +334,56 @@ const Sort = ({ stars, update }: ISort) => {
 		<>
 			<h2>Sort</h2>
 
-			<SortItem name='A-Z' label='alphabetically' callback={() => sortDefault()} checked={true} />
-			<SortItem name='Z-A' label='alphabetically_desc' callback={() => sortDefault(true)} />
+			<FormControl>
+				<RadioGroup name='sort' defaultValue='alphabetically'>
+					<FormControlLabel
+						label='A-Z'
+						value='alphabetically'
+						control={<Radio />}
+						onChange={() => sortDefault()}
+					/>
+					<FormControlLabel
+						label='Z-A'
+						value='alphabetically_desc'
+						control={<Radio />}
+						onChange={() => sortDefault(true)}
+					/>
 
-			<SortItem name='Old Upload' label='added' callback={() => sortAdded()} />
-			<SortItem name='Recent Upload' label='added_desc' callback={() => sortAdded(true)} />
+					<FormControlLabel
+						label='Old Upload'
+						value='added'
+						control={<Radio />}
+						onChange={() => sortAdded()}
+					/>
+					<FormControlLabel
+						label='Recent Upload'
+						value='added_desc'
+						control={<Radio />}
+						onChange={() => sortAdded(true)}
+					/>
 
-			<SortItem name='Teen' label='star-age' callback={() => sortAge()} />
-			<SortItem name='Milf' label='star-age_desc' callback={() => sortAge(true)} />
+					<FormControlLabel label='Teen' value='star-age' control={<Radio />} onChange={() => sortAge()} />
+					<FormControlLabel
+						label='Milf'
+						value='star-age_desc'
+						control={<Radio />}
+						onChange={() => sortAge(true)}
+					/>
 
-			<SortItem name='Least Videos' label='videos' callback={() => sortVideos()} />
-			<SortItem name='Most Videos' label='videos_desc' callback={() => sortVideos(true)} />
+					<FormControlLabel
+						label='Least Videos'
+						value='videos'
+						control={<Radio />}
+						onChange={() => sortVideos()}
+					/>
+					<FormControlLabel
+						label='Most Videos'
+						value='videos_desc'
+						control={<Radio />}
+						onChange={() => sortVideos(true)}
+					/>
+				</RadioGroup>
+			</FormControl>
 		</>
 	)
 }
@@ -347,28 +405,10 @@ const TitleSearch = ({ stars, update }: ITitleSearch) => {
 		update(stars)
 	}
 
-	return (
-		<div className='input-wrapper'>
-			<input type='text' placeholder='Name' autoFocus onChange={callback} />
-		</div>
-	)
+	return <TextField autoFocus placeholder='Name' onChange={callback} />
 }
 
 // ContainerItem
-interface ISortItem {
-	callback: any
-	label: string
-	name: string
-	checked?: boolean
-	disabled?: boolean
-}
-const SortItem = ({ callback, label, name, checked = false, disabled = false }: ISortItem) => (
-	<div className={`input-wrapper ${disabled ? 'disabled' : ''}`}>
-		<input type='radio' name='sort' id={label} onChange={callback} defaultChecked={checked} />
-		<label htmlFor={label}>{name}</label>
-	</div>
-)
-
 interface IFilterItem {
 	data: any[]
 	label: string
@@ -381,34 +421,30 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 	<>
 		<h2>{capitalize(label, true)}</h2>
 
-		<div id={label}>
-			{globalCallback !== null ? (
-				<div className='input-wrapper'>
-					<input type='radio' name={label} id={`${label}_ALL`} onChange={globalCallback} defaultChecked />
-					<label className='global-category' htmlFor={`${label}_ALL`}>
-						ALL
-					</label>
-				</div>
-			) : null}
+		<FormControl>
+			<RadioGroup name={label} defaultValue='ALL'>
+				{globalCallback !== null ? (
+					<FormControlLabel value='ALL' label='ALL' onChange={globalCallback} control={<Radio />} />
+				) : null}
+				{nullCallback !== null ? (
+					<FormControlLabel value='NULL' label='NULL' onChange={nullCallback} control={<Radio />} />
+				) : null}
 
-			{nullCallback !== null ? (
-				<div className='input-wrapper'>
-					<input type='radio' name={label} id={`${label}_NULL`} onChange={nullCallback} />
-					<label className='global-category' htmlFor={`${label}_NULL`}>
-						NULL
-					</label>
-				</div>
-			) : null}
-
-			{data.map((item: any) => (
-				<div className='input-wrapper' key={item}>
-					<input type='radio' name={label} id={`${label}-${item}`} onChange={() => callback(item)} />
-					<label htmlFor={`${label}-${item}`}>
-						{item} <LabelCount prop={label} label={item} obj={obj} isArr={true} />
-					</label>
-				</div>
-			))}
-		</div>
+				{data.map((item) => (
+					<FormControlLabel
+						key={item}
+						value={item}
+						onChange={() => callback(item)}
+						label={
+							<>
+								{item} <LabelCount prop={label} label={item} obj={obj} isArr />
+							</>
+						}
+						control={<Radio />}
+					/>
+				))}
+			</RadioGroup>
+		</FormControl>
 	</>
 )
 
@@ -422,17 +458,16 @@ const FilterDropdown = ({ data, label, labelPlural, callback }: IFilterDropdown)
 	<>
 		<h2>{capitalize(label, true)}</h2>
 
-		<div id={label}>
-			<div className='input-wrapper'>
-				<select className='form-select' name={labelPlural} onChange={callback}>
-					<option>All</option>
-
-					{data.map((item: { code: string; name: string }) => (
-						<option key={item.name}>{item.name}</option>
-					))}
-				</select>
-			</div>
-		</div>
+		<FormControl>
+			<Select id={label} name={labelPlural} defaultValue='ALL' onChange={callback}>
+				<MenuItem value='ALL'>All</MenuItem>
+				{data.map((item: { code: string; name: string }) => (
+					<MenuItem key={item.code} value={item.name}>
+						{item.name}
+					</MenuItem>
+				))}
+			</Select>
+		</FormControl>
 	</>
 )
 
