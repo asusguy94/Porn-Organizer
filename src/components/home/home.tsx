@@ -34,7 +34,7 @@ const HomeColumn = ({ enabled = true, label, limit = 12 }: IHomeColumn) => {
 
 	if (enabled && data.length) {
 		return (
-			<Grid container>
+			<Grid container component='section'>
 				<h2>
 					{capitalize(label)} (<span className='count'>{data.length}</span>)
 				</h2>

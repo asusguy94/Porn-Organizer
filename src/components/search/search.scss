@@ -8,44 +8,21 @@
 	.star,
 	.video {
 		margin: 5px;
+	}
 
-		&.video {
-			width: $thumbnailWidth + px;
+	.video {
+		width: $thumbnailWidth + px;
 
-			img {
-				height: $thumbnailHeight + px;
-			}
-		}
-
-		&.star {
-			width: $starWidth + px;
-
-			img {
-				height: $starHeight + px;
-			}
+		img {
+			height: $thumbnailHeight + px;
 		}
 	}
 
-	.input-wrapper {
-		margin-bottom: 4%;
+	.star {
+		width: $starWidth + px;
 
-		& > input[type='text'] {
-			width: 100%;
-			padding: 10px;
-		}
-
-		& > input[type='checkbox'],
-		& > input[type='radio'] {
-			transform: scale(1.5);
-		}
-
-		& > label {
-			margin-left: 5px;
-		}
-
-		&.disabled {
-			pointer-events: none;
-			opacity: 0.4;
+		img {
+			height: $starHeight + px;
 		}
 	}
 
@@ -57,12 +34,7 @@
 		color: blue;
 	}
 
-	// Global Category
 	.global-category {
 		text-decoration: underline;
-	}
-
-	option.global-category {
-		font-weight: bolder;
 	}
 }
