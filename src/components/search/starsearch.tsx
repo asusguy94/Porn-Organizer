@@ -430,10 +430,21 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 		<FormControl>
 			<RadioGroup name={label} defaultValue='ALL'>
 				{globalCallback !== null ? (
-					<FormControlLabel value='ALL' label='ALL' onChange={globalCallback} control={<Radio />} />
+					<FormControlLabel
+						value='ALL'
+						label={<div className='global-category'>ALL</div>}
+						onChange={globalCallback}
+						control={<Radio />}
+					/>
 				) : null}
+
 				{nullCallback !== null ? (
-					<FormControlLabel value='NULL' label='NULL' onChange={nullCallback} control={<Radio />} />
+					<FormControlLabel
+						value='NULL'
+						label={<div className='global-category'>NULL</div>}
+						onChange={nullCallback}
+						control={<Radio />}
+					/>
 				) : null}
 
 				{data.map((item) => (

@@ -477,12 +477,16 @@ const FilterObj = ({
 
 			<FormControl>
 				{nullCallback !== null ? (
-					<IndeterminateItem label='NULL' value='NULL' callback={(ref: any) => nullCallback(ref)} />
+					<IndeterminateItem
+						label={<div className='global-category'>NULL</div>}
+						value='NULL'
+						callback={(ref: any) => nullCallback(ref)}
+					/>
 				) : null}
 
 				{otherCallback !== null ? (
 					<IndeterminateItem
-						label={otherCallbackLabel.toUpperCase()}
+						label={<div className='global-category'>{otherCallbackLabel.toUpperCase()}</div>}
 						value='OTHER'
 						callback={(ref: any) => otherCallback(ref)}
 					/>
