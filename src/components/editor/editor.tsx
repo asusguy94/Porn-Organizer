@@ -67,7 +67,7 @@ const Wrapper: FC<{ label: string; name: string }> = ({ label, name, children })
 
 	return (
 		<Grid item xs={3} style={{ paddingLeft: 5, paddingRight: 5, marginTop: 5 }}>
-			<Grid container justify='center' style={{ marginBottom: 10 }} xs={12}>
+			<Grid container justify='center' style={{ marginBottom: 10 }}>
 				<Grid item component='h2'>
 					{capitalize(label)}
 				</Grid>
@@ -141,39 +141,32 @@ const WrapperItem = ({ label }: { label: string }) => {
 
 const Item = ({ update, data }: any) => {
 	const [edit, setEdit] = useState(false)
-	const [value, setValue] = useState(null)
+	const [value, setValue] = useState('')
 
 	const save = () => {
 		setEdit(false)
 
-		if (value) update(data, value)
+		if (value.length) update(data, value)
 	}
-
-	const handleKeyPress = (e: React.KeyboardEvent) => {
-		if (e.key === 'Enter') {
-			e.preventDefault()
-			save()
-		}
-	}
-
-	const clickHandler = () => setEdit(true)
-	const changeHandler = (e: any) => setValue(e.currentTarget.value)
 
 	return (
 		<TableRow>
 			<TableCell>{data.id}</TableCell>
 			<TableCell>
 				{edit ? (
-					<input
-						type='text'
+					<TextField
 						defaultValue={data.name}
 						autoFocus
 						onBlur={save}
-						onKeyPress={handleKeyPress}
-						onChange={changeHandler}
+						onKeyPress={(e) => {
+							if (e.key === 'Enter') {
+								save()
+							}
+						}}
+						onChange={(e) => setValue(e.currentTarget.value)}
 					/>
 				) : (
-					<span onClick={clickHandler}>{data.name}</span>
+					<span onClick={() => setEdit(true)}>{data.name}</span>
 				)}
 			</TableCell>
 		</TableRow>
@@ -212,7 +205,7 @@ class CountriesPage extends Component {
 	render() {
 		return (
 			<Grid item xs={3} style={{ paddingLeft: 5, paddingRight: 5, marginTop: 5 }}>
-				<Grid container justify='center' style={{ marginBottom: 10 }} xs={12}>
+				<Grid container justify='center' style={{ marginBottom: 10 }}>
 					<Grid item component='h2'>
 						Countries
 					</Grid>
@@ -354,21 +347,18 @@ class Country extends Component<any> {
 					}}
 				>
 					{this.state.country.edit ? (
-						<input
-							type='text'
+						<TextField
 							defaultValue={name}
 							autoFocus
 							onBlur={this.saveCountry.bind(this)}
 							onKeyPress={(e: React.KeyboardEvent) => {
 								if (e.key === 'Enter') {
-									e.preventDefault()
 									this.saveCountry()
 								}
 							}}
 							onChange={(e) => {
-								let value = e.currentTarget.value
 								this.setState(({ country }: any) => {
-									country.value = value
+									country.value = e.currentTarget.value
 
 									return { country }
 								})
@@ -389,26 +379,23 @@ class Country extends Component<any> {
 					}}
 				>
 					{this.state.code.edit ? (
-						<input
-							type='text'
+						<TextField
 							defaultValue={code}
 							autoFocus
 							onBlur={this.saveCode.bind(this)}
 							onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
 								if (e.key === 'Enter') {
-									e.preventDefault()
 									this.saveCode()
 								}
 							}}
 							onChange={(e) => {
-								let value = e.currentTarget.value
 								this.setState(({ code }: any) => {
-									code.value = value
+									code.value = e.currentTarget.value
 
 									return { code }
 								})
 							}}
-							maxLength={2}
+							inputProps={{ maxLength: 2 }}
 						/>
 					) : (
 						<span>{code}</span>

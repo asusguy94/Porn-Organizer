@@ -21,7 +21,6 @@ import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 import Modal from '../modal/modal'
 import { DaysToYears, dateToYears, daysToYears } from '../date/date'
 import Ribbon from '../ribbon/ribbon'
-import { setFocus } from '../../hooks'
 
 import './star.scss'
 
@@ -177,16 +176,17 @@ const StarTitle = ({ star }: any) => {
 					onClick={() => {
 						handleModal(
 							'Rename',
-							<input
-								type='text'
+							<TextField
+								variant='outlined'
+								label='Star'
 								defaultValue={star.name}
-								ref={setFocus}
+								autoFocus
 								onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
 									if (e.key === 'Enter') {
-										e.preventDefault()
-
 										handleModal()
-										renameStar(e.currentTarget.value)
+
+										//@ts-ignore
+										renameStar(e.target.value)
 									}
 								}}
 							/>

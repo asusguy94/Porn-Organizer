@@ -1,7 +1,7 @@
 import React, { Component, Fragment, useEffect, useState, createContext, useContext } from 'react'
 import { Link } from 'react-router-dom'
 
-import { Grid, Button, Card, CardMedia, Box, Typography } from '@material-ui/core'
+import { Grid, Button, Card, CardMedia, Box, Typography, TextField } from '@material-ui/core'
 
 import Axios from 'axios'
 //@ts-ignore
@@ -14,7 +14,7 @@ import KeyboardEventHandler from 'react-keyboard-event-handler'
 import Modal from '../modal/modal'
 import Ribbon from '../ribbon/ribbon'
 import { daysToYears } from '../date/date'
-import { setFocus, useRefWithEffect } from '../../hooks'
+import { useRefWithEffect } from '../../hooks'
 
 import './video.scss'
 
@@ -288,24 +288,25 @@ interface IStarInput {
 const StarInput = ({ video, disabled = false }: IStarInput) => {
 	const update = useContext(UpdateContext).star
 
-	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'Enter') {
-			e.preventDefault()
-
-			Axios.post(`${config.api}/video/${video.id}/star`, { name: e.currentTarget.value }).then(({ data }) => {
-				update(data)
-			})
-
-			e.currentTarget.value = ''
-		}
+	const addStar = (star: string) => {
+		Axios.post(`${config.api}/video/${video.id}/star`, { name: star }).then(({ data }) => {
+			update(data)
+		})
 	}
 
 	if (!disabled) {
 		return (
-			<>
-				<label htmlFor='add-star'>Star</label>
-				<input id='add-star' onKeyDown={handleKeyPress} />
-			</>
+			<TextField
+				label='Star'
+				variant='outlined'
+				autoFocus
+				onKeyDown={(e) => {
+					if (e.key === 'Enter') {
+						//@ts-ignore
+						addStar(e.target.value)
+					}
+				}}
+			/>
 		)
 	}
 
@@ -515,16 +516,17 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 					onClick={() => {
 						handleModal(
 							'Change Title',
-							<input
-								type='text'
+							<TextField
+								variant='outlined'
+								label='Title'
 								defaultValue={video.name}
-								ref={setFocus}
+								autoFocus
 								onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
 									if (e.key === 'Enter') {
-										e.preventDefault()
-
 										handleModal()
-										renameTitle(e.currentTarget.value)
+
+										//@ts-ignore
+										renameTitle(e.target.value)
 									}
 								}}
 							/>
@@ -1026,15 +1028,17 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 					onClick={() => {
 						handleModal(
 							'Set Age',
-							<input
+							<TextField
+								variant='outlined'
+								label='Age'
 								type='number'
-								ref={setFocus}
+								autoFocus
 								onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
 									if (e.key === 'Enter') {
-										e.preventDefault()
-
 										handleModal()
-										setAge(e.currentTarget.value)
+
+										//@ts-ignore
+										setAge(e.target.value)
 									}
 								}}
 							/>
@@ -1048,16 +1052,17 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 					onClick={() => {
 						handleModal(
 							'Rename Video',
-							<input
-								type='text'
+							<TextField
+								variant='outlined'
+								label='File'
 								defaultValue={video.path.file}
-								ref={setFocus}
+								autoFocus
 								onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
 									if (e.key === 'Enter') {
-										e.preventDefault()
-
 										handleModal()
-										renameVideo(e.currentTarget.value)
+
+										//@ts-ignore
+										renameVideo(e.target.value)
 									}
 								}}
 							/>
