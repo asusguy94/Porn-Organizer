@@ -467,7 +467,7 @@ const FilterDropdown = ({ data, label, labelPlural, callback }: IFilterDropdown)
 				<MenuItem value='ALL'>All</MenuItem>
 				{data.map((item: { code: string; name: string }) => (
 					<MenuItem key={item.code} value={item.name}>
-						{item.name}
+						<i className={`flag flag-${item.code}`} style={{ marginRight: 4 }} /> {item.name}
 					</MenuItem>
 				))}
 			</Select>
