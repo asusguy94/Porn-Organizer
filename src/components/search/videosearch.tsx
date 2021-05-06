@@ -116,25 +116,27 @@ const Videos = ({ videos }: any) => (
 				videos.map((video: any) => {
 					if (isHidden(video)) return null
 
-					return (
-						<a key={video.id} href={`/video/${video.id}`}>
-							<Card className='video ribbon-container'>
-								<CardActionArea>
-									<CardMedia component='img' src={`${config.source}/images/videos/${video.image}`} />
-
-									<Typography className='text-center'>{video.name}</Typography>
-
-									<Ribbon label={daysToYears(video.ageInVideo)} />
-								</CardActionArea>
-							</Card>
-						</a>
-					)
+					return <VideoCard video={video} key={video.id} />
 				})
 			) : (
 				<Spinner />
 			)}
 		</Grid>
 	</Box>
+)
+
+const VideoCard = ({ video }: any) => (
+	<a href={`/video/${video.id}`}>
+		<Card className='video ribbon-container'>
+			<CardActionArea>
+				<CardMedia component='img' src={`${config.source}/images/videos/${video.image}`} />
+
+				<Typography className='text-center'>{video.name}</Typography>
+
+				<Ribbon label={daysToYears(video.ageInVideo)} />
+			</CardActionArea>
+		</Card>
+	</a>
 )
 
 const Sidebar = ({ videoData, videos, update }: any) => (

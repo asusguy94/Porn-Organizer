@@ -137,25 +137,27 @@ const Stars = ({ stars }: { stars: IStar[] }) => (
 				stars.map((star) => {
 					if (isHidden(star)) return null
 
-					return (
-						<a key={star.id} href={`/star/${star.id}`}>
-							<Card className='star ribbon-container'>
-								<CardActionArea>
-									<CardMedia component='img' src={`${config.source}/images/stars/${star.image}`} />
-
-									<Typography className='text-center'>{star.name}</Typography>
-
-									<Ribbon label={daysToYears(star.age)} />
-								</CardActionArea>
-							</Card>
-						</a>
-					)
+					return <StarCard key={star.id} star={star} />
 				})
 			) : (
 				<Spinner />
 			)}
 		</Grid>
 	</Box>
+)
+
+const StarCard = ({ star }: any) => (
+	<a href={`/star/${star.id}`}>
+		<Card className='star ribbon-container'>
+			<CardActionArea>
+				<CardMedia component='img' src={`${config.source}/images/stars/${star.image}`} />
+
+				<Typography className='text-center'>{star.name}</Typography>
+
+				<Ribbon label={daysToYears(star.age)} />
+			</CardActionArea>
+		</Card>
+	</a>
 )
 
 interface ISidebar {
