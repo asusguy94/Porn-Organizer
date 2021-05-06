@@ -296,7 +296,7 @@ const Filter = ({ stars, starData, update }: IFilter) => {
 				globalCallback={ethnicity_ALL}
 			/>
 
-			<FilterDropdown data={starData.countries} label='country' labelPlural='countries' callback={country_DROP} />
+			<FilterDropdown data={starData.countries} label='country' callback={country_DROP} />
 		</>
 	)
 }
@@ -400,13 +400,13 @@ const TitleSearch = ({ stars, update }: ITitleSearch) => {
 	const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = e.currentTarget.value.toLowerCase()
 
-		stars = stars.map((item) => {
+		update(
+			stars.map((item) => {
 			item.hidden.titleSearch = !item.name.toLowerCase().includes(searchValue)
 
 			return item
 		})
-
-		update(stars)
+		)
 	}
 
 	return <TextField autoFocus placeholder='Name' onChange={callback} />
@@ -455,15 +455,14 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 interface IFilterDropdown {
 	data: any[]
 	label: string
-	labelPlural: string
 	callback: any
 }
-const FilterDropdown = ({ data, label, labelPlural, callback }: IFilterDropdown) => (
+const FilterDropdown = ({ data, label, callback }: IFilterDropdown) => (
 	<>
 		<h2>{capitalize(label, true)}</h2>
 
 		<FormControl>
-			<Select id={label} name={labelPlural} defaultValue='ALL' onChange={callback}>
+			<Select id={label} defaultValue='ALL' onChange={callback}>
 				<MenuItem value='ALL'>All</MenuItem>
 				{data.map((item: { code: string; name: string }) => (
 					<MenuItem key={item.code} value={item.name}>
