@@ -358,7 +358,7 @@ class Country extends Component<any> {
 							}}
 							onChange={(e) => {
 								this.setState(({ country }: any) => {
-									country.value = e.currentTarget.value
+									country.value = e.target.value
 
 									return { country }
 								})
@@ -390,7 +390,7 @@ class Country extends Component<any> {
 							}}
 							onChange={(e) => {
 								this.setState(({ code }: any) => {
-									code.value = e.currentTarget.value
+									code.value = e.target.value
 
 									return { code }
 								})
