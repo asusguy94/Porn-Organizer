@@ -121,7 +121,7 @@ const WrapperItem = ({ label }: { label: string }) => {
 
 	return (
 		<TableContainer component={Paper}>
-			<Table size='small'>
+			<Table size='small' className='table-striped'>
 				<TableHead>
 					<TableRow>
 						<TableCell>ID</TableCell>
@@ -266,7 +266,7 @@ class Countries extends Component {
 	render() {
 		return (
 			<TableContainer component={Paper}>
-				<Table size='small'>
+				<Table size='small' className='table-striped'>
 					<TableHead>
 						<TableRow>
 							<TableCell>ID</TableCell>
@@ -401,7 +401,8 @@ class Country extends Component<any> {
 						<span>{code}</span>
 					)}
 				</TableCell>
-				<TableCell>
+
+				<TableCell className='pb-0'>
 					<i className={`flag flag-${code}`} />
 				</TableCell>
 			</TableRow>

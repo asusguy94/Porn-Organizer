@@ -31,3 +31,13 @@
 		float: right;
 	}
 }
+
+.p {
+	&t-0 {
+		padding-top: 0 !important;
+	}
+
+	&b-0 {
+		padding-bottom: 0 !important;
+	}
+}

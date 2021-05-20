@@ -48,7 +48,7 @@ const AddVideoPage = () => {
 				) : (
 					<>
 						<TableContainer component={Paper}>
-							<Table size='small'>
+							<Table size='small' className='table-striped'>
 								<TableHead>
 									<TableRow>
 										<TableCell>website</TableCell>
