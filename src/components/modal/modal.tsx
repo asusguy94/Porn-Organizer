@@ -6,18 +6,11 @@ import { Card, CardContent, Button, Typography, Box } from '@material-ui/core'
 //@ts-ignore
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
-import config from '../config.json'
-
 import './modal.scss'
 
-//TODO improve children, props.children, pros.filter, children=children.filter
+import config from '../config.json'
 
-export interface IModal {
-	title: string
-	data: any
-	filter?: boolean
-	visible: boolean
-}
+//TODO improve children, props.children, pros.filter, children=children.filter
 
 const Modal = (props: any) => {
 	const [query, setQuery] = useState('')

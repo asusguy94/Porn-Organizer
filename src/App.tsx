@@ -22,32 +22,30 @@ import ErrorPage from './components/404/404'
 import './components/styles/main.scss'
 import './components/styles/flag.scss'
 
-const App = () => {
-	return (
-		<Router>
-			<CssBaseline>
-				<NavBar />
+const App = () => (
+	<Router>
+		<CssBaseline>
+			<NavBar />
 
-				<Container component='main' maxWidth={false}>
-					<Switch>
-						<Route path='/video/add' component={AddVideoPage} />
-						<Route path='/video/search' component={VideoSearchPage} />
-						<Route path='/video/:id' component={VideoPage} />
-						<Route path='/video' component={VideosPage} />
+			<Container component='main' maxWidth={false}>
+				<Switch>
+					<Route path='/video/add' component={AddVideoPage} />
+					<Route path='/video/search' component={VideoSearchPage} />
+					<Route path='/video/:id' component={VideoPage} />
+					<Route path='/video' component={VideosPage} />
 
-						<Route path='/star/search' component={StarSearchPage} />
-						<Route path='/star/:id' component={StarPage} />
-						<Route path='/star' component={StarsPage} />
+					<Route path='/star/search' component={StarSearchPage} />
+					<Route path='/star/:id' component={StarPage} />
+					<Route path='/star' component={StarsPage} />
 
-						<Route path='/editor' component={EditorPage} />
+					<Route path='/editor' component={EditorPage} />
 
-						<Route path='/' exact component={HomePage} />
-						<Route path='*' component={ErrorPage} />
-					</Switch>
-				</Container>
-			</CssBaseline>
-		</Router>
-	)
-}
+					<Route path='/' exact component={HomePage} />
+					<Route path='*' component={ErrorPage} />
+				</Switch>
+			</Container>
+		</CssBaseline>
+	</Router>
+)
 
 export default App

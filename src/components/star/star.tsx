@@ -144,8 +144,9 @@ const StarTitle = ({ star }: any) => {
 	const handleModal = useContext(ModalContext)
 	const update = useContext(UpdateContext).star
 
+	const isIgnored = star.ignored === 1
+
 	const copy = async () => await navigator.clipboard.writeText(star.name)
-	const isIgnored = () => star.ignored === 1
 
 	const renameStar = (value: any) => {
 		Axios.put(`${config.api}/star/${star.id}`, { name: value }).then(() => {
@@ -166,8 +167,8 @@ const StarTitle = ({ star }: any) => {
 	return (
 		<Box>
 			<Box className='d-inline-block'>
-				<ContextMenuTrigger id='title' renderTag='span'>
-					<h2 className={isIgnored() ? 'ignored' : ''}>{star.name}</h2>
+				<ContextMenuTrigger id='title'>
+					<h2 className={isIgnored ? 'ignored' : ''}>{star.name}</h2>
 				</ContextMenuTrigger>
 			</Box>
 
@@ -201,8 +202,8 @@ const StarTitle = ({ star }: any) => {
 				</MenuItem>
 
 				<MenuItem onClick={ignoreStar}>
-					<i className={`${config.theme.fa} ${isIgnored() ? 'fa-check' : 'fa-ban'}`} />{' '}
-					{isIgnored() ? 'Enable Star' : 'Ignore Star'}
+					<i className={`${config.theme.fa} ${isIgnored ? 'fa-check' : 'fa-ban'}`} />{' '}
+					{isIgnored ? 'Enable Star' : 'Ignore Star'}
 				</MenuItem>
 
 				<MenuItem divider />
@@ -306,7 +307,7 @@ const StarImageDropbox = ({ star }: any) => {
 		<Box className='d-inline-block'>
 			{star.image !== null ? (
 				<>
-					<ContextMenuTrigger id='star__image' renderTag='span'>
+					<ContextMenuTrigger id='star__image'>
 						<img className='star__image' src={`${config.source}/images/stars/${star.image}`} alt='star' />
 					</ContextMenuTrigger>
 
@@ -382,7 +383,7 @@ const StarForm = ({ star, starData }: IStarForm) => {
 	}
 
 	return (
-		<Box>
+		<>
 			<Box className='action'>
 				<Button variant='contained' color='primary' id='freeones' className='action__item' onClick={freeones}>
 					Get Data
@@ -411,7 +412,7 @@ const StarForm = ({ star, starData }: IStarForm) => {
 			<StarInputForm update={updateInfo} name='Weight' value={star.info.weight} />
 			<StarInputForm update={updateInfo} name='Start' value={star.info.start} />
 			<StarInputForm update={updateInfo} name='End' value={star.info.end} />
-		</Box>
+		</>
 	)
 }
 
