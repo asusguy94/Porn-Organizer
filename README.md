@@ -1,19 +1,10 @@
-# PornJS
+# PornJS Frontend Scripts
 
-## Frontend Requirements
+## Requirements
 
-1. NodeJS
+1. Yarn package manager
 2. Modern Web Browser
-3. Browser resolution set to 1920x1080 (not a hard requirement, but some stuff might be visually bugged otherwise)
-
-## Backend Requirements (API & SERVER)
-
-1. NodeJS
-2. Database (preferable mariaDB) with known _port_, _username_, _password_, _Database Name_
-3. FFMPEG and FFPROBE (one of the following) ([more info](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg#prerequisites))
-    1. Installed to the server-computer and added to path
-    2. Installed to the server-computer and added to ENV
-    3. Installed to the server-computer in the root folder of the SERVER-project
+3. Browser resolution set to 1920x1080 (not a hard requirement, but you might have to change some variables otherwise)
 
 ## Installation
 
@@ -21,25 +12,25 @@
    | Variable | Details |
    | :---: | --- |
    | `api` | The URL to the backend scripts |
-   | `source` | The path to the old server...usefull for grabbing images, and also to be able to play videos |
+   | `source` | The path to the old server...useful for grabbing images, and also to be able to play videos |
    | `db` | The root path for phpMyAdmin, it can usually be set to the same as `source` |
-   |`hls`|`enable`: Enable HLS playback (requires special files)<br/>`maxLevel`: Highest quality allowed by HLS<br/>`maxStartLevel`: Highest initial quality allowed by HLS |
+   |`hls`|`enabled`: Enable HLS playback (requires special files)<br/>`maxLevel`: Highest quality allowed by HLS<br/>`maxStartLevel`: Highest initial quality allowed by HLS |
 
-2. Install NPM and then Yarn
-3. Make sure the backend scripts are running, _scroll down for more info_
+    > You change other variables in `config.json` to change the functionality, but none of these changes are required
 
-## Backend START
+1. Install NPM and then Yarn
+1. Make sure the backend scripts are running, _scroll down for more info_
 
-1. Navigate to the backend-scripts folder (where _app.js_ is located)
-2. Run `npm i` to install the packages
-3. Run `node app.js` to start the backend-scripts
+## Start Scripts
 
-## Frontend START
-
-1. Navigate to the scripts folder (where _app.js_ is located)
+1. Open terminal in this folder
 2. Run `yarn` to install the packages
 3. Run `yarn build` to build the scripts
 4. Run `yarn server` to start the app
+
+## Backend Scripts
+
+Backend scripts can be found in on of my other repositories: [Backend Scripts](https://github.com/asusguy94/Porn-Organizer-api)
 
 ## Features
 
@@ -47,4 +38,4 @@ Status of functionality can be found at [features.md](FEATURES.md)
 
 ## Known issues
 
--   Search-pages are a bit slow
+-   Search-pages starts to slow down after 100-200 elements
