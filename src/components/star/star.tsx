@@ -498,18 +498,18 @@ const StarVideos = ({ videos, years }: IStarVideos) => {
 
 // ContainerItem
 interface IStarInputForm {
-	update: any
-	value: any
-	name: any
-	list?: any[]
+	update: (value: string, label: string) => void
+	value: string
+	name: string
+	list?: (string | ICountry)[]
 }
 const StarInputForm: React.FC<IStarInputForm> = ({ update, value, name, list = [], children }) => {
+	const hasDropdown = list.length > 0
+
 	const [open, setOpen] = useState(false)
-	const [inputValue, setInputValue] = useState(value)
+	const [inputValue, setInputValue] = useState('')
 
-	const label = name.toLowerCase()
-
-	const updateValue = (value: any) => {
+	const updateValue = (value: string) => {
 		if (value === '') setOpen(false)
 
 		setInputValue(value)
@@ -517,45 +517,60 @@ const StarInputForm: React.FC<IStarInputForm> = ({ update, value, name, list = [
 
 	const handleKeyPress = (e: React.KeyboardEvent) => {
 		if (!open && e.key === 'Enter') {
-			update(inputValue, label)
+			update(inputValue, name.toLowerCase())
 		}
 	}
 
-	const isChanged = () => {
-		const serverValue = (value || '').toLowerCase()
-		const clientValue = (inputValue || '').toLowerCase()
+	const isChanged = inputValue.toLowerCase() !== (value || '').toLowerCase()
+	const shouldShrink = isChanged || (typeof value === 'string' && value.length > 0)
 
-		return clientValue !== serverValue
+	useEffect(() => {
+		if (value) {
+			setInputValue(value)
 	}
+	}, [value])
 
 	return (
-		<Box style={{ marginBottom: 4 }}>
+		<Grid container style={{ marginBottom: 4 }}>
+			<Grid item xs={10}>
 			<Autocomplete
-				id={label}
-				value={value}
+					inputValue={inputValue}
 				//
 				// EVENTS
-				onInputChange={(e, val) => updateValue(val)}
+					onInputChange={(e, val, reason) => {
+						if (reason === 'reset' && !open) return
+
+						updateValue(val)
+					}}
 				onKeyPress={handleKeyPress}
 				//
 				// OPTIONS
 				options={list.map((item) => (typeof item === 'object' ? item.name : item))}
 				renderInput={(params) => (
-					<TextField {...params} label={name} error={isChanged()} className='autocomplete' />
+						<TextField
+							{...params}
+							label={name}
+							error={isChanged}
+							InputLabelProps={{ shrink: shouldShrink }}
+						/>
 				)}
 				autoHighlight
+					clearOnBlur={false}
 				//
 				// open/closed STATUS
 				open={open}
-				onOpen={() => setOpen(true && list.length > 0)}
+					onOpen={() => setOpen(true && hasDropdown)}
 				onClose={() => setOpen(false)}
 				//
 				// SIMULATE input instead of dropdown
-				forcePopupIcon={list.length > 0}
+					forcePopupIcon={hasDropdown}
 			/>
+			</Grid>
 
-			{children ? <Box className='d-inline-block'>{children}</Box> : null}
-		</Box>
+			<Grid item style={{ marginTop: 18, marginLeft: 2 }}>
+				{children}
+			</Grid>
+		</Grid>
 	)
 }
 
