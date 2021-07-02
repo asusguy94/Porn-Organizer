@@ -257,6 +257,8 @@ const Filter = ({ stars, starData, update }: IFilter) => {
 
 	return (
 		<>
+			<FilterDropdown data={starData.countries} label='country' callback={country_DROP} />
+
 			<FilterItem
 				data={starData.breasts}
 				obj={stars}
@@ -281,8 +283,6 @@ const Filter = ({ stars, starData, update }: IFilter) => {
 				callback={ethnicity}
 				globalCallback={ethnicity_ALL}
 			/>
-
-			<FilterDropdown data={starData.countries} label='country' callback={country_DROP} />
 		</>
 	)
 }
