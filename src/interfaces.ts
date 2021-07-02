@@ -21,6 +21,30 @@ export interface IBookmark {
 	start: number
 }
 
+export interface ICountry {
+	code: string
+	name: string
+}
+
+export interface ISimilar {
+	id: number
+	name: string
+	image: string
+	match: number
+}
+
+export interface IModal {
+	title: string | null
+	data: any
+	filter?: boolean
+	visible: boolean
+}
+
+export interface IInput {
+	edit: boolean
+	value: null | string
+}
+
 export interface IVideo {
 	id: number
 	name: string

@@ -128,7 +128,7 @@ const Stars = ({ stars }: { stars: IStar[] }) => (
 	</Box>
 )
 
-const StarCard = ({ star }: any) => (
+const StarCard = ({ star }: { star: IStar }) => (
 	<a href={`/star/${star.id}`}>
 		<Card className='star ribbon-container'>
 			<Badge content={star.videoCount}>

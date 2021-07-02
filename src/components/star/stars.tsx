@@ -39,8 +39,8 @@ const StarsPage = () => {
 		Axios.get(`${config.api}/star/missing`).then(({ data }) => {
 			const imported = data.stars.map((item: IStar) => item.name)
 
-			const filtered = data.missing.filter((star: IStar, index: any, self: any) => {
-				return index === self.findIndex((item: any) => item.name === star.name && !imported.includes(star.name))
+			const filtered = data.missing.filter((star: IStar, index: number, self: IMissing[]) => {
+				return index === self.findIndex((item) => item.name === star.name && !imported.includes(star.name))
 			})
 
 			setStars(data.stars)

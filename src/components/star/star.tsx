@@ -25,6 +25,8 @@ import './star.scss'
 
 import config from '../config.json'
 
+import { ICountry, ISimilar } from '../../interfaces'
+
 const ModalContext = createContext((...args: any): void => {})
 const UpdateContext = createContext({ star: (star: any): void => {} })
 
@@ -126,7 +128,7 @@ const StarTitle = ({ star }: any) => {
 
 	const copy = async () => await navigator.clipboard.writeText(star.name)
 
-	const renameStar = (value: any) => {
+	const renameStar = (value: string) => {
 		Axios.put(`${config.api}/star/${star.id}`, { name: value }).then(() => {
 			update({ ...star, name: value })
 		})
@@ -197,7 +199,7 @@ const StarTitle = ({ star }: any) => {
 	)
 }
 
-const Sidebar = ({ similar }: any) => (
+const Sidebar = ({ similar }: { similar: ISimilar[] }) => (
 	<Card>
 		<Typography variant='h5' className='text-center'>
 			Similar Stars
@@ -324,13 +326,26 @@ const StarImageDropbox = ({ star }: any) => {
 
 // Container
 interface IStarForm {
-	star: any
-	starData: any
+	star: {
+		id: number
+		ignored: number
+		image: string
+		info: any
+		name: string
+		similar: ISimilar[]
+	}
+	starData: {
+		breast: string[]
+		country: ICountry[]
+		ethnicity: string[]
+		eyecolor: string[]
+		haircolor: string[]
+	}
 }
 const StarForm = ({ star, starData }: IStarForm) => {
 	const update = useContext(UpdateContext).star
 
-	const updateInfo = (value: any, label: any) => {
+	const updateInfo = (value: string, label: string) => {
 		Axios.put(`${config.api}/star/${star.id}`, { label, value }).then(({ data }) => {
 			if (data.reload) {
 				window.location.reload()
@@ -393,8 +408,17 @@ const StarForm = ({ star, starData }: IStarForm) => {
 }
 
 interface IStarVideos {
-	videos: any
-	years: any
+	videos: {
+		id: number
+		name: string
+		image: string
+		date: string
+		fname: string
+		website: string
+		site: string
+		age: number
+	}[]
+	years: { start: string | number; end: string | number }
 }
 const StarVideos = ({ videos, years }: IStarVideos) => {
 	const [inRange, setInRange] = useState(true)
@@ -557,13 +581,13 @@ const StarVideo = ({ video, isFirst, isLast, hidden }: IStarVideo) => {
 		setSrc('')
 	}
 
-	const playFrom = (video: any, time = 0) => {
+	const playFrom = (video: HTMLVideoElement, time = 0) => {
 		if (time) video.currentTime = time
 
 		video.play()
 	}
 
-	const stopFrom = (video: any, time = 0) => {
+	const stopFrom = (video: HTMLVideoElement, time = 0) => {
 		if (time) video.currentTime = time
 
 		video.pause()
