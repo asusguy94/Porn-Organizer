@@ -12,7 +12,6 @@ import {
 	Button,
 	TextField
 } from '@material-ui/core'
-
 import { Autocomplete, Alert, AlertTitle } from '@material-ui/lab'
 
 import Axios from 'axios'
@@ -118,16 +117,6 @@ const StarPage = (props: any) => {
 		)
 	}
 
-	componentDidMount() {
-		const props: any = this.props
-		const { id } = props.match.params
-
-		Axios.get(`${config.api}/star/${id}`).then(({ data: star }) => this.setState({ star }))
-		Axios.get(`${config.api}/star/${id}/video`).then(({ data: videos }) => this.setState({ videos }))
-		Axios.get(`${config.api}/star`).then(({ data: starData }) => this.setState({ starData }))
-	}
-}
-
 // Wrapper
 const StarTitle = ({ star }: any) => {
 	const handleModal = useContext(ModalContext)
@@ -179,22 +168,29 @@ const StarTitle = ({ star }: any) => {
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-edit`} /> Rename
+					<i className={config.theme.icons.edit} /> Rename
 				</MenuItem>
 
 				<MenuItem disabled>
-					<i className={`${config.theme.fa} fa-plus`} /> Add Alias
+					<i className={config.theme.icons.add} /> Add Alias
 				</MenuItem>
 
 				<MenuItem onClick={ignoreStar}>
-					<i className={`${config.theme.fa} ${isIgnored ? 'fa-check' : 'fa-ban'}`} />{' '}
-					{isIgnored ? 'Enable Star' : 'Ignore Star'}
+					{isIgnored ? (
+						<>
+							<i className={config.theme.icons['toggle-yes']} /> Enable Star
+						</>
+					) : (
+						<>
+							<i className={config.theme.icons['toggle-no']} /> Ignore Star
+						</>
+					)}
 				</MenuItem>
 
 				<MenuItem divider />
 
 				<MenuItem onClick={copy}>
-					<i className={`${config.theme.fa} fa-copy`} /> Copy Star
+					<i className={config.theme.icons.copy} /> Copy Star
 				</MenuItem>
 			</ContextMenu>
 		</Box>
@@ -294,7 +290,7 @@ const StarImageDropbox = ({ star }: any) => {
 
 					<ContextMenu id='star__image'>
 						<MenuItem onClick={removeImage}>
-							<i className={`${config.theme.fa} fa-trash-alt`} /> Delete Image
+							<i className={config.theme.icons.trash} /> Delete Image
 						</MenuItem>
 					</ContextMenu>
 				</>
@@ -315,7 +311,7 @@ const StarImageDropbox = ({ star }: any) => {
 
 					<ContextMenu id='star__dropbox'>
 						<MenuItem onClick={removeStar}>
-							<i className={`${config.theme.fa} fa-trash-alt`} /> Remove Star
+							<i className={config.theme.icons.trash} /> Remove Star
 						</MenuItem>
 					</ContextMenu>
 				</>

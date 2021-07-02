@@ -238,7 +238,7 @@ const Star = ({ star, video }: IStar) => {
 
 					<ContextMenu id='star'>
 						<MenuItem onClick={removeStar}>
-							<i className={`${config.theme.fa} fa-trash-alt`} /> Remove
+							<i className={config.theme.icons.trash} /> Remove
 						</MenuItem>
 					</ContextMenu>
 				</Box>
@@ -343,14 +343,14 @@ const HeaderLocations = ({ video }: { video: IVideo }) => {
 						<Fragment key={item.id}>
 							<ContextMenuTrigger id={`location-${item.id}`} renderTag='span'>
 								<Button size='small' variant='outlined' color='secondary' className='location'>
-									<i className={`${config.theme.fa} fa-map-marker-alt`} />
+										<i className={config.theme.icons.map} />
 									{item.name}
 								</Button>
 							</ContextMenuTrigger>
 
 							<ContextMenu id={`location-${item.id}`}>
 								<MenuItem onClick={() => removeLocation(item)}>
-									<i className={`${config.theme.fa} fa-trash-alt`} /> Remove
+										<i className={config.theme.icons.trash} /> Remove
 								</MenuItem>
 							</ContextMenu>
 						</Fragment>
@@ -376,14 +376,14 @@ const HeaderAttributes = ({ video }: { video: IVideo }) => {
 					<Fragment key={item.id}>
 						<ContextMenuTrigger id={`attribute-${item.id}`} renderTag='span'>
 							<Button size='small' variant='outlined' color='primary' className='attribute'>
-								<i className={`${config.theme.fa} fa-tag`} />
+									<i className={config.theme.icons.tag} />
 								{item.name}
 							</Button>
 						</ContextMenuTrigger>
 
 						<ContextMenu id={`attribute-${item.id}`}>
 							<MenuItem onClick={() => removeAttribute(item)}>
-								<i className={`${config.theme.fa} fa-trash-alt`} /> Remove
+									<i className={config.theme.icons.trash} /> Remove
 							</MenuItem>
 						</ContextMenu>
 					</Fragment>
@@ -411,14 +411,14 @@ const HeaderDate = ({ video, star }: IHeaderDate) => {
 		<>
 			<ContextMenuTrigger id='menu__date' renderTag='span'>
 				<Button size='small' variant='outlined' id='header__date'>
-					<i className={`${config.theme.fa} fa-calendar-check`} />
+					<i className={config.theme.icons.calendar} />
 					{video.date.published}
 				</Button>
 			</ContextMenuTrigger>
 
 			<ContextMenu id='menu__date'>
 				<MenuItem onClick={() => fixDate()}>
-					<i className={`${config.theme.fa} fa-edit`} /> Fix Date
+					<i className={config.theme.icons.sync} /> Refresh Date
 				</MenuItem>
 			</ContextMenu>
 		</>
@@ -495,7 +495,7 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-edit`} /> Rename Title
+					<i className={config.theme.icons.edit} /> Rename Title
 				</MenuItem>
 
 				<MenuItem
@@ -528,7 +528,7 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-tag`} /> Add Attribute
+					<i className={config.theme.icons.tag} /> Add Attribute
 				</MenuItem>
 
 				<MenuItem
@@ -561,17 +561,17 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-map-marker-alt`} /> Add Location
+					<i className={config.theme.icons.map} /> Add Location
 				</MenuItem>
 
 				<MenuItem divider />
 
 				<MenuItem onClick={() => copyTitle()}>
-					<i className={`${config.theme.fa} fa-copy`} /> Copy Title
+					<i className={config.theme.icons.copy} /> Copy Title
 				</MenuItem>
 
 				<MenuItem onClick={() => copyStar()}>
-					<i className={`${config.theme.fa} fa-user`} /> Copy Star
+					<i className={config.theme.icons.user} /> Copy Star
 				</MenuItem>
 			</ContextMenu>
 		</Typography>
@@ -714,17 +714,17 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 										)
 									}}
 								>
-									<i className={`${config.theme.fa} fa-edit`} /> Change Category
+									<i className={config.theme.icons.edit} /> Change Category
 								</MenuItem>
 
 								<MenuItem onClick={() => setTime(bookmark.id)}>
-									<i className={`${config.theme.fa} fa-clock`} /> Change Time
+									<i className={config.theme.icons.clock} /> Change Time
 								</MenuItem>
 
 								<MenuItem divider />
 
 								<MenuItem onClick={() => removeBookmark(bookmark.id)}>
-									<i className={`${config.theme.fa} fa-trash-alt`} /> Delete
+									<i className={config.theme.icons.trash} /> Delete
 								</MenuItem>
 							</ContextMenu>
 						</Fragment>
@@ -979,7 +979,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-plus`} /> Add Bookmark
+					<i className={config.theme.icons.add} /> Add Bookmark
 				</MenuItem>
 
 				<MenuItem
@@ -1004,7 +1004,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-plus`} /> Set Age
+					<i className={config.theme.icons.add} /> Set Age
 				</MenuItem>
 
 				<MenuItem
@@ -1028,21 +1028,21 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-edit`} /> Rename File
+					<i className={config.theme.icons.edit} /> Rename File
 				</MenuItem>
 
 				<MenuItem divider />
 
 				<MenuItem disabled={!bookmarks.length} onClick={clearBookmarks}>
-					<i className={`${config.theme.fa} fa-trash-alt`} /> Remove Bookmarks
+					<i className={config.theme.icons.trash} /> Remove Bookmarks
 				</MenuItem>
 
 				<MenuItem onClick={() => resetPlays()}>
-					<i className={`${config.theme.fa} fa-trash-alt`} /> Remove Plays
+					<i className={config.theme.icons.trash} /> Remove Plays
 				</MenuItem>
 
 				<MenuItem disabled={star.id > 0 || !!bookmarks.length} onClick={deleteVideo}>
-					<i className={`${config.theme.fa} fa-trash-alt`} /> Remove Video
+					<i className={config.theme.icons.trash} /> Remove Video
 				</MenuItem>
 			</ContextMenu>
 
