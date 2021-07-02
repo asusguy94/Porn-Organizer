@@ -1,4 +1,4 @@
-import React, { Component, useState, useRef, createContext, useContext, useEffect } from 'react'
+import React, { useState, useRef, createContext, useContext, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 import {
@@ -30,9 +30,15 @@ const ModalContext = createContext((...args: any): void => {})
 const UpdateContext = createContext({ star: (star: any): void => {} })
 
 //TODO state is very complex
-class StarPage extends Component {
-	state = {
-		star: {
+const StarPage = (props: any) => {
+	const [modal, setModal] = useState({
+		title: null,
+		data: null,
+		visible: false,
+		filter: false
+	})
+
+	const [star, setStar] = useState({
 			id: 0,
 			name: '',
 			image: '',
@@ -53,77 +59,60 @@ class StarPage extends Component {
 				end: 0
 			},
 			similar: []
-		},
-		starData: {
+	})
+
+	const [starData, setStarData] = useState({
 			breast: [],
 			eyecolor: [],
 			haircolor: [],
 			ethnicity: [],
 			country: []
-		},
-		videos: [],
-		modal: {
-			visible: false,
-			title: null,
-			data: null,
-			filter: false
-		}
+	})
+
+	const [videos, setVideos] = useState([])
+
+	const handleModal = (title = null, data = null, filter = false) => {
+		setModal((prevModal) => ({ title, data, visible: !prevModal.visible, filter }))
 	}
 
-	handleModal(title = null, data = null, filter = false) {
-		if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
+	useEffect(() => {
+		const { id } = props.match.params
 
-		this.setState(({ modal }: any) => {
-			modal.title = title
-			modal.data = data
-			modal.visible = !modal.visible
-			modal.filter = filter
+		Axios.get(`${config.api}/star`).then(({ data }) => setStarData(data))
+		Axios.get(`${config.api}/star/${id}`).then(({ data }) => setStar(data))
+		Axios.get(`${config.api}/star/${id}/video`).then(({ data }) => setVideos(data))
+	}, [])
 
-			return { modal }
-		})
-	}
-
-	render() {
 		return (
 			<Grid container id='star-page'>
-				<Grid item xs={7}>
-					{this.state.star.id !== 0 ? (
+			<Grid item xs={8}>
+				{star.id !== 0 ? (
 						<Grid item xs={3} id='star'>
-							<UpdateContext.Provider value={{ star: (star: any) => this.setState({ star }) }}>
-								<StarImageDropbox star={this.state.star} />
+						<UpdateContext.Provider value={{ star: (star: any) => setStar(star) }}>
+							<StarImageDropbox star={star} />
 
 								<ModalContext.Provider
-									value={(title: any, data: any, filter: any) =>
-										this.handleModal(title, data, filter)
-									}
+								value={(title: any, data: any, filter: boolean) => handleModal(title, data, filter)}
 								>
-									<StarTitle star={this.state.star} />
+								<StarTitle star={star} />
 								</ModalContext.Provider>
 
-								<StarForm starData={this.state.starData} star={this.state.star} />
+							<StarForm starData={starData} star={star} />
 							</UpdateContext.Provider>
 						</Grid>
 					) : null}
 
-					{this.state.videos.length ? (
-						<StarVideos
-							videos={this.state.videos}
-							years={{ start: this.state.star.info.start, end: this.state.star.info.end }}
-						/>
+				{videos.length ? (
+					<StarVideos videos={videos} years={{ start: star.info.start, end: star.info.end }} />
 					) : null}
 
-					<Modal
-						visible={this.state.modal.visible}
-						title={this.state.modal.title}
-						filter={this.state.modal.filter}
-						onClose={() => this.handleModal()}
-					>
-						{this.state.modal.data}
+				<Modal visible={modal.visible} title={modal.title} filter={modal.filter} onClose={handleModal}>
+					{modal.data}
 					</Modal>
 				</Grid>
 
-				<Grid item xs={5}>
-					<Sidebar similar={this.state.star.similar} />
+			<Grid item xs={4}>
+				<Sidebar similar={star.similar} />
 				</Grid>
 			</Grid>
 		)
@@ -150,17 +139,13 @@ const StarTitle = ({ star }: any) => {
 
 	const renameStar = (value: any) => {
 		Axios.put(`${config.api}/star/${star.id}`, { name: value }).then(() => {
-			star.name = value
-
-			update(star)
+			update({ ...star, name: value })
 		})
 	}
 
 	const ignoreStar = () => {
 		Axios.put(`${config.api}/star/${star.id}`, { ignore: +!star.ignored }).then(({ data }) => {
-			star.ignored = data.autoTaggerIgnore
-
-			update(star)
+			update({ ...star, ignored: data.autoTaggerIgnore })
 		})
 	}
 
@@ -253,16 +238,12 @@ const StarImageDropbox = ({ star }: any) => {
 
 	const removeImage = () => {
 		Axios.delete(`${config.source}/star/${star.id}/image`).then(() => {
-			star.image = null
-
-			update(star)
+			update({ ...star, image: null })
 		})
 	}
 	const addImage = (url: string) => {
 		Axios.post(`${config.source}/star/${star.id}/image`, { url }).then(({ data }) => {
-			star.image = `${data.image}?v=${new Date().getTime()}`
-
-			update(star)
+			update({ ...star, image: `${data.image}?v=${new Date().getTime()}` })
 		})
 	}
 
@@ -358,10 +339,7 @@ const StarForm = ({ star, starData }: IStarForm) => {
 			} else {
 				if (data.content !== null) value = data.content
 
-				star.info[label] = value
-				star.similar = data.similar
-
-				update(star)
+				update({ ...star, info: { ...star.info, [label]: value }, similar: data.similar })
 			}
 		})
 	}

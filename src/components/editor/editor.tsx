@@ -1,4 +1,4 @@
-import React, { FC, Component, useState, useEffect, ChangeEvent, KeyboardEvent } from 'react'
+import React, { FC, useState, useEffect, ChangeEvent, KeyboardEvent } from 'react'
 
 import {
 	Grid,
@@ -99,18 +99,10 @@ const Wrapper: FC<{ label: string; name: string }> = ({ label, name, children })
 const WrapperItem = ({ label }: { label: string }) => {
 	const [data, setData] = useState([])
 
-	useEffect(() => {
-		Axios.get(`${config.api}/${label}`).then(({ data }) => {
-			data.sort((a: { id: number; name: string }, b: { id: number; name: string }) => a.id - b.id)
-
-			setData(data)
-		})
-	}, [])
-
 	const updateItem = (ref: any, value: any) => {
 		Axios.put(`${config.api}/${label}/${ref.id}`, { value }).then(() => {
 			setData(
-				data.filter((item: any) => {
+				[...data].filter((item: any) => {
 					if (ref.id === item.id) item.name = value
 
 					return item
@@ -118,6 +110,12 @@ const WrapperItem = ({ label }: { label: string }) => {
 			)
 		})
 	}
+
+	useEffect(() => {
+		Axios.get(`${config.api}/${label}`).then(({ data }) => {
+			setData(data.sort((a: { id: number; name: string }, b: { id: number; name: string }) => a.id - b.id))
+		})
+	}, [])
 
 	return (
 		<TableContainer component={Paper}>
@@ -131,13 +129,64 @@ const WrapperItem = ({ label }: { label: string }) => {
 
 				<TableBody>
 					{data.map((item: any) => (
-						<Item key={item.id} data={item} update={(ref: any, value: any) => updateItem(ref, value)} />
+						<Item key={item.id} data={item} update={updateItem} />
 					))}
 				</TableBody>
 			</Table>
 		</TableContainer>
 	)
 }
+
+const WrapperItemCountries = ({ label }: { label: string }) => {
+	const [data, setData] = useState([])
+
+	const updateItem = (ref: any, value: any, label: any) => {
+		Axios.put(`${config.api}/${label}/${ref.id}`, { label, value }).then(({ data: countryData }) => {
+			setData(
+				[...data].filter((country: any) => {
+					if (ref.id === country.id) {
+						country.name = countryData.name
+						country.code = countryData.code
+					}
+
+					return country
+				})
+			)
+		})
+	}
+
+	useEffect(() => {
+		Axios.get(`${config.api}/${label}`).then(({ data }) => {
+			setData(data.sort((a: { id: number; name: string }, b: { id: number; name: string }) => a.id - b.id))
+		})
+	}, [])
+
+		return (
+			<TableContainer component={Paper}>
+				<Table size='small' className='table-striped'>
+					<TableHead>
+						<TableRow>
+							<TableCell>ID</TableCell>
+							<TableCell>Country</TableCell>
+							<TableCell>Code</TableCell>
+							<TableCell>Flag</TableCell>
+						</TableRow>
+					</TableHead>
+
+					<TableBody>
+					{data.map((item: any) => (
+						<ItemCountry
+							key={item.id}
+							data={item}
+							updateCountry={(ref: any, value: any, label = 'country') => updateItem(ref, value, label)}
+							updateCode={(ref: any, value: any, label = 'code') => updateItem(ref, value, label)}
+							/>
+						))}
+					</TableBody>
+				</Table>
+			</TableContainer>
+		)
+	}
 
 const Item = ({ update, data }: any) => {
 	const [edit, setEdit] = useState(false)
@@ -161,7 +210,7 @@ const Item = ({ update, data }: any) => {
 						onKeyPress={(e) => {
 							if (e.key === 'Enter') {
 								save()
-							}
+		}
 						}}
 						onChange={(e) => setValue(e.currentTarget.value)}
 					/>
@@ -171,243 +220,65 @@ const Item = ({ update, data }: any) => {
 			</TableCell>
 		</TableRow>
 	)
-}
-
-class CountriesPage extends Component {
-	state = {
-		input: ''
 	}
 
-	handleChange(e: any) {
-		this.setState({ input: e.currentTarget.value })
-	}
+const ItemCountry = ({ updateCountry, updateCode, data }: any) => {
+	const [country, setCountry] = useState<{ edit: boolean; value: null | string }>({ edit: false, value: null })
+	const [code, setCode] = useState<{ edit: boolean; value: null | string }>({ edit: false, value: null })
 
-	handleSubmit() {
-		const { input } = this.state
+	const saveCountry = () => {
+		setCountry({ ...country, edit: false })
 
-		if (input.length) {
-			// lower case is not allowed -- make red border and display notice
-			if (input.toLowerCase() === input) return false
-
-			Axios.post(`${config.api}/country`, { name: input }).then(() => {
-				window.location.reload()
-			})
+		if (country.value) updateCountry(data, country.value)
 		}
+
+	const saveCode = () => {
+		setCode({ ...code, edit: true })
+
+		if (code.value) updateCode(data, code.value)
 	}
-
-	handleKeyPress(e: React.KeyboardEvent) {
-		if (e.key === 'Enter') {
-			e.preventDefault()
-			this.handleSubmit()
-		}
-	}
-
-	render() {
-		return (
-			<Grid item xs={3} style={{ paddingLeft: 5, paddingRight: 5, marginTop: 5 }}>
-				<Grid container justify='center' style={{ marginBottom: 10 }}>
-					<Grid item component='h2'>
-						Countries
-					</Grid>
-
-					<Grid item>
-						<TextField
-							//@ts-ignore
-							ref={(input: any) => (this.input = input)}
-							onChange={this.handleChange.bind(this)}
-							onKeyPress={this.handleKeyPress.bind(this)}
-							style={{ marginLeft: 5, marginRight: 5 }}
-						/>
-						<Button
-							variant='contained'
-							color='primary'
-							size='small'
-							onClick={this.handleSubmit.bind(this)}
-							style={{ marginTop: 2 }}
-						>
-							Add Country
-						</Button>
-					</Grid>
-				</Grid>
-
-				<Countries />
-			</Grid>
-		)
-	}
-}
-
-class Countries extends Component {
-	state = {
-		countries: []
-	}
-
-	componentDidMount() {
-		Axios.get(`${config.api}/country`).then(({ data: countries }) => {
-			countries.sort((a: ICountry, b: ICountry) => a.id - b.id)
-			this.setState({ countries })
-		})
-	}
-
-	updateCountry(ref: any, value: any, label: any) {
-		Axios.put(`${config.api}/country/${ref.id}`, { label, value }).then(({ data }) => {
-			this.setState(
-				this.state.countries.filter((country: any) => {
-					if (ref.id === country.id) {
-						country.name = data.name
-						country.code = data.code
-					}
-
-					return country
-				})
-			)
-		})
-	}
-
-	render() {
-		return (
-			<TableContainer component={Paper}>
-				<Table size='small' className='table-striped'>
-					<TableHead>
-						<TableRow>
-							<TableCell>ID</TableCell>
-							<TableCell>Country</TableCell>
-							<TableCell>Code</TableCell>
-							<TableCell>Flag</TableCell>
-						</TableRow>
-					</TableHead>
-
-					<TableBody>
-						{this.state.countries.map((country: any) => (
-							<Country
-								key={country.id}
-								data={country}
-								updateCountry={(ref: any, value: any, label = 'country') =>
-									this.updateCountry(ref, value, label)
-								}
-								updateCode={(ref: any, value: any, label = 'code') =>
-									this.updateCountry(ref, value, label)
-								}
-							/>
-						))}
-					</TableBody>
-				</Table>
-			</TableContainer>
-		)
-	}
-}
-
-interface ICountry {
-	id: number
-	name: string
-	code: string
-}
-class Country extends Component<any> {
-	state = {
-		country: { edit: false, value: null },
-		code: { edit: false, value: null }
-	}
-
-	saveCountry() {
-		this.setState(({ country }: any) => {
-			country.edit = false
-
-			return { country }
-		})
-
-		if (this.state.country.value) {
-			this.props.updateCountry(this.props.data, this.state.country.value)
-		}
-	}
-
-	saveCode() {
-		this.setState(({ code }: any) => {
-			code.edit = false
-
-			return { code }
-		})
-
-		if (this.state.code.value) {
-			this.props.updateCode(this.props.data, this.state.code.value)
-		}
-	}
-
-	render() {
-		const { id, name, code } = this.props.data
 
 		return (
 			<TableRow>
-				<TableCell>{id}</TableCell>
-				<TableCell
-					onClick={() => {
-						this.setState(({ country }: any) => {
-							country.edit = true
-
-							return { country }
-						})
-					}}
-				>
-					{this.state.country.edit ? (
+			<TableCell>{data.id}</TableCell>
+			<TableCell onClick={() => setCountry({ ...country, edit: true })}>
+				{country.edit ? (
 						<TextField
-							defaultValue={name}
+						defaultValue={data.name}
 							autoFocus
-							onBlur={this.saveCountry.bind(this)}
+						onBlur={saveCountry}
+						onChange={(e) => setCountry({ ...country, value: e.target.value })}
 							onKeyPress={(e: React.KeyboardEvent) => {
-								if (e.key === 'Enter') {
-									this.saveCountry()
-								}
-							}}
-							onChange={(e) => {
-								this.setState(({ country }: any) => {
-									country.value = e.target.value
-
-									return { country }
-								})
+							if (e.key === 'Enter') saveCountry()
 							}}
 						/>
 					) : (
-						<span>{name}</span>
+					<span>{data.name}</span>
 					)}
 				</TableCell>
 
-				<TableCell
-					onClick={() => {
-						this.setState(({ code }: any) => {
-							code.edit = true
-
-							return { code }
-						})
-					}}
-				>
-					{this.state.code.edit ? (
+			<TableCell onClick={() => setCode({ ...country, edit: true })}>
+				{code.edit ? (
 						<TextField
-							defaultValue={code}
+						defaultValue={data.code}
 							autoFocus
-							onBlur={this.saveCode.bind(this)}
+						onBlur={saveCode}
+						onChange={(e) => setCode({ ...country, value: e.target.value })}
+						inputProps={{ maxLength: 2 }}
 							onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-								if (e.key === 'Enter') {
-									this.saveCode()
-								}
+							if (e.key === 'Enter') saveCode()
 							}}
-							onChange={(e) => {
-								this.setState(({ code }: any) => {
-									code.value = e.target.value
-
-									return { code }
-								})
-							}}
-							inputProps={{ maxLength: 2 }}
 						/>
 					) : (
-						<span>{code}</span>
+					<span>{data.code}</span>
 					)}
 				</TableCell>
 
 				<TableCell className='pb-0'>
-					<i className={`flag flag-${code}`} />
+				<i className={`flag flag-${data.code}`} />
 				</TableCell>
 			</TableRow>
 		)
 	}
-}
 
 export default EditorPage

@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import {
 	Box,
@@ -34,20 +34,18 @@ import config from '../config.json'
 
 //TODO use children-prop instead of coded-children inside component
 
-class VideoSearchPage extends Component {
-	state = {
-		videos: [],
+const VideoSearchPage = () => {
+	const [videos, setVideos] = useState([])
 
-		categories: [],
-		attributes: [],
-		locations: [],
-		websites: []
-	}
+	const [categories, setCategories] = useState([])
+	const [attributes, setAttributes] = useState([])
+	const [locations, setLocations] = useState([])
+	const [websites, setWebsites] = useState([])
 
-	componentDidMount() {
-		Axios.get(`${config.api}/search/video`).then(({ data: videos }) => {
-			this.setState(() => {
-				videos = videos.map((video: any) => {
+	useEffect(() => {
+		Axios.get(`${config.api}/search/video`).then(({ data }) => {
+			setVideos(
+				data.map((video: any) => {
 					video.hidden = {
 						category: [],
 						notCategory: [],
@@ -63,45 +61,34 @@ class VideoSearchPage extends Component {
 						website: false
 					}
 
-					video.pov = video.categories.length && video.categories.every((cat: any) => cat.includes('(POV)'))
-
 					return video
 				})
+			)
 
-				return { videos }
-			})
+			Axios.get(`${config.api}/category`).then(({ data }) => setCategories(data))
+			Axios.get(`${config.api}/attribute`).then(({ data }) => setAttributes(data))
+			Axios.get(`${config.api}/location`).then(({ data }) => setLocations(data))
+			Axios.get(`${config.api}/website`).then(({ data }) => setWebsites(data))
 		})
+	}, [])
 
-		Axios.get(`${config.api}/category`).then(({ data: categories }) => this.setState({ categories }))
-		Axios.get(`${config.api}/attribute`).then(({ data: attributes }) => this.setState({ attributes }))
-		Axios.get(`${config.api}/location`).then(({ data: locations }) => this.setState({ locations }))
-		Axios.get(`${config.api}/website`).then(({ data: websites }) => this.setState({ websites }))
-	}
-
-	render() {
-		return (
-			<Grid container id='search-page'>
-				<Grid item xs={2}>
-					<Sidebar
-						videoData={{
-							categories: this.state.categories,
-							attributes: this.state.attributes,
-							locations: this.state.locations,
-							website: this.state.websites
-						}}
-						videos={this.state.videos}
-						update={(videos: any) => this.setState({ videos })}
-					/>
-				</Grid>
-
-				<Grid item container xs={10} justify='center'>
-					<Videos videos={this.state.videos} />
-				</Grid>
-
-				<ScrollToTop smooth />
+	return (
+		<Grid container id='search-page'>
+			<Grid item xs={2}>
+				<Sidebar
+					videoData={{ categories, attributes, locations, websites }}
+					videos={videos}
+					update={setVideos}
+				/>
 			</Grid>
-		)
-	}
+
+			<Grid item container xs={10} justify='center'>
+				<Videos videos={videos} />
+			</Grid>
+
+			<ScrollToTop smooth />
+		</Grid>
+	)
 }
 
 // Wrapper
@@ -153,13 +140,13 @@ const TitleSearch = ({ update, videos }: any) => {
 	const callback = (e: any) => {
 		const searchValue = e.currentTarget.value.toLowerCase()
 
-		videos = videos.map((video: any) => {
+		update(
+			[...videos].map((video: any) => {
 			video.hidden.titleSearch = !video.name.toLowerCase().includes(searchValue)
 
 			return video
 		})
-
-		update(videos)
+		)
 	}
 
 	return <TextField autoFocus placeholder='Name' onChange={callback} />
@@ -168,48 +155,51 @@ const TitleSearch = ({ update, videos }: any) => {
 // Container
 const Sort = ({ videos, update }: any) => {
 	const sortDefault = (reverse = false) => {
-		videos.sort((a: any, b: any) => {
-			let valA = a.name.toLowerCase()
-			let valB = b.name.toLowerCase()
-
-			return valA.localeCompare(valB, 'en')
+		update(
+			[...videos].sort((a: any, b: any) => {
+				const result = a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en')
+				return reverse ? result * -1 : result
 		})
-
-		if (reverse) videos.reverse()
-		update(videos)
+		)
 	}
 
 	const sortAdded = (reverse = false) => {
-		videos.sort((a: any, b: any) => a.id - b.id)
-
-		if (reverse) videos.reverse()
-		update(videos)
+		update(
+			[...videos].sort((a: any, b: any) => {
+				const result = a.id - b.id
+				return reverse ? result * -1 : result
+			})
+		)
 	}
 
 	const sortDate = (reverse = false) => {
-		videos.sort((a: any, b: any) => {
+		update(
+			[videos].sort((a: any, b: any) => {
 			const dateA: any = new Date(a.date)
 			const dateB: any = new Date(b.date)
 
-			return dateA - dateB
+				const result = dateA - dateB
+				return reverse ? result * -1 : result
 		})
-
-		if (reverse) videos.reverse()
-		update(videos)
+		)
 	}
 
 	const sortAge = (reverse = false) => {
-		videos.sort((a: any, b: any) => a.ageInVideo - b.ageInVideo)
-
-		if (reverse) videos.reverse()
-		update(videos)
+		update(
+			[...videos].sort((a: any, b: any) => {
+				const result = a.ageInVideo - b.ageInVideo
+				return reverse ? result * -1 : result
+			})
+		)
 	}
 
 	const sortPlays = (reverse = false) => {
-		videos.sort((a: any, b: any) => a.plays - b.plays)
-
-		if (reverse) videos.reverse()
-		update(videos)
+		update(
+			[...videos].sort((a: any, b: any) => {
+				const result = a.plays - b.plays
+				return reverse ? result * -1 : result
+			})
+		)
 	}
 
 	return (
@@ -281,7 +271,8 @@ const Filter = ({ videoData, videos, update }: any) => {
 	const website = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const targetLower = e.target.value.toLowerCase()
 
-		videos = videos.map((video: any) => {
+		update(
+			[...videos].map((video: any) => {
 			if (targetLower === 'all') {
 				video.hidden.website = false
 			} else {
@@ -290,14 +281,14 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 			return video
 		})
-
-		update(videos)
+		)
 	}
 
 	const category = (ref: any, target: any) => {
 		const targetLower = target.name.toLowerCase()
 
-		videos = videos.map((video: any) => {
+		update(
+			[...videos].map((video: any) => {
 			if (ref.indeterminate) {
 				const match = video.categories.some((category: any) => category.toLowerCase() === targetLower)
 
@@ -324,14 +315,14 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 			return video
 		})
-
-		update(videos)
+		)
 	}
 
 	const attribute = (ref: any, target: any) => {
 		const targetLower = target.name.toLowerCase()
 
-		videos = videos.map((video: any) => {
+		update(
+			[...videos].map((video: any) => {
 			if (ref.indeterminate) {
 				const match = video.attributes.some((attribute: any) => attribute.toLowerCase() === targetLower)
 
@@ -342,28 +333,32 @@ const Filter = ({ videoData, videos, update }: any) => {
 					video.hidden.attribute.splice(video.hidden.attribute.indexOf(targetLower), 1)
 				}
 			} else if (!ref.checked) {
-				const match = video.attributes.map((attribute: any) => attribute.toLowerCase()).includes(targetLower)
+					const match = video.attributes
+						.map((attribute: any) => attribute.toLowerCase())
+						.includes(targetLower)
 
 				if (match) {
 					// Remove indeterminate-status from filtering
 					video.hidden.notAttribute.splice(video.hidden.notAttribute.indexOf(targetLower), 1)
 				}
 			} else {
-				const match = !video.attributes.map((attribute: any) => attribute.toLowerCase()).includes(targetLower)
+					const match = !video.attributes
+						.map((attribute: any) => attribute.toLowerCase())
+						.includes(targetLower)
 
 				if (match) video.hidden.attribute.push(targetLower)
 			}
 
 			return video
 		})
-
-		update(videos)
+		)
 	}
 
 	const location = (ref: any, target: any) => {
 		const targetLower = target.name.toLowerCase()
 
-		videos = videos.map((video: any) => {
+		update(
+			[...videos].map((video: any) => {
 			if (ref.indeterminate) {
 				const match = video.locations.some((location: any) => location.toLowerCase() === targetLower)
 
@@ -388,12 +383,12 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 			return video
 		})
-
-		update(videos)
+		)
 	}
 
 	const category_NULL = (ref: any) => {
-		videos = videos.map((video: any) => {
+		update(
+			[...videos].map((video: any) => {
 			if (ref.indeterminate) {
 				video.hidden.noCategory = false
 				video.hidden.notNoCategory = video.categories.length === 0
@@ -405,12 +400,12 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 			return video
 		})
-
-		update(videos)
+		)
 	}
 
 	const category_POV = (ref: any) => {
-		videos = videos.map((video: any) => {
+		update(
+			[...videos].map((video: any) => {
 			if (ref.indeterminate) {
 				video.hidden.pov = false
 				video.hidden.notPov = video.pov
@@ -422,8 +417,7 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 			return video
 		})
-
-		update(videos)
+		)
 	}
 
 	return (

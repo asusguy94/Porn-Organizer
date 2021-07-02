@@ -1,4 +1,4 @@
-import React, { Component, Fragment, useEffect, useState, createContext, useContext } from 'react'
+import React, { Fragment, useEffect, useState, createContext, useContext } from 'react'
 import { Link } from 'react-router-dom'
 
 import { Grid, Button, Card, CardMedia, Box, Typography, TextField } from '@material-ui/core'
@@ -41,9 +41,15 @@ const ModalContext = createContext({
 	data: { visible: false, title: null, data: null, filter: false }
 })
 
-class VideoPage extends Component {
-	state = {
-		video: {
+const VideoPage = (props: any) => {
+	const [modal, setModal] = useState({
+		visible: false,
+		title: null,
+		data: null,
+		filter: false
+	})
+
+	const [video, setVideo] = useState({
 			id: 0,
 			nextID: null,
 			name: '',
@@ -62,117 +68,90 @@ class VideoPage extends Component {
 			subsite: '',
 			locations: [],
 			attributes: []
-		},
-		star: {
+	})
+
+	const [star, setStar] = useState({
 			id: 0,
 			name: '',
 			image: '',
 			ageInVideo: 0,
 			numVideos: 0
-		},
-		bookmarks: [],
-		categories: [],
-		attributes: [],
-		locations: [],
-		modal: {
-			visible: false,
-			title: null,
-			data: null,
-			filter: false
-		}
-	}
+	})
 
-	handleKeyPress(key: string, e: IKeyPress) {
+	const [bookmarks, setBookmarks] = useState([])
+	const [categories, setCategories] = useState([])
+	const [attributes, setAttributes] = useState([])
+	const [locations, setLocations] = useState([])
+
+	const handleKeyPress = (key: string, e: IKeyPress) => {
 		if (e.target.tagName === 'INPUT') return
 		e.preventDefault()
 
 		if (key === 'tab') {
-			window.location.href = this.state.video.nextID ?? '/video'
+			window.location.href = video.nextID ?? '/video'
 		} else {
 			console.log(`${key} was pressed`)
 		}
 	}
 
-	handleModal(title = null, data = null, filter = false) {
-		if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
-
-		this.setState(({ modal }: any) => {
-			modal.title = title
-			modal.data = data
-			modal.visible = !modal.visible
-			modal.filter = filter
-
-			return { modal }
-		})
+	const handleModal = (title = null, data = null, filter = false) => {
+		setModal((prevModal) => ({ title, data, visible: !prevModal.visible, filter }))
 	}
 
-	render() {
+	useEffect(() => {
+		const { id } = props.match.params
+
+		Axios.get(`${config.api}/video/${id}`).then(({ data }) => setVideo(data))
+		Axios.get(`${config.api}/video/${id}/bookmark`).then(({ data }) => setBookmarks(data))
+		Axios.get(`${config.api}/video/${id}/star`).then(({ data }) => setStar(data))
+
+		Axios.get(`${config.api}/category`).then(({ data }) => setCategories(data))
+		Axios.get(`${config.api}/attribute`).then(({ data }) => setAttributes(data))
+		Axios.get(`${config.api}/location`).then(({ data }) => setLocations(data))
+	}, [])
+
 		return (
 			<Grid container id='video-page'>
 				<UpdateContext.Provider
 					value={{
-						video: (video: IVideo) => this.setState({ video }),
-						star: (star: IVideoStar) => this.setState({ star }),
-						bookmarks: (bookmarks: IVideoBookmark[]) => this.setState({ bookmarks })
+					video: (video: any) => setVideo(video),
+					star: (star: any) => setStar(star),
+					bookmarks: (bookmarks: any) => setBookmarks(bookmarks)
 					}}
 				>
 					<ModalContext.Provider
 						value={{
-							method: (title, data, filter) => this.handleModal(title, data, filter),
-							data: this.state.modal
+						method: (title, data, filter) => handleModal(title, data, filter),
+						data: modal
 						}}
 					>
 						<Section
-							video={this.state.video}
-							locations={this.state.locations}
-							attributes={this.state.attributes}
-							categories={this.state.categories}
-							bookmarks={this.state.bookmarks}
-							star={this.state.star}
+						video={video}
+						locations={locations}
+						attributes={attributes}
+						categories={categories}
+						bookmarks={bookmarks}
+						star={star}
 						/>
 					</ModalContext.Provider>
 
 					<Grid item xs={2} id='sidebar'>
 						<Box id='stars'>
-							<Star video={this.state.video} star={this.state.star} />
+						<Star video={video} star={star} />
 
-							<StarInput video={this.state.video} disabled={this.state.star.id !== 0} />
+						<StarInput video={video} disabled={star.id !== 0} />
 						</Box>
 					</Grid>
 				</UpdateContext.Provider>
 
-				<Modal
-					visible={this.state.modal.visible}
-					title={this.state.modal.title}
-					filter={this.state.modal.filter}
-					onClose={() => this.handleModal()}
-				>
-					{this.state.modal.data}
+			<Modal visible={modal.visible} title={modal.title} filter={modal.filter} onClose={handleModal}>
+				{modal.data}
 				</Modal>
 
-				<KeyboardEventHandler
-					handleKeys={['tab']}
-					onKeyEvent={(key: string, e: IKeyPress) => this.handleKeyPress(key, e)}
-					handleFocusableElements={true}
-				/>
+			<KeyboardEventHandler handleKeys={['tab']} onKeyEvent={handleKeyPress} handleFocusableElements={true} />
 			</Grid>
 		)
 	}
-
-	componentDidMount() {
-		// Load data
-		const props: any = this.props
-		const { id } = props.match.params
-
-		Axios.get(`${config.api}/video/${id}`).then(({ data: video }) => this.setState({ video }))
-
-		Axios.get(`${config.api}/video/${id}/bookmark`).then(({ data: bookmarks }) => this.setState({ bookmarks }))
-		Axios.get(`${config.api}/video/${id}/star`).then(({ data: star }) => this.setState({ star }))
-		Axios.get(`${config.api}/category`).then(({ data: categories }) => this.setState({ categories }))
-		Axios.get(`${config.api}/attribute`).then(({ data: attributes }) => this.setState({ attributes }))
-		Axios.get(`${config.api}/location`).then(({ data: locations }) => this.setState({ locations }))
-	}
-}
 
 interface ISection {
 	video: IVideo
@@ -231,10 +210,7 @@ const Star = ({ star, video }: IStar) => {
 
 	const removeStar = () => {
 		Axios.delete(`${config.api}/video/${video.id}/star/${star.id}`).then(() => {
-			star.id = 0
-			star.name = ''
-
-			update(star)
+			update({ ...star, id: 0, name: '' })
 		})
 	}
 
@@ -356,9 +332,7 @@ const HeaderLocations = ({ video }: { video: IVideo }) => {
 
 	const removeLocation = (location: ILocation) => {
 		Axios.delete(`${config.api}/location/${location.id}`).then(() => {
-			video.locations = video.locations.filter((item) => item.id !== location.id)
-
-			update(video)
+			update({ ...video, locations: video.locations.filter((item) => item.id !== location.id) })
 		})
 	}
 
@@ -391,9 +365,7 @@ const HeaderAttributes = ({ video }: { video: IVideo }) => {
 
 	const removeAttribute = (attribute: IAttribute) => {
 		Axios.delete(`${config.api}/attribute/${attribute.id}`).then(() => {
-			video.attributes = video.attributes.filter((item) => item.id !== attribute.id)
-
-			update(video)
+			update({ ...video, attributes: video.attributes.filter((item) => item.id !== attribute.id) })
 		})
 	}
 
@@ -429,11 +401,9 @@ const HeaderDate = ({ video, star }: IHeaderDate) => {
 
 	const fixDate = () => {
 		Axios.put(`${config.source}/video/${video.id}`, { date: true }).then(({ data }) => {
-			star.ageInVideo = data.age
-			updateStar(star)
+			updateStar({ ...star, ageInVideo: data.age })
 
-			video.date.published = data.date
-			update(video)
+			update({ ...video, date: { ...video.date, published: data.date } })
 		})
 	}
 
@@ -466,10 +436,12 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 
 	const addLocation = (location: ILocation) => {
 		Axios.post(`${config.api}/video/${video.id}/location`, { locationID: location.id }).then(({ data }) => {
-			video.locations.push({ id: data.id, name: location.name })
-			video.locations.sort((a, b) => a.name.localeCompare(b.name))
-
-			update(video)
+			update({
+				...video,
+				locations: [...video.locations, { id: data.id, name: location.name }].sort((a, b) =>
+					a.name.localeCompare(b.name)
+				)
+			})
 		})
 	}
 
@@ -477,18 +449,18 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 		Axios.post(`${config.api}/video/${video.id}/attribute`, {
 			attributeID: attribute.id
 		}).then(({ data }) => {
-			video.attributes.push({ id: data.id, name: attribute.name })
-			video.attributes.sort((a, b) => a.name.localeCompare(b.name))
-
-			update(video)
+			update({
+				...video,
+				attributes: [...video.attributes, { id: data.id, name: attribute.name }].sort((a, b) =>
+					a.name.localeCompare(b.name)
+				)
+			})
 		})
 	}
 
 	const renameTitle = (title: string) => {
 		Axios.put(`${config.api}/video/${video.id}`, { title }).then(() => {
-			video.name = title
-
-			update(video)
+			update({ ...video, name: title })
 		})
 	}
 
@@ -640,7 +612,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 
 		Axios.put(`${config.api}/bookmark/${id}`, { time }).then(() => {
 			update(
-				bookmarks
+				[...bookmarks]
 					.map((bookmark) => {
 						if (bookmark.id === id) bookmark.start = time
 
@@ -653,14 +625,14 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 
 	const removeBookmark = (id: number) => {
 		Axios.delete(`${config.api}/bookmark/${id}`).then(() => {
-			update(bookmarks.filter((item: any) => item.id !== id))
+			update([...bookmarks].filter((item: any) => item.id !== id))
 		})
 	}
 
 	const changeCategory = (category: ICategory, bookmark: IVideoBookmark) => {
 		Axios.put(`${config.api}/bookmark/${bookmark.id}`, { categoryID: category.id }).then(() => {
 			update(
-				bookmarks.map((bookmarkItem) => {
+				[...bookmarks].map((bookmarkItem) => {
 					if (bookmarkItem.id === bookmark.id) bookmarkItem.name = category.name
 
 					return bookmarkItem
@@ -887,9 +859,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 
 	const setAge = (age: string) => {
 		Axios.get(`${config.api}/setage.php?videoID=${video.id}&age=${age}`).then(() => {
-			star.ageInVideo = Number(age) * 365
-
-			updateStar(star)
+			updateStar({ ...star, ageInVideo: Number(age) * 365 })
 		})
 	}
 
@@ -902,7 +872,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 			}).then(({ data }) => {
 				bookmarks.push({ id: data.id, name: category.name, start: time })
 
-				updateBookmarks(bookmarks.sort((a, b) => a.start - b.start))
+				updateBookmarks([...bookmarks].sort((a, b) => a.start - b.start))
 			})
 		}
 	}
@@ -913,8 +883,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 
 	const resetPlays = () => {
 		Axios.put(`${config.api}/video/${video.id}`, { plays: 0 }).then(() => {
-			video.plays = 0
-			update(video)
+			update({ ...video, plays: 0 })
 		})
 	}
 

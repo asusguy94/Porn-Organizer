@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import {
 	Grid,
@@ -56,21 +56,18 @@ interface IStar {
 	}
 }
 
-class StarSearchPage extends Component {
-	state = {
-		stars: [],
+const StarSearchPage = () => {
+	const [stars, setStars] = useState([])
 
-		breasts: [],
-		haircolors: [],
-		ethnicities: [],
-		countries: []
-	}
+	const [breasts, setBreasts] = useState([])
+	const [haircolors, setHaircolors] = useState([])
+	const [ethnicities, setEthnicities] = useState([])
+	const [countries, setCountries] = useState([])
 
-	componentDidMount() {
-		// Stars
-		Axios.get(`${config.api}/search/star`).then(({ data: stars }) => {
-			this.setState(() => {
-				stars = stars.map((star: IStar) => {
+	useEffect(() => {
+		Axios.get(`${config.api}/search/star`).then(({ data }) => {
+			setStars(
+				data.map((star: IStar) => {
 					star.hidden = {
 						titleSearch: false,
 
@@ -84,47 +81,31 @@ class StarSearchPage extends Component {
 
 					return star
 				})
-
-				return { stars }
-			})
+			)
 		})
 
-		// starData
 		Axios.get(`${config.api}/star`).then(({ data }) => {
-			this.setState({
-				breasts: data.breast,
-				haircolors: data.haircolor,
-				ethnicities: data.ethnicity,
-				countries: data.country
+			setBreasts(data.breast)
+			setHaircolors(data.haircolor)
+			setEthnicities(data.ethnicity)
+			setCountries(data.country)
 			})
-		})
-	}
+	}, [])
 
-	render() {
 		return (
 			<Grid container id='search-page'>
 				<Grid item xs={2}>
-					<Sidebar
-						starData={{
-							breasts: this.state.breasts,
-							haircolors: this.state.haircolors,
-							ethnicities: this.state.ethnicities,
-							countries: this.state.countries
-						}}
-						stars={this.state.stars}
-						update={(stars: IStar[]) => this.setState({ stars })}
-					/>
+				<Sidebar starData={{ breasts, haircolors, ethnicities, countries }} stars={stars} update={setStars} />
 				</Grid>
 
 				<Grid item container xs={10} justify='center'>
-					<Stars stars={this.state.stars} />
+				<Stars stars={stars} />
 				</Grid>
 
 				<ScrollToTop smooth />
 			</Grid>
 		)
 	}
-}
 
 // Wrapper
 const Stars = ({ stars }: { stars: IStar[] }) => (
