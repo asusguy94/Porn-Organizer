@@ -15,7 +15,7 @@ import Modal from '../modal/modal'
 import Ribbon from '../ribbon/ribbon'
 import Badge from '../badge/badge'
 import { daysToYears } from '../date/date'
-import { useRefWithEffect } from '../../hooks'
+import { useRefWithEffect, useWindowSize } from '../../hooks'
 
 import './video.scss'
 
@@ -666,7 +666,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 
 			current.setAttribute('data-level', `${level}`)
 		}
-	}, [bookmarksArr])
+	}, [bookmarksArr, useWindowSize])
 
 	return (
 		<Grid id='timeline'>
