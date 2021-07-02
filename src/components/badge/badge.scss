@@ -1,0 +1,27 @@
+@import '../styles/functions';
+
+[data-badge] {
+	&:after {
+		content: attr(data-badge);
+		position: absolute;
+		@include circle(5px);
+		background: green;
+		color: white;
+		text-align: center;
+		border-radius: 50%;
+		box-shadow: 0 0 1px #333;
+
+		left: 3px;
+		top: 3px;
+	}
+
+	// 1-9 Videos
+	&.badge-x:after {
+		@include circle(23px);
+	}
+
+	// 10-99 videos
+	&.badge-xx:after {
+		@include circle(23px, 26px);
+	}
+}

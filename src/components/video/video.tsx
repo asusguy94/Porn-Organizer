@@ -13,6 +13,7 @@ import KeyboardEventHandler from 'react-keyboard-event-handler'
 
 import Modal from '../modal/modal'
 import Ribbon from '../ribbon/ribbon'
+import Badge from '../badge/badge'
 import { daysToYears } from '../date/date'
 import { useRefWithEffect } from '../../hooks'
 
@@ -228,19 +229,6 @@ interface IStar {
 const Star = ({ star, video }: IStar) => {
 	const update = useContext(UpdateContext).star
 
-	const handleBadge = (variation: null | string = null) => {
-		let data: number | string = ''
-		const { numVideos } = star
-
-		if (variation === 'data') {
-			data = numVideos
-		} else if (numVideos) {
-			data = `badge-${'x'.repeat(String(numVideos).length)}`
-		}
-
-		return data
-	}
-
 	const removeStar = () => {
 		Axios.delete(`${config.api}/video/${video.id}/star/${star.id}`).then(() => {
 			star.id = 0
@@ -254,7 +242,8 @@ const Star = ({ star, video }: IStar) => {
 		<>
 			{star.id !== 0 && (
 				<Box className='star'>
-					<Card className={`ribbon-container ${handleBadge()}`} data-badge={handleBadge('data')}>
+					<Card className='ribbon-container'>
+						<Badge content={star.numVideos}>
 						<ContextMenuTrigger id='star'>
 							<CardMedia
 								component='img'
@@ -268,6 +257,7 @@ const Star = ({ star, video }: IStar) => {
 
 							{star.ageInVideo > 0 ? <Ribbon label={daysToYears(star.ageInVideo)} /> : null}
 						</ContextMenuTrigger>
+						</Badge>
 					</Card>
 
 					<ContextMenu id='star'>

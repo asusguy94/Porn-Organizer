@@ -25,6 +25,7 @@ import LabelCount from '../labelcount/labelcount'
 import { getCount, isHidden } from './helper'
 import Spinner from '../spinner/spinner'
 import Ribbon from '../ribbon/ribbon'
+import Badge from '../badge/badge'
 
 import './search.scss'
 
@@ -149,6 +150,7 @@ const Stars = ({ stars }: { stars: IStar[] }) => (
 const StarCard = ({ star }: any) => (
 	<a href={`/star/${star.id}`}>
 		<Card className='star ribbon-container'>
+			<Badge content={star.videoCount}>
 			<CardActionArea>
 				<CardMedia component='img' src={`${config.source}/images/stars/${star.image}`} />
 
@@ -156,6 +158,7 @@ const StarCard = ({ star }: any) => (
 
 				<Ribbon label={daysToYears(star.age)} />
 			</CardActionArea>
+			</Badge>
 		</Card>
 	</a>
 )
