@@ -339,7 +339,9 @@ const HeaderLocations = ({ video }: { video: IVideo }) => {
 	return (
 		<Box id='header__locations'>
 			{video.id !== 0
-				? video.locations.map((item) => (
+				? video.locations
+						.sort((a, b) => a.name.localeCompare(b.name))
+						.map((item) => (
 						<Fragment key={item.id}>
 							<ContextMenuTrigger id={`location-${item.id}`} renderTag='span'>
 								<Button size='small' variant='outlined' color='secondary' className='location'>
@@ -372,7 +374,9 @@ const HeaderAttributes = ({ video }: { video: IVideo }) => {
 	return (
 		<Box id='header__attributes'>
 			{video.id !== 0 &&
-				video.attributes.map((item) => (
+				video.attributes
+					.sort((a, b) => a.name.localeCompare(b.name))
+					.map((item) => (
 					<Fragment key={item.id}>
 						<ContextMenuTrigger id={`attribute-${item.id}`} renderTag='span'>
 							<Button size='small' variant='outlined' color='primary' className='attribute'>
