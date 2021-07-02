@@ -959,7 +959,8 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 									src: `${config.source}/videos/${video.path.file}`,
 									type: 'video/mp4'
 								}
-							]
+							],
+							poster: `${config.source}/images/videos/${video.id}.jpg`
 						}}
 					/>
 				)}
