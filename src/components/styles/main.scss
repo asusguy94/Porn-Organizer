@@ -3,8 +3,10 @@
 @import 'material-ui';
 @import 'util';
 
+$fontFamily: 'Roboto', sans-serif;
+
 body {
-	font-family: 'Roboto', sans-serif;
+	font-family: $fontFamily;
 }
 
 @for $i from 1 through 6 {

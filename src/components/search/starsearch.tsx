@@ -114,7 +114,7 @@ const Stars = ({ stars }: { stars: IStar[] }) => (
 			<span className='count'>{getCount(stars)}</span> Stars
 		</Typography>
 
-		<Grid container>
+		<Grid container justify='center'>
 			{stars.length ? (
 				stars.map((star) => {
 					if (isHidden(star)) return null

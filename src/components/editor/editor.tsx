@@ -37,7 +37,9 @@ const EditorPage = () => (
 			<WrapperItem label='location' />
 		</Wrapper>
 
-		<CountriesPage />
+		<Wrapper label='countries' name='country'>
+			<WrapperItemCountries label='country' />
+		</Wrapper>
 	</Grid>
 )
 

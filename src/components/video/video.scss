@@ -31,8 +31,9 @@
 			margin-left: 15px;
 			color: black;
 
-			i {
-				margin-right: 5px;
+			i,
+			svg {
+				margin-right: 5px !important;
 			}
 		}
 	}

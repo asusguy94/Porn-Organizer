@@ -98,7 +98,7 @@ const Videos = ({ videos }: any) => (
 			<span className='count'>{getCount(videos)}</span> Videos
 		</Typography>
 
-		<Grid container>
+		<Grid container justify='center'>
 			{videos.length ? (
 				videos.map((video: any) => {
 					if (isHidden(video)) return null
@@ -422,7 +422,7 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 	return (
 		<>
-			<FilterDropdown data={videoData.website} label='website' labelPlural='websites' callback={website} />
+			<FilterDropdown data={videoData.websites} label='website' labelPlural='websites' callback={website} />
 
 			<FilterObj
 				data={videoData.categories}

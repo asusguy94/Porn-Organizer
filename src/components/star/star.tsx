@@ -199,12 +199,14 @@ const StarTitle = ({ star }: any) => {
 
 const Sidebar = ({ similar }: any) => (
 	<Card>
-		<Typography className='text-center'>Similar Stars</Typography>
+		<Typography variant='h5' className='text-center'>
+			Similar Stars
+		</Typography>
 
 		<CardContent>
 			<Grid id='similar'>
-				{similar.map((similarStar: any) => (
-					<a key={similarStar.id} href={similarStar.id} className='similar-star ribbon-container'>
+				{similar.map((similarStar) => (
+					<a key={similarStar.id} href={`${similarStar.id}`} className='similar-star ribbon-container'>
 						<Card className='star'>
 							<CardMedia component='img' src={`${config.source}/images/stars/${similarStar.image}`} />
 
@@ -413,7 +415,7 @@ const StarVideos = ({ videos, years }: IStarVideos) => {
 					One or more of the video-dates does not match star-activity years
 				</Alert>
 			) : null}
-			<h3>
+			<Typography variant='h6'>
 				Videos
 				{websites.length > 1
 					? websites.map((website) => (
@@ -430,10 +432,10 @@ const StarVideos = ({ videos, years }: IStarVideos) => {
 							</Button>
 					  ))
 					: null}
-			</h3>
+			</Typography>
 
 			<Grid container id='videos'>
-				{videos.map((video: any, i: number) => {
+				{videos.map((video, i) => {
 					const parsedYear = dateToYears(video.date)
 
 					// Check if warning is already displayed
@@ -620,7 +622,7 @@ const StarVideo = ({ video, isFirst, isLast, hidden }: IStarVideo) => {
 						<Typography className='video__site-info site-info'>
 							<span className='site-info__wsite'>{video.website}</span>
 
-							{video.site !== '' ? (
+							{video.site !== null ? (
 								<>
 									<span className='divider'>/</span>
 									<span className='site-info__site'>{video.site}</span>

@@ -23,9 +23,9 @@ import config from '../config.json'
 
 import {
 	IAttribute,
+	ILocation,
 	IBookmark as IVideoBookmark,
 	ICategory,
-	ILocation,
 	IVideo,
 	IVideoStar,
 	IKeyPress
@@ -228,7 +228,7 @@ const Star = ({ star, video }: IStar) => {
 							/>
 
 							<Link to={`/star/${star.id}`} className='star__name'>
-								<Typography>{star.name}</Typography>
+									<Typography className='unselectable'>{star.name}</Typography>
 							</Link>
 
 							{star.ageInVideo > 0 ? <Ribbon label={daysToYears(star.ageInVideo)} /> : null}
@@ -947,6 +947,10 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 						sources={{
 							type: 'video',
 							sources: [
+								{
+									src: `${config.source}/videos/${video.path.stream}`,
+									type: 'application/x-mpegURL'
+								},
 								{
 									src: `${config.source}/videos/${video.path.file}`,
 									type: 'video/mp4'
