@@ -29,9 +29,7 @@ import Badge from '../badge/badge'
 
 import './search.scss'
 
-import config from '../config.json'
-
-//TODO use children-prop instead of coded-children inside component
+import { server as serverConfig } from '../../config'
 
 interface IStar {
 	id: number
@@ -65,7 +63,7 @@ const StarSearchPage = () => {
 	const [countries, setCountries] = useState([])
 
 	useEffect(() => {
-		Axios.get(`${config.api}/search/star`).then(({ data }) => {
+		Axios.get(`${serverConfig.api}/search/star`).then(({ data }) => {
 			setStars(
 				data.map((star: IStar) => {
 					star.hidden = {
@@ -84,7 +82,7 @@ const StarSearchPage = () => {
 			)
 		})
 
-		Axios.get(`${config.api}/star`).then(({ data }) => {
+		Axios.get(`${serverConfig.api}/star`).then(({ data }) => {
 			setBreasts(data.breast)
 			setHaircolors(data.haircolor)
 			setEthnicities(data.ethnicity)
@@ -133,7 +131,7 @@ const StarCard = ({ star }: { star: IStar }) => (
 		<Card className='star ribbon-container'>
 			<Badge content={star.videoCount}>
 			<CardActionArea>
-				<CardMedia component='img' src={`${config.source}/images/stars/${star.image}`} />
+					<CardMedia component='img' src={`${serverConfig.source}/images/stars/${star.image}`} />
 
 				<Typography className='text-center'>{star.name}</Typography>
 

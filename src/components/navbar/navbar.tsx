@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import './navbar.scss'
 
-import config from '../config.json'
+import { server as serverConfig } from '../../config'
 
 const NavBar = () => (
 	<nav>
@@ -20,7 +20,7 @@ const NavBar = () => (
 
 			<NavBarItem name='DB Editor' path='/editor' />
 
-			<NavBarItem name='DB' path={config.db} remote={true} />
+			<NavBarItem name='DB' path={serverConfig.db} remote={true} />
 			<NavBarItem name='Import Videos' path='/video/add' />
 		</ul>
 	</nav>

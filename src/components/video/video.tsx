@@ -19,7 +19,7 @@ import { useRefWithEffect, useWindowSize } from '../../hooks'
 
 import './video.scss'
 
-import config from '../config.json'
+import { server as serverConfig, theme as themeConfig, settings as settingsConfig } from '../../config'
 
 import {
 	IAttribute,
@@ -101,13 +101,13 @@ const VideoPage = (props: any) => {
 	useEffect(() => {
 		const { id } = props.match.params
 
-		Axios.get(`${config.api}/video/${id}`).then(({ data }) => setVideo(data))
-		Axios.get(`${config.api}/video/${id}/bookmark`).then(({ data }) => setBookmarks(data))
-		Axios.get(`${config.api}/video/${id}/star`).then(({ data }) => setStar(data))
+		Axios.get(`${serverConfig.api}/video/${id}`).then(({ data }) => setVideo(data))
+		Axios.get(`${serverConfig.api}/video/${id}/bookmark`).then(({ data }) => setBookmarks(data))
+		Axios.get(`${serverConfig.api}/video/${id}/star`).then(({ data }) => setStar(data))
 
-		Axios.get(`${config.api}/category`).then(({ data }) => setCategories(data))
-		Axios.get(`${config.api}/attribute`).then(({ data }) => setAttributes(data))
-		Axios.get(`${config.api}/location`).then(({ data }) => setLocations(data))
+		Axios.get(`${serverConfig.api}/category`).then(({ data }) => setCategories(data))
+		Axios.get(`${serverConfig.api}/attribute`).then(({ data }) => setAttributes(data))
+		Axios.get(`${serverConfig.api}/location`).then(({ data }) => setLocations(data))
 	}, [])
 
 		return (
@@ -209,7 +209,7 @@ const Star = ({ star, video }: IStar) => {
 	const update = useContext(UpdateContext).star
 
 	const removeStar = () => {
-		Axios.delete(`${config.api}/video/${video.id}/star/${star.id}`).then(() => {
+		Axios.delete(`${serverConfig.api}/video/${video.id}/star/${star.id}`).then(() => {
 			update({ ...star, id: 0, name: '' })
 		})
 	}
@@ -223,7 +223,7 @@ const Star = ({ star, video }: IStar) => {
 						<ContextMenuTrigger id='star'>
 							<CardMedia
 								component='img'
-								src={`${config.source}/images/stars/${star.image}`}
+									src={`${serverConfig.source}/images/stars/${star.image}`}
 								className='star__image'
 							/>
 
@@ -238,7 +238,7 @@ const Star = ({ star, video }: IStar) => {
 
 					<ContextMenu id='star'>
 						<MenuItem onClick={removeStar}>
-							<i className={config.theme.icons.trash} /> Remove
+							<i className={themeConfig.icons.trash} /> Remove
 						</MenuItem>
 					</ContextMenu>
 				</Box>
@@ -255,7 +255,7 @@ const StarInput = ({ video, disabled = false }: IStarInput) => {
 	const update = useContext(UpdateContext).star
 
 	const addStar = (star: string) => {
-		Axios.post(`${config.api}/video/${video.id}/star`, { name: star }).then(({ data }) => {
+		Axios.post(`${serverConfig.api}/video/${video.id}/star`, { name: star }).then(({ data }) => {
 			update(data)
 		})
 	}
@@ -331,7 +331,7 @@ const HeaderLocations = ({ video }: { video: IVideo }) => {
 	const update = useContext(UpdateContext).video
 
 	const removeLocation = (location: ILocation) => {
-		Axios.delete(`${config.api}/location/${location.id}`).then(() => {
+		Axios.delete(`${serverConfig.api}/location/${location.id}`).then(() => {
 			update({ ...video, locations: video.locations.filter((item) => item.id !== location.id) })
 		})
 	}
@@ -345,14 +345,14 @@ const HeaderLocations = ({ video }: { video: IVideo }) => {
 						<Fragment key={item.id}>
 							<ContextMenuTrigger id={`location-${item.id}`} renderTag='span'>
 								<Button size='small' variant='outlined' color='secondary' className='location'>
-										<i className={config.theme.icons.map} />
+										<i className={themeConfig.icons.map} />
 									{item.name}
 								</Button>
 							</ContextMenuTrigger>
 
 							<ContextMenu id={`location-${item.id}`}>
 								<MenuItem onClick={() => removeLocation(item)}>
-										<i className={config.theme.icons.trash} /> Remove
+										<i className={themeConfig.icons.trash} /> Remove
 								</MenuItem>
 							</ContextMenu>
 						</Fragment>
@@ -366,7 +366,7 @@ const HeaderAttributes = ({ video }: { video: IVideo }) => {
 	const update = useContext(UpdateContext).video
 
 	const removeAttribute = (attribute: IAttribute) => {
-		Axios.delete(`${config.api}/attribute/${attribute.id}`).then(() => {
+		Axios.delete(`${serverConfig.api}/attribute/${attribute.id}`).then(() => {
 			update({ ...video, attributes: video.attributes.filter((item) => item.id !== attribute.id) })
 		})
 	}
@@ -380,14 +380,14 @@ const HeaderAttributes = ({ video }: { video: IVideo }) => {
 					<Fragment key={item.id}>
 						<ContextMenuTrigger id={`attribute-${item.id}`} renderTag='span'>
 							<Button size='small' variant='outlined' color='primary' className='attribute'>
-									<i className={config.theme.icons.tag} />
+									<i className={themeConfig.icons.tag} />
 								{item.name}
 							</Button>
 						</ContextMenuTrigger>
 
 						<ContextMenu id={`attribute-${item.id}`}>
 							<MenuItem onClick={() => removeAttribute(item)}>
-									<i className={config.theme.icons.trash} /> Remove
+									<i className={themeConfig.icons.trash} /> Remove
 							</MenuItem>
 						</ContextMenu>
 					</Fragment>
@@ -404,7 +404,7 @@ const HeaderDate = ({ video, star }: IHeaderDate) => {
 	const { video: update, star: updateStar } = useContext(UpdateContext)
 
 	const fixDate = () => {
-		Axios.put(`${config.source}/video/${video.id}`, { date: true }).then(({ data }) => {
+		Axios.put(`${serverConfig.source}/video/${video.id}`, { date: true }).then(({ data }) => {
 			updateStar({ ...star, ageInVideo: data.age })
 
 			update({ ...video, date: { ...video.date, published: data.date } })
@@ -415,14 +415,14 @@ const HeaderDate = ({ video, star }: IHeaderDate) => {
 		<>
 			<ContextMenuTrigger id='menu__date' renderTag='span'>
 				<Button size='small' variant='outlined' id='header__date'>
-					<i className={config.theme.icons.calendar} />
+					<i className={themeConfig.icons.calendar} />
 					{video.date.published}
 				</Button>
 			</ContextMenuTrigger>
 
 			<ContextMenu id='menu__date'>
 				<MenuItem onClick={() => fixDate()}>
-					<i className={config.theme.icons.sync} /> Refresh Date
+					<i className={themeConfig.icons.sync} /> Refresh Date
 				</MenuItem>
 			</ContextMenu>
 		</>
@@ -439,7 +439,7 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 	const update = useContext(UpdateContext).video
 
 	const addLocation = (location: ILocation) => {
-		Axios.post(`${config.api}/video/${video.id}/location`, { locationID: location.id }).then(({ data }) => {
+		Axios.post(`${serverConfig.api}/video/${video.id}/location`, { locationID: location.id }).then(({ data }) => {
 			update({
 				...video,
 				locations: [...video.locations, { id: data.id, name: location.name }].sort((a, b) =>
@@ -450,7 +450,7 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 	}
 
 	const addAttribute = (attribute: IAttribute) => {
-		Axios.post(`${config.api}/video/${video.id}/attribute`, {
+		Axios.post(`${serverConfig.api}/video/${video.id}/attribute`, {
 			attributeID: attribute.id
 		}).then(({ data }) => {
 			update({
@@ -463,7 +463,7 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 	}
 
 	const renameTitle = (title: string) => {
-		Axios.put(`${config.api}/video/${video.id}`, { title }).then(() => {
+		Axios.put(`${serverConfig.api}/video/${video.id}`, { title }).then(() => {
 			update({ ...video, name: title })
 		})
 	}
@@ -499,7 +499,7 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 						)
 					}}
 				>
-					<i className={config.theme.icons.edit} /> Rename Title
+					<i className={themeConfig.icons.edit} /> Rename Title
 				</MenuItem>
 
 				<MenuItem
@@ -532,7 +532,7 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 						)
 					}}
 				>
-					<i className={config.theme.icons.tag} /> Add Attribute
+					<i className={themeConfig.icons.tag} /> Add Attribute
 				</MenuItem>
 
 				<MenuItem
@@ -565,17 +565,17 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 						)
 					}}
 				>
-					<i className={config.theme.icons.map} /> Add Location
+					<i className={themeConfig.icons.map} /> Add Location
 				</MenuItem>
 
 				<MenuItem divider />
 
 				<MenuItem onClick={() => copyTitle()}>
-					<i className={config.theme.icons.copy} /> Copy Title
+					<i className={themeConfig.icons.copy} /> Copy Title
 				</MenuItem>
 
 				<MenuItem onClick={() => copyStar()}>
-					<i className={config.theme.icons.user} /> Copy Star
+					<i className={themeConfig.icons.user} /> Copy Star
 				</MenuItem>
 			</ContextMenu>
 		</Typography>
@@ -596,7 +596,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 	// Only show warning once
 	useEffect(() => {
 		if (duration && video.duration) {
-			if (Math.abs(duration - video.duration) >= config.maxDurationDiff) {
+			if (Math.abs(duration - video.duration) >= settingsConfig.maxDurationDiff) {
 				alert('invalid video-duration')
 
 				console.log('dur', duration)
@@ -614,7 +614,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 
 		const time = Math.round(player.currentTime)
 
-		Axios.put(`${config.api}/bookmark/${id}`, { time }).then(() => {
+		Axios.put(`${serverConfig.api}/bookmark/${id}`, { time }).then(() => {
 			update(
 				[...bookmarks]
 					.map((bookmark) => {
@@ -628,13 +628,13 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 	}
 
 	const removeBookmark = (id: number) => {
-		Axios.delete(`${config.api}/bookmark/${id}`).then(() => {
+		Axios.delete(`${serverConfig.api}/bookmark/${id}`).then(() => {
 			update([...bookmarks].filter((item: any) => item.id !== id))
 		})
 	}
 
 	const changeCategory = (category: ICategory, bookmark: IVideoBookmark) => {
-		Axios.put(`${config.api}/bookmark/${bookmark.id}`, { categoryID: category.id }).then(() => {
+		Axios.put(`${serverConfig.api}/bookmark/${bookmark.id}`, { categoryID: category.id }).then(() => {
 			update(
 				[...bookmarks].map((bookmarkItem) => {
 					if (bookmarkItem.id === bookmark.id) bookmarkItem.name = category.name
@@ -652,7 +652,10 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 		a = a.getBoundingClientRect()
 		b = b.getBoundingClientRect()
 
-		return !(a.x + a.width < b.x - config.timeline.spacing || a.x + config.timeline.spacing > b.x + b.width)
+		return !(
+			a.x + a.width < b.x - settingsConfig.timeline.spacing ||
+			a.x + settingsConfig.timeline.spacing > b.x + b.width
+		)
 	}
 
 	useEffect(() => {
@@ -684,7 +687,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 									variant='outlined'
 									color='primary'
 									style={{
-										left: `${((bookmark.start * 100) / duration) * config.timeline.offset}%`
+										left: `${((bookmark.start * 100) / duration) * settingsConfig.timeline.offset}%`
 									}}
 									onClick={() => playVideo(bookmark.start)}
 									ref={(bookmark: HTMLButtonElement) => (bookmarksArr[i] = bookmark)}
@@ -718,17 +721,17 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 										)
 									}}
 								>
-									<i className={config.theme.icons.edit} /> Change Category
+									<i className={themeConfig.icons.edit} /> Change Category
 								</MenuItem>
 
 								<MenuItem onClick={() => setTime(bookmark.id)}>
-									<i className={config.theme.icons.clock} /> Change Time
+									<i className={themeConfig.icons.clock} /> Change Time
 								</MenuItem>
 
 								<MenuItem divider />
 
 								<MenuItem onClick={() => removeBookmark(bookmark.id)}>
-									<i className={config.theme.icons.trash} /> Delete
+									<i className={themeConfig.icons.trash} /> Delete
 								</MenuItem>
 							</ContextMenu>
 						</Fragment>
@@ -790,7 +793,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 				if (newVideo && !playAdded) {
 					playAdded = true
 
-					Axios.put(`${config.api}/video/${video.id}`, { plays: 1 })
+					Axios.put(`${serverConfig.api}/video/${video.id}`, { plays: 1 })
 						.then(() => {
 							console.log('Play Added')
 							playAdded = true
@@ -809,17 +812,20 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 		if (events) {
 			const player = getPlayer()
 
-			if (Hls.isSupported() && config.hls.enabled) {
-				const hls = new Hls({ autoStartLoad: false })
-				hls.loadSource(`${config.source}/videos/${video.path.stream}`)
+			if (Hls.isSupported() && settingsConfig.hls.enabled) {
+				const hls = new Hls({
+					autoStartLoad: false,
+				})
+
+				hls.loadSource(`${serverConfig.source}/videos/${video.path.stream}`)
 				hls.attachMedia(player.media)
 
 				hls.on(Hls.Events.MANIFEST_PARSED, (e, data) => {
 					const dataLevels = data['levels'].length - 1
 
-					const levels: { [key: string]: number } = config.hls.levels
-					const maxLevel = levels[config.hls.maxLevel]
-					const maxStartLevel = levels[config.hls.maxStartLevel]
+					const levels: { [key: string]: number } = settingsConfig.hls.levels
+					const maxLevel = levels[settingsConfig.hls.maxLevel]
+					const maxStartLevel = levels[settingsConfig.hls.maxStartLevel]
 
 					// Default start level to maxLevel-1
 					let desiredStartLevel = maxLevel - 1
@@ -856,13 +862,13 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 	const handleWheel = (e: React.WheelEvent) => (getPlayer().currentTime += 10 * Math.sign(e.deltaY) * -1)
 
 	const deleteVideo = () => {
-		Axios.delete(`${config.source}/video/${video.id}`).then(() => {
+		Axios.delete(`${serverConfig.source}/video/${video.id}`).then(() => {
 			window.location.href = '/video'
 		})
 	}
 
 	const setAge = (age: string) => {
-		Axios.get(`${config.api}/setage.php?videoID=${video.id}&age=${age}`).then(() => {
+		Axios.get(`${serverConfig.api}/setage.php?videoID=${video.id}&age=${age}`).then(() => {
 			updateStar({ ...star, ageInVideo: Number(age) * 365 })
 		})
 	}
@@ -870,7 +876,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 	const addBookmark = (category: ICategory) => {
 		const time = Math.round(getPlayer().currentTime)
 		if (time) {
-			Axios.post(`${config.api}/video/${video.id}/bookmark`, {
+			Axios.post(`${serverConfig.api}/video/${video.id}/bookmark`, {
 				categoryID: category.id,
 				time
 			}).then(({ data }) => {
@@ -882,17 +888,17 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 	}
 
 	const clearBookmarks = () => {
-		Axios.delete(`${config.api}/video/${video.id}/bookmark`).then(() => updateBookmarks([]))
+		Axios.delete(`${serverConfig.api}/video/${video.id}/bookmark`).then(() => updateBookmarks([]))
 	}
 
 	const resetPlays = () => {
-		Axios.put(`${config.api}/video/${video.id}`, { plays: 0 }).then(() => {
+		Axios.put(`${serverConfig.api}/video/${video.id}`, { plays: 0 }).then(() => {
 			update({ ...video, plays: 0 })
 		})
 	}
 
 	const renameVideo = (path: string) => {
-		Axios.put(`${config.source}/video/${video.id}`, { path }).then(() => {
+		Axios.put(`${serverConfig.source}/video/${video.id}`, { path }).then(() => {
 			window.location.reload()
 		})
 	}
@@ -952,15 +958,15 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 							type: 'video',
 							sources: [
 								{
-									src: `${config.source}/videos/${video.path.stream}`,
+									src: `${serverConfig.source}/videos/${video.path.stream}`,
 									type: 'application/x-mpegURL'
 								},
 								{
-									src: `${config.source}/videos/${video.path.file}`,
+									src: `${serverConfig.source}/videos/${video.path.file}`,
 									type: 'video/mp4'
 								}
 							],
-							poster: `${config.source}/images/videos/${video.id}.jpg`
+							poster: `${serverConfig.source}/images/videos/${video.id}.jpg`
 						}}
 					/>
 				)}
@@ -988,7 +994,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 						)
 					}}
 				>
-					<i className={config.theme.icons.add} /> Add Bookmark
+					<i className={themeConfig.icons.add} /> Add Bookmark
 				</MenuItem>
 
 				<MenuItem
@@ -1013,7 +1019,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 						)
 					}}
 				>
-					<i className={config.theme.icons.add} /> Set Age
+					<i className={themeConfig.icons.add} /> Set Age
 				</MenuItem>
 
 				<MenuItem
@@ -1037,21 +1043,21 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 						)
 					}}
 				>
-					<i className={config.theme.icons.edit} /> Rename File
+					<i className={themeConfig.icons.edit} /> Rename File
 				</MenuItem>
 
 				<MenuItem divider />
 
 				<MenuItem disabled={!bookmarks.length} onClick={clearBookmarks}>
-					<i className={config.theme.icons.trash} /> Remove Bookmarks
+					<i className={themeConfig.icons.trash} /> Remove Bookmarks
 				</MenuItem>
 
 				<MenuItem onClick={() => resetPlays()}>
-					<i className={config.theme.icons.trash} /> Remove Plays
+					<i className={themeConfig.icons.trash} /> Remove Plays
 				</MenuItem>
 
 				<MenuItem disabled={star.id > 0 || !!bookmarks.length} onClick={deleteVideo}>
-					<i className={config.theme.icons.trash} /> Remove Video
+					<i className={themeConfig.icons.trash} /> Remove Video
 				</MenuItem>
 			</ContextMenu>
 

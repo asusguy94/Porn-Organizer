@@ -17,14 +17,14 @@ import Axios from 'axios'
 
 import Spinner from '../spinner/spinner'
 
-import config from '../config.json'
+import { server as serverConfig } from '../../config'
 
 const AddVideoPage = () => {
 	const [videos, setVideos] = useState([])
 	const [loaded, setLoaded] = useState(false)
 
 	useEffect(() => {
-		Axios.post(`${config.source}/video`)
+		Axios.post(`${serverConfig.source}/video`)
 			.then(({ data }) => setVideos(data))
 			.finally(() => setLoaded(true))
 	}, [])
@@ -37,11 +37,11 @@ const AddVideoPage = () => {
 					<div className='text-center'>
 						<Action
 							label='Generate Thumbnails'
-							callback={() => Axios.post(`${config.source}/generate/thumb`)}
+							callback={() => Axios.post(`${serverConfig.source}/generate/thumb`)}
 						/>
 						<Action
 							label='Generate Metadata'
-							callback={() => Axios.post(`${config.source}/generate/meta`)}
+							callback={() => Axios.post(`${serverConfig.source}/generate/meta`)}
 						/>
 						<Action label='Generate VTT' disabled={true} />
 					</div>
@@ -77,7 +77,7 @@ const AddVideoPage = () => {
 							<Action
 								label='Add Videos'
 								callback={() =>
-									Axios.post(`${config.source}/video/add`, { videos }).then(() => {
+									Axios.post(`${serverConfig.source}/video/add`, { videos }).then(() => {
 										window.location.reload()
 									})
 								}

@@ -7,7 +7,7 @@ import Axios from 'axios'
 
 import { daysToYears } from '../date/date'
 
-import config from '../config.json'
+import { server as serverConfig } from '../../config'
 
 interface IVideo {
 	id: number
@@ -19,7 +19,7 @@ const VideosPage = () => {
 	const [videos, setVideos] = useState([])
 
 	useEffect(() => {
-		Axios.get(`${config.api}/video`).then(({ data }) => setVideos(data))
+		Axios.get(`${serverConfig.api}/video`).then(({ data }) => setVideos(data))
 	}, [])
 
 	return (

@@ -18,7 +18,7 @@ import capitalize from 'capitalize'
 
 import './editor.scss'
 
-import config from '../config.json'
+import { server as serverConfig } from '../../config'
 
 //TODO pass down to child using cloneElement
 //TODO implement country
@@ -52,7 +52,7 @@ const Wrapper: FC<{ label: string; name: string }> = ({ label, name, children })
 		if (input.length) {
 			if (input.toLowerCase() === input) return false
 
-			Axios.post(`${config.api}/${name}`, { name: input }).then(() => {
+			Axios.post(`${serverConfig.api}/${name}`, { name: input }).then(() => {
 				window.location.reload()
 
 				//TODO use stateObj instead
@@ -102,7 +102,7 @@ const WrapperItem = ({ label }: { label: string }) => {
 	const [data, setData] = useState([])
 
 	const updateItem = (ref: any, value: any) => {
-		Axios.put(`${config.api}/${label}/${ref.id}`, { value }).then(() => {
+		Axios.put(`${serverConfig.api}/${label}/${ref.id}`, { value }).then(() => {
 			setData(
 				[...data].filter((item: any) => {
 					if (ref.id === item.id) item.name = value
@@ -114,7 +114,7 @@ const WrapperItem = ({ label }: { label: string }) => {
 	}
 
 	useEffect(() => {
-		Axios.get(`${config.api}/${label}`).then(({ data }) => {
+		Axios.get(`${serverConfig.api}/${label}`).then(({ data }) => {
 			setData(data.sort((a: { id: number; name: string }, b: { id: number; name: string }) => a.id - b.id))
 		})
 	}, [])
@@ -143,7 +143,7 @@ const WrapperItemCountries = ({ label }: { label: string }) => {
 	const [data, setData] = useState([])
 
 	const updateItem = (ref: any, value: any, label: any) => {
-		Axios.put(`${config.api}/${label}/${ref.id}`, { label, value }).then(({ data: countryData }) => {
+		Axios.put(`${serverConfig.api}/${label}/${ref.id}`, { label, value }).then(({ data: countryData }) => {
 			setData(
 				[...data].filter((country: any) => {
 					if (ref.id === country.id) {
@@ -158,7 +158,7 @@ const WrapperItemCountries = ({ label }: { label: string }) => {
 	}
 
 	useEffect(() => {
-		Axios.get(`${config.api}/${label}`).then(({ data }) => {
+		Axios.get(`${serverConfig.api}/${label}`).then(({ data }) => {
 			setData(data.sort((a: { id: number; name: string }, b: { id: number; name: string }) => a.id - b.id))
 		})
 	}, [])

@@ -30,7 +30,7 @@ import Ribbon from '../ribbon/ribbon'
 
 import './search.scss'
 
-import config from '../config.json'
+import { server as serverConfig } from '../../config'
 
 //TODO use children-prop instead of coded-children inside component
 
@@ -43,7 +43,7 @@ const VideoSearchPage = () => {
 	const [websites, setWebsites] = useState([])
 
 	useEffect(() => {
-		Axios.get(`${config.api}/search/video`).then(({ data }) => {
+		Axios.get(`${serverConfig.api}/search/video`).then(({ data }) => {
 			setVideos(
 				data.map((video: any) => {
 					video.hidden = {
@@ -65,10 +65,10 @@ const VideoSearchPage = () => {
 				})
 			)
 
-			Axios.get(`${config.api}/category`).then(({ data }) => setCategories(data))
-			Axios.get(`${config.api}/attribute`).then(({ data }) => setAttributes(data))
-			Axios.get(`${config.api}/location`).then(({ data }) => setLocations(data))
-			Axios.get(`${config.api}/website`).then(({ data }) => setWebsites(data))
+			Axios.get(`${serverConfig.api}/category`).then(({ data }) => setCategories(data))
+			Axios.get(`${serverConfig.api}/attribute`).then(({ data }) => setAttributes(data))
+			Axios.get(`${serverConfig.api}/location`).then(({ data }) => setLocations(data))
+			Axios.get(`${serverConfig.api}/website`).then(({ data }) => setWebsites(data))
 		})
 	}, [])
 
@@ -116,7 +116,7 @@ const VideoCard = ({ video }: any) => (
 	<a href={`/video/${video.id}`}>
 		<Card className='video ribbon-container'>
 			<CardActionArea>
-				<CardMedia component='img' src={`${config.source}/images/videos/${video.image}`} />
+				<CardMedia component='img' src={`${serverConfig.source}/images/videos/${video.image}`} />
 
 				<Typography className='text-center'>{video.name}</Typography>
 

@@ -23,7 +23,7 @@ import Ribbon from '../ribbon/ribbon'
 
 import './star.scss'
 
-import config from '../config.json'
+import { server as serverConfig, theme as themeConfig } from '../../config'
 
 import { ICountry, ISimilar } from '../../interfaces'
 
@@ -79,9 +79,9 @@ const StarPage = (props: any) => {
 	useEffect(() => {
 		const { id } = props.match.params
 
-		Axios.get(`${config.api}/star`).then(({ data }) => setStarData(data))
-		Axios.get(`${config.api}/star/${id}`).then(({ data }) => setStar(data))
-		Axios.get(`${config.api}/star/${id}/video`).then(({ data }) => setVideos(data))
+		Axios.get(`${serverConfig.api}/star`).then(({ data }) => setStarData(data))
+		Axios.get(`${serverConfig.api}/star/${id}`).then(({ data }) => setStar(data))
+		Axios.get(`${serverConfig.api}/star/${id}/video`).then(({ data }) => setVideos(data))
 	}, [])
 
 		return (
@@ -129,13 +129,13 @@ const StarTitle = ({ star }: any) => {
 	const copy = async () => await navigator.clipboard.writeText(star.name)
 
 	const renameStar = (value: string) => {
-		Axios.put(`${config.api}/star/${star.id}`, { name: value }).then(() => {
+		Axios.put(`${serverConfig.api}/star/${star.id}`, { name: value }).then(() => {
 			update({ ...star, name: value })
 		})
 	}
 
 	const ignoreStar = () => {
-		Axios.put(`${config.api}/star/${star.id}`, { ignore: +!star.ignored }).then(({ data }) => {
+		Axios.put(`${serverConfig.api}/star/${star.id}`, { ignore: +!star.ignored }).then(({ data }) => {
 			update({ ...star, ignored: data.autoTaggerIgnore })
 		})
 	}
@@ -170,21 +170,21 @@ const StarTitle = ({ star }: any) => {
 						)
 					}}
 				>
-					<i className={config.theme.icons.edit} /> Rename
+					<i className={themeConfig.icons.edit} /> Rename
 				</MenuItem>
 
 				<MenuItem disabled>
-					<i className={config.theme.icons.add} /> Add Alias
+					<i className={themeConfig.icons.add} /> Add Alias
 				</MenuItem>
 
 				<MenuItem onClick={ignoreStar}>
 					{isIgnored ? (
 						<>
-							<i className={config.theme.icons['toggle-yes']} /> Enable Star
+							<i className={themeConfig.icons['toggle-yes']} /> Enable Star
 						</>
 					) : (
 						<>
-							<i className={config.theme.icons['toggle-no']} /> Ignore Star
+							<i className={themeConfig.icons['toggle-no']} /> Ignore Star
 						</>
 					)}
 				</MenuItem>
@@ -192,7 +192,7 @@ const StarTitle = ({ star }: any) => {
 				<MenuItem divider />
 
 				<MenuItem onClick={copy}>
-					<i className={config.theme.icons.copy} /> Copy Star
+					<i className={themeConfig.icons.copy} /> Copy Star
 				</MenuItem>
 			</ContextMenu>
 		</Box>
@@ -210,7 +210,10 @@ const Sidebar = ({ similar }: { similar: ISimilar[] }) => (
 				{similar.map((similarStar) => (
 					<a key={similarStar.id} href={`${similarStar.id}`} className='similar-star ribbon-container'>
 						<Card className='star'>
-							<CardMedia component='img' src={`${config.source}/images/stars/${similarStar.image}`} />
+							<CardMedia
+								component='img'
+								src={`${serverConfig.source}/images/stars/${similarStar.image}`}
+							/>
 
 							<Typography>{similarStar.name}</Typography>
 
@@ -231,18 +234,18 @@ const StarImageDropbox = ({ star }: any) => {
 	const addLocalImage = (image: any) => console.log('Adding local file is not yet supported', image)
 
 	const removeStar = () => {
-		Axios.delete(`${config.api}/star/${star.id}`).then(() => {
+		Axios.delete(`${serverConfig.api}/star/${star.id}`).then(() => {
 			window.location.href = '/star'
 		})
 	}
 
 	const removeImage = () => {
-		Axios.delete(`${config.source}/star/${star.id}/image`).then(() => {
+		Axios.delete(`${serverConfig.source}/star/${star.id}/image`).then(() => {
 			update({ ...star, image: null })
 		})
 	}
 	const addImage = (url: string) => {
-		Axios.post(`${config.source}/star/${star.id}/image`, { url }).then(({ data }) => {
+		Axios.post(`${serverConfig.source}/star/${star.id}/image`, { url }).then(({ data }) => {
 			update({ ...star, image: `${data.image}?v=${new Date().getTime()}` })
 		})
 	}
@@ -289,12 +292,16 @@ const StarImageDropbox = ({ star }: any) => {
 			{star.image !== null ? (
 				<>
 					<ContextMenuTrigger id='star__image'>
-						<img className='star__image' src={`${config.source}/images/stars/${star.image}`} alt='star' />
+						<img
+							className='star__image'
+							src={`${serverConfig.source}/images/stars/${star.image}`}
+							alt='star'
+						/>
 					</ContextMenuTrigger>
 
 					<ContextMenu id='star__image'>
 						<MenuItem onClick={removeImage}>
-							<i className={config.theme.icons.trash} /> Delete Image
+							<i className={themeConfig.icons.trash} /> Delete Image
 						</MenuItem>
 					</ContextMenu>
 				</>
@@ -315,7 +322,7 @@ const StarImageDropbox = ({ star }: any) => {
 
 					<ContextMenu id='star__dropbox'>
 						<MenuItem onClick={removeStar}>
-							<i className={config.theme.icons.trash} /> Remove Star
+							<i className={themeConfig.icons.trash} /> Remove Star
 						</MenuItem>
 					</ContextMenu>
 				</>
@@ -346,7 +353,7 @@ const StarForm = ({ star, starData }: IStarForm) => {
 	const update = useContext(UpdateContext).star
 
 	const updateInfo = (value: string, label: string) => {
-		Axios.put(`${config.api}/star/${star.id}`, { label, value }).then(({ data }) => {
+		Axios.put(`${serverConfig.api}/star/${star.id}`, { label, value }).then(({ data }) => {
 			if (data.reload) {
 				window.location.reload()
 			} else {
@@ -358,7 +365,7 @@ const StarForm = ({ star, starData }: IStarForm) => {
 	}
 
 	const freeones = () => {
-		Axios.post(`${config.api}/star/${star.id}/freeones`).then(() => {
+		Axios.post(`${serverConfig.api}/star/${star.id}/freeones`).then(() => {
 			window.location.reload()
 
 			//TODO use stateObj
@@ -366,7 +373,7 @@ const StarForm = ({ star, starData }: IStarForm) => {
 	}
 
 	const freeonesReset = () => {
-		Axios.delete(`${config.api}/star/${star.id}/freeones`).then(() => {
+		Axios.delete(`${serverConfig.api}/star/${star.id}/freeones`).then(() => {
 			window.location.reload()
 
 			//TODO use stateObj
@@ -582,7 +589,7 @@ interface IStarVideo {
 }
 const StarVideo = ({ video, isFirst, isLast, hidden }: IStarVideo) => {
 	const [src, setSrc] = useState('')
-	const [dataSrc, setDataSrc] = useState(`${config.source}/videos/${video.fname}`)
+	const [dataSrc, setDataSrc] = useState(`${serverConfig.source}/videos/${video.fname}`)
 
 	const thumbnail: any = useRef()
 
@@ -649,7 +656,7 @@ const StarVideo = ({ video, isFirst, isLast, hidden }: IStarVideo) => {
 						component='video'
 						src={src}
 						data-src={dataSrc}
-						poster={`${config.source}/images/videos/${video.image}`}
+						poster={`${serverConfig.source}/images/videos/${video.image}`}
 						preload='metadata'
 						muted
 						onMouseEnter={handleMouseEnter}

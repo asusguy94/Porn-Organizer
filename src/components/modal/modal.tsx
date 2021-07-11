@@ -8,7 +8,7 @@ import KeyboardEventHandler from 'react-keyboard-event-handler'
 
 import './modal.scss'
 
-import config from '../config.json'
+import { settings as settingsConfig } from '../../config'
 
 //TODO improve children, props.children, pros.filter, children=children.filter
 
@@ -41,7 +41,7 @@ const Modal = (props: any) => {
 				let valA = a.props.children.toLowerCase()
 				let valB = b.props.children.toLowerCase()
 
-				if (query.length && config.modal.filter.startsWithOnTop) {
+				if (query.length && settingsConfig.modal.filter.startsWithOnTop) {
 					if (valA.startsWith(query) && valB.startsWith(query)) return 0
 					else if (valA.startsWith(query)) return -1
 					else if (valB.startsWith(query)) return 1
@@ -74,7 +74,9 @@ const Modal = (props: any) => {
 
 			<KeyboardEventHandler
 				handleKeys={
-					props.filter && config.modal.filter.search ? ['alphabetic', 'space', 'backspace', 'esc'] : ['esc']
+					props.filter && settingsConfig.modal.filter.search
+						? ['alphabetic', 'space', 'backspace', 'esc']
+						: ['esc']
 				}
 				onKeyEvent={(key: any, e: any) => handleKeyPress(key, e)}
 				handleFocusableElements={true}

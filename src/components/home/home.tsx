@@ -10,7 +10,7 @@ import Ribbon from '../ribbon/ribbon'
 
 import './home.scss'
 
-import config from '../config.json'
+import { server as serverConfig } from '../../config'
 
 interface IHomeColumn {
 	enabled?: boolean
@@ -29,7 +29,7 @@ const HomeColumn = ({ enabled = true, label, limit = 12 }: IHomeColumn) => {
 	const [data, setData] = useState<IVideo[]>([])
 
 	useEffect(() => {
-		Axios.get(`${config.api}/home/${label}/${limit}`).then(({ data }) => setData(data))
+		Axios.get(`${serverConfig.api}/home/${label}/${limit}`).then(({ data }) => setData(data))
 	}, [])
 
 	if (enabled && data.length) {
@@ -45,7 +45,7 @@ const HomeColumn = ({ enabled = true, label, limit = 12 }: IHomeColumn) => {
 							<Link to={`/video/${video.id}`}>
 								<Box className='video ribbon-container'>
 									<img
-										src={`${config.source}/images/videos/${video.image}`}
+										src={`${serverConfig.source}/images/videos/${video.image}`}
 										className='img-thumbnail'
 										alt='video'
 									/>

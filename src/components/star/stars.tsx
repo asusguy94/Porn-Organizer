@@ -16,7 +16,7 @@ import Axios from 'axios'
 
 import './stars.scss'
 
-import config from '../config.json'
+import { server as serverConfig } from '../../config'
 
 interface IStar {
 	id: number
@@ -36,7 +36,7 @@ const StarsPage = () => {
 	const [input, setInput] = useState('')
 
 	useEffect(() => {
-		Axios.get(`${config.api}/star/missing`).then(({ data }) => {
+		Axios.get(`${serverConfig.api}/star/missing`).then(({ data }) => {
 			const imported = data.stars.map((item: IStar) => item.name)
 
 			const filtered = data.missing.filter((star: IStar, index: number, self: IMissing[]) => {
@@ -55,7 +55,7 @@ const StarsPage = () => {
 
 	const handleSubmit = () => {
 		if (input.length) {
-			Axios.post(`${config.api}/star`, { name: input }).finally(() => {
+			Axios.post(`${serverConfig.api}/star`, { name: input }).finally(() => {
 				window.location.reload()
 			})
 		}
@@ -85,7 +85,7 @@ const StarsPage = () => {
 									<CardActionArea>
 										{star.image ? (
 											<CardMedia
-												src={`${config.source}/images/stars/${star.image}`}
+												src={`${serverConfig.source}/images/stars/${star.image}`}
 												component='img'
 											/>
 										) : null}
