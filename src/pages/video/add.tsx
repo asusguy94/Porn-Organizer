@@ -15,9 +15,9 @@ import {
 
 import Axios from 'axios'
 
-import Spinner from '../spinner/spinner'
+import Spinner from '@components/spinner/spinner'
 
-import { server as serverConfig } from '../../config'
+import { server as serverConfig } from '@/config'
 
 const AddVideoPage = () => {
 	const [videos, setVideos] = useState([])

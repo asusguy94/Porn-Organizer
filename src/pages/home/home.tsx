@@ -6,11 +6,11 @@ import { Grid, Box } from '@material-ui/core'
 import Axios from 'axios'
 import capitalize from 'capitalize'
 
-import Ribbon from '../ribbon/ribbon'
+import Ribbon from '@components/ribbon/ribbon'
 
 import './home.scss'
 
-import { server as serverConfig } from '../../config'
+import { server as serverConfig } from '@/config'
 
 interface IHomeColumn {
 	enabled?: boolean

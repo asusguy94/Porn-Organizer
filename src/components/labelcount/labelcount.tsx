@@ -1,4 +1,4 @@
-import { isHidden } from '../search/helper'
+import { isHidden } from '@components/search/helper'
 
 interface ILabelCount {
 	obj: any

@@ -18,7 +18,7 @@ import capitalize from 'capitalize'
 
 import './editor.scss'
 
-import { server as serverConfig } from '../../config'
+import { server as serverConfig } from '@/config'
 
 //TODO pass down to child using cloneElement
 //TODO implement country
@@ -163,32 +163,32 @@ const WrapperItemCountries = ({ label }: { label: string }) => {
 		})
 	}, [])
 
-		return (
-			<TableContainer component={Paper}>
-				<Table size='small' className='table-striped'>
-					<TableHead>
-						<TableRow>
-							<TableCell>ID</TableCell>
-							<TableCell>Country</TableCell>
-							<TableCell>Code</TableCell>
-							<TableCell>Flag</TableCell>
-						</TableRow>
-					</TableHead>
+	return (
+		<TableContainer component={Paper}>
+			<Table size='small' className='table-striped'>
+				<TableHead>
+					<TableRow>
+						<TableCell>ID</TableCell>
+						<TableCell>Country</TableCell>
+						<TableCell>Code</TableCell>
+						<TableCell>Flag</TableCell>
+					</TableRow>
+				</TableHead>
 
-					<TableBody>
+				<TableBody>
 					{data.map((item: any) => (
 						<ItemCountry
 							key={item.id}
 							data={item}
 							updateCountry={(ref: any, value: any, label = 'country') => updateItem(ref, value, label)}
 							updateCode={(ref: any, value: any, label = 'code') => updateItem(ref, value, label)}
-							/>
-						))}
-					</TableBody>
-				</Table>
-			</TableContainer>
-		)
-	}
+						/>
+					))}
+				</TableBody>
+			</Table>
+		</TableContainer>
+	)
+}
 
 const Item = ({ update, data }: any) => {
 	const [edit, setEdit] = useState(false)
@@ -212,7 +212,7 @@ const Item = ({ update, data }: any) => {
 						onKeyPress={(e) => {
 							if (e.key === 'Enter') {
 								save()
-		}
+							}
 						}}
 						onChange={(e) => setValue(e.currentTarget.value)}
 					/>
@@ -222,7 +222,7 @@ const Item = ({ update, data }: any) => {
 			</TableCell>
 		</TableRow>
 	)
-	}
+}
 
 const ItemCountry = ({ updateCountry, updateCode, data }: any) => {
 	const [country, setCountry] = useState<{ edit: boolean; value: null | string }>({ edit: false, value: null })
@@ -232,7 +232,7 @@ const ItemCountry = ({ updateCountry, updateCode, data }: any) => {
 		setCountry({ ...country, edit: false })
 
 		if (country.value) updateCountry(data, country.value)
-		}
+	}
 
 	const saveCode = () => {
 		setCode({ ...code, edit: true })
@@ -240,47 +240,47 @@ const ItemCountry = ({ updateCountry, updateCode, data }: any) => {
 		if (code.value) updateCode(data, code.value)
 	}
 
-		return (
-			<TableRow>
+	return (
+		<TableRow>
 			<TableCell>{data.id}</TableCell>
 			<TableCell onClick={() => setCountry({ ...country, edit: true })}>
 				{country.edit ? (
-						<TextField
+					<TextField
 						defaultValue={data.name}
-							autoFocus
+						autoFocus
 						onBlur={saveCountry}
 						onChange={(e) => setCountry({ ...country, value: e.target.value })}
-							onKeyPress={(e: React.KeyboardEvent) => {
+						onKeyPress={(e: React.KeyboardEvent) => {
 							if (e.key === 'Enter') saveCountry()
-							}}
-						/>
-					) : (
+						}}
+					/>
+				) : (
 					<span>{data.name}</span>
-					)}
-				</TableCell>
+				)}
+			</TableCell>
 
 			<TableCell onClick={() => setCode({ ...country, edit: true })}>
 				{code.edit ? (
-						<TextField
+					<TextField
 						defaultValue={data.code}
-							autoFocus
+						autoFocus
 						onBlur={saveCode}
 						onChange={(e) => setCode({ ...country, value: e.target.value })}
 						inputProps={{ maxLength: 2 }}
-							onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+						onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
 							if (e.key === 'Enter') saveCode()
-							}}
-						/>
-					) : (
+						}}
+					/>
+				) : (
 					<span>{data.code}</span>
-					)}
-				</TableCell>
+				)}
+			</TableCell>
 
-				<TableCell className='pb-0'>
+			<TableCell className='pb-0'>
 				<i className={`flag flag-${data.code}`} />
-				</TableCell>
-			</TableRow>
-		)
-	}
+			</TableCell>
+		</TableRow>
+	)
+}
 
 export default EditorPage

@@ -8,7 +8,7 @@ import KeyboardEventHandler from 'react-keyboard-event-handler'
 
 import './modal.scss'
 
-import { settings as settingsConfig } from '../../config'
+import { settings as settingsConfig } from '@/config'
 
 //TODO improve children, props.children, pros.filter, children=children.filter
 

@@ -27,17 +27,15 @@
 		"@testing-library/react": "^12.0.0",
 		"@testing-library/user-event": "^13.1.9",
 		"@types/capitalize": "^2.0.0",
-		"@types/jest": "^26.0.23",
-		"@types/node": "^15.14.1",
-		"@types/react": "^17.0.13",
-		"@types/react-dom": "^17.0.8",
-		"@types/react-router-dom": "^5.1.7",
+		"eslint-import-resolver-typescript": "^2.4.0",
+		"react-app-rewire-alias": "^1.0.3",
+		"react-app-rewired": "^2.1.8",
 		"typescript": "^4.3.5"
 	},
 	"scripts": {
-		"start": "npx cross-env browser=NONE PORT=3001 react-scripts start",
-		"start:browser": "npx cross-env PORT=3001 react-scripts start",
-		"build": "react-scripts build",
+		"dev": "npx cross-env browser=NONE PORT=3001 react-app-rewired start",
+		"dev:browser": "npx cross-env PORT=3001 react-app-rewired start",
+		"build": "react-app-rewired build",
 		"server": "serve -l 3001 -s build",
 		"build+server": "yarn build & yarn server"
 	},

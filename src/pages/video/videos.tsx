@@ -5,9 +5,9 @@ import { Grid, List, ListItem, ListItemText, Badge } from '@material-ui/core'
 
 import Axios from 'axios'
 
-import { daysToYears } from '../date/date'
+import { daysToYears } from '@components/date/date'
 
-import { server as serverConfig } from '../../config'
+import { server as serverConfig } from '@/config'
 
 interface IVideo {
 	id: number

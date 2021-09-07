@@ -6,21 +6,21 @@ import { Container, CssBaseline } from '@material-ui/core'
 import NavBar from './components/navbar/navbar'
 
 /* Page Components */
-import HomePage from './components/home/home'
-import VideosPage from './components/video/videos'
-import VideoPage from './components/video/video'
-import AddVideoPage from './components/video/add'
-import StarsPage from './components/star/stars'
-import StarPage from './components/star/star'
-import VideoSearchPage from './components/search/videosearch'
-import StarSearchPage from './components/search/starsearch'
+import HomePage from '@pages/home/home'
+import VideosPage from '@pages/video/videos'
+import VideoPage from '@pages/video/video'
+import AddVideoPage from '@pages/video/add'
+import StarsPage from '@pages/star/stars'
+import StarPage from '@pages/star/star'
+import VideoSearchPage from '@pages/search/videosearch'
+import StarSearchPage from '@pages/search/starsearch'
 
-import EditorPage from './components/editor/editor'
-import ErrorPage from './components/404/404'
+import EditorPage from '@pages/editor/editor'
+import ErrorPage from '@pages/404/404'
 
 /* Style */
-import './components/styles/main.scss'
-import './components/styles/flag.scss'
+import '@styles/main.scss'
+import '@styles/flag.scss'
 
 const App = () => (
 	<Router>

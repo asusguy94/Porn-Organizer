@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import './navbar.scss'
 
-import { server as serverConfig } from '../../config'
+import { server as serverConfig } from '@/config'
 
 const NavBar = () => (
 	<nav>
