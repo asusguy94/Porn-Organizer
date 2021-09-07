@@ -5,5 +5,5 @@ export const handler = ({ checked, indeterminate }: { checked: boolean; indeterm
 		return { indeterminate: false, checked: false }
 	}
 
-		return { indeterminate: false, checked: true }
-	}
+	return { indeterminate: false, checked: true }
+}

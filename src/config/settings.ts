@@ -15,6 +15,7 @@ export default {
 		maxLevel: 720,
 		maxStartLevel: 480
 	},
+	player: 'plyr',
 	modal: {
 		filter: {
 			search: true,

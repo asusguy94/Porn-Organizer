@@ -1,0 +1,102 @@
+@import '@styles/functions';
+#star-page {
+	.alert {
+		margin: 0.5em 0;
+	}
+
+	#similar {
+		text-align: center;
+
+		a.similar-star {
+			display: inline-block;
+			width: 200px;
+
+			margin: 10px;
+
+			&:hover {
+				text-decoration: underline !important;
+			}
+		}
+	}
+
+	#star {
+		#dropbox {
+			width: 200px;
+			height: 275px;
+			border: 2px dashed rgba(255, 0, 0, 0.3);
+
+			&.hover {
+				border-color: rgba(255, 0, 0, 1);
+			}
+
+			.label {
+				position: relative;
+				text-align: center;
+				top: 50%;
+			}
+		}
+
+		.star {
+			&__image {
+				max-height: $starHeight + px;
+				width: $starWidth + px;
+			}
+		}
+
+		h2.ignored {
+			color: red;
+		}
+
+		.action {
+			&__item {
+				margin-right: 10px;
+
+				margin-bottom: 10px;
+			}
+		}
+
+		label.Mui-error {
+			font-weight: bold;
+			color: black;
+		}
+
+		.MuiInput-underline.Mui-error::after {
+			border-bottom-color: black;
+		}
+
+		input {
+			text-transform: capitalize;
+		}
+
+		.flag {
+			margin-left: 5px;
+			margin-bottom: -5px;
+		}
+	}
+
+	.video {
+		margin: 0 10px 10px 5px;
+		width: $thumbnailWidth + px;
+
+		&.hidden {
+			opacity: 0.2;
+		}
+
+		&__info {
+			padding: 2px 8px;
+		}
+
+		.site-info {
+			text-align: center;
+			margin-top: 10px;
+
+			&__wsite {
+				color: green;
+			}
+
+			&__site {
+				color: red;
+			}
+		}
+	}
+}
