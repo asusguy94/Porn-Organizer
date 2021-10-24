@@ -1,5 +1,7 @@
 # PornJS Frontend Scripts
 
+## Yarn v1 >> Yarn v2
+
 ## Requirements
 
 1. Yarn package manager
