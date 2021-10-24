@@ -58,7 +58,8 @@ const VideoPage = (props: any) => {
 		star: '',
 		path: {
 			file: '',
-			stream: ''
+			stream: '',
+			dash: ''
 		},
 		duration: 0,
 		date: {
@@ -938,7 +939,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 				// Required, otherwise crashes component
 				dash.initialize()
 				dash.setAutoPlay(false)
-				dash.attachSource(`${serverConfig.source}/videos/${video.path.stream.replace('.m3u8', '.mpd')}`)
+				dash.attachSource(`${serverConfig.source}/videos/${video.path.dash}`)
 				dash.attachView(player.media)
 
 				let triggered = false

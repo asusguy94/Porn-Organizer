@@ -58,7 +58,7 @@ export interface IVideo {
 	locations: ILocation[]
 	attributes: IAttribute[]
 	date: { added: string; published: string }
-	path: { file: string; stream: string }
+	path: { file: string; stream: string; dash: string }
 }
 
 export interface IVideoStar {
