@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import { Container, CssBaseline } from '@material-ui/core'
 
 /* Custom Components */
-import NavBar from './components/navbar/navbar'
+import NavBar from '@components/navbar/navbar'
 
 /* Page Components */
 import HomePage from '@pages/home/home'

@@ -1,6 +1,6 @@
 export const isHidden = ({ hidden }: any) => {
 	let value = 0
-	for (var prop in hidden) {
+	for (const prop in hidden) {
 		if (typeof hidden[prop] !== 'object') {
 			value += Number(hidden[prop])
 		} else {
@@ -27,3 +27,5 @@ export const getCount = (obj: any) => {
 	})
 	return count
 }
+
+export const getVisible = (arr: any[]) => arr.filter((item: any) => (!isHidden(item) ? item : null))

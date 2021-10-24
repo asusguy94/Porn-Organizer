@@ -22,8 +22,7 @@ import capitalize from 'capitalize'
 
 import { daysToYears } from '@components/date/date'
 import LabelCount from '@components/labelcount/labelcount'
-import { getCount, isHidden } from '@components/search/helper'
-import Spinner from '@components/spinner/spinner'
+import { getVisible } from '@components/search/helper'
 import Ribbon from '@components/ribbon/ribbon'
 import Badge from '@components/badge/badge'
 
@@ -96,7 +95,7 @@ const StarSearchPage = () => {
 				<Sidebar starData={{ breasts, haircolors, ethnicities, countries }} stars={stars} update={setStars} />
 			</Grid>
 
-			<Grid item container xs={10} justify='center'>
+			<Grid item xs={10}>
 				<Stars stars={stars} />
 			</Grid>
 
