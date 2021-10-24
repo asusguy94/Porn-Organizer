@@ -25,6 +25,7 @@ import LabelCount from '@components/labelcount/labelcount'
 import { getVisible } from '@components/search/helper'
 import Ribbon from '@components/ribbon/ribbon'
 import Badge from '@components/badge/badge'
+import VGrid from '@components/virtualized/virtuoso'
 
 import './search.scss'
 
@@ -105,25 +106,19 @@ const StarSearchPage = () => {
 }
 
 // Wrapper
-const Stars = ({ stars }: { stars: IStar[] }) => (
-	<Box id='stars'>
-		<Typography variant='h6' className='text-center'>
-			<span className='count'>{getCount(stars)}</span> Stars
-		</Typography>
+const Stars = ({ stars }: { stars: IStar[] }) => {
+	const visibleStars = getVisible(stars)
 
-		<Grid container justify='center'>
-			{stars.length ? (
-				stars.map((star) => {
-					if (isHidden(star)) return null
+	return (
+		<Box id='stars'>
+			<Typography variant='h6' className='text-center'>
+				<span className='count'>{visibleStars.length}</span> Stars
+			</Typography>
 
-					return <StarCard key={star.id} star={star} />
-				})
-			) : (
-				<Spinner />
-			)}
-		</Grid>
-	</Box>
-)
+			<VGrid items={visibleStars} renderData={(idx: number) => <StarCard star={visibleStars[idx]} />} />
+		</Box>
+	)
+}
 
 const StarCard = ({ star }: { star: IStar }) => (
 	<a href={`/star/${star.id}`}>

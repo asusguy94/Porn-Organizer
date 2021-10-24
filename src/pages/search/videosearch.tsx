@@ -26,6 +26,7 @@ import { handler as indeterminateHandler } from '@components/indeterminate/indet
 import LabelCount from '@components/labelcount/labelcount'
 import { getVisible } from '@components/search/helper'
 import Ribbon from '@components/ribbon/ribbon'
+import VGrid from '../../components/virtualized/virtuoso'
 
 import './search.scss'
 
@@ -91,25 +92,19 @@ const VideoSearchPage = () => {
 }
 
 // Wrapper
-const Videos = ({ videos }: any) => (
-	<Box id='videos'>
-		<Typography variant='h6' className='text-center'>
-			<span className='count'>{getCount(videos)}</span> Videos
-		</Typography>
+const Videos = ({ videos }: any) => {
+	const visibleVideos = getVisible(videos)
 
-		<Grid container justify='center'>
-			{videos.length ? (
-				videos.map((video: any) => {
-					if (isHidden(video)) return null
+	return (
+		<Box id='videos'>
+			<Typography variant='h6' className='text-center'>
+				<span className='count'>{visibleVideos.length}</span> Videos
+			</Typography>
 
-					return <VideoCard video={video} key={video.id} />
-				})
-			) : (
-				<Spinner />
-			)}
-		</Grid>
-	</Box>
-)
+			<VGrid items={visibleVideos} renderData={(idx: number) => <VideoCard video={visibleVideos[idx]} />} />
+		</Box>
+	)
+}
 
 const VideoCard = ({ video }: any) => (
 	<a href={`/video/${video.id}`}>
@@ -118,7 +113,7 @@ const VideoCard = ({ video }: any) => (
 				<CardMedia component='img' src={`${serverConfig.source}/images/videos/${video.image}`} />
 
 				<Grid container justifyContent='center' className='card__title card__title--fixed-height height-3'>
-				<Typography className='text-center'>{video.name}</Typography>
+					<Typography className='text-center'>{video.name}</Typography>
 				</Grid>
 
 				<Ribbon label={daysToYears(video.ageInVideo)} />

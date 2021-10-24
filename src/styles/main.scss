@@ -60,6 +60,33 @@ a {
 	text-decoration: none !important;
 }
 
+.card {
+	&__title {
+		padding: 0 2px;
+
+		&--fixed-height {
+			display: flex;
+			align-items: center;
+
+			&.height-1 {
+				height: 24px;
+			}
+
+			&.height-2 {
+				height: 24px * 2;
+			}
+
+			&.height-3 {
+				height: 24px * 3;
+			}
+
+			&.height-4 {
+				height: 24px * 4;
+			}
+		}
+	}
+}
+
 .table-striped {
 	tbody tr:nth-of-type(odd) {
 		background-color: rgba(0, 0, 0, 0.05);

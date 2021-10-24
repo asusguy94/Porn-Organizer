@@ -38,10 +38,6 @@ Backend scripts can be found in on of my other repositories: [Backend Scripts](h
 
 Status of functionality can be found at [features.md](FEATURES.md)
 
-## Known issues
-
--   Search-pages starts to slow down after 100-200 elements
-
 ### Customization
 
 You can easily change some functionality by altering some of the variables in `config/`
