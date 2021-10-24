@@ -2,7 +2,7 @@
 	"extends": "./tsconfig.path.json",
 	"compilerOptions": {
 		"target": "ES5",
-		"module": "esnext",
+		"module": "ESNext",
 		"lib": ["dom", "dom.iterable", "esnext"],
 		"moduleResolution": "node",
 		"removeComments": true,

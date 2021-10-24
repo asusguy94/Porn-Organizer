@@ -910,9 +910,9 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 
 					// MaxLevel
 					let desiredBitrate = -1
-					for (var i = 0, currentQuality = 0; i < qualityArr.length; i++) {
-						const obj = qualityArr[i]
 
+					let currentQuality = 0
+					for (let obj of qualityArr) {
 						if (obj.height <= settingsConfig.dash.maxLevel && obj.height > currentQuality) {
 							currentQuality = obj.height
 

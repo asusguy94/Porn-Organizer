@@ -69,7 +69,7 @@ const Wrapper: FC<{ label: string; name: string }> = ({ label, name, children })
 
 	return (
 		<Grid item xs={3} style={{ paddingLeft: 5, paddingRight: 5, marginTop: 5 }}>
-			<Grid container justify='center' style={{ marginBottom: 10 }}>
+			<Grid container justifyContent='center' style={{ marginBottom: 10 }}>
 				<Grid item component='h2'>
 					{capitalize(label)}
 				</Grid>

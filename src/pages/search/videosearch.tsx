@@ -81,7 +81,7 @@ const VideoSearchPage = () => {
 				/>
 			</Grid>
 
-			<Grid item container xs={10} justify='center'>
+			<Grid item xs={10}>
 				<Videos videos={videos} />
 			</Grid>
 
@@ -117,7 +117,9 @@ const VideoCard = ({ video }: any) => (
 			<CardActionArea>
 				<CardMedia component='img' src={`${serverConfig.source}/images/videos/${video.image}`} />
 
+				<Grid container justifyContent='center' className='card__title card__title--fixed-height height-3'>
 				<Typography className='text-center'>{video.name}</Typography>
+				</Grid>
 
 				<Ribbon label={daysToYears(video.ageInVideo)} />
 			</CardActionArea>

@@ -90,7 +90,7 @@ const StarsPage = () => {
 	}
 
 	return (
-		<Grid container justify='center' spacing={3} id='stars-page'>
+		<Grid container justifyContent='center' spacing={3} id='stars-page'>
 			<form noValidate>
 				<TextField value={input} onChange={(e) => setInput(e.currentTarget.value)} />
 
@@ -105,7 +105,7 @@ const StarsPage = () => {
 				>{`Add Star ${missing.length ? `(${index + 1} of ${missing.length})` : ''}`}</Button>
 			</form>
 
-			<Grid container justify='center' spacing={3} className='stars__no-image'>
+			<Grid container justifyContent='center' spacing={3} className='stars__no-image'>
 				{stars
 					.sort((a, b) => a.name.localeCompare(b.name))
 					.map((star) => (
@@ -130,7 +130,7 @@ const StarsPage = () => {
 					))}
 			</Grid>
 
-			<Grid container justify='center' spacing={3} className='videos__no-star'>
+			<Grid container justifyContent='center' spacing={3} className='videos__no-star'>
 				{videoStars
 					.sort((a, b) => a.name.localeCompare(b.name))
 					.map((star) => (

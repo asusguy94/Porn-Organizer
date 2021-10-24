@@ -86,7 +86,7 @@
 | Copy Star        | :heavy_check_mark: |
 | Remove Attribute | :heavy_check_mark: |
 | Remove Location  | :heavy_check_mark: |
-| Fix Date         | :heavy_check_mark: |
+| Refresh Date     | :heavy_check_mark: |
 | Next ID          | :heavy_check_mark: |
 
 ### :heavy_check_mark: Video
