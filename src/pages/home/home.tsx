@@ -25,7 +25,7 @@ interface IVideo {
 	total: number
 }
 
-const HomeColumn = ({ enabled = true, label, limit = 12 }: IHomeColumn) => {
+export const HomeColumn = ({ enabled = true, label, limit = 12 }: IHomeColumn) => {
 	const [data, setData] = useState<IVideo[]>([])
 
 	useEffect(() => {

@@ -16,6 +16,7 @@ import VideoSearchPage from '@pages/search/videosearch'
 import StarSearchPage from '@pages/search/starsearch'
 
 import EditorPage from '@pages/editor/editor'
+import TestPage from '@pages/test/testpage'
 
 import ErrorPage from '@pages/404/404'
 
@@ -44,6 +45,7 @@ const App = () => (
 					</Route>
 
 					<Route path='/editor' element={<EditorPage />} />
+					<Route path='/test' element={<TestPage />} />
 
 					<Route path='/' element={<HomePage />} />
 					<Route path='*' element={<ErrorPage />} />
