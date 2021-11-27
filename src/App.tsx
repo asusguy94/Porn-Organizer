@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
-import { Container, CssBaseline } from '@material-ui/core'
+import { Container, CssBaseline } from '@mui/material'
 
 /* Custom Components */
 import NavBar from '@components/navbar/navbar'

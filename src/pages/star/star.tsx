@@ -1,18 +1,8 @@
 import React, { useState, useRef, createContext, useContext, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
-import {
-	Box,
-	Grid,
-	Card,
-	CardActionArea,
-	CardContent,
-	CardMedia,
-	Typography,
-	Button,
-	TextField
-} from '@material-ui/core'
-import { Autocomplete, Alert, AlertTitle } from '@material-ui/lab'
+import { Button, TextField, Box, Grid, Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material'
+import { Autocomplete, Alert, AlertTitle } from '@mui/lab'
 
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
@@ -394,7 +384,7 @@ const StarForm = ({ star, starData }: IStarForm) => {
 
 				<Button
 					variant='contained'
-					color='secondary'
+					color='error'
 					id='freeones_rs'
 					className='action__item'
 					onClick={freeonesReset}
@@ -594,6 +584,7 @@ const StarInputForm: React.FC<IStarInputForm> = ({ update, value, name, list = [
 					renderInput={(params) => (
 						<TextField
 							{...params}
+							variant='standard'
 							label={name}
 							error={isChanged}
 							InputLabelProps={{ shrink: shouldShrink }}

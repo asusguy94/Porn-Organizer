@@ -1,16 +1,6 @@
 import { useState, useEffect } from 'react'
 
-import {
-	Grid,
-	TextField,
-	Card,
-	CardMedia,
-	CardActionArea,
-	CardContent,
-	Button,
-	Link,
-	Typography
-} from '@material-ui/core'
+import { Grid, TextField, Card, CardMedia, CardActionArea, CardContent, Button, Link, Typography } from '@mui/material'
 
 import Axios from 'axios'
 
@@ -92,7 +82,7 @@ const StarsPage = () => {
 	return (
 		<Grid container justifyContent='center' spacing={3} id='stars-page'>
 			<form noValidate>
-				<TextField value={input} onChange={(e) => setInput(e.currentTarget.value)} />
+				<TextField variant='standard' value={input} onChange={(e) => setInput(e.currentTarget.value)} />
 
 				<IndexChanger total={missing} index={index} setIndex={setIndex} />
 

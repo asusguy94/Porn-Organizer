@@ -11,7 +11,7 @@ import {
 	TableHead,
 	Typography,
 	Paper
-} from '@material-ui/core'
+} from '@mui/material'
 
 import Axios from 'axios'
 

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-import { Button, Grid } from '@material-ui/core'
+import { Button, Grid } from '@mui/material'
 
 const ErrorPage = () => (
 	<Grid item id='error-page' className='text-center'>

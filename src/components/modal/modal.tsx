@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 
-import { Card, CardContent, Button, Typography, Box } from '@material-ui/core'
+import { Card, CardContent, Button, Typography, Box } from '@mui/material'
 
 //@ts-ignore
 import KeyboardEventHandler from 'react-keyboard-event-handler'
@@ -64,7 +64,7 @@ const Modal = (props: any) => {
 					<CardContent id='modal__body'>
 						<Box className='content'>{children}</Box>
 						<Box className='actions'>
-							<Button size='small' variant='contained' color='secondary' onClick={props.onClose}>
+							<Button size='small' variant='contained' color='error' onClick={props.onClose}>
 								Close
 							</Button>
 						</Box>

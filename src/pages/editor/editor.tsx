@@ -11,7 +11,7 @@ import {
 	TableBody,
 	TextField,
 	Paper
-} from '@material-ui/core'
+} from '@mui/material'
 
 import Axios from 'axios'
 import capitalize from 'capitalize'
@@ -76,6 +76,7 @@ const Wrapper: FC<{ label: string; name: string }> = ({ label, name, children })
 
 				<Grid item>
 					<TextField
+						variant='standard'
 						onChange={handleChange}
 						onKeyPress={handleKeyPress}
 						style={{ marginLeft: 5, marginRight: 5 }}
@@ -159,7 +160,7 @@ const WrapperItemCountries = ({ label }: { label: string }) => {
 
 	useEffect(() => {
 		Axios.get(`${serverConfig.api}/${label}`).then(({ data }) => {
-			setData(data.sort((a: { id: number; name: string }, b: { id: number; name: string }) => a.id - b.id))
+			setData(data.sort((a: any, b: any) => a.id - b.id))
 		})
 	}, [])
 
@@ -206,6 +207,7 @@ const Item = ({ update, data }: any) => {
 			<TableCell>
 				{edit ? (
 					<TextField
+						variant='standard'
 						defaultValue={data.name}
 						autoFocus
 						onBlur={save}
@@ -235,7 +237,7 @@ const ItemCountry = ({ updateCountry, updateCode, data }: any) => {
 	}
 
 	const saveCode = () => {
-		setCode({ ...code, edit: true })
+		setCode({ ...code, edit: false })
 
 		if (code.value) updateCode(data, code.value)
 	}
@@ -246,6 +248,7 @@ const ItemCountry = ({ updateCountry, updateCode, data }: any) => {
 			<TableCell onClick={() => setCountry({ ...country, edit: true })}>
 				{country.edit ? (
 					<TextField
+						variant='standard'
 						defaultValue={data.name}
 						autoFocus
 						onBlur={saveCountry}
@@ -262,6 +265,7 @@ const ItemCountry = ({ updateCountry, updateCode, data }: any) => {
 			<TableCell onClick={() => setCode({ ...country, edit: true })}>
 				{code.edit ? (
 					<TextField
+						variant='standard'
 						defaultValue={data.code}
 						autoFocus
 						onBlur={saveCode}

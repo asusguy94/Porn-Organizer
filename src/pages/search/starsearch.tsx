@@ -14,7 +14,7 @@ import {
 	Radio,
 	Select,
 	MenuItem
-} from '@material-ui/core'
+} from '@mui/material'
 
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
@@ -395,7 +395,7 @@ const TitleSearch = ({ stars, update }: ITitleSearch) => {
 		)
 	}
 
-	return <TextField autoFocus placeholder='Name' onChange={callback} />
+	return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} />
 }
 
 // ContainerItem
@@ -459,7 +459,7 @@ const FilterDropdown = ({ data, label, callback }: IFilterDropdown) => (
 		<h2>{capitalize(label, true)}</h2>
 
 		<FormControl>
-			<Select id={label} defaultValue='ALL' onChange={callback}>
+			<Select variant='standard' id={label} defaultValue='ALL' onChange={callback}>
 				<MenuItem value='ALL'>All</MenuItem>
 				{data.map((item: { code: string; name: string }) => (
 					<MenuItem key={item.code} value={item.name}>

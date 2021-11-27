@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
-import { Grid, Box } from '@material-ui/core'
+import { Grid, Box } from '@mui/material'
 
 import Axios from 'axios'
 import capitalize from 'capitalize'
