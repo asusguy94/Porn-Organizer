@@ -104,10 +104,7 @@ const StarsPage = () => {
 								<Card className='text-center'>
 									<CardActionArea>
 										{star.image ? (
-											<CardMedia
-												src={`${serverConfig.source}/images/stars/${star.image}`}
-												component='img'
-											/>
+											<CardMedia src={`${serverConfig.source}/star/${star.id}`} component='img' />
 										) : null}
 
 										<CardContent>

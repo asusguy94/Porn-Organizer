@@ -110,7 +110,7 @@ const VideoCard = ({ video }: any) => (
 	<a href={`/video/${video.id}`}>
 		<Card className='video ribbon-container'>
 			<CardActionArea>
-				<CardMedia component='img' src={`${serverConfig.source}/images/videos/${video.image}`} />
+				<CardMedia component='img' src={`${serverConfig.source}/video/${video.id}/thumb`} />
 
 				<Grid container justifyContent='center' className='card__title card__title--fixed-height height-3'>
 					<Typography className='text-center'>{video.name}</Typography>

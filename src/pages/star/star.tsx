@@ -205,10 +205,7 @@ const Sidebar = ({ similar }: { similar: ISimilar[] }) => (
 				{similar.map((similarStar) => (
 					<a key={similarStar.id} href={`${similarStar.id}`} className='similar-star ribbon-container'>
 						<Card className='star'>
-							<CardMedia
-								component='img'
-								src={`${serverConfig.source}/images/stars/${similarStar.image}`}
-							/>
+							<CardMedia component='img' src={`${serverConfig.source}/star/${similarStar.id}`} />
 
 							<Typography>{similarStar.name}</Typography>
 
@@ -287,11 +284,7 @@ const StarImageDropbox = ({ star }: any) => {
 			{star.image !== null ? (
 				<>
 					<ContextMenuTrigger id='star__image'>
-						<img
-							className='star__image'
-							src={`${serverConfig.source}/images/stars/${star.image}`}
-							alt='star'
-						/>
+						<img className='star__image' src={`${serverConfig.source}/star/${star.id}`} alt='star' />
 					</ContextMenuTrigger>
 
 					<ContextMenu id='star__image'>
@@ -683,7 +676,7 @@ const StarVideo = ({ video, isFirst, isLast }: IStarVideo) => {
 					component='video'
 					src={src}
 					data-src={dataSrc}
-					poster={`${serverConfig.source}/images/videos/${video.image}`}
+					poster={`${serverConfig.source}/video/${video.id}/thumb`}
 					preload='metadata'
 					muted
 					onMouseEnter={handleMouseEnter}

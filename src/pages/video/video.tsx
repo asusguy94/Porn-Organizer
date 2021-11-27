@@ -228,7 +228,7 @@ const Star = ({ star, video }: IStar) => {
 							<ContextMenuTrigger id='star'>
 								<CardMedia
 									component='img'
-									src={`${serverConfig.source}/images/stars/${star.image}`}
+									src={`${serverConfig.source}/star/${star.id}`}
 									className='star__image'
 								/>
 
@@ -1079,7 +1079,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 											type: 'video/mp4'
 										}
 									],
-									poster: `${serverConfig.source}/images/videos/${video.id}.jpg`
+									poster: `${serverConfig.source}/video/${video.id}`
 								}}
 							/>
 						) : null}

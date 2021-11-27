@@ -125,7 +125,7 @@ const StarCard = ({ star }: { star: IStar }) => (
 		<Card className='star ribbon-container'>
 			<Badge content={star.videoCount}>
 				<CardActionArea>
-					<CardMedia component='img' src={`${serverConfig.source}/images/stars/${star.image}`} />
+					<CardMedia component='img' src={`${serverConfig.source}/star/${star.id}`} />
 
 					<Typography className='text-center'>{star.name}</Typography>
 

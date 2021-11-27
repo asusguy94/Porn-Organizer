@@ -45,7 +45,7 @@ export const HomeColumn = ({ enabled = true, label, limit = 12 }: IHomeColumn) =
 							<Link to={`/video/${video.id}`}>
 								<Box className='video ribbon-container'>
 									<img
-										src={`${serverConfig.source}/images/videos/${video.image}`}
+										src={`${serverConfig.source}/video/${video.id}/thumb`}
 										className='img-thumbnail'
 										alt='video'
 									/>
