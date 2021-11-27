@@ -18,7 +18,7 @@
 		"react-flip-toolkit": "^7.0.13",
 		"react-keyboard-event-handler": "^1.5.4",
 		"react-lazyload": "^3.2.0",
-		"react-router-dom": "^5.3.0",
+		"react-router-dom": "^6.0.2",
 		"react-scripts": "4.0.3",
 		"react-scroll-to-top": "^1.0.5",
 		"react-virtuoso": "^2.0.5",

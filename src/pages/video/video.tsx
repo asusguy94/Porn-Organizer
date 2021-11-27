@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState, createContext, useContext } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 
 import { Grid, Button, Card, CardMedia, Box, Typography, TextField } from '@mui/material'
 
@@ -43,7 +43,9 @@ const ModalContext = createContext({
 	data: { visible: false, title: null, data: null, filter: false }
 })
 
-const VideoPage = (props: any) => {
+const VideoPage = () => {
+	const { id } = useParams()
+
 	const [modal, setModal] = useState({
 		visible: false,
 		title: null,
@@ -102,8 +104,6 @@ const VideoPage = (props: any) => {
 	}
 
 	useEffect(() => {
-		const { id } = props.match.params
-
 		Axios.get(`${serverConfig.api}/video/${id}`).then(({ data }) => setVideo(data))
 		Axios.get(`${serverConfig.api}/video/${id}/bookmark`).then(({ data }) => setBookmarks(data))
 		Axios.get(`${serverConfig.api}/video/${id}/star`).then(({ data }) => setStar(data))

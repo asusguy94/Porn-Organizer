@@ -1,5 +1,5 @@
 import React, { useState, useRef, createContext, useContext, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 
 import { Button, TextField, Box, Grid, Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material'
 import { Autocomplete, Alert, AlertTitle } from '@mui/lab'
@@ -22,7 +22,9 @@ const ModalContext = createContext((...args: any): void => {})
 const UpdateContext = createContext({ star: (star: any): void => {} })
 
 //TODO state is very complex
-const StarPage = (props: any) => {
+const StarPage = () => {
+	const { id } = useParams()
+
 	const [modal, setModal] = useState({
 		title: null,
 		data: null,
@@ -68,8 +70,6 @@ const StarPage = (props: any) => {
 	}
 
 	useEffect(() => {
-		const { id } = props.match.params
-
 		Axios.get(`${serverConfig.api}/star`).then(({ data }) => setStarData(data))
 		Axios.get(`${serverConfig.api}/star/${id}`).then(({ data }) => setStar(data))
 		Axios.get(`${serverConfig.api}/star/${id}/video`).then(({ data }) => setVideos(data))
