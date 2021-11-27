@@ -26,7 +26,8 @@ import { handler as indeterminateHandler } from '@components/indeterminate/indet
 import LabelCount from '@components/labelcount/labelcount'
 import { getVisible } from '@components/search/helper'
 import Ribbon from '@components/ribbon/ribbon'
-import VGrid from '../../components/virtualized/virtuoso'
+import VGrid from '@components/virtualized/virtuoso'
+import Spinner from '@components/spinner/spinner'
 
 import './search.scss'
 
@@ -83,7 +84,7 @@ const VideoSearchPage = () => {
 			</Grid>
 
 			<Grid item xs={10}>
-				<Videos videos={videos} />
+				{videos.length ? <Videos videos={videos} /> : <Spinner />}
 			</Grid>
 
 			<ScrollToTop smooth />
@@ -531,7 +532,7 @@ const FilterDropdown = ({ data, label, labelPlural, callback }: any) => (
 		<h2>{capitalize(label, true)}</h2>
 
 		<FormControl>
-			<Select id={label} name={labelPlural} defaultValue='ALL' onChange={callback}>
+			<Select variant='standard' id={label} name={labelPlural} defaultValue='ALL' onChange={callback}>
 				<MenuItem value='ALL'>All</MenuItem>
 
 				{data.map((item: any) => (
