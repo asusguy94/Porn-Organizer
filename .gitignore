@@ -20,6 +20,7 @@ yarn-error.log*
 
 # editor
 .vscode
+.idea
 
 # yarn2
 .pnp.*
