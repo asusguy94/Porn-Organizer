@@ -13,7 +13,7 @@
 		"dashjs": "^4.1.0",
 		"dayjs": "^1.10.7",
 		"hls.js": "^1.1.1",
-		"node-sass": "^6.0.1",
+		"node-sass": "^7.0.0",
 		"plyr-react": "2.2.1-0",
 		"react": "^17.0.2",
 		"react-contextmenu": "^2.14.0",
