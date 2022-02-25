@@ -1,5 +1,8 @@
 import { FC } from 'react'
-import { Link } from 'react-router-dom'
+
+import { Link } from '@mui/material'
+
+import RouterLink from '@components/router-link/router-link'
 
 import './navbar.scss'
 
@@ -18,10 +21,9 @@ const NavBar = () => (
 				<NavBarItem name='Stars' path='/star' />
 			</NavBarItem>
 
-			<NavBarItem name='DB Editor' path='/editor' />
-
 			<NavBarItem name='DB' path={serverConfig.db} remote={true} />
 			<NavBarItem name='Import Videos' path='/video/add' />
+			<NavBarItem name='DB Editor' path='/editor' />
 		</ul>
 	</nav>
 )
@@ -36,7 +38,13 @@ const NavBarItem: FC<INavBarItem> = ({ name, path, children, disabled = false, r
 	if (!disabled) {
 		return (
 			<li>
-				{!remote ? <Link to={path}>{name}</Link> : <a href={path}>{name}</a>}
+				{!remote ? (
+					<Link component={RouterLink} href={path}>
+						{name}
+					</Link>
+				) : (
+					<Link href={path}>{name}</Link>
+				)}
 				{children ? <ul className='sub-menu'>{children}</ul> : null}
 			</li>
 		)

@@ -14,6 +14,7 @@
 | --------------- | ------------------------------------------------------------------------ |
 | VideoFileRename | Solution breaks the VideoPlayer, so reloading is still the best solution |
 | StarVideosHover | Throws an error when hovering, still works though                        |
+| StarIgnoreIcon  | Icon is not changed, unless page is refreshed                            |
 
 ## :heavy_check_mark: Home Page
 
@@ -139,9 +140,10 @@
 
 ### :heavy_check_mark: Star Name
 
-| Name   | Status             |
-| ------ | ------------------ |
-| Rename | :heavy_check_mark: |
+| Name   | Status                         |
+| ------ | ------------------------------ |
+| Rename | :heavy_check_mark:             |
+| Ignore | :x: [Info](#issue-explanation) |
 
 ### :heavy_check_mark: Input Fields
 

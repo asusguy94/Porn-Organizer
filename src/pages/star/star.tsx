@@ -1,15 +1,29 @@
 import React, { useState, useRef, createContext, useContext, useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
-import { Button, TextField, Box, Grid, Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material'
-import { Autocomplete, Alert, AlertTitle } from '@mui/lab'
+import {
+	Button,
+	TextField,
+	Box,
+	Grid,
+	Card,
+	CardActionArea,
+	CardContent,
+	CardMedia,
+	Typography,
+	Autocomplete,
+	Alert,
+	AlertTitle,
+	Link
+} from '@mui/material'
 
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 import { Flipper, Flipped } from 'react-flip-toolkit'
 
+import RouterLink from '@components/router-link/router-link'
 import Modal from '@components/modal/modal'
-import { DaysToYears, dateToYears, daysToYears } from '@components/date/date'
+import { DaysToYears } from '@components/date/date'
 import Ribbon from '@components/ribbon/ribbon'
 
 import './star.scss'
@@ -48,9 +62,7 @@ const StarPage = () => {
 			},
 			birthdate: '',
 			height: 0,
-			weight: 0,
-			start: 0,
-			end: 0
+			weight: 0
 		},
 		similar: []
 	})
@@ -94,13 +106,7 @@ const StarPage = () => {
 					</Grid>
 				) : null}
 
-				{videos.length ? (
-					<StarVideos
-						videos={videos}
-						update={setVideos}
-						years={{ start: star.info.start, end: star.info.end }}
-					/>
-				) : null}
+				{videos.length ? <StarVideos videos={videos} update={setVideos} similar={star.similar} /> : null}
 
 				<Modal visible={modal.visible} title={modal.title} filter={modal.filter} onClose={handleModal}>
 					{modal.data}
@@ -132,6 +138,13 @@ const StarTitle = ({ star }: any) => {
 	const ignoreStar = () => {
 		Axios.put(`${serverConfig.api}/star/${star.id}`, { ignore: +!star.ignored }).then(({ data }) => {
 			update({ ...star, ignored: data.autoTaggerIgnore })
+		})
+	}
+
+	const addAlias = (alias: string) => {
+		Axios.post(`${serverConfig.api}/star/${star.id}/alias`, { alias }).then(() => {
+			//TODO starAlias is not rendered, so just refresh the page for now
+			window.location.reload()
 		})
 	}
 
@@ -168,7 +181,26 @@ const StarTitle = ({ star }: any) => {
 					<i className={themeConfig.icons.edit} /> Rename
 				</MenuItem>
 
-				<MenuItem disabled>
+				<MenuItem
+					onClick={() =>
+						handleModal(
+							'Add Alias',
+							<TextField
+								variant='outlined'
+								label='Star'
+								autoFocus
+								onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+									if (e.key === 'Enter') {
+										handleModal()
+
+										//@ts-ignore
+										addAlias(e.target.value)
+									}
+								}}
+							/>
+						)
+					}
+				>
 					<i className={themeConfig.icons.add} /> Add Alias
 				</MenuItem>
 
@@ -284,7 +316,11 @@ const StarImageDropbox = ({ star }: any) => {
 			{star.image !== null ? (
 				<>
 					<ContextMenuTrigger id='star__image'>
-						<img className='star__image' src={`${serverConfig.source}/star/${star.id}`} alt='star' />
+						<img
+							className='star__image'
+							src={`${serverConfig.source}/star/${star.id}?${Date.now()}`}
+							alt='star'
+						/>
 					</ContextMenuTrigger>
 
 					<ContextMenu id='star__image'>
@@ -338,6 +374,7 @@ interface IStarForm {
 	}
 }
 const StarForm = ({ star, starData }: IStarForm) => {
+	const handleModal = useContext(ModalContext)
 	const update = useContext(UpdateContext).star
 
 	const updateInfo = (value: string, label: string) => {
@@ -352,8 +389,8 @@ const StarForm = ({ star, starData }: IStarForm) => {
 		})
 	}
 
-	const freeones = () => {
-		Axios.post(`${serverConfig.api}/star/${star.id}/freeones`).then(() => {
+	const freeones = (url: string | undefined = undefined) => {
+		Axios.post(`${serverConfig.api}/star/${star.id}/freeones`, { star: url }).then(() => {
 			window.location.reload()
 
 			//TODO use stateObj
@@ -370,10 +407,43 @@ const StarForm = ({ star, starData }: IStarForm) => {
 
 	return (
 		<>
+			<ContextMenu id='get-data'>
+				<MenuItem
+					onClick={() => {
+						handleModal(
+							'Get Data',
+							<TextField
+								variant='outlined'
+								label='Star'
+								autoFocus
+								onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+									if (e.key === 'Enter') {
+										handleModal()
+
+										//@ts-ignore
+										freeones(e.target.value)
+									}
+								}}
+							/>
+						)
+					}}
+				>
+					Get Data from URL
+				</MenuItem>
+			</ContextMenu>
+
 			<Box className='action'>
-				<Button variant='contained' color='primary' id='freeones' className='action__item' onClick={freeones}>
+				<ContextMenuTrigger id='get-data' renderTag='span'>
+					<Button
+						variant='contained'
+						color='primary'
+						id='freeones'
+						className='action__item'
+						onClick={() => freeones()}
+					>
 					Get Data
 				</Button>
+				</ContextMenuTrigger>
 
 				<Button
 					variant='contained'
@@ -396,8 +466,6 @@ const StarForm = ({ star, starData }: IStarForm) => {
 			<StarInputForm update={updateInfo} name='Birthdate' value={star.info.birthdate} />
 			<StarInputForm update={updateInfo} name='Height' value={star.info.height} />
 			<StarInputForm update={updateInfo} name='Weight' value={star.info.weight} />
-			<StarInputForm update={updateInfo} name='Start' value={star.info.start} />
-			<StarInputForm update={updateInfo} name='End' value={star.info.end} />
 		</>
 	)
 }
@@ -414,38 +482,35 @@ interface IStarVideos {
 		age: number
 		hidden: boolean
 	}[]
-	years: { start: string | number; end: string | number }
+	similar: ISimilar[]
 	update: any
 }
-const StarVideos = ({ videos, years, update }: IStarVideos) => {
+const StarVideos = ({ videos, update, similar }: IStarVideos) => {
 	const [websites, setWebsites] = useState<string[]>([])
-	const [websiteFocus, setWebsiteFocus] = useState('')
-	const [keepWebsiteFocus, setKeepWebsiteFocus] = useState(false)
-
-	const [outOfRange, setOutOfRange] = useState<any[]>([])
-
-	const endYear = years.end ?? null
-	const startYear = years.start ?? null
-
-	useEffect(() => setOutOfRange([]), [years])
+	const [websiteFocus, setWebsiteFocus] = useState<String[]>([])
 
 	useEffect(() => {
 		update([...videos].sort((a, b) => a.age - b.age).sort((a, b) => Number(a.hidden) - Number(b.hidden)))
 	}, [websiteFocus])
 
+	const toggleWebsiteFocus = (website: string) => {
+		// allow multiple websites to be selected
+		if (websiteFocus.includes(website)) {
+			// remove website from websiteFocus
+			setWebsiteFocus(websiteFocus.filter((websiteItem) => websiteItem !== website))
+		} else {
+			// add website to websiteFocus
+			setWebsiteFocus([...websiteFocus, website])
+		}
+	}
+
 	return (
 		<Box>
-			{outOfRange.length ? (
+			{similar.some((star) => star.match === 100) ? (
 				<Alert severity='warning' className='alert'>
-					<AlertTitle>Out of Range</AlertTitle>
-					One or more of the video-dates does not match star-activity years
-					<ul>
-						{outOfRange.map((video) => (
-							<li key={video.id}>
-								{video.name} ({dateToYears(video.date)})
-							</li>
-						))}
-					</ul>
+					<AlertTitle>
+						Duplicate Star (<strong>{similar.filter((star) => star.match === 100).length}</strong>)
+					</AlertTitle>
 				</Alert>
 			) : null}
 
@@ -456,12 +521,10 @@ const StarVideos = ({ videos, years, update }: IStarVideos) => {
 							<Button
 								key={website}
 								size='small'
-								variant={keepWebsiteFocus && website === websiteFocus ? 'contained' : 'outlined'}
+								variant={websiteFocus.includes(website) ? 'contained' : 'outlined'}
 								color='primary'
 								style={{ marginRight: 8 }}
-								onMouseOver={() => setWebsiteFocus(website)}
-								onMouseLeave={() => !keepWebsiteFocus && setWebsiteFocus('')}
-								onClick={() => setKeepWebsiteFocus(!keepWebsiteFocus)}
+								onClick={() => toggleWebsiteFocus(website)}
 							>
 								{website}
 							</Button>
@@ -471,53 +534,30 @@ const StarVideos = ({ videos, years, update }: IStarVideos) => {
 
 			<Flipper flipKey={videos}>
 				<Grid container id='videos'>
-					{videos
-						.filter((video) => {
-							const parsedYear = dateToYears(video.date)
-
-							// Check if warning is already displayed
-							//>> only display warning once
-							if (!outOfRange.includes(video)) {
-								if (video.age !== null && daysToYears(video.age) < 18) {
-									// if underaged >> probably wrong date
-									setOutOfRange([...outOfRange, video])
-								} else if (startYear && endYear) {
-									if (parsedYear < startYear || parsedYear > endYear) {
-										setOutOfRange([...outOfRange, video])
-									}
-								} else if (startYear) {
-									if (parsedYear < startYear) {
-										setOutOfRange([...outOfRange, video])
-									}
-								} else if (endYear) {
-									if (parsedYear > endYear) {
-										setOutOfRange([...outOfRange, video])
-									}
-								}
-							}
-
-							return video
-						})
-						.filter((video) => {
+					{videos.map((video, i) => {
 							if (!websites.includes(video.website)) {
 								setWebsites([...websites, video.website])
 							}
 
-							video.hidden = websiteFocus.length > 0 && websiteFocus !== video.website
+						video.hidden = websiteFocus.length > 0 && !websiteFocus.includes(video.website)
 
-							return video
-						})
-						.map((video, i) => (
+						return (
 							<Flipped key={video.id} flipId={video.id}>
-								<Link className={`video ${video.hidden ? 'hidden' : ''}`} to={`/video/${video.id}`}>
+								<Link
+									component={RouterLink}
+									className={`video ${video.hidden ? 'hidden' : ''}`}
+									href={`/video/${video.id}`}
+								>
 									<StarVideo
 										video={video}
 										isFirst={videos.length > 1 && i === 0}
 										isLast={videos.length > 1 && i === videos.length - 1}
+										isHidden={video.hidden}
 									/>
 								</Link>
 							</Flipped>
-						))}
+						)
+					})}
 				</Grid>
 			</Flipper>
 		</Box>
@@ -607,8 +647,9 @@ interface IStarVideo {
 	video: any
 	isFirst: boolean
 	isLast: boolean
+	isHidden: boolean
 }
-const StarVideo = ({ video, isFirst, isLast }: IStarVideo) => {
+const StarVideo = ({ video, isFirst, isLast, isHidden }: IStarVideo) => {
 	const [src, setSrc] = useState('')
 	const [dataSrc, setDataSrc] = useState(`${serverConfig.source}/videos/${video.fname}`)
 
@@ -658,8 +699,10 @@ const StarVideo = ({ video, isFirst, isLast }: IStarVideo) => {
 	}
 
 	const handleMouseEnter = ({ target }: { target: React.ReactNode }) => {
+		if (!isHidden) {
 		if (dataSrc.length && !src.length) {
 			reload().then(() => startThumbnailPlayback(target))
+			}
 		}
 	}
 

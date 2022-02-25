@@ -22,10 +22,14 @@ import { server as serverConfig } from '@/config'
 const AddVideoPage = () => {
 	const [videos, setVideos] = useState([])
 	const [loaded, setLoaded] = useState(false)
+	const [pages, setPages] = useState(0)
 
 	useEffect(() => {
 		Axios.post(`${serverConfig.source}/video`)
-			.then(({ data }) => setVideos(data))
+			.then(({ data: { files, pages } }) => {
+				setVideos(files)
+				setPages(pages)
+			})
 			.finally(() => setLoaded(true))
 	}, [])
 
@@ -43,7 +47,10 @@ const AddVideoPage = () => {
 							label='Generate Metadata'
 							callback={() => Axios.post(`${serverConfig.source}/generate/meta`)}
 						/>
-						<Action label='Generate VTT' disabled={true} />
+						<Action
+							label='Generate VTT'
+							callback={() => Axios.post(`${serverConfig.source}/generate/vtt`)}
+						/>
 					</div>
 				) : (
 					<>
@@ -75,7 +82,7 @@ const AddVideoPage = () => {
 
 						<div style={{ marginTop: 8 }}>
 							<Action
-								label='Add Videos'
+								label={`Add Videos ${pages > 1 ? ` (${pages - 1} pages remaining)` : ''}`}
 								callback={() =>
 									Axios.post(`${serverConfig.source}/video/add`, { videos }).then(() => {
 										window.location.reload()

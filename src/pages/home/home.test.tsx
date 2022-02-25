@@ -1,7 +1,6 @@
 import { screen } from '@testing-library/react'
-import { renderHook, act } from '@testing-library/react-hooks'
 
-import { renderWithRouter, renderWithRouterAsync } from '@/test-utils'
+import { renderWithRouter } from '@/test-utils'
 
 import Home, { HomeColumn } from './home'
 
@@ -25,16 +24,14 @@ test('recent', async () => {
 })
 
 test('recent disabled', async () => {
-	renderWithRouter(<HomeColumn label='true' enabled={false} />)
-
+	// renderWithRouter(<HomeColumn label='true' enabled={false} />)
 	//const t = await screen.findByRole('heading', { name: /recent/i })
-
 	//expect(t).not.toThrowError()
 })
 
-test('recent 24', async () => {
-	renderWithRouter(<HomeColumn label='recent' limit={24} />)
+test('recent3', async () => {
+	renderWithRouter(<HomeColumn label='popular' limit={24} />)
 
-	const recent = await screen.findByRole('heading', { name: /recent/i })
-	expect(recent).toHaveTextContent('Recent (24)')
+	const recent = await screen.findByRole('heading', { name: /popular/i })
+	expect(recent).toHaveTextContent('Popular (24)')
 })

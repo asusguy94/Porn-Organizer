@@ -80,7 +80,7 @@ const StarsPage = () => {
 	}
 
 	return (
-		<Grid container justifyContent='center' spacing={3} id='stars-page'>
+		<Grid container justifyContent='center' id='stars-page'>
 			<form noValidate>
 				<TextField variant='standard' value={input} onChange={(e) => setInput(e.currentTarget.value)} />
 
@@ -98,6 +98,7 @@ const StarsPage = () => {
 			<Grid container justifyContent='center' spacing={3} className='stars__no-image'>
 				{stars
 					.sort((a, b) => a.name.localeCompare(b.name))
+					.slice(0, 1000) // limit results to avoid crash
 					.map((star) => (
 						<Grid item key={star.id} lg={1} md={2} xs={3}>
 							<Link href={`/star/${star.id}`}>
@@ -120,6 +121,7 @@ const StarsPage = () => {
 			<Grid container justifyContent='center' spacing={3} className='videos__no-star'>
 				{videoStars
 					.sort((a, b) => a.name.localeCompare(b.name))
+					.slice(0, 1000) // limit results to avoid crash
 					.map((star) => (
 						<Grid item key={star.videoID} lg={1} md={2} xs={3}>
 							<Card className='text-center'>

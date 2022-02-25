@@ -143,8 +143,8 @@ const WrapperItem = ({ label }: { label: string }) => {
 const WrapperItemCountries = ({ label }: { label: string }) => {
 	const [data, setData] = useState([])
 
-	const updateItem = (ref: any, value: any, label: any) => {
-		Axios.put(`${serverConfig.api}/${label}/${ref.id}`, { label, value }).then(({ data: countryData }) => {
+	const updateItem = (ref: { id: number }, value: string, label: string) => {
+		Axios.put(`${serverConfig.api}/country/${ref.id}`, { label, value }).then(({ data: countryData }) => {
 			setData(
 				[...data].filter((country: any) => {
 					if (ref.id === country.id) {
@@ -181,8 +181,8 @@ const WrapperItemCountries = ({ label }: { label: string }) => {
 						<ItemCountry
 							key={item.id}
 							data={item}
-							updateCountry={(ref: any, value: any, label = 'country') => updateItem(ref, value, label)}
-							updateCode={(ref: any, value: any, label = 'code') => updateItem(ref, value, label)}
+							updateCountry={(ref: any, value: any) => updateItem(ref, value, 'country')}
+							updateCode={(ref: any, value: any) => updateItem(ref, value, 'code')}
 						/>
 					))}
 				</TableBody>
@@ -262,14 +262,14 @@ const ItemCountry = ({ updateCountry, updateCode, data }: any) => {
 				)}
 			</TableCell>
 
-			<TableCell onClick={() => setCode({ ...country, edit: true })}>
+			<TableCell onClick={() => setCode({ ...code, edit: true })}>
 				{code.edit ? (
 					<TextField
 						variant='standard'
 						defaultValue={data.code}
 						autoFocus
 						onBlur={saveCode}
-						onChange={(e) => setCode({ ...country, value: e.target.value })}
+						onChange={(e) => setCode({ ...code, value: e.target.value })}
 						inputProps={{ maxLength: 2 }}
 						onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
 							if (e.key === 'Enter') saveCode()

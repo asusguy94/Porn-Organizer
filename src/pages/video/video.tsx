@@ -221,14 +221,14 @@ const Star = ({ star, video }: IStar) => {
 
 	return (
 		<>
-			{star.id !== 0 && (
+			{star.id !== 0 ? (
 				<Box className='star'>
 					<Card className='ribbon-container'>
 						<Badge content={star.numVideos}>
 							<ContextMenuTrigger id='star'>
 								<CardMedia
 									component='img'
-									src={`${serverConfig.source}/star/${star.id}`}
+									src={`${serverConfig.source}/star/${star.id}?${Date.now()}`}
 									className='star__image'
 								/>
 
@@ -247,7 +247,7 @@ const Star = ({ star, video }: IStar) => {
 						</MenuItem>
 					</ContextMenu>
 				</Box>
-			)}
+			) : null}
 		</>
 	)
 }
@@ -808,7 +808,9 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 			if (Number(localStorage.video) !== video.id) localStorage.playing = 0
 
 			player.on('timeupdate', () => {
-				if (player.currentTime) localStorage.bookmark = Math.round(player.currentTime)
+				if (player.currentTime > 0.007) {
+					localStorage.bookmark = Math.round(player.currentTime)
+				}
 			})
 			player.on('play', () => {
 				localStorage.playing = 1
@@ -962,7 +964,26 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 					}
 				})
 			} else {
+				// player is broken, never remembers time
+				let triggered = false
+				player.on('canplay', (e: any) => {
+					if (!triggered) {
+						triggered = true
+
+						if (!newVideo) {
+							player.currentTime = Number(localStorage.bookmark)
+
+							if (Number(localStorage.playing)) player.play()
+						} else {
+							localStorage.video = video.id
+							localStorage.bookmark = 0
+
+							player.pause()
+						}
+
 				player.media.ondurationchange = (e: any) => updateDuration(e.target.duration)
+					}
+				})
 			}
 		}
 	}, [events])
@@ -1079,7 +1100,11 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 											type: 'video/mp4'
 										}
 									],
-									poster: `${serverConfig.source}/video/${video.id}`
+									poster: `${serverConfig.source}/video/${video.id}`,
+									previewThumbnails: {
+										enabled: settingsConfig.thumbnails,
+										src: `${serverConfig.source}/video/${video.id}/vtt`
+									}
 								}}
 							/>
 						) : null}

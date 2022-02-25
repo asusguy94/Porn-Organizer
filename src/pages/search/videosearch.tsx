@@ -5,7 +5,6 @@ import {
 	Card,
 	CardActionArea,
 	CardMedia,
-	Checkbox,
 	FormControl,
 	FormControlLabel,
 	Grid,
@@ -22,12 +21,14 @@ import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
 
 import { daysToYears } from '@components/date/date'
-import { handler as indeterminateHandler } from '@components/indeterminate/indeterminate'
+import { Item as IndeterminateItem } from '@components/indeterminate/indeterminate'
 import LabelCount from '@components/labelcount/labelcount'
 import { getVisible } from '@components/search/helper'
 import Ribbon from '@components/ribbon/ribbon'
 import VGrid from '@components/virtualized/virtuoso'
 import Spinner from '@components/spinner/spinner'
+
+import { ICategory, IAttribute, ILocation } from '@/interfaces'
 
 import './search.scss'
 
@@ -36,10 +37,10 @@ import { server as serverConfig } from '@/config'
 const VideoSearchPage = () => {
 	const [videos, setVideos] = useState([])
 
-	const [categories, setCategories] = useState([])
-	const [attributes, setAttributes] = useState([])
-	const [locations, setLocations] = useState([])
-	const [websites, setWebsites] = useState([])
+	const [categories, setCategories] = useState<ICategory[]>([])
+	const [attributes, setAttributes] = useState<IAttribute[]>([])
+	const [locations, setLocations] = useState<ILocation[]>([])
+	const [websites, setWebsites] = useState<string[]>([])
 
 	useEffect(() => {
 		Axios.get(`${serverConfig.api}/search/video`).then(({ data }) => {
@@ -488,7 +489,7 @@ const FilterObj = ({
 						key={item.id}
 						label={
 							<>
-								{item.name} <LabelCount prop={labelPlural} label={item.name} obj={obj} />
+								{item.name} <LabelCount prop={labelPlural || `${label}s`} label={item.name} obj={obj} />
 							</>
 						}
 						value={item.name}
@@ -501,38 +502,18 @@ const FilterObj = ({
 	)
 }
 
-const IndeterminateItem = ({ label, value, item = null, callback }: any) => {
-	const [indeterminate, setIndeterminate] = useState(false)
-	const [checked, setChecked] = useState(false)
-
-	return (
-		<FormControlLabel
-			label={label}
-			value={value}
-			control={
-				<Checkbox
-					checked={checked}
-					indeterminate={indeterminate}
-					onChange={() => {
-						const result = indeterminateHandler({ checked, indeterminate })
-
-						setIndeterminate(result.indeterminate)
-						setChecked(result.checked)
-
-						callback(result, item)
-					}}
-				/>
-			}
-		/>
-	)
-}
-
 const FilterDropdown = ({ data, label, labelPlural, callback }: any) => (
 	<>
 		<h2>{capitalize(label, true)}</h2>
 
 		<FormControl>
-			<Select variant='standard' id={label} name={labelPlural} defaultValue='ALL' onChange={callback}>
+			<Select
+				variant='standard'
+				id={label}
+				name={labelPlural || `${label}s`}
+				defaultValue='ALL'
+				onChange={callback}
+			>
 				<MenuItem value='ALL'>All</MenuItem>
 
 				{data.map((item: any) => (

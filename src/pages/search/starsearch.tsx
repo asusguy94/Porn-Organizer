@@ -25,6 +25,7 @@ import LabelCount from '@components/labelcount/labelcount'
 import { getVisible } from '@components/search/helper'
 import Ribbon from '@components/ribbon/ribbon'
 import Badge from '@components/badge/badge'
+import Loader from '@components/spinner/spinner'
 import VGrid from '@components/virtualized/virtuoso'
 
 import './search.scss'
@@ -111,11 +112,17 @@ const Stars = ({ stars }: { stars: IStar[] }) => {
 
 	return (
 		<Box id='stars'>
+			{stars.length ? (
+				<>
 			<Typography variant='h6' className='text-center'>
 				<span className='count'>{visibleStars.length}</span> Stars
 			</Typography>
 
 			<VGrid items={visibleStars} renderData={(idx: number) => <StarCard star={visibleStars[idx]} />} />
+				</>
+			) : (
+				<Loader />
+			)}
 		</Box>
 	)
 }

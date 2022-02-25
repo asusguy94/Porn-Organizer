@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 
-import { Grid, List, ListItem, ListItemText, Badge } from '@mui/material'
+import { Grid, List, ListItem, ListItemText, Badge, Typography, Link } from '@mui/material'
 
 import Axios from 'axios'
 
 import { daysToYears } from '@components/date/date'
+import RouterLink from '@components/router-link/router-link'
 
 import { server as serverConfig } from '@/config'
 
@@ -15,28 +15,37 @@ interface IVideo {
 	ageInVideo: number
 }
 
-const VideosPage = () => {
-	const [videos, setVideos] = useState([])
+const VideosPage = () => (
+	<Grid item id='videos-page'>
+		<Helper source={`${serverConfig.api}/video`} label='without-bookmark' />
+	</Grid>
+)
+
+const Helper = ({ source, label }: { source: string; label: string }) => {
+	const [videos, setVideos] = useState<IVideo[]>([])
 
 	useEffect(() => {
-		Axios.get(`${serverConfig.api}/video`).then(({ data }) => setVideos(data))
-	}, [])
+		Axios.get(source).then(({ data }) => setVideos(data))
+	}, [source])
 
 	return (
-		<Grid item id='videos-page'>
+		<Grid item id={`videos-${label}`}>
+			<Typography variant='h4'>
+				{label} ({videos.length})
+			</Typography>
 			<List>
-				{videos.map((video: IVideo) => (
-					<ListItem button divider key={video.id}>
+				{videos.map((video) => (
+					<Link component={RouterLink} key={`${label}-${video.id}`} href={`${video.id}`}>
+						<ListItem button divider>
 						<Badge
 							color='primary'
 							badgeContent={daysToYears(video.ageInVideo)}
 							style={{ marginRight: '2em' }}
 						/>
 
-						<Link to={`/video/${video.id}`}>
 							<ListItemText>{video.name}</ListItemText>
-						</Link>
 					</ListItem>
+					</Link>
 				))}
 			</List>
 		</Grid>
