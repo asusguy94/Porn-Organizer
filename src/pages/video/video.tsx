@@ -648,35 +648,31 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: Timelin
 		})
 	}
 
-	const collisionCheck = (a: any, b: any) => {
-		if (a === null || b === null) return false
-		if (typeof a === 'undefined' || typeof b === 'undefined') return false
-
-		a = a.getBoundingClientRect()
-		b = b.getBoundingClientRect()
+	const collisionCheck = (a: HTMLElement, b: HTMLElement) => {
+		const valA = a.getBoundingClientRect()
+		const valB = b.getBoundingClientRect()
 
 		return !(
-			a.x + a.width < b.x - settingsConfig.timeline.spacing ||
-			a.x + settingsConfig.timeline.spacing > b.x + b.width
+			valA.x + valA.width < valB.x - settingsConfig.timeline.spacing ||
+			valA.x + settingsConfig.timeline.spacing > valB.x + valB.width
 		)
 	}
 
 	useEffect(() => {
-		for (let i = 0, items = bookmarksArr, LEVEL_MIN = 1, LEVEL_MAX = 10, level = LEVEL_MIN; i < items.length; i++) {
-			const prePrev = items[i - 2]
-			const prev = items[i - 1]
+		for (let i = 1, items = bookmarksArr, LEVEL_MIN = 1, level = LEVEL_MIN; i < items.length; i++) {
 			const current = items[i]
 
-			const collision = collisionCheck(prev, current) || collisionCheck(prePrev, current)
-			if (collision && level < LEVEL_MAX) {
-				level++
-			} else {
-				level = LEVEL_MIN
+			let collision = false
+			for (let j = i - 1; !collision && j >= 0; j--) {
+				if (collisionCheck(items[j], current)) {
+					collision = true
+				}
 			}
 
-			current.setAttribute('data-level', `${level}`)
+			level = collision ? level + 1 : LEVEL_MIN
+			current.setAttribute('data-level', level.toString())
 		}
-	}, [bookmarksArr, useWindowSize])
+	}, [bookmarksArr, useWindowSize().width])
 
 	return (
 		<Grid id='timeline'>
