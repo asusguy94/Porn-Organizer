@@ -1,11 +1,10 @@
-interface IRibbon {
+interface RibbonProps {
 	isFirst?: boolean
 	isLast?: boolean
 	align?: string
 	label?: string | number
 }
-
-const Ribbon = ({ isFirst = false, isLast = false, align, label }: IRibbon) => {
+const Ribbon = ({ isFirst = false, isLast = false, align, label }: RibbonProps) => {
 	const className = `ribbon ${align === 'left' ? 'ribbon-left ribbon-purple' : ''}`
 
 	return isFirst ? (

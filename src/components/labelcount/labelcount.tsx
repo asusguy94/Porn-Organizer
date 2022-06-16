@@ -1,12 +1,12 @@
 import { isHidden } from '@components/search/helper'
 
-interface ILabelCount {
-	obj: any
+interface LabelCountProps<T> {
+	obj: T[]
 	isArr?: boolean
 	label: string
 	prop: string
 }
-const LabelCount = ({ obj, isArr = false, label, prop }: ILabelCount) => {
+function LabelCount<T>({ obj, isArr = false, label, prop }: LabelCountProps<T>) {
 	const getPropCount = (prop: string, label: string, visibleOnly = false) => {
 		const arr = obj.filter((item: any) => item[prop].includes(label) && !(isHidden(item) && visibleOnly))
 

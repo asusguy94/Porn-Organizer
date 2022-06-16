@@ -11,7 +11,7 @@ export const isHidden = ({ hidden }: any) => {
 	return value
 }
 
-export const getCount = (obj: any) => {
+export const getCount = <T>(obj: T[]) => {
 	let count = obj.length
 
 	obj.forEach(({ hidden }: any) => {
@@ -28,4 +28,4 @@ export const getCount = (obj: any) => {
 	return count
 }
 
-export const getVisible = (arr: any[]) => arr.filter((item: any) => (!isHidden(item) ? item : null))
+export const getVisible = <T>(arr: T[]) => arr.filter((item: T) => (!isHidden(item) ? item : null))

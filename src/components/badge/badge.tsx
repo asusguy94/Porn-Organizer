@@ -1,8 +1,10 @@
-import { FC } from 'react'
-
 import './badge.scss'
 
-const Badge: FC<{ content: string | number }> = ({ content, children }) => {
+interface IBadge {
+	content: number
+	children: React.ReactNode
+}
+const Badge = ({ content, children }: IBadge) => {
 	const badgeClass = `badge-${'x'.repeat(String(content).length)}`
 
 	return (

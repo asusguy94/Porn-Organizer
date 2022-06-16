@@ -2,12 +2,11 @@ import { useState } from 'react'
 
 import { Checkbox, FormControlLabel, FormControlLabelProps } from '@mui/material'
 
-interface IHandler {
+export interface HandlerProps {
 	checked: boolean
 	indeterminate: boolean
 }
-
-const handler = ({ checked, indeterminate }: IHandler) => {
+const handler = ({ checked, indeterminate }: HandlerProps) => {
 	if (checked) {
 		return { indeterminate: true, checked: false }
 	} else if (indeterminate) {
@@ -17,17 +16,13 @@ const handler = ({ checked, indeterminate }: IHandler) => {
 	}
 }
 
-export const Item = ({
-	label,
-	value,
-	item = null,
-	callback
-}: {
+interface ItemProps<T> {
 	label: FormControlLabelProps['label']
-	value: any
-	item?: any
-	callback: any
-}) => {
+	value: string
+	item?: T
+	callback: (result: HandlerProps, item?: T) => void
+}
+function Item<T>({ label, value, item = undefined, callback }: ItemProps<T>) {
 	const [indeterminate, setIndeterminate] = useState(false)
 	const [checked, setChecked] = useState(false)
 
@@ -52,3 +47,5 @@ export const Item = ({
 		/>
 	)
 }
+
+export default Item
