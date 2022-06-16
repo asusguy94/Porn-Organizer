@@ -51,6 +51,7 @@ interface IStar extends IGeneral {
 		haircolor: boolean
 		ethnicity: boolean
 		country: boolean
+		website: boolean
 		noBreast: boolean
 	}
 }
@@ -60,6 +61,7 @@ interface IStarData {
 	haircolors: string[]
 	ethnicities: string[]
 	countries: ICountry[]
+	websites: IWebsite[]
 }
 
 const StarSearchPage = () => {
@@ -69,6 +71,7 @@ const StarSearchPage = () => {
 	const [haircolors, setHaircolors] = useState<string[]>([])
 	const [ethnicities, setEthnicities] = useState<string[]>([])
 	const [countries, setCountries] = useState<ICountry[]>([])
+	const [websites, setWebsites] = useState<IWebsite[]>([])
 
 	useEffect(() => {
 		Axios.get(`${serverConfig.api}/search/star`).then(({ data }: AxiosData<IStar[]>) => {
@@ -77,15 +80,16 @@ const StarSearchPage = () => {
 					return {
 						...star,
 						hidden: {
-						titleSearch: false,
+							titleSearch: false,
 
-						breast: false,
-						haircolor: false,
-						ethnicity: false,
-						country: false,
+							breast: false,
+							haircolor: false,
+							ethnicity: false,
+							country: false,
+							website: false,
 
-						noBreast: false
-					}
+							noBreast: false
+						}
 					}
 				})
 			)
@@ -95,18 +99,24 @@ const StarSearchPage = () => {
 			({
 				data
 			}: AxiosData<{ breast: string[]; haircolor: string[]; ethnicity: string[]; country: ICountry[] }>) => {
-			setBreasts(data.breast)
-			setHaircolors(data.haircolor)
-			setEthnicities(data.ethnicity)
-			setCountries(data.country)
+				setBreasts(data.breast)
+				setHaircolors(data.haircolor)
+				setEthnicities(data.ethnicity)
+				setCountries(data.country)
 			}
 		)
+
+		Axios.get(`${serverConfig.api}/website`).then(({ data }) => setWebsites(data))
 	}, [])
 
 	return (
 		<Grid container id='search-page'>
 			<Grid item xs={2}>
-				<Sidebar starData={{ breasts, haircolors, ethnicities, countries }} stars={stars} update={setStars} />
+				<Sidebar
+					starData={{ breasts, haircolors, ethnicities, countries, websites }}
+					stars={stars}
+					update={setStars}
+				/>
 			</Grid>
 
 			<Grid item xs={10}>
@@ -128,9 +138,9 @@ const Stars = ({ stars }: StarsProps) => {
 		<Box id='stars'>
 			{stars.length ? (
 				<>
-			<Typography variant='h6' className='text-center'>
-				<span className='count'>{visibleStars.length}</span> Stars
-			</Typography>
+					<Typography variant='h6' className='text-center'>
+						<span className='count'>{visibleStars.length}</span> Stars
+					</Typography>
 
 					<VGrid
 						itemHeight={309}
@@ -232,6 +242,22 @@ const Filter = ({ stars, starData, update }: FilterProps) => {
 		update(stars)
 	}
 
+	const website_DROP = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const targetLower = e.target.value.toLowerCase()
+
+		stars = stars.map((star) => {
+			if (targetLower === 'all') {
+				star.hidden.website = false
+			} else {
+				star.hidden.website = !star.websites.some((website) => website.toLowerCase() === targetLower)
+			}
+
+			return star
+		})
+
+		update(stars)
+	}
+
 	const breast_NULL = (e: React.ChangeEvent<HTMLFormElement>) => {
 		stars = stars.map((star) => {
 			star.hidden.noBreast = e.currentTarget.checked && star.breast.length
@@ -276,6 +302,7 @@ const Filter = ({ stars, starData, update }: FilterProps) => {
 
 	return (
 		<>
+			<FilterDropdown data={starData.websites} label='website' callback={website_DROP} />
 			<FilterDropdown data={starData.countries} label='country' callback={country_DROP} />
 
 			<FilterItem
@@ -424,6 +451,11 @@ const TitleSearch = ({ stars, update }: TitleSearchProps) => {
 		)
 	}
 
+	// TODO search by alias, and change result-title to the alias name
+	//! this might cause sort, methods to be broken
+	//! should stars be sorted by the visible name?
+	//! might cause flickering and difficulty to find a star by name
+
 	return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} />
 }
 
@@ -492,9 +524,9 @@ const FilterDropdown = ({ data, label, callback }: FilterDropdownProps) => (
 				{data.map((item) => {
 					if ('code' in item) {
 						return (
-					<MenuItem key={item.code} value={item.name}>
-						<i className={`flag flag-${item.code}`} style={{ marginRight: 4 }} /> {item.name}
-					</MenuItem>
+							<MenuItem key={item.code} value={item.name}>
+								<i className={`flag flag-${item.code}`} style={{ marginRight: 4 }} /> {item.name}
+							</MenuItem>
 						)
 					}
 
