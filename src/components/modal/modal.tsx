@@ -9,6 +9,7 @@ import './modal.scss'
 
 import { settings as settingsConfig } from '@/config'
 
+//FIXME opening another menu, while the previous one is open, should do something else?
 //TODO improve children, props.children, pros.filter, children=children.filter
 
 const Modal = (props: any) => {

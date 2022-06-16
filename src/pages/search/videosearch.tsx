@@ -90,6 +90,7 @@ const VideoSearchPage = () => {
 	const [attributes, setAttributes] = useState<IAttribute[]>([])
 	const [locations, setLocations] = useState<ILocation[]>([])
 	const [websites, setWebsites] = useState<IWebsite[]>([])
+	const [sites, setSites] = useState<ISite[]>([])
 
 	useEffect(() => {
 		Axios.get(`${serverConfig.api}/search/video`).then(({ data }) => {
@@ -107,7 +108,8 @@ const VideoSearchPage = () => {
 						notNoCategory: false,
 						pov: false,
 						notPov: false,
-						website: false
+						website: false,
+                        site: false
 					}
 
 					if (video.quality === 0) return null
@@ -127,7 +129,7 @@ const VideoSearchPage = () => {
 		<Grid container id='search-page'>
 			<Grid item xs={2}>
 				<Sidebar
-					videoData={{ categories, attributes, locations, websites }}
+					videoData={{ categories, attributes, locations, websites, sites }}
 					videos={videos}
 					update={setVideos}
 				/>
@@ -347,14 +349,32 @@ const Filter = ({ videoData, videos, update }: FilterProps) => {
 		const targetLower = e.target.value.toLowerCase()
 
 		update(
-			[...videos].map((video: any) => {
+			[...videos].map((video) => {
 				if (targetLower === 'all') {
-					video.hidden.website = false
-				} else {
-					video.hidden.website = !(video.website?.toLowerCase() === targetLower)
+					return { ...video, hidden: { ...video.hidden, website: false } }
 				}
 
-				return video
+				return {
+					...video,
+					hidden: { ...video.hidden, website: !(video.website?.toLowerCase() === targetLower) }
+				}
+			})
+		)
+	}
+
+	const site = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const targetLower = e.target.value.toLowerCase()
+
+		update(
+			[...videos].map((video) => {
+				if (targetLower === 'all') {
+					return { ...video, hidden: { ...video.hidden, site: false } }
+				}
+
+				return {
+					...video,
+					hidden: { ...video.hidden, site: !(video.site?.toLowerCase() === targetLower) }
+				}
 			})
 		)
 	}
@@ -494,6 +514,7 @@ const Filter = ({ videoData, videos, update }: FilterProps) => {
 	return (
 		<>
 			<FilterDropdown data={videoData.websites} label='website' callback={website} />
+			<FilterDropdown data={videoData.sites} label='site' callback={site} />
 
 			<FilterObj
 				data={videoData.categories}
