@@ -486,6 +486,7 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 										renameTitle(e.target.value)
 									}
 								}}
+								className='wide'
 							/>
 						)
 					}}
@@ -1139,6 +1140,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 										renameVideo(e.target.value)
 									}
 								}}
+								className='wider'
 							/>
 						)
 					}}
