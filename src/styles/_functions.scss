@@ -12,13 +12,30 @@
 	line-height: $sizeY;
 }
 
-@mixin bookmarkPosition() {
+//DEPRECATED This is an unused method, and will be removed at some time
+@mixin bookmarkPosition_legacy() {
 	$levelSelector: 1;
 	$margin: 0;
 	$margin-offset: 35;
 
 	@for $i from 1 through $bookmarkRows {
 		$margin: ($levelSelector - 1) * $margin-offset;
+		&[data-level='#{$i}'] {
+			margin-top: $margin + px;
+		}
+
+		$levelSelector: $levelSelector + 1;
+	}
+}
+
+@mixin bookmarkPosition() {
+	$levelSelector: 1;
+	$margin: 0;
+	$margin-offset: 35;
+
+	@for $i from 1 through $totalBookmarkRows {
+		$modLevelSelector: (($levelSelector - 1) % $bookmarkRows);
+		$margin: ($modLevelSelector) * $margin-offset;
 		&[data-level='#{$i}'] {
 			margin-top: $margin + px;
 		}
