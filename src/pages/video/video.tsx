@@ -29,7 +29,8 @@ import {
 	ICategory,
 	IVideo,
 	IVideoStar,
-	IKeyPress
+	IBookmark,
+	ILevels
 } from '@/interfaces'
 
 const UpdateContext = createContext({
@@ -141,7 +142,7 @@ const VideoPage = () => {
 	)
 }
 
-interface ISection {
+interface SectionProps {
 	video: IVideo
 	locations: ILocation[]
 	attributes: IAttribute[]
@@ -149,7 +150,7 @@ interface ISection {
 	bookmarks: IVideoBookmark[]
 	star: IVideoStar
 }
-const Section = ({ video, locations, attributes, categories, bookmarks, star }: ISection) => {
+const Section = ({ video, locations, attributes, categories, bookmarks, star }: SectionProps) => {
 	const [playerRef, ref] = useRefWithEffect()
 	const [duration, setDuration] = useState(0)
 
@@ -189,15 +190,15 @@ const Section = ({ video, locations, attributes, categories, bookmarks, star }: 
 	)
 }
 
-interface IStar {
+interface StarProps {
 	star: IVideoStar
 	video: IVideo
 }
-const Star = ({ star, video }: IStar) => {
+const Star = ({ star, video }: StarProps) => {
 	const update = useContext(UpdateContext).star
 
 	const removeStar = () => {
-		Axios.delete(`${serverConfig.api}/video/${video.id}/star/${star.id}`).then(() => {
+		Axios.delete(`${serverConfig.api}/video/${video.id}/star`).then(() => {
 			update({ ...star, id: 0, name: '' })
 		})
 	}
@@ -235,11 +236,11 @@ const Star = ({ star, video }: IStar) => {
 	)
 }
 
-interface IStarInput {
+interface StarInputProps {
 	video: IVideo
 	disabled?: boolean
 }
-const StarInput = ({ video, disabled = false }: IStarInput) => {
+const StarInput = ({ video, disabled = false }: StarInputProps) => {
 	const update = useContext(UpdateContext).star
 
 	const addStar = (star: string) => {
@@ -256,8 +257,7 @@ const StarInput = ({ video, disabled = false }: IStarInput) => {
 				autoFocus
 				onKeyDown={(e) => {
 					if (e.key === 'Enter') {
-						//@ts-ignore
-						addStar(e.target.value)
+						addStar((e.target as HTMLInputElement).value)
 					}
 				}}
 			/>
@@ -267,13 +267,13 @@ const StarInput = ({ video, disabled = false }: IStarInput) => {
 	return null
 }
 
-interface IHeader {
+interface HeaderProps {
 	video: IVideo
 	attributes: IAttribute[]
 	locations: ILocation[]
 	star: IVideoStar
 }
-const Header = ({ video, attributes, locations, star }: IHeader) => {
+const Header = ({ video, attributes, locations, star }: HeaderProps) => {
 	const isFullHD = video.height ? video.height > 720 : false
 
 	return (
@@ -294,7 +294,10 @@ const Header = ({ video, attributes, locations, star }: IHeader) => {
 	)
 }
 
-const HeaderSite = ({ video }: { video: IVideo }) => (
+interface HeaderSiteProps {
+	video: IVideo
+}
+const HeaderSite = ({ video }: HeaderSiteProps) => (
 	<Box id='header__site'>
 		<span className='wsite'>{video.website}</span>
 		{video.subsite ? (
@@ -306,9 +309,11 @@ const HeaderSite = ({ video }: { video: IVideo }) => (
 	</Box>
 )
 
-	
-
-const HeaderQuality = ({ video, hidden = false }: { video: IVideo; hidden?: boolean }) => {
+interface HeaderQualityProps {
+	video: IVideo
+	hidden?: boolean
+}
+const HeaderQuality = ({ video, hidden = false }: HeaderQualityProps) => {
 	if (hidden) return null
 
 	return (
@@ -318,12 +323,15 @@ const HeaderQuality = ({ video, hidden = false }: { video: IVideo; hidden?: bool
 	)
 }
 
-const HeaderLocations = ({ video }: { video: IVideo }) => {
+interface HeaderLocationsProps {
+	video: IVideo
+}
+const HeaderLocations = ({ video }: HeaderLocationsProps) => {
 	const update = useContext(UpdateContext).video
 
 	const removeLocation = (location: ILocation) => {
-		Axios.delete(`${serverConfig.api}/location/${location.id}`).then(() => {
-			update({ ...video, locations: video.locations.filter((item) => item.id !== location.id) })
+		Axios.delete(`${serverConfig.api}/location/${video.id}/${location.id}`).then(() => {
+			update({ ...video, locations: video.locations.filter((locationItem) => locationItem.id !== location.id) })
 		})
 	}
 
@@ -353,11 +361,14 @@ const HeaderLocations = ({ video }: { video: IVideo }) => {
 	)
 }
 
-const HeaderAttributes = ({ video }: { video: IVideo }) => {
+interface HeaderAttributesProps {
+	video: IVideo
+}
+const HeaderAttributes = ({ video }: HeaderAttributesProps) => {
 	const update = useContext(UpdateContext).video
 
 	const removeAttribute = (attribute: IAttribute) => {
-		Axios.delete(`${serverConfig.api}/attribute/${attribute.id}`).then(() => {
+		Axios.delete(`${serverConfig.api}/attribute/${video.id}/${attribute.id}`).then(() => {
 			update({ ...video, attributes: video.attributes.filter((item) => item.id !== attribute.id) })
 		})
 	}
@@ -387,11 +398,11 @@ const HeaderAttributes = ({ video }: { video: IVideo }) => {
 	)
 }
 
-interface IHeaderDate {
+interface HeaderDateProps {
 	video: IVideo
 	star: IVideoStar
 }
-const HeaderDate = ({ video, star }: IHeaderDate) => {
+const HeaderDate = ({ video, star }: HeaderDateProps) => {
 	const { video: update, star: updateStar } = useContext(UpdateContext)
 
 	const fixDate = () => {
@@ -420,12 +431,12 @@ const HeaderDate = ({ video, star }: IHeaderDate) => {
 	)
 }
 
-interface IHeaderTitle {
+interface HeaderTitleProps {
 	video: IVideo
 	attributes: IAttribute[]
 	locations: ILocation[]
 }
-const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
+const HeaderTitle = ({ video, attributes, locations }: HeaderTitleProps) => {
 	const handleModal = useContext(ModalContext).method
 	const update = useContext(UpdateContext).video
 
@@ -433,9 +444,9 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 		Axios.post(`${serverConfig.api}/video/${video.id}/location`, { locationID: location.id }).then(({ data }) => {
 			update({
 				...video,
-				locations: [...video.locations, { id: data.id, name: location.name }].sort((a, b) =>
-					a.name.localeCompare(b.name)
-				)
+				locations: [...video.locations, data].sort((a, b) => {
+					return a.name.localeCompare(b.name)
+				})
 			})
 		})
 	}
@@ -446,9 +457,7 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 		}).then(({ data }) => {
 			update({
 				...video,
-				attributes: [...video.attributes, { id: data.id, name: attribute.name }].sort((a, b) =>
-					a.name.localeCompare(b.name)
-				)
+				attributes: [...video.attributes, data].sort((a, b) => a.name.localeCompare(b.name))
 			})
 		})
 	}
@@ -482,8 +491,7 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 									if (e.key === 'Enter') {
 										handleModal()
 
-										//@ts-ignore
-										renameTitle(e.target.value)
+										renameTitle((e.target as HTMLInputElement).value)
 									}
 								}}
 								className='wide'
@@ -574,14 +582,14 @@ const HeaderTitle = ({ video, attributes, locations }: IHeaderTitle) => {
 	)
 }
 
-interface ITimeline {
+interface TimelineProps {
 	video: IVideo
 	bookmarks: IVideoBookmark[]
 	categories: ICategory[]
 	playVideo: any
 	duration: number
 }
-const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeline) => {
+const Timeline = ({ bookmarks, video, playVideo, categories, duration }: TimelineProps) => {
 	const handleModal = useContext(ModalContext).method
 	const update = useContext(UpdateContext).bookmarks
 
@@ -604,27 +612,27 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 
 	const bookmarksArr: HTMLElement[] = []
 
-	const setTime = (id: number) => {
+	const setTime = (bookmark: IBookmark) => {
 		const player = document.getElementsByTagName('video')[0]
-
 		const time = Math.round(player.currentTime)
 
-		Axios.put(`${serverConfig.api}/bookmark/${id}`, { time }).then(() => {
+		Axios.put(`${serverConfig.api}/bookmark/${bookmark.id}`, { time }).then(() => {
 			update(
 				[...bookmarks]
-					.map((bookmark) => {
-						if (bookmark.id === id) bookmark.start = time
-
-						return bookmark
+					.map((bookmarkItem) => {
+						if (bookmarkItem.id === bookmark.id) {
+							bookmarkItem.start = time
+						}
+						return bookmarkItem
 					})
 					.sort((a, b) => a.start - b.start)
 			)
 		})
 	}
 
-	const removeBookmark = (id: number) => {
-		Axios.delete(`${serverConfig.api}/bookmark/${id}`).then(() => {
-			update([...bookmarks].filter((item: any) => item.id !== id))
+	const removeBookmark = (bookmark: IBookmark) => {
+		Axios.delete(`${serverConfig.api}/bookmark/${bookmark.id}`).then(() => {
+			update([...bookmarks].filter((item) => item.start !== bookmark.start))
 		})
 	}
 
@@ -632,7 +640,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 		Axios.put(`${serverConfig.api}/bookmark/${bookmark.id}`, { categoryID: category.id }).then(() => {
 			update(
 				[...bookmarks].map((bookmarkItem) => {
-					if (bookmarkItem.id === bookmark.id) bookmarkItem.name = category.name
+					if (bookmarkItem.start === bookmark.start) bookmarkItem.category.name = category.name
 
 					return bookmarkItem
 				})
@@ -674,8 +682,8 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 		<Grid id='timeline'>
 			{bookmarks.length && video.id !== 0
 				? bookmarks.map((bookmark, i) => (
-						<Fragment key={bookmark.id}>
-							<ContextMenuTrigger id={`bookmark-${bookmark.id}`}>
+						<Fragment key={bookmark.start}>
+							<ContextMenuTrigger id={`bookmark-${bookmark.start}`}>
 								<Button
 									className='bookmark'
 									size='small'
@@ -688,17 +696,17 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 									ref={(bookmark: HTMLButtonElement) => (bookmarksArr[i] = bookmark)}
 									data-level={1}
 								>
-									{bookmark.name}
+									{bookmark.category.name}
 								</Button>
 							</ContextMenuTrigger>
 
-							<ContextMenu id={`bookmark-${bookmark.id}`}>
+							<ContextMenu id={`bookmark-${bookmark.start}`}>
 								<MenuItem
 									onClick={() => {
 										handleModal(
 											'Change Category',
 											categories
-												.filter((category) => category.name !== bookmark.name)
+												.filter((category) => category.id !== bookmark.category.id)
 												.map((category) => (
 													<Button
 														variant='outlined'
@@ -719,13 +727,13 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 									<i className={themeConfig.icons.edit} /> Change Category
 								</MenuItem>
 
-								<MenuItem onClick={() => setTime(bookmark.id)}>
+								<MenuItem onClick={() => setTime(bookmark)}>
 									<i className={themeConfig.icons.clock} /> Change Time
 								</MenuItem>
 
 								<MenuItem divider />
 
-								<MenuItem onClick={() => removeBookmark(bookmark.id)}>
+								<MenuItem onClick={() => removeBookmark(bookmark)}>
 									<i className={themeConfig.icons.trash} /> Delete
 								</MenuItem>
 							</ContextMenu>
@@ -736,7 +744,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: ITimeli
 	)
 }
 
-interface IVideoPlayer {
+interface VideoPlayerProps {
 	video: IVideo
 	categories: ICategory[]
 	bookmarks: IVideoBookmark[]
@@ -745,7 +753,15 @@ interface IVideoPlayer {
 	playerValue: any
 	updateDuration: any
 }
-const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValue, updateDuration }: IVideoPlayer) => {
+const VideoPlayer = ({
+	video,
+	categories,
+	bookmarks,
+	star,
+	playerRef,
+	playerValue,
+	updateDuration
+}: VideoPlayerProps) => {
 	const handleModal = useContext(ModalContext).method
 	const modalData = useContext(ModalContext).data
 
@@ -821,10 +837,10 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 				hls.loadSource(`${serverConfig.source}/videos/${video.path.stream}`)
 				hls.attachMedia(player.media)
 
-				hls.on(HlsJS.Events.MANIFEST_PARSED, (e, data) => {
+				hls.once(HlsJS.Events.MANIFEST_PARSED, (e, data) => {
 					const dataLevels = data['levels'].length - 1
 
-					const levels: { [key: string]: number } = settingsConfig.hls.levels
+					const levels: ILevels = settingsConfig.hls.levels
 					const maxLevel = levels[settingsConfig.hls.maxLevel]
 					const maxStartLevel = levels[settingsConfig.hls.maxStartLevel]
 
@@ -872,7 +888,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 					const qualityArr = data['Period']['AdaptationSet'][0]['Representation']
 					const dataLevels = qualityArr.length
 
-					const levels: { [key: string]: number } = settingsConfig.dash.levels
+					const levels: ILevels = settingsConfig.dash.levels
 					const maxLevel = levels[settingsConfig.dash.maxLevel]
 					const maxStartLevel = levels[settingsConfig.dash.maxStartLevel]
 
@@ -937,11 +953,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 				})
 			} else {
 				// player is broken, never remembers time
-				let triggered = false
-				player.on('canplay', (e: any) => {
-					if (!triggered) {
-						triggered = true
-
+				player.once('canplay', (e: any) => {
 						if (!newVideo) {
 							player.currentTime = Number(localStorage.bookmark)
 
@@ -954,7 +966,6 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 						}
 
 				player.media.ondurationchange = (e: any) => updateDuration(e.target.duration)
-					}
 				})
 			}
 		}
@@ -981,7 +992,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 				categoryID: category.id,
 				time
 			}).then(({ data }) => {
-				bookmarks.push({ id: data.id, name: category.name, start: time })
+				bookmarks.push({ id: data.id, category: { id: category.id, name: category.name }, start: data.start })
 
 				updateBookmarks([...bookmarks].sort((a, b) => a.start - b.start))
 			})
@@ -1004,8 +1015,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 		})
 	}
 
-	const handleKeyPress = (key: string, e: IKeyPress) => {
-		if (e.target.tagName === 'INPUT') return
+	const handleKeyPress = (key: string, e: KeyboardEvent) => {
 		e.preventDefault()
 
 		const player = getPlayer()
@@ -1112,8 +1122,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 									if (e.key === 'Enter') {
 										handleModal()
 
-										//@ts-ignore
-										setAge(e.target.value)
+										setAge((e.target as HTMLInputElement).value)
 									}
 								}}
 							/>
@@ -1136,8 +1145,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 									if (e.key === 'Enter') {
 										handleModal()
 
-										//@ts-ignore
-										renameVideo(e.target.value)
+										renameVideo((e.target as HTMLInputElement).value)
 									}
 								}}
 								className='wider'

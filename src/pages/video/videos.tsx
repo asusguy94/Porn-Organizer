@@ -8,20 +8,24 @@ import { daysToYears } from '@components/date/date'
 import RouterLink from '@components/router-link/router-link'
 
 import { server as serverConfig } from '@/config'
+import { IGeneral } from '@/interfaces'
 
-interface IVideo {
-	id: number
-	name: string
+interface IVideo extends IGeneral {
 	ageInVideo: number
 }
 
 const VideosPage = () => (
 	<Grid item id='videos-page'>
-		<Helper source={`${serverConfig.api}/video`} label='without-bookmark' />
+		{/* TODO Moving logic to search-page */}
+		{/* <Helper source={`${serverConfig.api}/video`} label='without-bookmark' /> */}
 	</Grid>
 )
 
-const Helper = ({ source, label }: { source: string; label: string }) => {
+interface HelperProps {
+	source: string
+	label: string
+}
+const Helper = ({ source, label }: HelperProps) => {
 	const [videos, setVideos] = useState<IVideo[]>([])
 
 	useEffect(() => {
@@ -37,14 +41,14 @@ const Helper = ({ source, label }: { source: string; label: string }) => {
 				{videos.map((video) => (
 					<Link component={RouterLink} key={`${label}-${video.id}`} href={`${video.id}`}>
 						<ListItem button divider>
-						<Badge
-							color='primary'
-							badgeContent={daysToYears(video.ageInVideo)}
-							style={{ marginRight: '2em' }}
-						/>
+							<Badge
+								color='primary'
+								badgeContent={daysToYears(video.ageInVideo)}
+								style={{ marginRight: '2em' }}
+							/>
 
 							<ListItemText>{video.name}</ListItemText>
-					</ListItem>
+						</ListItem>
 					</Link>
 				))}
 			</List>

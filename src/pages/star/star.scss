@@ -69,6 +69,10 @@
 			text-transform: capitalize;
 		}
 
+		.capitalize input {
+			text-transform: uppercase;
+		}
+
 		.flag {
 			margin-left: 5px;
 			margin-bottom: -5px;

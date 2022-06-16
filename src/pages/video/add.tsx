@@ -18,15 +18,23 @@ import Axios from 'axios'
 import Spinner from '@components/spinner/spinner'
 
 import { server as serverConfig } from '@/config'
+import { AxiosData } from '@/interfaces'
 
 const AddVideoPage = () => {
-	const [videos, setVideos] = useState([])
+	interface IVideoFile {
+		path: string
+		website: string
+		site: string
+		title: string
+	}
+
+	const [videos, setVideos] = useState<IVideoFile[]>([])
 	const [loaded, setLoaded] = useState(false)
 	const [pages, setPages] = useState(0)
 
 	useEffect(() => {
 		Axios.post(`${serverConfig.source}/video`)
-			.then(({ data: { files, pages } }) => {
+			.then(({ data: { files, pages } }: AxiosData<{ files: IVideoFile[]; pages: number }>) => {
 				setVideos(files)
 				setPages(pages)
 			})
@@ -67,7 +75,7 @@ const AddVideoPage = () => {
 								</TableHead>
 
 								<TableBody>
-									{videos.map((video: any) => {
+									{videos.map((video) => {
 										return (
 											<TableRow key={video.path}>
 												<TableCell>{video.website}</TableCell>
@@ -100,12 +108,12 @@ const AddVideoPage = () => {
 	)
 }
 
-interface IAction {
+interface ActionProps {
 	label: string
 	callback?: () => void
 	disabled?: boolean
 }
-const Action = ({ label, callback = () => {}, disabled = false }: IAction) => {
+const Action = ({ label, callback = () => {}, disabled = false }: ActionProps) => {
 	const [isDisabled, setIsDisabled] = useState(disabled)
 
 	const clickHandler = () => {
