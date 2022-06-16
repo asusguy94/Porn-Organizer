@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom'
 
 import { Card, CardContent, Button, Typography, Box } from '@mui/material'
 
-//@ts-ignore
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
 import './modal.scss'

@@ -23,7 +23,7 @@ import { Flipper, Flipped } from 'react-flip-toolkit'
 
 import RouterLink from '@components/router-link/router-link'
 import Modal from '@components/modal/modal'
-import { DaysToYears } from '@components/date/date'
+import { daysToYears } from '@components/date/date'
 import Ribbon from '@components/ribbon/ribbon'
 
 import './star.scss'
@@ -50,13 +50,13 @@ const StarPage = () => {
 		id: 0,
 		name: '',
 		image: '',
-		ignored: 0,
+		ignored: false,
 		info: {
 			breast: '',
 			eyecolor: '',
 			haircolor: '',
 			ethnicity: '',
-			county: {
+			country: {
 				name: '',
 				code: ''
 			},
@@ -125,8 +125,6 @@ const StarTitle = ({ star }: any) => {
 	const handleModal = useContext(ModalContext)
 	const update = useContext(UpdateContext).star
 
-	const isIgnored = star.ignored === 1
-
 	const copy = async () => await navigator.clipboard.writeText(star.name)
 
 	const renameStar = (value: string) => {
@@ -152,7 +150,7 @@ const StarTitle = ({ star }: any) => {
 		<Box>
 			<Box className='d-inline-block'>
 				<ContextMenuTrigger id='title'>
-					<h2 className={isIgnored ? 'ignored' : ''}>{star.name}</h2>
+					<h2 className={star.ignored ? 'ignored' : ''}>{star.name}</h2>
 				</ContextMenuTrigger>
 			</Box>
 
@@ -205,7 +203,7 @@ const StarTitle = ({ star }: any) => {
 				</MenuItem>
 
 				<MenuItem onClick={ignoreStar}>
-					{isIgnored ? (
+					{star.ignored ? (
 						<>
 							<i className={themeConfig.icons['toggle-yes']} /> Enable Star
 						</>
@@ -509,7 +507,7 @@ const StarVideos = ({ videos, update, similar }: IStarVideos) => {
 			{similar.some((star) => star.match === 100) ? (
 				<Alert severity='warning' className='alert'>
 					<AlertTitle>
-						Duplicate Star (<strong>{similar.filter((star) => star.match === 100).length}</strong>)
+						Possible Duplicates: <strong>{similar.filter((star) => star.match === 100).length}</strong>
 					</AlertTitle>
 				</Alert>
 			) : null}
@@ -741,8 +739,7 @@ const StarVideo = ({ video, isFirst, isLast, isHidden }: IStarVideo) => {
 
 					<Ribbon isFirst={isFirst} isLast={isLast} align='left' />
 
-					{/* @ts-ignore */}
-					{video.age ? <Ribbon label={<DaysToYears days={video.age} />} /> : null}
+					{video.age ? <Ribbon label={daysToYears(video.age)} /> : null}
 				</CardContent>
 			</CardActionArea>
 		</Card>

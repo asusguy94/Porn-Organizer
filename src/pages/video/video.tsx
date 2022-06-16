@@ -9,7 +9,6 @@ import { PlyrComponent } from 'plyr-react'
 import HlsJS from 'hls.js'
 import DashJS from 'dashjs'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
-//@ts-ignore
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
 import Modal from '@components/modal/modal'
@@ -55,7 +54,6 @@ const VideoPage = () => {
 
 	const [video, setVideo] = useState({
 		id: 0,
-		nextID: null,
 		name: '',
 		star: '',
 		path: {
@@ -87,17 +85,6 @@ const VideoPage = () => {
 	const [categories, setCategories] = useState([])
 	const [attributes, setAttributes] = useState([])
 	const [locations, setLocations] = useState([])
-
-	const handleKeyPress = (key: string, e: IKeyPress) => {
-		if (e.target.tagName === 'INPUT') return
-		e.preventDefault()
-
-		if (key === 'tab') {
-			window.location.href = video.nextID ?? '/video'
-		} else {
-			console.log(`${key} was pressed`)
-		}
-	}
 
 	const handleModal = (title = null, data = null, filter = false) => {
 		setModal((prevModal) => ({ title, data, visible: !prevModal.visible, filter }))
@@ -150,8 +137,6 @@ const VideoPage = () => {
 			<Modal visible={modal.visible} title={modal.title} filter={modal.filter} onClose={handleModal}>
 				{modal.data}
 			</Modal>
-
-			<KeyboardEventHandler handleKeys={['tab']} onKeyEvent={handleKeyPress} handleFocusableElements={true} />
 		</Grid>
 	)
 }
@@ -178,8 +163,6 @@ const Section = ({ video, locations, attributes, categories, bookmarks, star }: 
 		player.currentTime = time || player.currentTime
 		player.play()
 	}
-
-	//console.log(playerRef, ref)
 
 	return (
 		<Grid item xs={10}>
@@ -295,7 +278,7 @@ const Header = ({ video, attributes, locations, star }: IHeader) => {
 
 	return (
 		<Grid container component='header' id='header'>
-			<Grid item xs={11}>
+			<Grid item>
 				<HeaderTitle video={video} attributes={attributes} locations={locations} />
 
 				<HeaderQuality video={video} hidden={!isFullHD} />
@@ -306,10 +289,6 @@ const Header = ({ video, attributes, locations, star }: IHeader) => {
 				<HeaderAttributes video={video} />
 
 				<HeaderSite video={video} />
-			</Grid>
-
-			<Grid item xs={1}>
-				<HeaderNext video={video} />
 			</Grid>
 		</Grid>
 	)
@@ -327,15 +306,7 @@ const HeaderSite = ({ video }: { video: IVideo }) => (
 	</Box>
 )
 
-const HeaderNext = ({ video }: { video: IVideo }) => (
-	<Box id='header__next'>
-		<a id='next' href={`/video/${video.nextID ?? ''}`}>
-			<Button size='small' variant='outlined'>
-				Next
-			</Button>
-		</a>
-	</Box>
-)
+	
 
 const HeaderQuality = ({ video, hidden = false }: { video: IVideo; hidden?: boolean }) => {
 	if (hidden) return null
@@ -1072,19 +1043,10 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 		<div className='video-container' onWheel={handleWheel}>
 			<ContextMenuTrigger id='video' holdToDisplay={-1}>
 				{video.id !== 0 && (
-					<>
-						{settingsConfig.player === 'plyr' ? (
 							<PlyrComponent
 								ref={playerRef}
 								options={{
-									controls: [
-										'play-large',
-										'play',
-										'current-time',
-										'progress',
-										'duration',
-										'settings'
-									],
+							controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'settings'],
 									settings: ['speed'],
 									speed: { selected: 1, options: [0.5, 1, 1.5, 2] },
 									hideControls: false,
@@ -1107,8 +1069,6 @@ const VideoPlayer = ({ video, categories, bookmarks, star, playerRef, playerValu
 									}
 								}}
 							/>
-						) : null}
-					</>
 				)}
 			</ContextMenuTrigger>
 

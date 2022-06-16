@@ -50,6 +50,7 @@ const AddVideoPage = () => {
 						<Action
 							label='Generate VTT'
 							callback={() => Axios.post(`${serverConfig.source}/generate/vtt`)}
+							disabled
 						/>
 					</div>
 				) : (
