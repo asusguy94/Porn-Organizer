@@ -947,21 +947,36 @@ const VideoPlayer = ({
 						updateDuration(dash.duration())
 					}
 				})
+
+				let debugDuration = 0
+				player.media.ondurationchange = (e: any) => (debugDuration = e.target.duration)
+
+				dash.on(DashJS.MediaPlayer.events.ERROR, ({ error }: any) => {
+					if (error.code === 25) {
+						if (debugDuration > 0) {
+							updateDuration(debugDuration)
+						} else {
+							player.media.ondurationchange = (e: any) => updateDuration(e.target.duration)
+						}
+					}
+				})
 			} else {
 				// player is broken, never remembers time
 				player.once('canplay', (e: any) => {
-						if (!newVideo) {
+					if (!newVideo) {
+						setTimeout(() => {
 							player.currentTime = Number(localStorage.bookmark)
+						}, 100)
 
-							if (Number(localStorage.playing)) player.play()
-						} else {
-							localStorage.video = video.id
-							localStorage.bookmark = 0
+						if (Number(localStorage.playing)) player.play()
+					} else {
+						localStorage.video = video.id
+						localStorage.bookmark = 0
 
-							player.pause()
-						}
+						player.pause()
+					}
 
-				player.media.ondurationchange = (e: any) => updateDuration(e.target.duration)
+					player.media.ondurationchange = (e: any) => updateDuration(e.target.duration)
 				})
 			}
 		}
@@ -1021,12 +1036,14 @@ const VideoPlayer = ({
 			min: 0
 		}
 
+		const getSeekTime = (multiplier = 1) => 1 * multiplier
+
 		switch (key) {
 			case 'left':
-				player.currentTime -= 1
+				player.currentTime -= getSeekTime()
 				break
 			case 'right':
-				player.currentTime += 1
+				player.currentTime += getSeekTime()
 				break
 			case 'space':
 				if (player.playing) player.pause()
@@ -1050,32 +1067,32 @@ const VideoPlayer = ({
 		<div className='video-container' onWheel={handleWheel}>
 			<ContextMenuTrigger id='video' holdToDisplay={-1}>
 				{video.id !== 0 && (
-							<PlyrComponent
-								ref={playerRef}
-								options={{
+					<PlyrComponent
+						ref={playerRef}
+						options={{
 							controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'settings'],
-									settings: ['speed'],
-									speed: { selected: 1, options: [0.5, 1, 1.5, 2] },
-									hideControls: false,
-									ratio: '21:9',
-									keyboard: { focused: false },
-									fullscreen: { enabled: false }
-								}}
-								sources={{
-									type: 'video',
-									sources: [
-										{
-											src: `${serverConfig.source}/videos/${video.path.file}`,
-											type: 'video/mp4'
-										}
-									],
-									poster: `${serverConfig.source}/video/${video.id}`,
-									previewThumbnails: {
-										enabled: settingsConfig.thumbnails,
-										src: `${serverConfig.source}/video/${video.id}/vtt`
-									}
-								}}
-							/>
+							settings: ['speed'],
+							speed: { selected: 1, options: [0.5, 1, 1.5, 2] },
+							hideControls: false,
+							ratio: '21:9',
+							keyboard: { focused: false },
+							fullscreen: { enabled: false }
+						}}
+						sources={{
+							type: 'video',
+							sources: [
+								{
+									src: `${serverConfig.source}/videos/${video.path.file}`,
+									type: 'video/mp4'
+								}
+							],
+							poster: `${serverConfig.source}/video/${video.id}`,
+							previewThumbnails: {
+								enabled: settingsConfig.thumbnails,
+								src: `${serverConfig.source}/video/${video.id}/vtt`
+							}
+						}}
+					/>
 				)}
 			</ContextMenuTrigger>
 
