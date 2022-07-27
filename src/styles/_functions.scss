@@ -18,7 +18,7 @@
 	$margin: 0;
 	$margin-offset: 35;
 
-	@for $i from 1 through $bookmarkRows {
+	@for $i from 1 through $bookmarkCols {
 		$margin: ($levelSelector - 1) * $margin-offset;
 		&[data-level='#{$i}'] {
 			margin-top: $margin + px;
@@ -33,8 +33,8 @@
 	$margin: 0;
 	$margin-offset: 35;
 
-	@for $i from 1 through $totalBookmarkRows {
-		$modLevelSelector: (($levelSelector - 1) % $bookmarkRows);
+	@for $i from 1 through ($bookmarkRows * $bookmarkCols) {
+		$modLevelSelector: (($levelSelector - 1) % $bookmarkCols);
 		$margin: ($modLevelSelector) * $margin-offset;
 		&[data-level='#{$i}'] {
 			margin-top: $margin + px;

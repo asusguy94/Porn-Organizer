@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 import {
 	Grid,
@@ -13,10 +13,11 @@ import {
 	FormControlLabel,
 	Radio,
 	Select,
-	MenuItem
+	MenuItem,
+	SelectChangeEvent
 } from '@mui/material'
 
-import Axios from 'axios'
+import KeyboardEventHandler from 'react-keyboard-event-handler'
 import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
 
@@ -28,11 +29,12 @@ import Badge from '@components/badge/badge'
 import Loader from '@components/spinner/spinner'
 import VGrid from '@components/virtualized/virtuoso'
 
-import { AxiosData, ICountry, IGeneral, ISetState, IWebsite } from '@/interfaces'
+import { ICountry, IGeneral, ISetState, IWebsite } from '@/interfaces'
 
 import './search.scss'
 
 import { server as serverConfig } from '@/config'
+import { searchApi, starApi, websiteApi } from '@/api'
 
 interface IStar extends IGeneral {
 	image: string
@@ -73,8 +75,22 @@ const StarSearchPage = () => {
 	const [countries, setCountries] = useState<ICountry[]>([])
 	const [websites, setWebsites] = useState<IWebsite[]>([])
 
+	const inputRef = useRef<HTMLInputElement>()
+
+	const handleKeyPress = (key: string, e: KeyboardEvent) => {
+		e.preventDefault()
+
+		switch (key) {
+			case 'ctrl+f':
+				inputRef.current?.focus()
+				break
+			default:
+				console.log(`${key} was pressed`)
+		}
+	}
+
 	useEffect(() => {
-		Axios.get(`${serverConfig.api}/search/star`).then(({ data }: AxiosData<IStar[]>) => {
+		searchApi.getStars<IStar[]>().then(({ data }) => {
 			setStars(
 				data.map((star) => {
 					return {
@@ -95,18 +111,14 @@ const StarSearchPage = () => {
 			)
 		})
 
-		Axios.get(`${serverConfig.api}/star`).then(
-			({
-				data
-			}: AxiosData<{ breast: string[]; haircolor: string[]; ethnicity: string[]; country: ICountry[] }>) => {
-				setBreasts(data.breast)
-				setHaircolors(data.haircolor)
-				setEthnicities(data.ethnicity)
-				setCountries(data.country)
-			}
-		)
+		starApi.getInfo().then(({ data }) => {
+			setBreasts(data.breast)
+			setHaircolors(data.haircolor)
+			setEthnicities(data.ethnicity)
+			setCountries(data.country)
+		})
 
-		Axios.get(`${serverConfig.api}/website`).then(({ data }) => setWebsites(data))
+		websiteApi.getAll().then(({ data }) => setWebsites(data))
 	}, [])
 
 	return (
@@ -116,6 +128,7 @@ const StarSearchPage = () => {
 					starData={{ breasts, haircolors, ethnicities, countries, websites }}
 					stars={stars}
 					update={setStars}
+					inputRef={inputRef}
 				/>
 			</Grid>
 
@@ -124,6 +137,7 @@ const StarSearchPage = () => {
 			</Grid>
 
 			<ScrollToTop smooth />
+			<KeyboardEventHandler handleKeys={['ctrl+f']} onKeyEvent={handleKeyPress} handleFocusableElements={true} />
 		</Grid>
 	)
 }
@@ -178,10 +192,11 @@ interface SidebarProps {
 	starData: IStarData
 	stars: IStar[]
 	update: ISetState<IStar[]>
+	inputRef: any
 }
-const Sidebar = ({ starData, stars, update }: SidebarProps) => (
+const Sidebar = ({ starData, stars, update, inputRef }: SidebarProps) => (
 	<>
-		<TitleSearch stars={stars} update={update} />
+		<TitleSearch stars={stars} update={update} inputRef={inputRef} />
 
 		<Sort stars={stars} update={update} />
 
@@ -226,36 +241,38 @@ const Filter = ({ stars, starData, update }: FilterProps) => {
 		update(stars)
 	}
 
-	const country_DROP = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const country_DROP = (e: SelectChangeEvent<string>) => {
 		const targetLower = e.target.value.toLowerCase()
 
-		stars = stars.map((star) => {
-			if (targetLower === 'all') {
-				star.hidden.country = false
-			} else {
-				star.hidden.country = star.country.toLowerCase() !== targetLower
-			}
-
-			return star
-		})
-
-		update(stars)
+		update(
+			[...stars].map((star) => {
+				if (targetLower === 'all') {
+					return { ...star, hidden: { ...star.hidden, country: false } }
+				} else {
+					return { ...star, hidden: { ...star.hidden, country: star.country.toLowerCase() !== targetLower } }
+				}
+			})
+		)
 	}
 
-	const website_DROP = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const website_DROP = (e: SelectChangeEvent<string>) => {
 		const targetLower = e.target.value.toLowerCase()
 
-		stars = stars.map((star) => {
-			if (targetLower === 'all') {
-				star.hidden.website = false
-			} else {
-				star.hidden.website = !star.websites.some((website) => website.toLowerCase() === targetLower)
-			}
-
-			return star
-		})
-
-		update(stars)
+		update(
+			[...stars].map((star) => {
+				if (targetLower === 'all') {
+					return { ...star, hidden: { ...star.hidden, website: false } }
+				} else {
+					return {
+						...star,
+						hidden: {
+							...star.hidden,
+							website: !star.websites.some((website) => website.toLowerCase() === targetLower)
+						}
+					}
+				}
+			})
+		)
 	}
 
 	const breast_NULL = (e: React.ChangeEvent<HTMLFormElement>) => {
@@ -435,8 +452,9 @@ const Sort = ({ stars, update }: SortProps) => {
 interface TitleSearchProps {
 	stars: IStar[]
 	update: ISetState<IStar[]>
+	inputRef: any
 }
-const TitleSearch = ({ stars, update }: TitleSearchProps) => {
+const TitleSearch = ({ stars, update, inputRef }: TitleSearchProps) => {
 	const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = e.currentTarget.value.toLowerCase()
 
@@ -456,7 +474,7 @@ const TitleSearch = ({ stars, update }: TitleSearchProps) => {
 	//! should stars be sorted by the visible name?
 	//! might cause flickering and difficulty to find a star by name
 
-	return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} />
+	return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} inputRef={inputRef} />
 }
 
 interface FilterItemProps {
@@ -512,7 +530,7 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 interface FilterDropdownProps {
 	data: IStarData['countries'] | IStarData['websites']
 	label: string
-	callback: (e: any) => void // TODO material-ui incompatible types
+	callback: (e: SelectChangeEvent<string>) => void
 }
 const FilterDropdown = ({ data, label, callback }: FilterDropdownProps) => (
 	<>

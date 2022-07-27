@@ -7,7 +7,6 @@ import NavBar from '@components/navbar/navbar'
 
 /* Page Components */
 import HomePage from '@pages/home/home'
-import VideosPage from '@pages/video/videos'
 import VideoPage from '@pages/video/video'
 import AddVideoPage from '@pages/video/add'
 import StarsPage from '@pages/star/stars'
@@ -34,7 +33,6 @@ const App = () => (
 						<Route path='add' element={<AddVideoPage />} />
 						<Route path='search' element={<VideoSearchPage />} />
 						<Route path=':id' element={<VideoPage />} />
-						<Route path='' element={<VideosPage />} />
 					</Route>
 
 					<Route path='star'>

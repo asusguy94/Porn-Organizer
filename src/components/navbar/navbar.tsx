@@ -13,9 +13,7 @@ const NavBar = () => (
 		<ul className='main-menu'>
 			<NavBarItem name='Home' path='/' />
 
-			<NavBarItem name='Video Search' path='/video/search'>
-				<NavBarItem name='Videos' path='/video' />
-			</NavBarItem>
+			<NavBarItem name='Video Search' path='/video/search' />
 
 			<NavBarItem name='Star Search' path='/star/search'>
 				<NavBarItem name='Stars' path='/star' />

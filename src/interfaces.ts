@@ -7,20 +7,37 @@ export interface IGeneral {
 	name: string
 }
 
+export type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<T, Exclude<keyof T, Keys>> &
+	{
+		[K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>
+	}[Keys]
+
+export type RequireOnlyOne<T, Keys extends keyof T = keyof T> = Pick<T, Exclude<keyof T, Keys>> &
+	{
+		[K in Keys]-?: Required<Pick<T, K>> & Partial<Record<Exclude<Keys, K>, undefined>>
+	}[Keys]
+
 export interface AxiosData<T> {
 	data: T
+}
+
+export type IndexType<V> = {
+	[key: string]: V
 }
 
 // Other Types
 export type IQuality = 1080 | 720 | 480 | 360 | 0
 export type ILevels = { [key: string]: number }
+export type IAttribute = IGeneral
+export type ILocation = IGeneral
+export type ICategory = IGeneral
+export type IWebsite = IGeneral
+export type ICountryExtended = ICountry & IGeneral
 
 // Other Interfaces
-export interface IAttribute extends IGeneral {}
-export interface ILocation extends IGeneral {}
-export interface ICategory extends IGeneral {}
-export interface IWebsite extends IGeneral {}
-export interface ISite extends IGeneral {}
+export interface IWebsiteWithSites extends IGeneral {
+	sites: IGeneral[]
+}
 
 export interface IBookmark {
 	id: number
@@ -35,8 +52,6 @@ export interface ICountry {
 	code: string
 	name: string
 }
-
-export type ICountryExtended = ICountry & IGeneral
 
 export interface ISimilar {
 	id: number

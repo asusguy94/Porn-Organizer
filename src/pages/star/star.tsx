@@ -30,7 +30,8 @@ import './star.scss'
 
 import { server as serverConfig, theme as themeConfig } from '@/config'
 
-import { AxiosData, ICountry, IGeneral, ISetState, ISimilar, IStarVideo } from '@/interfaces'
+import { ICountry, IGeneral, ISetState, ISimilar, IStarVideo } from '@/interfaces'
+import { starApi } from '@/api'
 
 const ModalContext = createContext((...args: any): void => {})
 const UpdateContext = createContext({ star: (star: any): void => {} })
@@ -106,17 +107,13 @@ const StarPage = () => {
 	}
 
 	useEffect(() => {
-		Axios.get(`${serverConfig.api}/star`).then(({ data }: AxiosData<IStarData>) => {
-			setStarData(data)
-		})
+		starApi.getInfo().then(({ data }) => setStarData(data))
+		if (id !== undefined) {
+			const starID = parseInt(id)
 
-		Axios.get(`${serverConfig.api}/star/${id}`).then(({ data }: AxiosData<IStar>) => {
-			setStar(data)
-		})
-
-		Axios.get(`${serverConfig.api}/star/${id}/video`).then(({ data }: AxiosData<IStarVideo[]>) => {
-			setVideos(data)
-		})
+			starApi.getStar<IStar>(starID).then(({ data }) => setStar(data))
+			starApi.getVideos(starID).then(({ data }) => setVideos(data))
+		}
 	}, [])
 
 	return (
@@ -162,19 +159,19 @@ const StarTitle = ({ star }: StarTitleProps) => {
 	const copy = async () => await navigator.clipboard.writeText(star.name)
 
 	const renameStar = (value: string) => {
-		Axios.put(`${serverConfig.api}/star/${star.id}`, { name: value }).then(() => {
+		starApi.renameStar(star.id, value).then(() => {
 			update({ ...star, name: value })
 		})
 	}
 
 	const ignoreStar = () => {
-		Axios.put(`${serverConfig.api}/star/${star.id}`, { ignore: !star.ignored }).then(({ data }) => {
+		starApi.ignoreStar(star).then(({ data }) => {
 			update({ ...star, ignored: data.autoTaggerIgnore })
 		})
 	}
 
 	const addAlias = (alias: string) => {
-		Axios.post(`${serverConfig.api}/star/${star.id}/alias`, { alias }).then(() => {
+		starApi.addAlias(star.id, alias).then(() => {
 			//TODO starAlias is not rendered, so just refresh the page for now
 			window.location.reload()
 		})
@@ -295,7 +292,7 @@ const StarImageDropbox = ({ star }: StarImageDropboxProps) => {
 	const addLocalImage = (image: any) => console.log('Adding local file is not yet supported', image)
 
 	const removeStar = () => {
-		Axios.delete(`${serverConfig.api}/star/${star.id}`).then(() => {
+		starApi.removeStar(star.id).then(() => {
 			window.location.href = '/star'
 		})
 	}

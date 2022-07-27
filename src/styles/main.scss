@@ -2,10 +2,10 @@
 @import 'ribbon';
 @import 'material-ui';
 @import 'util';
-@import '@styles/variables';
+@import 'variables';
 
 .plyr {
-	max-height: $maxPlayerHeight;
+	max-height: calc(#{$initialHeight} - (36px *#{$bookmarkCols}));
 
 	.plyr__progress {
 		.plyr__progress__buffer {

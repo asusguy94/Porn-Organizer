@@ -6,8 +6,7 @@ import { Grid, Button, Card, CardMedia, Box, Typography, TextField } from '@mui/
 import Axios from 'axios'
 //@ts-ignore
 import { PlyrComponent } from 'plyr-react'
-import HlsJS from 'hls.js'
-import DashJS from 'dashjs'
+import HlsJS, { ErrorDetails } from 'hls.js'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
@@ -15,7 +14,6 @@ import Modal from '@components/modal/modal'
 import Ribbon from '@components/ribbon/ribbon'
 import Badge from '@components/badge/badge'
 import { daysToYears } from '@components/date/date'
-import { timeToSeconds } from '@/time'
 import { useRefWithEffect, useWindowSize } from '@/hooks'
 
 import './video.scss'
@@ -29,9 +27,9 @@ import {
 	ICategory,
 	IVideo,
 	IVideoStar,
-	IBookmark,
-	ILevels
+	IBookmark
 } from '@/interfaces'
+import { attributeApi, categoryApi, locationApi, videoApi } from '@/api'
 
 const UpdateContext = createContext({
 	video: (video: IVideo): void => {},
@@ -83,22 +81,26 @@ const VideoPage = () => {
 	})
 
 	const [bookmarks, setBookmarks] = useState([])
-	const [categories, setCategories] = useState([])
-	const [attributes, setAttributes] = useState([])
-	const [locations, setLocations] = useState([])
+	const [categories, setCategories] = useState<ICategory[]>([])
+	const [attributes, setAttributes] = useState<IAttribute[]>([])
+	const [locations, setLocations] = useState<ILocation[]>([])
 
 	const handleModal = (title = null, data = null, filter = false) => {
 		setModal((prevModal) => ({ title, data, visible: !prevModal.visible, filter }))
 	}
 
 	useEffect(() => {
-		Axios.get(`${serverConfig.api}/video/${id}`).then(({ data }) => setVideo(data))
-		Axios.get(`${serverConfig.api}/video/${id}/bookmark`).then(({ data }) => setBookmarks(data))
-		Axios.get(`${serverConfig.api}/video/${id}/star`).then(({ data }) => setStar(data))
+		if (id !== undefined) {
+			const videoID = parseInt(id)
 
-		Axios.get(`${serverConfig.api}/category`).then(({ data }) => setCategories(data))
-		Axios.get(`${serverConfig.api}/attribute`).then(({ data }) => setAttributes(data))
-		Axios.get(`${serverConfig.api}/location`).then(({ data }) => setLocations(data))
+			videoApi.getVideo<any>(videoID).then(({ data }) => setVideo(data))
+			videoApi.getBookmarks<any>(videoID).then(({ data }) => setBookmarks(data))
+			videoApi.getStar<any>(videoID).then(({ data }) => setStar(data))
+		}
+
+		categoryApi.getAll().then(({ data }) => setCategories(data))
+		attributeApi.getAll().then(({ data }) => setAttributes(data))
+		locationApi.getAll().then(({ data }) => setLocations(data))
 	}, [])
 
 	return (
@@ -197,8 +199,8 @@ interface StarProps {
 const Star = ({ star, video }: StarProps) => {
 	const update = useContext(UpdateContext).star
 
-	const removeStar = () => {
-		Axios.delete(`${serverConfig.api}/video/${video.id}/star`).then(() => {
+	const removeStarHandler = () => {
+		videoApi.removeStar(video.id).then(() => {
 			update({ ...star, id: 0, name: '' })
 		})
 	}
@@ -226,7 +228,7 @@ const Star = ({ star, video }: StarProps) => {
 					</Card>
 
 					<ContextMenu id='star'>
-						<MenuItem onClick={removeStar}>
+						<MenuItem onClick={removeStarHandler}>
 							<i className={themeConfig.icons.trash} /> Remove
 						</MenuItem>
 					</ContextMenu>
@@ -244,9 +246,7 @@ const StarInput = ({ video, disabled = false }: StarInputProps) => {
 	const update = useContext(UpdateContext).star
 
 	const addStar = (star: string) => {
-		Axios.post(`${serverConfig.api}/video/${video.id}/star`, { name: star }).then(({ data }) => {
-			update(data)
-		})
+		videoApi.addStar(video.id, star).then(({ data }) => update(data))
 	}
 
 	if (!disabled) {
@@ -406,7 +406,7 @@ const HeaderDate = ({ video, star }: HeaderDateProps) => {
 	const { video: update, star: updateStar } = useContext(UpdateContext)
 
 	const fixDate = () => {
-		Axios.put(`${serverConfig.source}/video/${video.id}`, { date: true }).then(({ data }) => {
+		videoApi.fixDate<any>(video.id).then(({ data }) => {
 			updateStar({ ...star, ageInVideo: data.age })
 
 			update({ ...video, date: { ...video.date, published: data.date } })
@@ -440,8 +440,8 @@ const HeaderTitle = ({ video, attributes, locations }: HeaderTitleProps) => {
 	const handleModal = useContext(ModalContext).method
 	const update = useContext(UpdateContext).video
 
-	const addLocation = (location: ILocation) => {
-		Axios.post(`${serverConfig.api}/video/${video.id}/location`, { locationID: location.id }).then(({ data }) => {
+	const addLocationHandler = (location: ILocation) => {
+		videoApi.addLocation(video.id, location.id).then(({ data }) => {
 			update({
 				...video,
 				locations: [...video.locations, data].sort((a, b) => {
@@ -452,20 +452,13 @@ const HeaderTitle = ({ video, attributes, locations }: HeaderTitleProps) => {
 	}
 
 	const addAttribute = (attribute: IAttribute) => {
-		Axios.post(`${serverConfig.api}/video/${video.id}/attribute`, {
-			attributeID: attribute.id
-		}).then(({ data }) => {
-			update({
-				...video,
-				attributes: [...video.attributes, data].sort((a, b) => a.name.localeCompare(b.name))
-			})
+		videoApi.addAttribute(video.id, attribute.id).then(({ data }) => {
+			update({ ...video, attributes: [...video.attributes, data].sort((a, b) => a.name.localeCompare(b.name)) })
 		})
 	}
 
 	const renameTitle = (title: string) => {
-		Axios.put(`${serverConfig.api}/video/${video.id}`, { title }).then(() => {
-			update({ ...video, name: title })
-		})
+		videoApi.renameTitle(video.id, title).then(() => update({ ...video, name: title }))
 	}
 
 	const copyTitle = async () => await navigator.clipboard.writeText(video.name)
@@ -555,7 +548,7 @@ const HeaderTitle = ({ video, attributes, locations }: HeaderTitleProps) => {
 										key={item.id}
 										onClick={() => {
 											handleModal()
-											addLocation(item)
+											addLocationHandler(item)
 										}}
 									>
 										{item.name}
@@ -640,7 +633,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: Timelin
 		Axios.put(`${serverConfig.api}/bookmark/${bookmark.id}`, { categoryID: category.id }).then(() => {
 			update(
 				[...bookmarks].map((bookmarkItem) => {
-					if (bookmarkItem.start === bookmark.start) bookmarkItem.category.name = category.name
+					if (bookmarkItem.start === bookmark.start) bookmarkItem.category = category
 
 					return bookmarkItem
 				})
@@ -649,13 +642,19 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: Timelin
 	}
 
 	const collisionCheck = (a: HTMLElement, b: HTMLElement) => {
-		const valA = a.getBoundingClientRect()
-		const valB = b.getBoundingClientRect()
+		const aRect = a.getBoundingClientRect()
+		const bRect = b.getBoundingClientRect()
 
 		return !(
-			valA.x + valA.width < valB.x - settingsConfig.timeline.spacing ||
-			valA.x + settingsConfig.timeline.spacing > valB.x + valB.width
+			aRect.x + aRect.width < bRect.x - settingsConfig.timeline.spacing ||
+			bRect.x + settingsConfig.timeline.spacing > bRect.x + bRect.width
 		)
+	}
+
+	const setDataLevel = (item: HTMLElement, level: number) => {
+		if (level > 0) {
+			item.setAttribute('data-level', level.toString())
+		}
 	}
 
 	useEffect(() => {
@@ -670,7 +669,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration }: Timelin
 			}
 
 			level = collision ? level + 1 : LEVEL_MIN
-			current.setAttribute('data-level', level.toString())
+			setDataLevel(current, level)
 		}
 	}, [bookmarksArr, useWindowSize().width])
 
@@ -767,6 +766,7 @@ const VideoPlayer = ({
 
 	const [newVideo, setNewVideo] = useState<boolean>()
 	const [events, setEvents] = useState(false)
+	const [fallback, setFallback] = useState(false)
 
 	let playAdded = false
 
@@ -779,6 +779,8 @@ const VideoPlayer = ({
 				setNewVideo(false)
 			} else {
 				setNewVideo(true)
+				localStorage.video = video.id
+				localStorage.bookmark = 0
 			}
 			setEvents(true)
 		}
@@ -789,20 +791,18 @@ const VideoPlayer = ({
 		if (events) {
 			const player = getPlayer()
 
-			if (Number(localStorage.video) !== video.id) localStorage.playing = 0
-
 			player.on('timeupdate', () => {
-				if (player.currentTime > 0.007) {
+				if (player.currentTime > 0) {
 					localStorage.bookmark = Math.round(player.currentTime)
 				}
 			})
-			player.on('play', () => {
-				localStorage.playing = 1
 
+			player.on('play', () => {
 				if (newVideo && !playAdded) {
 					playAdded = true
 
-					Axios.put(`${serverConfig.api}/video/${video.id}`, { plays: 1 })
+					videoApi
+						.addPlay(video.id)
 						.then(() => {
 							console.log('Play Added')
 							playAdded = true
@@ -812,7 +812,6 @@ const VideoPlayer = ({
 						})
 				}
 			})
-			player.on('pause', () => (localStorage.playing = 0))
 		}
 	}, [events])
 
@@ -821,172 +820,50 @@ const VideoPlayer = ({
 		if (events) {
 			const player = getPlayer()
 
-			if (HlsJS.isSupported() && settingsConfig.hls.enabled) {
+			if (HlsJS.isSupported()) {
 				const hls = new HlsJS({
-					//maxBufferLength: undefined,
-					maxBufferLength: timeToSeconds(5),
-					//backBufferLength: undefined,
-					//backBufferLength: timeToSeconds(2),
+					maxBufferLength: Infinity,
 					autoStartLoad: false
 				})
 
 				hls.loadSource(`${serverConfig.source}/videos/${video.path.stream}`)
 				hls.attachMedia(player.media)
 
-				hls.once(HlsJS.Events.MANIFEST_PARSED, (e, data) => {
-					const dataLevels = data['levels'].length - 1
-
-					const levels: ILevels = settingsConfig.hls.levels
-					const maxLevel = levels[settingsConfig.hls.maxLevel]
-					const maxStartLevel = levels[settingsConfig.hls.maxStartLevel]
-
-					// Default start level to maxLevel-1
-					let desiredStartLevel = maxLevel - 1
-					// Start level should never be above 720p
-					if (desiredStartLevel > maxStartLevel) desiredStartLevel = maxStartLevel
-					// Check if desiredStartLevel is too big
-					if (desiredStartLevel > dataLevels) desiredStartLevel = dataLevels - 1
-					// Check if desiredStartLevel is too small
-					if (desiredStartLevel < 0) desiredStartLevel = 0
-
-					hls.startLevel = desiredStartLevel
-					hls.autoLevelCapping = maxLevel
-
+				hls.once(HlsJS.Events.MANIFEST_PARSED, () => {
 					if (!newVideo) {
 						hls.startLoad(Number(localStorage.bookmark))
-
-						if (Number(localStorage.playing)) player.play()
 					} else {
-						localStorage.video = video.id
-						localStorage.bookmark = 0
-
 						hls.startLoad()
-						player.pause()
+					}
+				})
+
+				hls.on(HlsJS.Events.ERROR, (e, { details }) => {
+					if (details === ErrorDetails.MANIFEST_LOAD_ERROR) {
+						setFallback(true)
 					}
 				})
 
 				hls.on(HlsJS.Events.LEVEL_LOADED, (e, data) => updateDuration(data.details.totalduration))
-			} else if (DashJS.supportsMediaSource() && settingsConfig.dash.enabled) {
-				const dash = DashJS.MediaPlayer().create()
-
-				// Initial Settings
-				dash.updateSettings({
-					streaming: {
-						buffer: {
-							bufferTimeAtTopQuality: timeToSeconds(5),
-							bufferTimeAtTopQualityLongForm: timeToSeconds(2),
-							bufferToKeep: timeToSeconds(1)
-						}
-					}
-				})
-
-				dash.on(DashJS.MediaPlayer.events.MANIFEST_LOADED, ({ data }: any) => {
-					const qualityArr = data['Period']['AdaptationSet'][0]['Representation']
-					const dataLevels = qualityArr.length
-
-					const levels: ILevels = settingsConfig.dash.levels
-					const maxLevel = levels[settingsConfig.dash.maxLevel]
-					const maxStartLevel = levels[settingsConfig.dash.maxStartLevel]
-
-					// StartLevel
-					let desiredStartLevel = maxLevel - 1
-					if (desiredStartLevel > maxStartLevel) desiredStartLevel = maxStartLevel
-					if (desiredStartLevel > dataLevels) desiredStartLevel = dataLevels - 1
-					if (desiredStartLevel < 0) desiredStartLevel = 0
-
-					// MaxLevel
-					let desiredBitrate = -1
-
-					let currentQuality = 0
-					for (let obj of qualityArr) {
-						if (obj.height <= settingsConfig.dash.maxLevel && obj.height > currentQuality) {
-							currentQuality = obj.height
-
-							desiredBitrate = Math.ceil(obj.bandwidth / 1000)
-						}
-					}
-
-					dash.updateSettings({
-						streaming: {
-							buffer: {
-								initialBufferLevel: desiredStartLevel
-							},
-							abr: {
-								maxBitrate: {
-									video: desiredBitrate
-								}
-							}
-						}
-					})
-
-					//TODO add start-time
-				})
-
-				// Required, otherwise crashes component
-				dash.initialize()
-				dash.setAutoPlay(false)
-				dash.attachSource(`${serverConfig.source}/videos/${video.path.dash}`)
-				dash.attachView(player.media)
-
-				let triggered = false
-				dash.on(DashJS.MediaPlayer.events.CAN_PLAY, () => {
-					if (!triggered) {
-						triggered = true
-
-						if (!newVideo) {
-							dash.seek(Number(localStorage.bookmark))
-
-							if (Number(localStorage.playing)) dash.play()
-						} else {
-							localStorage.video = video.id
-							localStorage.bookmark = 0
-
-							dash.pause()
-						}
-
-						updateDuration(dash.duration())
-					}
-				})
-
-				let debugDuration = 0
-				player.media.ondurationchange = (e: any) => (debugDuration = e.target.duration)
-
-				dash.on(DashJS.MediaPlayer.events.ERROR, ({ error }: any) => {
-					if (error.code === 25) {
-						if (debugDuration > 0) {
-							updateDuration(debugDuration)
-						} else {
-							player.media.ondurationchange = (e: any) => updateDuration(e.target.duration)
-						}
-					}
-				})
 			} else {
-				// player is broken, never remembers time
-				player.once('canplay', (e: any) => {
-					if (!newVideo) {
-						setTimeout(() => {
-							player.currentTime = Number(localStorage.bookmark)
-						}, 100)
-
-						if (Number(localStorage.playing)) player.play()
-					} else {
-						localStorage.video = video.id
-						localStorage.bookmark = 0
-
-						player.pause()
-					}
-
-					player.media.ondurationchange = (e: any) => updateDuration(e.target.duration)
-				})
+				setFallback(true)
 			}
 		}
 	}, [events])
+
+	useEffect(() => {
+		if (fallback) {
+			const player = getPlayer()
+
+			player.media.src = `${serverConfig.source}/videos/${video.path.file}`
+			player.media.ondurationchange = () => updateDuration(player.media.duration)
+		}
+	}, [fallback])
 
 	const handleWheel = (e: React.WheelEvent) => (getPlayer().currentTime += 10 * Math.sign(e.deltaY) * -1)
 
 	const deleteVideo = () => {
 		Axios.delete(`${serverConfig.source}/video/${video.id}`).then(() => {
-			window.location.href = '/video'
+			window.location.href = '/'
 		})
 	}
 
@@ -1027,6 +904,9 @@ const VideoPlayer = ({
 	}
 
 	const handleKeyPress = (key: string, e: KeyboardEvent) => {
+		//@ts-ignore
+		if (e.target.tagName === 'INPUT') return
+
 		e.preventDefault()
 
 		const player = getPlayer()
@@ -1072,7 +952,7 @@ const VideoPlayer = ({
 						options={{
 							controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'settings'],
 							settings: ['speed'],
-							speed: { selected: 1, options: [0.5, 1, 1.5, 2] },
+							speed: { selected: 1, options: [0.75, 1, 1.25] },
 							hideControls: false,
 							ratio: '21:9',
 							keyboard: { focused: false },

@@ -2,12 +2,11 @@ import { useState, useEffect } from 'react'
 
 import { Grid, TextField, Card, CardMedia, CardActionArea, CardContent, Button, Link, Typography } from '@mui/material'
 
-import Axios from 'axios'
-
 import './stars.scss'
 
 import { server as serverConfig } from '@/config'
-import { AxiosData, IGeneral } from '@/interfaces'
+import { IGeneral } from '@/interfaces'
+import { starApi } from '@/api'
 
 interface IStar extends IGeneral {
 	image: string | null
@@ -54,32 +53,36 @@ const StarsPage = () => {
 	const [missing, setMissing] = useState<IMissing[]>([])
 	const [videoStars, setVideoStars] = useState<IMissing[]>([])
 	const [input, setInput] = useState('')
+	const [activeStar, setActiveStar] = useState<string>()
 
 	const [index, setIndex] = useState(0)
 
 	useEffect(() => {
-		Axios.get(`${serverConfig.api}/star/missing`).then(
-			({ data }: AxiosData<{ missing: IMissing[]; stars: IStar[] }>) => {
-				const imported = data.stars.map((item) => item.name)
+		starApi.getMissing<IMissing, IStar>().then(({ data }) => {
+			const imported = data.stars.map((item) => item.name)
 
-				const filtered = data.missing.filter((star, index, self) => {
-					return index === self.findIndex((item) => item.name === star.name && !imported.includes(star.name))
-				})
+			const filtered = data.missing.filter((star, idx, self) => {
+				return idx === self.findIndex((item) => item.name === star.name && !imported.includes(star.name))
+			})
 
-				setStars(data.stars)
-				setMissing(filtered)
-				setVideoStars(data.missing)
-			}
-		)
+			setStars(data.stars)
+			setMissing(filtered)
+			setVideoStars(data.missing)
+		})
 	}, [])
 
 	useEffect(() => {
 		if (missing.length) setInput(missing[index].name)
 	}, [missing, index])
 
+	useEffect(() => {
+		setActiveStar(stars.find((s) => s.name === localStorage.starInput)?.name)
+	}, [stars])
+
 	const handleSubmit = () => {
 		if (input.length) {
-			Axios.post(`${serverConfig.api}/star`, { name: input }).finally(() => {
+			localStorage.starInput = input
+			starApi.addStar(input).finally(() => {
 				window.location.reload()
 			})
 		}
@@ -87,7 +90,7 @@ const StarsPage = () => {
 
 	return (
 		<Grid container justifyContent='center' id='stars-page'>
-			<form noValidate>
+			<form noValidate onSubmit={handleSubmit}>
 				<TextField variant='standard' value={input} onChange={(e) => setInput(e.currentTarget.value)} />
 
 				<IndexChanger total={missing} index={index} setIndex={setIndex} />
@@ -96,7 +99,7 @@ const StarsPage = () => {
 					size='small'
 					variant='contained'
 					color='primary'
-					onClick={handleSubmit}
+					type='submit'
 					style={{ marginLeft: 5, marginTop: 1 }}
 				>{`Add Star ${missing.length ? `(${index + 1} of ${missing.length})` : ''}`}</Button>
 			</form>
@@ -114,7 +117,9 @@ const StarsPage = () => {
 											<CardMedia src={`${serverConfig.source}/star/${star.id}`} component='img' />
 										) : null}
 
-										<CardContent>
+										<CardContent
+											style={activeStar === star.name ? { backgroundColor: 'orange' } : {}}
+										>
 											<Typography>{star.name}</Typography>
 										</CardContent>
 									</CardActionArea>

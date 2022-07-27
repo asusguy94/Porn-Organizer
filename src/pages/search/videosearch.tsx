@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 import {
 	Box,
@@ -13,11 +13,12 @@ import {
 	Radio,
 	RadioGroup,
 	Select,
+	SelectChangeEvent,
 	TextField,
 	Typography
 } from '@mui/material'
 
-import Axios from 'axios'
+import KeyboardEventHandler from 'react-keyboard-event-handler'
 import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
 
@@ -35,15 +36,15 @@ import {
 	ILocation,
 	IQuality,
 	ISetState,
-	IWebsite,
-	ISite,
+	IWebsiteWithSites as IWebsite,
 	IGeneral,
-	AxiosData
+	IndexType
 } from '@/interfaces'
 
 import './search.scss'
 
 import { server as serverConfig } from '@/config'
+import { attributeApi, categoryApi, locationApi, searchApi, websiteApi } from '@/api'
 
 interface IVideo extends IGeneral {
 	ageInVideo: number
@@ -71,7 +72,6 @@ interface IVideo extends IGeneral {
 		pov: boolean
 		notPov: boolean
 		website: boolean
-		site: boolean
 	}
 }
 
@@ -80,7 +80,42 @@ interface IVideoData {
 	attributes: IAttribute[]
 	locations: ILocation[]
 	websites: IWebsite[]
-	sites: ISite[]
+}
+
+interface IVideo extends IGeneral {
+	ageInVideo: number
+	attributes: string[]
+	categories: string[]
+	date: string
+	image: string
+	locations: string[]
+	plays: number
+	pov: boolean
+	quality: IQuality
+	site: string
+	star: string
+	website: string
+	hidden: {
+		category: string[]
+		notCategory: string[]
+		attribute: string[]
+		notAttribute: string[]
+		location: string[]
+		notLocation: string[]
+		titleSearch: boolean
+		noCategory: boolean
+		notNoCategory: boolean
+		pov: boolean
+		notPov: boolean
+		website: boolean
+	}
+}
+
+interface IVideoData {
+	categories: ICategory[]
+	attributes: IAttribute[]
+	locations: ILocation[]
+	websites: IWebsite[]
 }
 
 const VideoSearchPage = () => {
@@ -90,56 +125,87 @@ const VideoSearchPage = () => {
 	const [attributes, setAttributes] = useState<IAttribute[]>([])
 	const [locations, setLocations] = useState<ILocation[]>([])
 	const [websites, setWebsites] = useState<IWebsite[]>([])
-	const [sites, setSites] = useState<ISite[]>([])
+
+	const inputRef = useRef<HTMLInputElement>()
+
+	const handleKeyPress = (key: string, e: KeyboardEvent) => {
+		e.preventDefault()
+
+		switch (key) {
+			case 'ctrl+f':
+				inputRef.current?.focus()
+				break
+			default:
+				console.log(`${key} was pressed`)
+		}
+	}
 
 	useEffect(() => {
-		Axios.get(`${serverConfig.api}/search/video`).then(({ data }) => {
-			setVideos(
-				data.filter((video: any) => {
-					video.hidden = {
-						category: [],
-						notCategory: [],
-						attribute: [],
-						notAttribute: [],
-						location: [],
-						notLocation: [],
-						titleSearch: false,
-						noCategory: false,
-						notNoCategory: false,
-						pov: false,
-						notPov: false,
-						website: false,
-                        site: false
-					}
-
-					if (video.quality === 0) return null
-
-					return video
-				})
-			)
-
-			Axios.get(`${serverConfig.api}/category`).then(({ data }) => setCategories(data))
-			Axios.get(`${serverConfig.api}/attribute`).then(({ data }) => setAttributes(data))
-			Axios.get(`${serverConfig.api}/location`).then(({ data }) => setLocations(data))
-			Axios.get(`${serverConfig.api}/website`).then(({ data }) => setWebsites(data))
+		loadVideos().then(() => {
+			categoryApi.getAll().then(({ data }) => setCategories(data))
+			attributeApi.getAll().then(({ data }) => setAttributes(data))
+			locationApi.getAll().then(({ data }) => setLocations(data))
+			websiteApi.getAll<IWebsite>().then(({ data }) => setWebsites(data))
 		})
 	}, [])
+
+	const loadVideos = async () => {
+		return searchApi.getVideos<IVideo[]>().then(({ data }) => {
+			const websiteInfo: IndexType<number> = {
+				
+			}
+			//+1 if finished!
+
+			setVideos(
+				data
+					.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+					.filter((v) => v.website in websiteInfo && websiteInfo[v.website]-- > 1)
+					.filter((v) => !v.attributes.includes('video-unplayable')) //FIXME broken file/stream?
+					.map((video) => {
+						return {
+							...video,
+							hidden: {
+								category: [],
+								notCategory: [],
+								attribute: [],
+								notAttribute: [],
+								location: [],
+								notLocation: [],
+								titleSearch: false,
+								noCategory: !(video.categories.length === 0),
+								notNoCategory: false,
+								pov: false,
+								notPov: false,
+								website: false
+							}
+						}
+					})
+			)
+		})
+	}
 
 	return (
 		<Grid container id='search-page'>
 			<Grid item xs={2}>
 				<Sidebar
-					videoData={{ categories, attributes, locations, websites, sites }}
+					videoData={{ categories, attributes, locations, websites }}
 					videos={videos}
 					update={setVideos}
+					inputRef={inputRef}
 				/>
 			</Grid>
 
 			<Grid item xs={10}>
+				<div className='text-center'>
+					<Button variant='contained' onClick={loadVideos}>
+						ReLoad
+					</Button>
+				</div>
 				{videos.length ? <Videos videos={videos} /> : <Spinner />}
 			</Grid>
 
 			<ScrollToTop smooth />
+			<KeyboardEventHandler handleKeys={['ctrl+f']} onKeyEvent={handleKeyPress} handleFocusableElements={true} />
 		</Grid>
 	)
 }
@@ -188,10 +254,11 @@ interface SidebarProps {
 	videoData: IVideoData
 	videos: IVideo[]
 	update: ISetState<IVideo[]>
+	inputRef: any
 }
-const Sidebar = ({ videoData, videos, update }: SidebarProps) => (
+const Sidebar = ({ videoData, videos, update, inputRef }: SidebarProps) => (
 	<>
-		<TitleSearch videos={videos} update={update} />
+		<TitleSearch videos={videos} update={update} inputRef={inputRef} />
 
 		<Sort videos={videos} update={update} />
 
@@ -202,8 +269,9 @@ const Sidebar = ({ videoData, videos, update }: SidebarProps) => (
 interface TitleSearchProps {
 	update: ISetState<IVideo[]>
 	videos: IVideo[]
+	inputRef: any
 }
-const TitleSearch = ({ update, videos }: TitleSearchProps) => {
+const TitleSearch = ({ update, videos, inputRef }: TitleSearchProps) => {
 	const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = e.currentTarget.value.toLowerCase()
 
@@ -218,7 +286,7 @@ const TitleSearch = ({ update, videos }: TitleSearchProps) => {
 		)
 	}
 
-	return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} />
+	return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} inputRef={inputRef} />
 }
 
 interface SortProps {
@@ -269,6 +337,15 @@ const Sort = ({ videos, update }: SortProps) => {
 		update(
 			[...videos].sort((a, b) => {
 				const result = a.plays - b.plays
+				return reverse ? result * -1 : result
+			})
+		)
+	}
+
+	const sortTitleLength = (reverse = false) => {
+		update(
+			[...videos].sort((a, b) => {
+				const result = a.name.length - b.name.length
 				return reverse ? result * -1 : result
 			})
 		)
@@ -333,6 +410,19 @@ const Sort = ({ videos, update }: SortProps) => {
 						control={<Radio />}
 						onChange={() => sortPlays()}
 					/>
+
+					<FormControlLabel
+						label='Longest Title'
+						value='title-len'
+						control={<Radio />}
+						onChange={() => sortTitleLength(true)}
+					/>
+					<FormControlLabel
+						label='Shortest Title'
+						value='title-len_desc'
+						control={<Radio />}
+						onChange={() => sortTitleLength()}
+					/>
 				</RadioGroup>
 			</FormControl>
 		</>
@@ -345,35 +435,29 @@ interface FilterProps {
 	update: ISetState<IVideo[]>
 }
 const Filter = ({ videoData, videos, update }: FilterProps) => {
-	const website = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const targetLower = e.target.value.toLowerCase()
+	const website = (e: SelectChangeEvent<string>) => {
+		const websiteObj: IWebsite = JSON.parse(e.target.value)
 
 		update(
 			[...videos].map((video) => {
-				if (targetLower === 'all') {
+				if (websiteObj.name === 'ALL') {
 					return { ...video, hidden: { ...video.hidden, website: false } }
-				}
-
-				return {
-					...video,
-					hidden: { ...video.hidden, website: !(video.website?.toLowerCase() === targetLower) }
-				}
-			})
-		)
-	}
-
-	const site = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const targetLower = e.target.value.toLowerCase()
-
-		update(
-			[...videos].map((video) => {
-				if (targetLower === 'all') {
-					return { ...video, hidden: { ...video.hidden, site: false } }
-				}
-
-				return {
-					...video,
-					hidden: { ...video.hidden, site: !(video.site?.toLowerCase() === targetLower) }
+				} else if (websiteObj.sites.length === 0) {
+					return {
+						...video,
+						hidden: {
+							...video.hidden,
+							website: !(video.website.toLowerCase() === websiteObj.name.toLowerCase())
+						}
+					}
+				} else {
+					return {
+						...video,
+						hidden: {
+							...video.hidden,
+							website: !(video.site.toLowerCase() === websiteObj.sites[0].name.toLowerCase())
+						}
+					}
 				}
 			})
 		)
@@ -513,8 +597,7 @@ const Filter = ({ videoData, videos, update }: FilterProps) => {
 
 	return (
 		<>
-			<FilterDropdown data={videoData.websites} label='website' callback={website} />
-			<FilterDropdown data={videoData.sites} label='site' callback={site} />
+			<WebsiteDropdown websites={videoData.websites} label='website' callback={website} />
 
 			<FilterObj
 				data={videoData.categories}
@@ -554,71 +637,85 @@ const FilterObj = ({
 	otherCallback = null,
 	otherCallbackLabel = ''
 }: FilterObjProps) => (
-		<>
-			<h2>{capitalize(label, true)}</h2>
-
-			<FormControl>
-				{nullCallback !== null ? (
-					<IndeterminateItem
-						label={<div className='global-category'>NULL</div>}
-						value='NULL'
-						callback={(ref: any) => nullCallback(ref)}
-					/>
-				) : null}
-
-				{otherCallback !== null ? (
-					<IndeterminateItem
-						label={<div className='global-category'>{otherCallbackLabel.toUpperCase()}</div>}
-						value='OTHER'
-						callback={(ref: any) => otherCallback(ref)}
-					/>
-				) : null}
-
-				{data.map((item: any) => (
-					<IndeterminateItem
-						key={item.id}
-						label={
-							<>
-							{item.name} <LabelCount prop={labelPlural ?? `${label}s`} label={item.name} obj={obj} />
-							</>
-						}
-						value={item.name}
-						item={item}
-						callback={(ref: any, item: any) => callback(ref, item)}
-					/>
-				))}
-			</FormControl>
-		</>
-	)
-
-interface FilterDropdownProps {
-	data: IGeneral[]
-	label: string
-	labelPlural?: string
-	callback: any
-}
-const FilterDropdown = ({ data, label, labelPlural, callback }: FilterDropdownProps) => (
 	<>
 		<h2>{capitalize(label, true)}</h2>
 
 		<FormControl>
-			<Select
-				variant='standard'
-				id={label}
-				name={labelPlural ?? `${label}s`}
-				defaultValue='ALL'
-				onChange={callback}
-			>
-				<MenuItem value='ALL'>All</MenuItem>
+			{nullCallback !== null ? (
+				<IndeterminateItem
+					label={<div className='global-category'>NULL</div>}
+					value='NULL'
+					callback={(ref: any) => nullCallback(ref)}
+				/>
+			) : null}
 
-				{data.map((item) => (
-					<MenuItem key={item.id} value={item.name}>
-						{item.name}
-					</MenuItem>
-				))}
-			</Select>
+			{otherCallback !== null ? (
+				<IndeterminateItem
+					label={<div className='global-category'>{otherCallbackLabel.toUpperCase()}</div>}
+					value='OTHER'
+					callback={(ref: any) => otherCallback(ref)}
+				/>
+			) : null}
+
+			{data.map((item: any) => (
+				<IndeterminateItem
+					key={item.id}
+					label={
+						<>
+							{item.name} <LabelCount prop={labelPlural ?? `${label}s`} label={item.name} obj={obj} />
+						</>
+					}
+					value={item.name}
+					item={item}
+					callback={(ref: any, item: any) => callback(ref, item)}
+				/>
+			))}
 		</FormControl>
 	</>
 )
+
+interface WebsiteDropdownProps {
+	websites: IWebsite[]
+	label: string
+	labelPlural?: string
+	callback: (e: SelectChangeEvent<string>) => void
+}
+const WebsiteDropdown = ({ websites, label, labelPlural, callback }: WebsiteDropdownProps) => {
+	const defaultValue = JSON.stringify({ name: 'ALL' })
+
+	return (
+		<>
+			<h2>{capitalize(label, true)}</h2>
+
+			<FormControl>
+				<Select
+					variant='standard'
+					id={label}
+					name={labelPlural ?? `${label}s`}
+					defaultValue={defaultValue}
+					onChange={callback}
+				>
+					<MenuItem value={defaultValue}>All</MenuItem>
+
+					{websites.map((website) => [
+						<MenuItem key={website.id.toString()} value={JSON.stringify({ ...website, sites: [] })}>
+							{website.name}
+						</MenuItem>,
+						website.sites.map((site) => (
+							<MenuItem
+								key={`${website.id}-${site.id}`}
+								value={JSON.stringify({
+									...website,
+									sites: [site]
+								})}
+							>
+								{website.name} / {site.name}
+							</MenuItem>
+						))
+					])}
+				</Select>
+			</FormControl>
+		</>
+	)
 
 export default VideoSearchPage

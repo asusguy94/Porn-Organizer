@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { Grid, Box } from '@mui/material'
 
-import Axios from 'axios'
+import axios from 'axios'
 import capitalize from 'capitalize'
 
 import Ribbon from '@components/ribbon/ribbon'
@@ -33,7 +33,7 @@ export const HomeColumn = ({ enabled = true, label, rows = 1, limit = -1, colSiz
 
 	useEffect(() => {
 		if (enabled) {
-			Axios.get(`${serverConfig.api}/home/${label}/${limit}`).then(({ data }) => setData(data))
+			axios.get(`${serverConfig.api}/home/${label}/${limit}`).then(({ data }) => setData(data))
 		}
 	}, [])
 
@@ -45,9 +45,9 @@ export const HomeColumn = ({ enabled = true, label, rows = 1, limit = -1, colSiz
 				{capitalize(label)} (<span className='count'>{data.length}</span>)
 			</h2>
 
-			<Grid container spacing={2}>
+			<Grid container spacing={2} columns={colSize}>
 				{data.map((video) => (
-					<Grid item xs={1} key={video.id} columns={colSize}>
+					<Grid item xs={1} key={video.id}>
 						<Link to={`/video/${video.id}`}>
 							<Box className='video ribbon-container'>
 								<img

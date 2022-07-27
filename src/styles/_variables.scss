@@ -1,9 +1,8 @@
 // Bookmarks
-$bookmarkRows: 5; // number of nested bookmarks
-$totalBookmarkRows: $bookmarkRows * 2;
+$bookmarkCols: 7;
+$bookmarkRows: 1;
 
-// Player
-$maxPlayerHeight: 64vh;
+$initialHeight: 83vh;
 
 // Navbar
 $navElementsRight: 3;
