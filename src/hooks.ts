@@ -7,8 +7,6 @@ export const useRefWithEffect = () => {
 	return [ref, refValue]
 }
 
-export const setFocus = (input: any) => input && input.focus()
-
 export const useWindowSize = () => {
 	const [windowSize, setWindowSize] = useState({ width: 0, height: 0 })
 

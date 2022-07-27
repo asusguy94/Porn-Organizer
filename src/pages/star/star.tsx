@@ -23,17 +23,41 @@ import { Flipper, Flipped } from 'react-flip-toolkit'
 
 import RouterLink from '@components/router-link/router-link'
 import Modal from '@components/modal/modal'
-import { DaysToYears } from '@components/date/date'
+import { daysToYears } from '@components/date/date'
 import Ribbon from '@components/ribbon/ribbon'
 
 import './star.scss'
 
 import { server as serverConfig, theme as themeConfig } from '@/config'
 
-import { ICountry, ISimilar } from '@/interfaces'
+import { AxiosData, ICountry, IGeneral, ISetState, ISimilar, IStarVideo } from '@/interfaces'
 
 const ModalContext = createContext((...args: any): void => {})
 const UpdateContext = createContext({ star: (star: any): void => {} })
+
+interface IStar extends IGeneral {
+	image: string
+	ignored: boolean
+	info: {
+		breast: string
+		eyecolor: string
+		haircolor: string
+		ethnicity: string
+		country: ICountry
+		birthdate: string
+		height: number
+		weight: number
+	}
+	similar: ISimilar[]
+}
+
+interface IStarData {
+	breast: string[]
+	country: ICountry[]
+	ethnicity: string[]
+	eyecolor: string[]
+	haircolor: string[]
+}
 
 //TODO state is very complex
 const StarPage = () => {
@@ -46,17 +70,17 @@ const StarPage = () => {
 		filter: false
 	})
 
-	const [star, setStar] = useState({
+	const [star, setStar] = useState<IStar>({
 		id: 0,
 		name: '',
 		image: '',
-		ignored: 0,
+		ignored: false,
 		info: {
 			breast: '',
 			eyecolor: '',
 			haircolor: '',
 			ethnicity: '',
-			county: {
+			country: {
 				name: '',
 				code: ''
 			},
@@ -67,7 +91,7 @@ const StarPage = () => {
 		similar: []
 	})
 
-	const [starData, setStarData] = useState({
+	const [starData, setStarData] = useState<IStarData>({
 		breast: [],
 		eyecolor: [],
 		haircolor: [],
@@ -75,16 +99,24 @@ const StarPage = () => {
 		country: []
 	})
 
-	const [videos, setVideos] = useState([])
+	const [videos, setVideos] = useState<IStarVideo[]>([])
 
 	const handleModal = (title = null, data = null, filter = false) => {
 		setModal((prevModal) => ({ title, data, visible: !prevModal.visible, filter }))
 	}
 
 	useEffect(() => {
-		Axios.get(`${serverConfig.api}/star`).then(({ data }) => setStarData(data))
-		Axios.get(`${serverConfig.api}/star/${id}`).then(({ data }) => setStar(data))
-		Axios.get(`${serverConfig.api}/star/${id}/video`).then(({ data }) => setVideos(data))
+		Axios.get(`${serverConfig.api}/star`).then(({ data }: AxiosData<IStarData>) => {
+			setStarData(data)
+		})
+
+		Axios.get(`${serverConfig.api}/star/${id}`).then(({ data }: AxiosData<IStar>) => {
+			setStar(data)
+		})
+
+		Axios.get(`${serverConfig.api}/star/${id}/video`).then(({ data }: AxiosData<IStarVideo[]>) => {
+			setVideos(data)
+		})
 	}, [])
 
 	return (
@@ -120,12 +152,12 @@ const StarPage = () => {
 	)
 }
 
-// Wrapper
-const StarTitle = ({ star }: any) => {
+interface StarTitleProps {
+	star: IStar
+}
+const StarTitle = ({ star }: StarTitleProps) => {
 	const handleModal = useContext(ModalContext)
 	const update = useContext(UpdateContext).star
-
-	const isIgnored = star.ignored === 1
 
 	const copy = async () => await navigator.clipboard.writeText(star.name)
 
@@ -136,7 +168,7 @@ const StarTitle = ({ star }: any) => {
 	}
 
 	const ignoreStar = () => {
-		Axios.put(`${serverConfig.api}/star/${star.id}`, { ignore: +!star.ignored }).then(({ data }) => {
+		Axios.put(`${serverConfig.api}/star/${star.id}`, { ignore: !star.ignored }).then(({ data }) => {
 			update({ ...star, ignored: data.autoTaggerIgnore })
 		})
 	}
@@ -152,7 +184,7 @@ const StarTitle = ({ star }: any) => {
 		<Box>
 			<Box className='d-inline-block'>
 				<ContextMenuTrigger id='title'>
-					<h2 className={isIgnored ? 'ignored' : ''}>{star.name}</h2>
+					<h2 className={star.ignored ? 'ignored' : ''}>{star.name}</h2>
 				</ContextMenuTrigger>
 			</Box>
 
@@ -170,8 +202,7 @@ const StarTitle = ({ star }: any) => {
 									if (e.key === 'Enter') {
 										handleModal()
 
-										//@ts-ignore
-										renameStar(e.target.value)
+										renameStar((e.target as HTMLInputElement).value)
 									}
 								}}
 							/>
@@ -193,8 +224,7 @@ const StarTitle = ({ star }: any) => {
 									if (e.key === 'Enter') {
 										handleModal()
 
-										//@ts-ignore
-										addAlias(e.target.value)
+										addAlias((e.target as HTMLInputElement).value)
 									}
 								}}
 							/>
@@ -205,7 +235,7 @@ const StarTitle = ({ star }: any) => {
 				</MenuItem>
 
 				<MenuItem onClick={ignoreStar}>
-					{isIgnored ? (
+					{star.ignored ? (
 						<>
 							<i className={themeConfig.icons['toggle-yes']} /> Enable Star
 						</>
@@ -226,7 +256,11 @@ const StarTitle = ({ star }: any) => {
 	)
 }
 
-const Sidebar = ({ similar }: { similar: ISimilar[] }) => (
+interface SidebarProps {
+	similar: ISimilar[]
+}
+
+const Sidebar = ({ similar }: SidebarProps) => (
 	<Card>
 		<Typography variant='h5' className='text-center'>
 			Similar Stars
@@ -250,7 +284,10 @@ const Sidebar = ({ similar }: { similar: ISimilar[] }) => (
 	</Card>
 )
 
-const StarImageDropbox = ({ star }: any) => {
+interface StarImageDropboxProps {
+	star: IStar
+}
+const StarImageDropbox = ({ star }: StarImageDropboxProps) => {
 	const update = useContext(UpdateContext).star
 
 	const [hover, setHover] = useState(false)
@@ -355,25 +392,18 @@ const StarImageDropbox = ({ star }: any) => {
 	)
 }
 
-// Container
-interface IStarForm {
+interface StarFormProps {
 	star: {
 		id: number
-		ignored: number
+		ignored: boolean
 		image: string
 		info: any
 		name: string
 		similar: ISimilar[]
 	}
-	starData: {
-		breast: string[]
-		country: ICountry[]
-		ethnicity: string[]
-		eyecolor: string[]
-		haircolor: string[]
-	}
+	starData: IStarData
 }
-const StarForm = ({ star, starData }: IStarForm) => {
+const StarForm = ({ star, starData }: StarFormProps) => {
 	const handleModal = useContext(ModalContext)
 	const update = useContext(UpdateContext).star
 
@@ -420,8 +450,7 @@ const StarForm = ({ star, starData }: IStarForm) => {
 									if (e.key === 'Enter') {
 										handleModal()
 
-										//@ts-ignore
-										freeones(e.target.value)
+										freeones((e.target as HTMLInputElement).value)
 									}
 								}}
 							/>
@@ -441,8 +470,8 @@ const StarForm = ({ star, starData }: IStarForm) => {
 						className='action__item'
 						onClick={() => freeones()}
 					>
-					Get Data
-				</Button>
+						Get Data
+					</Button>
 				</ContextMenuTrigger>
 
 				<Button
@@ -456,7 +485,13 @@ const StarForm = ({ star, starData }: IStarForm) => {
 				</Button>
 			</Box>
 
-			<StarInputForm update={updateInfo} name='Breast' value={star.info.breast} list={starData.breast} />
+			<StarInputForm
+				update={updateInfo}
+				name='Breast'
+				value={star.info.breast}
+				list={starData.breast}
+				capitalize
+			/>
 			<StarInputForm update={updateInfo} name='EyeColor' value={star.info.eyecolor} list={starData.eyecolor} />
 			<StarInputForm update={updateInfo} name='HairColor' value={star.info.haircolor} list={starData.haircolor} />
 			<StarInputForm update={updateInfo} name='Ethnicity' value={star.info.ethnicity} list={starData.ethnicity} />
@@ -470,22 +505,12 @@ const StarForm = ({ star, starData }: IStarForm) => {
 	)
 }
 
-interface IStarVideos {
-	videos: {
-		id: number
-		name: string
-		image: string
-		date: string
-		fname: string
-		website: string
-		site: string
-		age: number
-		hidden: boolean
-	}[]
+interface StarVideosProps {
+	videos: IStarVideo[]
 	similar: ISimilar[]
-	update: any
+	update: ISetState<IStarVideo[]>
 }
-const StarVideos = ({ videos, update, similar }: IStarVideos) => {
+const StarVideos = ({ videos, update, similar }: StarVideosProps) => {
 	const [websites, setWebsites] = useState<string[]>([])
 	const [websiteFocus, setWebsiteFocus] = useState<String[]>([])
 
@@ -509,7 +534,7 @@ const StarVideos = ({ videos, update, similar }: IStarVideos) => {
 			{similar.some((star) => star.match === 100) ? (
 				<Alert severity='warning' className='alert'>
 					<AlertTitle>
-						Duplicate Star (<strong>{similar.filter((star) => star.match === 100).length}</strong>)
+						Possible Duplicates: <strong>{similar.filter((star) => star.match === 100).length}</strong>
 					</AlertTitle>
 				</Alert>
 			) : null}
@@ -535,9 +560,9 @@ const StarVideos = ({ videos, update, similar }: IStarVideos) => {
 			<Flipper flipKey={videos}>
 				<Grid container id='videos'>
 					{videos.map((video, i) => {
-							if (!websites.includes(video.website)) {
-								setWebsites([...websites, video.website])
-							}
+						if (!websites.includes(video.website)) {
+							setWebsites([...websites, video.website])
+						}
 
 						video.hidden = websiteFocus.length > 0 && !websiteFocus.includes(video.website)
 
@@ -565,13 +590,21 @@ const StarVideos = ({ videos, update, similar }: IStarVideos) => {
 }
 
 // ContainerItem
-interface IStarInputForm {
+interface StarInputFormProps {
 	update: (value: string, label: string) => void
 	value: string
 	name: string
 	list?: (string | ICountry)[]
+	capitalize?: boolean
 }
-const StarInputForm: React.FC<IStarInputForm> = ({ update, value, name, list = [], children }) => {
+const StarInputForm: React.FC<StarInputFormProps> = ({
+	update,
+	value,
+	name,
+	list = [],
+	children,
+	capitalize = false
+}) => {
 	const hasDropdown = list.length > 0
 
 	const [open, setOpen] = useState(false)
@@ -621,6 +654,7 @@ const StarInputForm: React.FC<IStarInputForm> = ({ update, value, name, list = [
 							label={name}
 							error={isChanged}
 							InputLabelProps={{ shrink: shouldShrink }}
+							className={capitalize ? 'capitalize' : ''}
 						/>
 					)}
 					autoHighlight
@@ -643,13 +677,13 @@ const StarInputForm: React.FC<IStarInputForm> = ({ update, value, name, list = [
 	)
 }
 
-interface IStarVideo {
-	video: any
+interface StarVideoProps {
+	video: IStarVideo
 	isFirst: boolean
 	isLast: boolean
 	isHidden: boolean
 }
-const StarVideo = ({ video, isFirst, isLast, isHidden }: IStarVideo) => {
+const StarVideo = ({ video, isFirst, isLast, isHidden }: StarVideoProps) => {
 	const [src, setSrc] = useState('')
 	const [dataSrc, setDataSrc] = useState(`${serverConfig.source}/videos/${video.fname}`)
 
@@ -692,23 +726,23 @@ const StarVideo = ({ video, isFirst, isLast, isHidden }: IStarVideo) => {
 		}, duration * 1000)
 	}
 
-	const stopThumbnailPlayback = async (video: any) => {
+	const stopThumbnailPlayback = async (video: HTMLVideoElement) => {
 		stopFrom(video)
 
 		clearInterval(thumbnail.current)
 	}
 
-	const handleMouseEnter = ({ target }: { target: React.ReactNode }) => {
+	const handleMouseEnter = ({ target }: any) => {
 		if (!isHidden) {
-		if (dataSrc.length && !src.length) {
-			reload().then(() => startThumbnailPlayback(target))
+			if (dataSrc.length && !src.length) {
+				reload().then(() => startThumbnailPlayback(target))
 			}
 		}
 	}
 
-	const handleMouseLeave = ({ target }: { target: React.ReactNode }) => {
+	const handleMouseLeave = (e: React.MouseEvent<HTMLVideoElement>) => {
 		if (!dataSrc.length && src.length) {
-			stopThumbnailPlayback(target).then(() => unload())
+			stopThumbnailPlayback(e.currentTarget).then(() => unload())
 		}
 	}
 
@@ -741,8 +775,7 @@ const StarVideo = ({ video, isFirst, isLast, isHidden }: IStarVideo) => {
 
 					<Ribbon isFirst={isFirst} isLast={isLast} align='left' />
 
-					{/* @ts-ignore */}
-					{video.age ? <Ribbon label={<DaysToYears days={video.age} />} /> : null}
+					{video.age ? <Ribbon label={daysToYears(video.age)} /> : null}
 				</CardContent>
 			</CardActionArea>
 		</Card>

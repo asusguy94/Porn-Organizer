@@ -1,23 +1,33 @@
-import React from 'react'
+// Common Types
+export type ISetState<T> = (input: T) => void
 
-export interface IAttribute {
+// Common Interfaces
+export interface IGeneral {
 	id: number
 	name: string
 }
 
-export interface ILocation {
-	id: number
-	name: string
+export interface AxiosData<T> {
+	data: T
 }
 
-export interface ICategory {
-	id: number
-	name: string
-}
+// Other Types
+export type IQuality = 1080 | 720 | 480 | 360 | 0
+export type ILevels = { [key: string]: number }
+
+// Other Interfaces
+export interface IAttribute extends IGeneral {}
+export interface ILocation extends IGeneral {}
+export interface ICategory extends IGeneral {}
+export interface IWebsite extends IGeneral {}
+export interface ISite extends IGeneral {}
 
 export interface IBookmark {
 	id: number
-	name: string
+	category: {
+		id: number
+		name: string
+	}
 	start: number
 }
 
@@ -26,6 +36,8 @@ export interface ICountry {
 	name: string
 }
 
+export type ICountryExtended = ICountry & IGeneral
+
 export interface ISimilar {
 	id: number
 	name: string
@@ -33,24 +45,9 @@ export interface ISimilar {
 	match: number
 }
 
-export interface IModal {
-	title: string | null
-	data: any
-	filter?: boolean
-	visible: boolean
-}
-
-export interface IInput {
-	edit: boolean
-	value: null | string
-}
-
-export interface IVideo {
-	id: number
-	name: string
+export interface IVideo extends IGeneral {
 	duration: number
 	height?: number
-	nextID: number | null
 	plays: number
 	star: string
 	website: string
@@ -61,14 +58,18 @@ export interface IVideo {
 	path: { file: string; stream: string; dash: string }
 }
 
-export interface IVideoStar {
-	id: number
-	name: string
+export interface IVideoStar extends IGeneral {
 	image?: string
 	ageInVideo: number
 	numVideos: number
 }
 
-export interface IKeyPress extends React.KeyboardEvent {
-	target: HTMLInputElement
+export interface IStarVideo extends IGeneral {
+	image: string
+	date: string
+	fname: string
+	website: string
+	site: string
+	age: number
+	hidden: boolean
 }

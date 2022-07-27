@@ -3,13 +3,13 @@ import ReactDOM from 'react-dom'
 
 import { Card, CardContent, Button, Typography, Box } from '@mui/material'
 
-//@ts-ignore
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
 import './modal.scss'
 
 import { settings as settingsConfig } from '@/config'
 
+//FIXME opening another menu, while the previous one is open, should do something else?
 //TODO improve children, props.children, pros.filter, children=children.filter
 
 const Modal = (props: any) => {
@@ -83,8 +83,7 @@ const Modal = (props: any) => {
 				isDisabled={!props.visible}
 			/>
 		</>,
-		//@ts-ignore
-		document.getElementById('portal')
+		document.getElementById('portal') as Element
 	)
 }
 

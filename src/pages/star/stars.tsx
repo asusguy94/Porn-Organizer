@@ -7,11 +7,10 @@ import Axios from 'axios'
 import './stars.scss'
 
 import { server as serverConfig } from '@/config'
+import { AxiosData, IGeneral } from '@/interfaces'
 
-interface IStar {
-	id: number
-	name: string
-	image: string
+interface IStar extends IGeneral {
+	image: string | null
 }
 
 interface IMissing {
@@ -19,7 +18,12 @@ interface IMissing {
 	name: string
 }
 
-const IndexChanger = ({ total, index, setIndex }: any) => (
+interface IIndexChanger {
+	total: IMissing[]
+	index: number
+	setIndex: (index: number) => void
+}
+const IndexChanger = ({ total, index, setIndex }: IIndexChanger) => (
 	<span className='mx-1' style={total.length ? {} : { display: 'none' }}>
 		<Button
 			variant='outlined'
@@ -54,17 +58,19 @@ const StarsPage = () => {
 	const [index, setIndex] = useState(0)
 
 	useEffect(() => {
-		Axios.get(`${serverConfig.api}/star/missing`).then(({ data }) => {
-			const imported = data.stars.map((item: IStar) => item.name)
+		Axios.get(`${serverConfig.api}/star/missing`).then(
+			({ data }: AxiosData<{ missing: IMissing[]; stars: IStar[] }>) => {
+				const imported = data.stars.map((item) => item.name)
 
-			const filtered = data.missing.filter((star: IStar, index: number, self: IMissing[]) => {
-				return index === self.findIndex((item) => item.name === star.name && !imported.includes(star.name))
-			})
+				const filtered = data.missing.filter((star, index, self) => {
+					return index === self.findIndex((item) => item.name === star.name && !imported.includes(star.name))
+				})
 
-			setStars(data.stars)
-			setMissing(filtered)
-			setVideoStars(data.missing)
-		})
+				setStars(data.stars)
+				setMissing(filtered)
+				setVideoStars(data.missing)
+			}
+		)
 	}, [])
 
 	useEffect(() => {

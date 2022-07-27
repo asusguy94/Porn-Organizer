@@ -1,5 +1,11 @@
 // Bookmarks
-$bookmarkRows: 12; // number of rows of bookmarks
+$bookmarkRows: 5; // number of nested bookmarks
+$totalBookmarkRows: $bookmarkRows * 2;
+
+// Player
+$maxPlayerHeight: 64vh;
+
+// Navbar
 $navElementsRight: 3;
 
 // Video Thumbnails
@@ -11,4 +17,5 @@ $thumbnailHeight: ($thumbnailWidth / $aspectRatio);
 $starWidth: 200;
 $starHeight: 275;
 
+// Spinner Color
 $spinnerBlue: #3498db;

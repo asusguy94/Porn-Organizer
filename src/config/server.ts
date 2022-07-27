@@ -1,5 +1,7 @@
+const ip = '192.168.1.200'
+
 export default {
-	api: 'http://192.168.1.200:8090/api',
-	source: 'http://192.168.1.200:8090',
-	db: 'http://192.168.1.100:8080'
+	api: `http://${ip}:8091/api`,
+	source: `http://${ip}:8091`,
+	db: `http://${ip}:8080`
 }

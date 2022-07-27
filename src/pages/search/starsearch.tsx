@@ -28,13 +28,13 @@ import Badge from '@components/badge/badge'
 import Loader from '@components/spinner/spinner'
 import VGrid from '@components/virtualized/virtuoso'
 
+import { AxiosData, ICountry, IGeneral, ISetState, IWebsite } from '@/interfaces'
+
 import './search.scss'
 
 import { server as serverConfig } from '@/config'
 
-interface IStar {
-	id: number
-	name: string
+interface IStar extends IGeneral {
 	image: string
 	age: number
 	breast: string
@@ -51,50 +51,72 @@ interface IStar {
 		haircolor: boolean
 		ethnicity: boolean
 		country: boolean
+		website: boolean
 		noBreast: boolean
 	}
 }
 
-const StarSearchPage = () => {
-	const [stars, setStars] = useState([])
+interface IStarData {
+	breasts: string[]
+	haircolors: string[]
+	ethnicities: string[]
+	countries: ICountry[]
+	websites: IWebsite[]
+}
 
-	const [breasts, setBreasts] = useState([])
-	const [haircolors, setHaircolors] = useState([])
-	const [ethnicities, setEthnicities] = useState([])
-	const [countries, setCountries] = useState([])
+const StarSearchPage = () => {
+	const [stars, setStars] = useState<IStar[]>([])
+
+	const [breasts, setBreasts] = useState<string[]>([])
+	const [haircolors, setHaircolors] = useState<string[]>([])
+	const [ethnicities, setEthnicities] = useState<string[]>([])
+	const [countries, setCountries] = useState<ICountry[]>([])
+	const [websites, setWebsites] = useState<IWebsite[]>([])
 
 	useEffect(() => {
-		Axios.get(`${serverConfig.api}/search/star`).then(({ data }) => {
+		Axios.get(`${serverConfig.api}/search/star`).then(({ data }: AxiosData<IStar[]>) => {
 			setStars(
-				data.map((star: IStar) => {
-					star.hidden = {
-						titleSearch: false,
+				data.map((star) => {
+					return {
+						...star,
+						hidden: {
+							titleSearch: false,
 
-						breast: false,
-						haircolor: false,
-						ethnicity: false,
-						country: false,
+							breast: false,
+							haircolor: false,
+							ethnicity: false,
+							country: false,
+							website: false,
 
-						noBreast: false
+							noBreast: false
+						}
 					}
-
-					return star
 				})
 			)
 		})
 
-		Axios.get(`${serverConfig.api}/star`).then(({ data }) => {
-			setBreasts(data.breast)
-			setHaircolors(data.haircolor)
-			setEthnicities(data.ethnicity)
-			setCountries(data.country)
-		})
+		Axios.get(`${serverConfig.api}/star`).then(
+			({
+				data
+			}: AxiosData<{ breast: string[]; haircolor: string[]; ethnicity: string[]; country: ICountry[] }>) => {
+				setBreasts(data.breast)
+				setHaircolors(data.haircolor)
+				setEthnicities(data.ethnicity)
+				setCountries(data.country)
+			}
+		)
+
+		Axios.get(`${serverConfig.api}/website`).then(({ data }) => setWebsites(data))
 	}, [])
 
 	return (
 		<Grid container id='search-page'>
 			<Grid item xs={2}>
-				<Sidebar starData={{ breasts, haircolors, ethnicities, countries }} stars={stars} update={setStars} />
+				<Sidebar
+					starData={{ breasts, haircolors, ethnicities, countries, websites }}
+					stars={stars}
+					update={setStars}
+				/>
 			</Grid>
 
 			<Grid item xs={10}>
@@ -106,19 +128,25 @@ const StarSearchPage = () => {
 	)
 }
 
-// Wrapper
-const Stars = ({ stars }: { stars: IStar[] }) => {
+interface StarsProps {
+	stars: IStar[]
+}
+const Stars = ({ stars }: StarsProps) => {
 	const visibleStars = getVisible(stars)
 
 	return (
 		<Box id='stars'>
 			{stars.length ? (
 				<>
-			<Typography variant='h6' className='text-center'>
-				<span className='count'>{visibleStars.length}</span> Stars
-			</Typography>
+					<Typography variant='h6' className='text-center'>
+						<span className='count'>{visibleStars.length}</span> Stars
+					</Typography>
 
-			<VGrid items={visibleStars} renderData={(idx: number) => <StarCard star={visibleStars[idx]} />} />
+					<VGrid
+						itemHeight={309}
+						total={visibleStars.length}
+						renderData={(idx) => <StarCard star={visibleStars[idx]} />}
+					/>
 				</>
 			) : (
 				<Loader />
@@ -127,7 +155,10 @@ const Stars = ({ stars }: { stars: IStar[] }) => {
 	)
 }
 
-const StarCard = ({ star }: { star: IStar }) => (
+interface StarCardProps {
+	star: IStar
+}
+const StarCard = ({ star }: StarCardProps) => (
 	<a href={`/star/${star.id}`}>
 		<Card className='star ribbon-container'>
 			<Badge content={star.videoCount}>
@@ -143,12 +174,12 @@ const StarCard = ({ star }: { star: IStar }) => (
 	</a>
 )
 
-interface ISidebar {
-	starData: any
+interface SidebarProps {
+	starData: IStarData
 	stars: IStar[]
-	update: any
+	update: ISetState<IStar[]>
 }
-const Sidebar = ({ starData, stars, update }: ISidebar) => (
+const Sidebar = ({ starData, stars, update }: SidebarProps) => (
 	<>
 		<TitleSearch stars={stars} update={update} />
 
@@ -158,13 +189,12 @@ const Sidebar = ({ starData, stars, update }: ISidebar) => (
 	</>
 )
 
-// Container
-interface IFilter {
+interface FilterProps {
 	stars: IStar[]
-	starData: any
-	update: any
+	starData: IStarData
+	update: ISetState<IStar[]>
 }
-const Filter = ({ stars, starData, update }: IFilter) => {
+const Filter = ({ stars, starData, update }: FilterProps) => {
 	const breast = (target: string) => {
 		stars = stars.map((star) => {
 			star.hidden.noBreast = false
@@ -204,6 +234,22 @@ const Filter = ({ stars, starData, update }: IFilter) => {
 				star.hidden.country = false
 			} else {
 				star.hidden.country = star.country.toLowerCase() !== targetLower
+			}
+
+			return star
+		})
+
+		update(stars)
+	}
+
+	const website_DROP = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const targetLower = e.target.value.toLowerCase()
+
+		stars = stars.map((star) => {
+			if (targetLower === 'all') {
+				star.hidden.website = false
+			} else {
+				star.hidden.website = !star.websites.some((website) => website.toLowerCase() === targetLower)
 			}
 
 			return star
@@ -256,6 +302,7 @@ const Filter = ({ stars, starData, update }: IFilter) => {
 
 	return (
 		<>
+			<FilterDropdown data={starData.websites} label='website' callback={website_DROP} />
 			<FilterDropdown data={starData.countries} label='country' callback={country_DROP} />
 
 			<FilterItem
@@ -286,11 +333,11 @@ const Filter = ({ stars, starData, update }: IFilter) => {
 	)
 }
 
-interface ISort {
+interface SortProps {
 	stars: IStar[]
-	update: any
+	update: ISetState<IStar[]>
 }
-const Sort = ({ stars, update }: ISort) => {
+const Sort = ({ stars, update }: SortProps) => {
 	const sortDefault = (reverse = false) => {
 		update(
 			[...stars].sort((a, b) => {
@@ -385,36 +432,42 @@ const Sort = ({ stars, update }: ISort) => {
 	)
 }
 
-interface ITitleSearch {
+interface TitleSearchProps {
 	stars: IStar[]
-	update: any
+	update: ISetState<IStar[]>
 }
-const TitleSearch = ({ stars, update }: ITitleSearch) => {
+const TitleSearch = ({ stars, update }: TitleSearchProps) => {
 	const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = e.currentTarget.value.toLowerCase()
 
 		update(
-			stars.map((item) => {
-				item.hidden.titleSearch = !item.name.toLowerCase().includes(searchValue)
-
-				return item
-			})
+			stars.map((star) => ({
+				...star,
+				hidden: {
+					...star.hidden,
+					titleSearch: !star.name.toLowerCase().includes(searchValue)
+				}
+			}))
 		)
 	}
+
+	// TODO search by alias, and change result-title to the alias name
+	//! this might cause sort, methods to be broken
+	//! should stars be sorted by the visible name?
+	//! might cause flickering and difficulty to find a star by name
 
 	return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} />
 }
 
-// ContainerItem
-interface IFilterItem {
-	data: any[]
+interface FilterItemProps {
+	data: string[]
 	label: string
-	obj: any
+	obj: IStar[]
 	callback: any
-	globalCallback?: any
+	globalCallback?: (() => void) | null
 	nullCallback?: any
 }
-const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCallback = null }: IFilterItem) => (
+const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCallback = null }: FilterItemProps) => (
 	<>
 		<h2>{capitalize(label, true)}</h2>
 
@@ -456,23 +509,33 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 	</>
 )
 
-interface IFilterDropdown {
-	data: any[]
+interface FilterDropdownProps {
+	data: IStarData['countries'] | IStarData['websites']
 	label: string
-	callback: any
+	callback: (e: any) => void // TODO material-ui incompatible types
 }
-const FilterDropdown = ({ data, label, callback }: IFilterDropdown) => (
+const FilterDropdown = ({ data, label, callback }: FilterDropdownProps) => (
 	<>
 		<h2>{capitalize(label, true)}</h2>
 
 		<FormControl>
 			<Select variant='standard' id={label} defaultValue='ALL' onChange={callback}>
 				<MenuItem value='ALL'>All</MenuItem>
-				{data.map((item: { code: string; name: string }) => (
-					<MenuItem key={item.code} value={item.name}>
-						<i className={`flag flag-${item.code}`} style={{ marginRight: 4 }} /> {item.name}
-					</MenuItem>
-				))}
+				{data.map((item) => {
+					if ('code' in item) {
+						return (
+							<MenuItem key={item.code} value={item.name}>
+								<i className={`flag flag-${item.code}`} style={{ marginRight: 4 }} /> {item.name}
+							</MenuItem>
+						)
+					}
+
+					return (
+						<MenuItem key={item.name} value={item.name}>
+							{item.name}
+						</MenuItem>
+					)
+				})}
 			</Select>
 		</FormControl>
 	</>

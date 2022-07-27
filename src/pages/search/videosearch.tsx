@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 import {
 	Box,
+	Button,
 	Card,
 	CardActionArea,
 	CardMedia,
@@ -21,26 +22,75 @@ import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
 
 import { daysToYears } from '@components/date/date'
-import { Item as IndeterminateItem } from '@components/indeterminate/indeterminate'
+import IndeterminateItem, { HandlerProps as IndeterminateItemProps } from '@components/indeterminate/indeterminate'
 import LabelCount from '@components/labelcount/labelcount'
 import { getVisible } from '@components/search/helper'
 import Ribbon from '@components/ribbon/ribbon'
 import VGrid from '@components/virtualized/virtuoso'
 import Spinner from '@components/spinner/spinner'
 
-import { ICategory, IAttribute, ILocation } from '@/interfaces'
+import {
+	ICategory,
+	IAttribute,
+	ILocation,
+	IQuality,
+	ISetState,
+	IWebsite,
+	ISite,
+	IGeneral,
+	AxiosData
+} from '@/interfaces'
 
 import './search.scss'
 
 import { server as serverConfig } from '@/config'
 
+interface IVideo extends IGeneral {
+	ageInVideo: number
+	attributes: string[]
+	categories: string[]
+	date: string
+	image: string
+	locations: string[]
+	plays: number
+	pov: boolean
+	quality: IQuality
+	site: string
+	star: string
+	website: string
+	hidden: {
+		category: string[]
+		notCategory: string[]
+		attribute: string[]
+		notAttribute: string[]
+		location: string[]
+		notLocation: string[]
+		titleSearch: boolean
+		noCategory: boolean
+		notNoCategory: boolean
+		pov: boolean
+		notPov: boolean
+		website: boolean
+		site: boolean
+	}
+}
+
+interface IVideoData {
+	categories: ICategory[]
+	attributes: IAttribute[]
+	locations: ILocation[]
+	websites: IWebsite[]
+	sites: ISite[]
+}
+
 const VideoSearchPage = () => {
-	const [videos, setVideos] = useState([])
+	const [videos, setVideos] = useState<IVideo[]>([])
 
 	const [categories, setCategories] = useState<ICategory[]>([])
 	const [attributes, setAttributes] = useState<IAttribute[]>([])
 	const [locations, setLocations] = useState<ILocation[]>([])
-	const [websites, setWebsites] = useState<string[]>([])
+	const [websites, setWebsites] = useState<IWebsite[]>([])
+	const [sites, setSites] = useState<ISite[]>([])
 
 	useEffect(() => {
 		Axios.get(`${serverConfig.api}/search/video`).then(({ data }) => {
@@ -58,7 +108,8 @@ const VideoSearchPage = () => {
 						notNoCategory: false,
 						pov: false,
 						notPov: false,
-						website: false
+						website: false,
+                        site: false
 					}
 
 					if (video.quality === 0) return null
@@ -78,7 +129,7 @@ const VideoSearchPage = () => {
 		<Grid container id='search-page'>
 			<Grid item xs={2}>
 				<Sidebar
-					videoData={{ categories, attributes, locations, websites }}
+					videoData={{ categories, attributes, locations, websites, sites }}
 					videos={videos}
 					update={setVideos}
 				/>
@@ -93,8 +144,10 @@ const VideoSearchPage = () => {
 	)
 }
 
-// Wrapper
-const Videos = ({ videos }: any) => {
+interface VideosProps {
+	videos: IVideo[]
+}
+const Videos = ({ videos }: VideosProps) => {
 	const visibleVideos = getVisible(videos)
 
 	return (
@@ -103,12 +156,19 @@ const Videos = ({ videos }: any) => {
 				<span className='count'>{visibleVideos.length}</span> Videos
 			</Typography>
 
-			<VGrid items={visibleVideos} renderData={(idx: number) => <VideoCard video={visibleVideos[idx]} />} />
+			<VGrid
+				itemHeight={300}
+				total={visibleVideos.length}
+				renderData={(idx) => <VideoCard video={visibleVideos[idx]} />}
+			/>
 		</Box>
 	)
 }
 
-const VideoCard = ({ video }: any) => (
+interface VideoCardProps {
+	video: IVideo
+}
+const VideoCard = ({ video }: VideoCardProps) => (
 	<a href={`/video/${video.id}`}>
 		<Card className='video ribbon-container'>
 			<CardActionArea>
@@ -124,7 +184,12 @@ const VideoCard = ({ video }: any) => (
 	</a>
 )
 
-const Sidebar = ({ videoData, videos, update }: any) => (
+interface SidebarProps {
+	videoData: IVideoData
+	videos: IVideo[]
+	update: ISetState<IVideo[]>
+}
+const Sidebar = ({ videoData, videos, update }: SidebarProps) => (
 	<>
 		<TitleSearch videos={videos} update={update} />
 
@@ -134,27 +199,36 @@ const Sidebar = ({ videoData, videos, update }: any) => (
 	</>
 )
 
-const TitleSearch = ({ update, videos }: any) => {
-	const callback = (e: any) => {
+interface TitleSearchProps {
+	update: ISetState<IVideo[]>
+	videos: IVideo[]
+}
+const TitleSearch = ({ update, videos }: TitleSearchProps) => {
+	const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = e.currentTarget.value.toLowerCase()
 
 		update(
-			[...videos].map((video: any) => {
-				video.hidden.titleSearch = !video.name.toLowerCase().includes(searchValue)
-
-				return video
-			})
+			[...videos].map((video) => ({
+				...video,
+				hidden: {
+					...video.hidden,
+					titleSearch: !video.name.toLowerCase().includes(searchValue)
+				}
+			}))
 		)
 	}
 
 	return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} />
 }
 
-// Container
-const Sort = ({ videos, update }: any) => {
+interface SortProps {
+	videos: IVideo[]
+	update: ISetState<IVideo[]>
+}
+const Sort = ({ videos, update }: SortProps) => {
 	const sortDefault = (reverse = false) => {
 		update(
-			[...videos].sort((a: any, b: any) => {
+			[...videos].sort((a, b) => {
 				const result = a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en')
 				return reverse ? result * -1 : result
 			})
@@ -163,7 +237,7 @@ const Sort = ({ videos, update }: any) => {
 
 	const sortAdded = (reverse = false) => {
 		update(
-			[...videos].sort((a: any, b: any) => {
+			[...videos].sort((a, b) => {
 				const result = a.id - b.id
 				return reverse ? result * -1 : result
 			})
@@ -172,11 +246,11 @@ const Sort = ({ videos, update }: any) => {
 
 	const sortDate = (reverse = false) => {
 		update(
-			[...videos].sort((a: any, b: any) => {
-				const dateA: any = new Date(a.date)
-				const dateB: any = new Date(b.date)
+			[...videos].sort((a, b) => {
+				const dateA: Date = new Date(a.date)
+				const dateB: Date = new Date(b.date)
 
-				const result = dateA - dateB
+				const result = dateA.getTime() - dateB.getTime()
 				return reverse ? result * -1 : result
 			})
 		)
@@ -184,7 +258,7 @@ const Sort = ({ videos, update }: any) => {
 
 	const sortAge = (reverse = false) => {
 		update(
-			[...videos].sort((a: any, b: any) => {
+			[...videos].sort((a, b) => {
 				const result = a.ageInVideo - b.ageInVideo
 				return reverse ? result * -1 : result
 			})
@@ -193,7 +267,7 @@ const Sort = ({ videos, update }: any) => {
 
 	const sortPlays = (reverse = false) => {
 		update(
-			[...videos].sort((a: any, b: any) => {
+			[...videos].sort((a, b) => {
 				const result = a.plays - b.plays
 				return reverse ? result * -1 : result
 			})
@@ -265,30 +339,53 @@ const Sort = ({ videos, update }: any) => {
 	)
 }
 
-const Filter = ({ videoData, videos, update }: any) => {
+interface FilterProps {
+	videoData: IVideoData
+	videos: IVideo[]
+	update: ISetState<IVideo[]>
+}
+const Filter = ({ videoData, videos, update }: FilterProps) => {
 	const website = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const targetLower = e.target.value.toLowerCase()
 
 		update(
-			[...videos].map((video: any) => {
+			[...videos].map((video) => {
 				if (targetLower === 'all') {
-					video.hidden.website = false
-				} else {
-					video.hidden.website = !(video.website?.toLowerCase() === targetLower)
+					return { ...video, hidden: { ...video.hidden, website: false } }
 				}
 
-				return video
+				return {
+					...video,
+					hidden: { ...video.hidden, website: !(video.website?.toLowerCase() === targetLower) }
+				}
 			})
 		)
 	}
 
-	const category = (ref: any, target: any) => {
+	const site = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const targetLower = e.target.value.toLowerCase()
+
+		update(
+			[...videos].map((video) => {
+				if (targetLower === 'all') {
+					return { ...video, hidden: { ...video.hidden, site: false } }
+				}
+
+				return {
+					...video,
+					hidden: { ...video.hidden, site: !(video.site?.toLowerCase() === targetLower) }
+				}
+			})
+		)
+	}
+
+	const category = (ref: IndeterminateItemProps, target: ICategory) => {
 		const targetLower = target.name.toLowerCase()
 
 		update(
-			[...videos].map((video: any) => {
+			[...videos].map((video) => {
 				if (ref.indeterminate) {
-					const match = video.categories.some((category: any) => category.toLowerCase() === targetLower)
+					const match = video.categories.some((category) => category.toLowerCase() === targetLower)
 
 					if (match) {
 						video.hidden.notCategory.push(targetLower)
@@ -299,14 +396,14 @@ const Filter = ({ videoData, videos, update }: any) => {
 				} else if (!ref.checked) {
 					video.hidden.noCategory = false
 
-					const match = video.categories.map((category: any) => category.toLowerCase()).includes(targetLower)
+					const match = video.categories.map((category) => category.toLowerCase()).includes(targetLower)
 
 					if (match) {
 						// Remove indeterminate-status from filtering
 						video.hidden.notCategory.splice(video.hidden.notCategory.indexOf(targetLower), 1)
 					}
 				} else {
-					const match = !video.categories.map((category: any) => category.toLowerCase()).includes(targetLower)
+					const match = !video.categories.map((category) => category.toLowerCase()).includes(targetLower)
 
 					if (match) video.hidden.category.push(targetLower)
 				}
@@ -316,13 +413,13 @@ const Filter = ({ videoData, videos, update }: any) => {
 		)
 	}
 
-	const attribute = (ref: any, target: any) => {
+	const attribute = (ref: IndeterminateItemProps, target: IAttribute) => {
 		const targetLower = target.name.toLowerCase()
 
 		update(
-			[...videos].map((video: any) => {
+			[...videos].map((video) => {
 				if (ref.indeterminate) {
-					const match = video.attributes.some((attribute: any) => attribute.toLowerCase() === targetLower)
+					const match = video.attributes.some((attribute) => attribute.toLowerCase() === targetLower)
 
 					if (match) {
 						video.hidden.notAttribute.push(targetLower)
@@ -331,18 +428,14 @@ const Filter = ({ videoData, videos, update }: any) => {
 						video.hidden.attribute.splice(video.hidden.attribute.indexOf(targetLower), 1)
 					}
 				} else if (!ref.checked) {
-					const match = video.attributes
-						.map((attribute: any) => attribute.toLowerCase())
-						.includes(targetLower)
+					const match = video.attributes.map((attribute) => attribute.toLowerCase()).includes(targetLower)
 
 					if (match) {
 						// Remove indeterminate-status from filtering
 						video.hidden.notAttribute.splice(video.hidden.notAttribute.indexOf(targetLower), 1)
 					}
 				} else {
-					const match = !video.attributes
-						.map((attribute: any) => attribute.toLowerCase())
-						.includes(targetLower)
+					const match = !video.attributes.map((attribute) => attribute.toLowerCase()).includes(targetLower)
 
 					if (match) video.hidden.attribute.push(targetLower)
 				}
@@ -352,13 +445,13 @@ const Filter = ({ videoData, videos, update }: any) => {
 		)
 	}
 
-	const location = (ref: any, target: any) => {
+	const location = (ref: IndeterminateItemProps, target: ILocation) => {
 		const targetLower = target.name.toLowerCase()
 
 		update(
-			[...videos].map((video: any) => {
+			[...videos].map((video) => {
 				if (ref.indeterminate) {
-					const match = video.locations.some((location: any) => location.toLowerCase() === targetLower)
+					const match = video.locations.some((location) => location.toLowerCase() === targetLower)
 
 					if (match) {
 						video.hidden.notLocation.push(targetLower)
@@ -367,14 +460,14 @@ const Filter = ({ videoData, videos, update }: any) => {
 						video.hidden.location.splice(video.hidden.location.indexOf(targetLower), 1)
 					}
 				} else if (!ref.checked) {
-					const match = video.locations.map((location: any) => location.toLowerCase()).includes(targetLower)
+					const match = video.locations.map((location) => location.toLowerCase()).includes(targetLower)
 
 					if (match) {
 						// Remove indeterminate-status from filtering
 						video.hidden.notLocation.splice(video.hidden.notLocation.indexOf(targetLower), 1)
 					}
 				} else {
-					const match = !video.locations.map((location: any) => location.toLowerCase()).includes(targetLower)
+					const match = !video.locations.map((location) => location.toLowerCase()).includes(targetLower)
 
 					if (match) video.hidden.location.push(targetLower)
 				}
@@ -384,9 +477,9 @@ const Filter = ({ videoData, videos, update }: any) => {
 		)
 	}
 
-	const category_NULL = (ref: any) => {
+	const category_NULL = (ref: IndeterminateItemProps) => {
 		update(
-			[...videos].map((video: any) => {
+			[...videos].map((video) => {
 				if (ref.indeterminate) {
 					video.hidden.noCategory = false
 					video.hidden.notNoCategory = video.categories.length === 0
@@ -401,9 +494,9 @@ const Filter = ({ videoData, videos, update }: any) => {
 		)
 	}
 
-	const category_POV = (ref: any) => {
+	const category_POV = (ref: IndeterminateItemProps) => {
 		update(
-			[...videos].map((video: any) => {
+			[...videos].map((video) => {
 				if (ref.indeterminate) {
 					video.hidden.pov = false
 					video.hidden.notPov = video.pov
@@ -420,7 +513,8 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 	return (
 		<>
-			<FilterDropdown data={videoData.websites} label='website' labelPlural='websites' callback={website} />
+			<FilterDropdown data={videoData.websites} label='website' callback={website} />
+			<FilterDropdown data={videoData.sites} label='site' callback={site} />
 
 			<FilterObj
 				data={videoData.categories}
@@ -433,26 +527,23 @@ const Filter = ({ videoData, videos, update }: any) => {
 				otherCallbackLabel='pov'
 			/>
 
-			<FilterObj
-				data={videoData.attributes}
-				obj={videos}
-				label='attribute'
-				labelPlural='attributes'
-				callback={attribute}
-			/>
+			<FilterObj data={videoData.attributes} obj={videos} label='attribute' callback={attribute} />
 
-			<FilterObj
-				data={videoData.locations}
-				obj={videos}
-				label='location'
-				labelPlural='locations'
-				callback={location}
-			/>
+			<FilterObj data={videoData.locations} obj={videos} label='location' callback={location} />
 		</>
 	)
 }
 
-// ContainerItem
+interface FilterObjProps {
+	data: ICategory[] | IAttribute[] | ILocation[] | string[]
+	label: string
+	labelPlural?: string
+	obj: IVideo[]
+	callback: any
+	nullCallback?: any
+	otherCallback?: any
+	otherCallbackLabel?: string
+}
 const FilterObj = ({
 	data,
 	label,
@@ -462,8 +553,7 @@ const FilterObj = ({
 	nullCallback = null,
 	otherCallback = null,
 	otherCallbackLabel = ''
-}: any) => {
-	return (
+}: FilterObjProps) => (
 		<>
 			<h2>{capitalize(label, true)}</h2>
 
@@ -489,7 +579,7 @@ const FilterObj = ({
 						key={item.id}
 						label={
 							<>
-								{item.name} <LabelCount prop={labelPlural || `${label}s`} label={item.name} obj={obj} />
+							{item.name} <LabelCount prop={labelPlural ?? `${label}s`} label={item.name} obj={obj} />
 							</>
 						}
 						value={item.name}
@@ -500,9 +590,14 @@ const FilterObj = ({
 			</FormControl>
 		</>
 	)
-}
 
-const FilterDropdown = ({ data, label, labelPlural, callback }: any) => (
+interface FilterDropdownProps {
+	data: IGeneral[]
+	label: string
+	labelPlural?: string
+	callback: any
+}
+const FilterDropdown = ({ data, label, labelPlural, callback }: FilterDropdownProps) => (
 	<>
 		<h2>{capitalize(label, true)}</h2>
 
@@ -510,13 +605,13 @@ const FilterDropdown = ({ data, label, labelPlural, callback }: any) => (
 			<Select
 				variant='standard'
 				id={label}
-				name={labelPlural || `${label}s`}
+				name={labelPlural ?? `${label}s`}
 				defaultValue='ALL'
 				onChange={callback}
 			>
 				<MenuItem value='ALL'>All</MenuItem>
 
-				{data.map((item: any) => (
+				{data.map((item) => (
 					<MenuItem key={item.id} value={item.name}>
 						{item.name}
 					</MenuItem>

@@ -19,6 +19,7 @@ import capitalize from 'capitalize'
 import './editor.scss'
 
 import { server as serverConfig } from '@/config'
+import { AxiosData, ICountryExtended, IGeneral } from '@/interfaces'
 
 //TODO pass down to child using cloneElement
 //TODO implement country
@@ -43,7 +44,11 @@ const EditorPage = () => (
 	</Grid>
 )
 
-const Wrapper: FC<{ label: string; name: string }> = ({ label, name, children }) => {
+interface WrapperProps {
+	label: string
+	name: string
+}
+const Wrapper: FC<WrapperProps> = ({ label, name, children }) => {
 	const [input, setInput] = useState('')
 
 	const handleChange = (e: ChangeEvent<HTMLInputElement>) => setInput(e.currentTarget.value)
@@ -99,13 +104,16 @@ const Wrapper: FC<{ label: string; name: string }> = ({ label, name, children })
 	)
 }
 
-const WrapperItem = ({ label }: { label: string }) => {
-	const [data, setData] = useState([])
+interface WrapperItemProps {
+	label: string
+}
+const WrapperItem = ({ label }: WrapperItemProps) => {
+	const [data, setData] = useState<IGeneral[]>([])
 
-	const updateItem = (ref: any, value: any) => {
+	const updateItem = (ref: IGeneral, value: string) => {
 		Axios.put(`${serverConfig.api}/${label}/${ref.id}`, { value }).then(() => {
 			setData(
-				[...data].filter((item: any) => {
+				[...data].filter((item) => {
 					if (ref.id === item.id) item.name = value
 
 					return item
@@ -115,8 +123,8 @@ const WrapperItem = ({ label }: { label: string }) => {
 	}
 
 	useEffect(() => {
-		Axios.get(`${serverConfig.api}/${label}`).then(({ data }) => {
-			setData(data.sort((a: { id: number; name: string }, b: { id: number; name: string }) => a.id - b.id))
+		Axios.get(`${serverConfig.api}/${label}`).then(({ data }: AxiosData<IGeneral[]>) => {
+			setData(data.sort((a, b) => a.id - b.id))
 		})
 	}, [])
 
@@ -131,7 +139,7 @@ const WrapperItem = ({ label }: { label: string }) => {
 				</TableHead>
 
 				<TableBody>
-					{data.map((item: any) => (
+					{data.map((item) => (
 						<Item key={item.id} data={item} update={updateItem} />
 					))}
 				</TableBody>
@@ -140,13 +148,16 @@ const WrapperItem = ({ label }: { label: string }) => {
 	)
 }
 
-const WrapperItemCountries = ({ label }: { label: string }) => {
-	const [data, setData] = useState([])
+interface WrapperItemCountriesProps {
+	label: string
+}
+const WrapperItemCountries = ({ label }: WrapperItemCountriesProps) => {
+	const [data, setData] = useState<ICountryExtended[]>([])
 
 	const updateItem = (ref: { id: number }, value: string, label: string) => {
 		Axios.put(`${serverConfig.api}/country/${ref.id}`, { label, value }).then(({ data: countryData }) => {
 			setData(
-				[...data].filter((country: any) => {
+				[...data].filter((country) => {
 					if (ref.id === country.id) {
 						country.name = countryData.name
 						country.code = countryData.code
@@ -159,8 +170,8 @@ const WrapperItemCountries = ({ label }: { label: string }) => {
 	}
 
 	useEffect(() => {
-		Axios.get(`${serverConfig.api}/${label}`).then(({ data }) => {
-			setData(data.sort((a: any, b: any) => a.id - b.id))
+		Axios.get(`${serverConfig.api}/${label}`).then(({ data }: AxiosData<ICountryExtended[]>) => {
+			setData(data.sort((a, b) => a.id - b.id))
 		})
 	}, [])
 
@@ -177,12 +188,12 @@ const WrapperItemCountries = ({ label }: { label: string }) => {
 				</TableHead>
 
 				<TableBody>
-					{data.map((item: any) => (
+					{data.map((item) => (
 						<ItemCountry
 							key={item.id}
 							data={item}
-							updateCountry={(ref: any, value: any) => updateItem(ref, value, 'country')}
-							updateCode={(ref: any, value: any) => updateItem(ref, value, 'code')}
+							updateCountry={(ref, value) => updateItem(ref, value, 'country')}
+							updateCode={(ref, value) => updateItem(ref, value, 'code')}
 						/>
 					))}
 				</TableBody>
@@ -191,7 +202,11 @@ const WrapperItemCountries = ({ label }: { label: string }) => {
 	)
 }
 
-const Item = ({ update, data }: any) => {
+interface ItemProps {
+	update: (ref: IGeneral, value: string) => void
+	data: IGeneral
+}
+const Item = ({ update, data }: ItemProps) => {
 	const [edit, setEdit] = useState(false)
 	const [value, setValue] = useState('')
 
@@ -226,7 +241,12 @@ const Item = ({ update, data }: any) => {
 	)
 }
 
-const ItemCountry = ({ updateCountry, updateCode, data }: any) => {
+interface ItemCountryProps {
+	updateCountry: (ref: { id: number }, value: string) => void
+	updateCode: (ref: { id: number }, value: string) => void
+	data: ICountryExtended
+}
+const ItemCountry = ({ updateCountry, updateCode, data }: ItemCountryProps) => {
 	const [country, setCountry] = useState<{ edit: boolean; value: null | string }>({ edit: false, value: null })
 	const [code, setCode] = useState<{ edit: boolean; value: null | string }>({ edit: false, value: null })
 

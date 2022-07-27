@@ -1,7 +1,8 @@
 #modal {
 	position: absolute;
-	left: 40%;
 	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
 
 	&__header {
 		padding: 6px 10px;
@@ -29,6 +30,14 @@
 
 				width: 100%;
 				display: block;
+			}
+
+			.wide input[type='text'] {
+				width: 300px;
+			}
+
+			.wider input[type='text'] {
+				width: 650px;
 			}
 		}
 

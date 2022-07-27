@@ -2,6 +2,21 @@
 @import 'ribbon';
 @import 'material-ui';
 @import 'util';
+@import '@styles/variables';
+
+.plyr {
+	max-height: $maxPlayerHeight;
+
+	.plyr__progress {
+		.plyr__progress__buffer {
+			color: rgb(162, 0, 255);
+		}
+
+		input[data-plyr='seek'] {
+			color: rgb(0, 200, 0);
+		}
+	}
+}
 
 $fontFamily: 'Roboto', sans-serif;
 
