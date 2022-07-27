@@ -27,9 +27,6 @@
 		"web-vitals": "^2.1.4"
 	},
 	"devDependencies": {
-		"@testing-library/jest-dom": "^5.16.2",
-		"@testing-library/react": "^12.1.2",
-		"@testing-library/user-event": "^13.5.0",
 		"@types/capitalize": "^2.0.0",
 		"@types/jest": "^27.4.0",
 		"@types/node": "^17.0.18",
@@ -46,8 +43,7 @@
 		"dev:browser": "npx cross-env PORT=3001 react-app-rewired start",
 		"build": "react-app-rewired build",
 		"server": "serve -l 3001 -s build",
-		"build+server": "yarn build & yarn server",
-		"test": "react-app-rewired test --maxWorkers=1"
+		"build+server": "yarn build & yarn server"
 	},
 	"eslintConfig": {
 		"extends": [
