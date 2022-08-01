@@ -1,0 +1,30 @@
+@import '@styles/variables';
+
+#sidebar {
+	h2 {
+		margin-bottom: 0;
+	}
+
+	.global {
+		text-decoration: underline;
+	}
+
+	.flag {
+		margin-right: 5px;
+	}
+}
+
+#stars {
+	#count {
+		color: blue;
+	}
+
+	.star {
+		margin: 5px;
+
+		width: $starWidth + px;
+		img {
+			height: $starHeight + px;
+		}
+	}
+}

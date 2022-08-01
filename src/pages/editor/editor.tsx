@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, ChangeEvent, KeyboardEvent } from 'react'
+import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from 'react'
 
 import {
 	Grid,
@@ -16,7 +16,9 @@ import {
 import Axios from 'axios'
 import capitalize from 'capitalize'
 
-import './editor.scss'
+import Flag from '@components/flag/flag'
+
+import classes from './editor.module.scss'
 
 import { server as serverConfig } from '@/config'
 import { AxiosData, ICountryExtended, IGeneral } from '@/interfaces'
@@ -47,8 +49,9 @@ const EditorPage = () => (
 interface WrapperProps {
 	label: string
 	name: string
+	children?: React.ReactNode
 }
-const Wrapper: FC<WrapperProps> = ({ label, name, children }) => {
+const Wrapper = ({ label, name, children }: WrapperProps) => {
 	const [input, setInput] = useState('')
 
 	const handleChange = (e: ChangeEvent<HTMLInputElement>) => setInput(e.currentTarget.value)
@@ -130,7 +133,7 @@ const WrapperItem = ({ label }: WrapperItemProps) => {
 
 	return (
 		<TableContainer component={Paper}>
-			<Table size='small' className='table-striped'>
+			<Table size='small' className={classes['table-striped']}>
 				<TableHead>
 					<TableRow>
 						<TableCell>ID</TableCell>
@@ -177,7 +180,7 @@ const WrapperItemCountries = ({ label }: WrapperItemCountriesProps) => {
 
 	return (
 		<TableContainer component={Paper}>
-			<Table size='small' className='table-striped'>
+			<Table size='small' className={classes['table-striped']}>
 				<TableHead>
 					<TableRow>
 						<TableCell>ID</TableCell>
@@ -301,7 +304,7 @@ const ItemCountry = ({ updateCountry, updateCode, data }: ItemCountryProps) => {
 			</TableCell>
 
 			<TableCell className='pb-0'>
-				<i className={`flag flag-${data.code}`} />
+				<Flag code={data.code} />
 			</TableCell>
 		</TableRow>
 	)

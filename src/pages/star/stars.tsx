@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 
 import { Grid, TextField, Card, CardMedia, CardActionArea, CardContent, Button, Link, Typography } from '@mui/material'
 
-import './stars.scss'
+import { useLocalStorage } from 'usehooks-ts'
+
+import { starApi } from '@/api'
+
+import { IGeneral } from '@/interfaces'
 
 import { server as serverConfig } from '@/config'
-import { IGeneral } from '@/interfaces'
-import { starApi } from '@/api'
 
 interface IStar extends IGeneral {
 	image: string | null
@@ -49,6 +51,8 @@ const IndexChanger = ({ total, index, setIndex }: IIndexChanger) => (
 )
 
 const StarsPage = () => {
+	const [starInput, setStarInput] = useLocalStorage('starInput', '')
+
 	const [stars, setStars] = useState<IStar[]>([])
 	const [missing, setMissing] = useState<IMissing[]>([])
 	const [videoStars, setVideoStars] = useState<IMissing[]>([])
@@ -76,12 +80,12 @@ const StarsPage = () => {
 	}, [missing, index])
 
 	useEffect(() => {
-		setActiveStar(stars.find((s) => s.name === localStorage.starInput)?.name)
+		setActiveStar(stars.find((s) => s.name === starInput)?.name)
 	}, [stars])
 
 	const handleSubmit = () => {
 		if (input.length) {
-			localStorage.starInput = input
+			setStarInput(input)
 			starApi.addStar(input).finally(() => {
 				window.location.reload()
 			})
@@ -89,7 +93,7 @@ const StarsPage = () => {
 	}
 
 	return (
-		<Grid container justifyContent='center' id='stars-page'>
+		<Grid container justifyContent='center'>
 			<form noValidate onSubmit={handleSubmit}>
 				<TextField variant='standard' value={input} onChange={(e) => setInput(e.currentTarget.value)} />
 
@@ -104,7 +108,7 @@ const StarsPage = () => {
 				>{`Add Star ${missing.length ? `(${index + 1} of ${missing.length})` : ''}`}</Button>
 			</form>
 
-			<Grid container justifyContent='center' spacing={3} className='stars__no-image'>
+			<Grid container justifyContent='center' spacing={3} style={{ marginTop: 0 }}>
 				{stars
 					.sort((a, b) => a.name.localeCompare(b.name))
 					.slice(0, 1000) // limit results to avoid crash
@@ -129,7 +133,7 @@ const StarsPage = () => {
 					))}
 			</Grid>
 
-			<Grid container justifyContent='center' spacing={3} className='videos__no-star'>
+			<Grid container justifyContent='center' spacing={3}>
 				{videoStars
 					.sort((a, b) => a.name.localeCompare(b.name))
 					.slice(0, 1000) // limit results to avoid crash

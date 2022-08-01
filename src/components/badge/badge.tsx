@@ -1,11 +1,11 @@
-import './badge.scss'
+import classes from './badge.module.scss'
 
 interface IBadge {
 	content: number
 	children: React.ReactNode
 }
 const Badge = ({ content, children }: IBadge) => {
-	const badgeClass = `badge-${'x'.repeat(String(content).length)}`
+	const badgeClass = String(content).length < 10 ? classes['badge--small'] : classes['badge--large']
 
 	return (
 		<div className={badgeClass} data-badge={content}>

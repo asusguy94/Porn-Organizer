@@ -1,0 +1,75 @@
+@import '@styles/variables';
+
+#alert {
+	margin: 0.5em 0;
+}
+
+#similar {
+	text-align: center;
+
+	.star {
+		display: inline-block;
+		width: 200px;
+
+		margin: 10px;
+
+		&:hover {
+			text-decoration: underline !important;
+		}
+	}
+}
+
+#star {
+	#profile {
+		max-height: $starHeight + px;
+		width: $starWidth + px;
+	}
+
+	#ignored {
+		color: red;
+	}
+
+	.action {
+		margin-right: 10px;
+		margin-bottom: 10px;
+	}
+
+	.error label {
+		font-weight: bold;
+		color: black;
+	}
+
+	input {
+		text-transform: capitalize;
+	}
+
+	.capitalize input {
+		text-transform: uppercase;
+	}
+}
+
+.video {
+	margin: 0 10px 10px 5px !important;
+	width: $thumbnailWidth + px;
+
+	&.hidden {
+		opacity: 0.2;
+	}
+
+	.info {
+		padding: 2px 8px;
+	}
+
+	.site-info {
+		text-align: center;
+		margin-top: 10px;
+
+		.wsite {
+			color: green;
+		}
+
+		.site {
+			color: red;
+		}
+	}
+}

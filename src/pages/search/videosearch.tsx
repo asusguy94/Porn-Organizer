@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 
 import {
-	Box,
 	Button,
 	Card,
 	CardActionArea,
@@ -22,13 +21,16 @@ import KeyboardEventHandler from 'react-keyboard-event-handler'
 import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
 
-import { daysToYears } from '@components/date/date'
+import { daysToYears } from '@/date'
+
 import IndeterminateItem, { HandlerProps as IndeterminateItemProps } from '@components/indeterminate/indeterminate'
 import LabelCount from '@components/labelcount/labelcount'
 import { getVisible } from '@components/search/helper'
-import Ribbon from '@components/ribbon/ribbon'
+import Ribbon, { RibbonContainer } from '@components/ribbon/ribbon'
 import VGrid from '@components/virtualized/virtuoso'
 import Spinner from '@components/spinner/spinner'
+
+import { attributeApi, categoryApi, locationApi, searchApi, websiteApi } from '@/api'
 
 import {
 	ICategory,
@@ -41,10 +43,9 @@ import {
 	IndexType
 } from '@/interfaces'
 
-import './search.scss'
-
 import { server as serverConfig } from '@/config'
-import { attributeApi, categoryApi, locationApi, searchApi, websiteApi } from '@/api'
+
+import styles from './video.module.scss'
 
 interface IVideo extends IGeneral {
 	ageInVideo: number
@@ -152,7 +153,9 @@ const VideoSearchPage = () => {
 	const loadVideos = async () => {
 		return searchApi.getVideos<IVideo[]>().then(({ data }) => {
 			const websiteInfo: IndexType<number> = {
-				
+				Brazzers: 1035 + 1,
+				Mofos: 201 + 1,
+				SexyHub: 23 + 1
 			}
 			//+1 if finished!
 
@@ -185,8 +188,8 @@ const VideoSearchPage = () => {
 	}
 
 	return (
-		<Grid container id='search-page'>
-			<Grid item xs={2}>
+		<Grid container>
+			<Grid item xs={2} id={styles.sidebar}>
 				<Sidebar
 					videoData={{ categories, attributes, locations, websites }}
 					videos={videos}
@@ -217,9 +220,9 @@ const Videos = ({ videos }: VideosProps) => {
 	const visibleVideos = getVisible(videos)
 
 	return (
-		<Box id='videos'>
+		<div id={styles.videos}>
 			<Typography variant='h6' className='text-center'>
-				<span className='count'>{visibleVideos.length}</span> Videos
+				<span id={styles.count}>{visibleVideos.length}</span> Videos
 			</Typography>
 
 			<VGrid
@@ -227,7 +230,7 @@ const Videos = ({ videos }: VideosProps) => {
 				total={visibleVideos.length}
 				renderData={(idx) => <VideoCard video={visibleVideos[idx]} />}
 			/>
-		</Box>
+		</div>
 	)
 }
 
@@ -236,17 +239,21 @@ interface VideoCardProps {
 }
 const VideoCard = ({ video }: VideoCardProps) => (
 	<a href={`/video/${video.id}`}>
-		<Card className='video ribbon-container'>
+		<RibbonContainer component={Card} className={styles.video}>
 			<CardActionArea>
-				<CardMedia component='img' src={`${serverConfig.source}/video/${video.id}/thumb`} />
+				<CardMedia
+					component='img'
+					src={`${serverConfig.source}/video/${video.id}/thumb`}
+					style={{ objectFit: 'inherit' }}
+				/>
 
-				<Grid container justifyContent='center' className='card__title card__title--fixed-height height-3'>
+				<Grid container justifyContent='center' className={styles.title}>
 					<Typography className='text-center'>{video.name}</Typography>
 				</Grid>
 
 				<Ribbon label={daysToYears(video.ageInVideo)} />
 			</CardActionArea>
-		</Card>
+		</RibbonContainer>
 	</a>
 )
 
@@ -643,7 +650,7 @@ const FilterObj = ({
 		<FormControl>
 			{nullCallback !== null ? (
 				<IndeterminateItem
-					label={<div className='global-category'>NULL</div>}
+					label={<div className={styles.global}>NULL</div>}
 					value='NULL'
 					callback={(ref: any) => nullCallback(ref)}
 				/>
@@ -651,7 +658,7 @@ const FilterObj = ({
 
 			{otherCallback !== null ? (
 				<IndeterminateItem
-					label={<div className='global-category'>{otherCallbackLabel.toUpperCase()}</div>}
+					label={<div className={styles.global}>{otherCallbackLabel.toUpperCase()}</div>}
 					value='OTHER'
 					callback={(ref: any) => otherCallback(ref)}
 				/>
@@ -717,5 +724,6 @@ const WebsiteDropdown = ({ websites, label, labelPlural, callback }: WebsiteDrop
 			</FormControl>
 		</>
 	)
+}
 
 export default VideoSearchPage

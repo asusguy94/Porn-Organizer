@@ -5,7 +5,6 @@ import {
 	Card,
 	CardMedia,
 	CardActionArea,
-	Box,
 	Typography,
 	TextField,
 	FormControl,
@@ -21,20 +20,21 @@ import KeyboardEventHandler from 'react-keyboard-event-handler'
 import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
 
-import { daysToYears } from '@components/date/date'
+import { daysToYears } from '@/date'
 import LabelCount from '@components/labelcount/labelcount'
 import { getVisible } from '@components/search/helper'
-import Ribbon from '@components/ribbon/ribbon'
+import Ribbon, { RibbonContainer } from '@components/ribbon/ribbon'
 import Badge from '@components/badge/badge'
 import Loader from '@components/spinner/spinner'
 import VGrid from '@components/virtualized/virtuoso'
+import Flag from '@components/flag/flag'
 
 import { ICountry, IGeneral, ISetState, IWebsite } from '@/interfaces'
 
-import './search.scss'
-
 import { server as serverConfig } from '@/config'
 import { searchApi, starApi, websiteApi } from '@/api'
+
+import styles from './star.module.scss'
 
 interface IStar extends IGeneral {
 	image: string
@@ -122,8 +122,8 @@ const StarSearchPage = () => {
 	}, [])
 
 	return (
-		<Grid container id='search-page'>
-			<Grid item xs={2}>
+		<Grid container>
+			<Grid item xs={2} id={styles.sidebar}>
 				<Sidebar
 					starData={{ breasts, haircolors, ethnicities, countries, websites }}
 					stars={stars}
@@ -149,11 +149,11 @@ const Stars = ({ stars }: StarsProps) => {
 	const visibleStars = getVisible(stars)
 
 	return (
-		<Box id='stars'>
+		<div id={styles.stars}>
 			{stars.length ? (
 				<>
 					<Typography variant='h6' className='text-center'>
-						<span className='count'>{visibleStars.length}</span> Stars
+						<span className={styles.count}>{visibleStars.length}</span> Stars
 					</Typography>
 
 					<VGrid
@@ -165,7 +165,7 @@ const Stars = ({ stars }: StarsProps) => {
 			) : (
 				<Loader />
 			)}
-		</Box>
+		</div>
 	)
 }
 
@@ -174,17 +174,21 @@ interface StarCardProps {
 }
 const StarCard = ({ star }: StarCardProps) => (
 	<a href={`/star/${star.id}`}>
-		<Card className='star ribbon-container'>
+		<RibbonContainer component={Card} className={styles.star}>
 			<Badge content={star.videoCount}>
 				<CardActionArea>
-					<CardMedia component='img' src={`${serverConfig.source}/star/${star.id}`} />
+					<CardMedia
+						component='img'
+						src={`${serverConfig.source}/star/${star.id}`}
+						style={{ objectFit: 'inherit' }}
+					/>
 
 					<Typography className='text-center'>{star.name}</Typography>
 
 					<Ribbon label={daysToYears(star.age)} />
 				</CardActionArea>
 			</Badge>
-		</Card>
+		</RibbonContainer>
 	</a>
 )
 
@@ -494,7 +498,7 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 				{globalCallback !== null ? (
 					<FormControlLabel
 						value='ALL'
-						label={<div className='global-category'>ALL</div>}
+						label={<div className={styles.global}>ALL</div>}
 						onChange={globalCallback}
 						control={<Radio />}
 					/>
@@ -503,7 +507,7 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 				{nullCallback !== null ? (
 					<FormControlLabel
 						value='NULL'
-						label={<div className='global-category'>NULL</div>}
+						label={<div className={styles.global}>NULL</div>}
 						onChange={nullCallback}
 						control={<Radio />}
 					/>
@@ -543,7 +547,7 @@ const FilterDropdown = ({ data, label, callback }: FilterDropdownProps) => (
 					if ('code' in item) {
 						return (
 							<MenuItem key={item.code} value={item.name}>
-								<i className={`flag flag-${item.code}`} style={{ marginRight: 4 }} /> {item.name}
+								<Flag code={item.code} spacing={4} style={{ marginRight: 5 }} /> {item.name}
 							</MenuItem>
 						)
 					}

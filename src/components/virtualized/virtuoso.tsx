@@ -1,6 +1,6 @@
 import { VirtuosoGrid } from 'react-virtuoso'
 
-import './virtuoso.scss'
+import classes from './virtuoso.module.scss'
 
 interface GridProps {
 	renderData: (id: number) => JSX.Element
@@ -9,7 +9,13 @@ interface GridProps {
 	itemRows?: number
 }
 const Grid = ({ renderData, total, itemHeight, itemRows = 1 }: GridProps) => (
-	<VirtuosoGrid useWindowScroll overscan={itemHeight * itemRows} totalCount={total} itemContent={renderData} />
+	<VirtuosoGrid
+		useWindowScroll
+		overscan={itemHeight * itemRows}
+		totalCount={total}
+		itemContent={renderData}
+		listClassName={classes['grid-list']}
+	/>
 )
 
 export default Grid

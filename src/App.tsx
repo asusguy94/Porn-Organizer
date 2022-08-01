@@ -20,7 +20,6 @@ import ErrorPage from '@pages/404/404'
 
 /* Style */
 import '@styles/main.scss'
-import '@styles/flag.scss'
 
 const App = () => (
 	<Router>

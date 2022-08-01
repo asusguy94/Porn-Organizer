@@ -5,7 +5,7 @@ import { Card, CardContent, Button, Typography, Box } from '@mui/material'
 
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
-import './modal.scss'
+import styles from './modal.module.scss'
 
 import { settings as settingsConfig } from '@/config'
 
@@ -53,21 +53,21 @@ const Modal = (props: any) => {
 	return ReactDOM.createPortal(
 		<>
 			{props.visible ? (
-				<Card id='modal'>
-					<Box id='modal__header'>
-						<Typography variant='h5' className='label'>
+				<Card id={styles.modal}>
+					<div id={styles['modal__header']}>
+						<Typography variant='h5' className={styles.label}>
 							{props.title}
 						</Typography>
-						{query ? <Typography className='query'>{query}</Typography> : null}
-					</Box>
+						{query ? <Typography className={styles.query}>{query}</Typography> : null}
+					</div>
 
-					<CardContent id='modal__body'>
-						<Box className='content'>{children}</Box>
-						<Box className='actions'>
+					<CardContent id={styles['modal__body']}>
+						<div className={styles.content}>{children}</div>
+						<div className={styles.actions}>
 							<Button size='small' variant='contained' color='error' onClick={props.onClose}>
 								Close
 							</Button>
-						</Box>
+						</div>
 					</CardContent>
 				</Card>
 			) : null}

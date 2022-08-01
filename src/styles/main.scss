@@ -1,5 +1,4 @@
 @import 'context-menu';
-@import 'ribbon';
 @import 'material-ui';
 @import 'util';
 @import 'variables';
@@ -18,18 +17,19 @@
 	}
 }
 
-$fontFamily: 'Roboto', sans-serif;
-
 body {
-	font-family: $fontFamily;
+	font-family: Roboto, Helvetica, sans-serif;
 }
 
-@for $i from 1 through 6 {
-	h#{$i} {
-		font-weight: 500;
-		margin-top: 0.3em;
-		margin-bottom: 0.3em;
-	}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-weight: 400;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
 }
 
 .divider {
@@ -38,26 +38,6 @@ body {
 	&::before,
 	&::after {
 		content: ' ';
-	}
-}
-
-.info,
-.header__site {
-	.wsite {
-		color: green;
-	}
-
-	.site {
-		color: red;
-	}
-}
-
-.video {
-	text-decoration: none !important;
-	color: black !important;
-
-	&__title {
-		text-align: center;
 	}
 }
 
@@ -75,35 +55,10 @@ a {
 	text-decoration: none !important;
 }
 
-.card {
-	&__title {
-		padding: 0 2px;
-
-		&--fixed-height {
-			display: flex;
-			align-items: center;
-
-			&.height-1 {
-				height: 24px;
-			}
-
-			&.height-2 {
-				height: 24px * 2;
-			}
-
-			&.height-3 {
-				height: 24px * 3;
-			}
-
-			&.height-4 {
-				height: 24px * 4;
-			}
+table {
+	tbody {
+		td {
+			position: relative;
 		}
-	}
-}
-
-.table-striped {
-	tbody tr:nth-of-type(odd) {
-		background-color: rgba(0, 0, 0, 0.05);
 	}
 }

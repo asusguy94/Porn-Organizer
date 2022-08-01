@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
-import { Grid, Box } from '@mui/material'
+import { Grid } from '@mui/material'
 
 import axios from 'axios'
 import capitalize from 'capitalize'
 
-import Ribbon from '@components/ribbon/ribbon'
+import Ribbon, { RibbonContainer } from '@components/ribbon/ribbon'
 
-import './home.scss'
+import { IGeneral } from '@/interfaces'
 
 import { server as serverConfig } from '@/config'
-import { IGeneral } from '@/interfaces'
+
+import classes from './home.module.scss'
 
 interface HomeColumnProps {
 	enabled?: boolean
@@ -40,26 +41,31 @@ export const HomeColumn = ({ enabled = true, label, rows = 1, limit = -1, colSiz
 	if (!data.length) return null
 
 	return (
-		<Grid container component='section'>
-			<h2>
-				{capitalize(label)} (<span className='count'>{data.length}</span>)
+		<Grid container component='section' style={{ marginBottom: '0.5em' }}>
+			<h2
+				style={{
+					marginTop: 0,
+					marginBottom: 0
+				}}
+			>
+				{capitalize(label)} (<span style={{ color: 'green' }}>{data.length}</span>)
 			</h2>
 
 			<Grid container spacing={2} columns={colSize}>
 				{data.map((video) => (
 					<Grid item xs={1} key={video.id}>
 						<Link to={`/video/${video.id}`}>
-							<Box className='video ribbon-container'>
+							<RibbonContainer className={classes.video}>
 								<img
 									src={`${serverConfig.source}/video/${video.id}/thumb`}
-									className='img-thumbnail'
+									className={classes.thumb}
 									alt='video'
 								/>
 
-								<Box className='video__title'>{video.name}</Box>
+								<div className={classes.title}>{video.name}</div>
 
 								{video.total ? <Ribbon label={video.total} /> : null}
-							</Box>
+							</RibbonContainer>
 						</Link>
 					</Grid>
 				))}

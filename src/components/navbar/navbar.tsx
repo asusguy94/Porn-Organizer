@@ -1,16 +1,14 @@
-import { FC } from 'react'
-
 import { Link } from '@mui/material'
 
 import RouterLink from '@components/router-link/router-link'
 
-import './navbar.scss'
+import styles from './navbar.module.scss'
 
 import { server as serverConfig } from '@/config'
 
 const NavBar = () => (
-	<nav>
-		<ul className='main-menu'>
+	<nav id={styles.navbar}>
+		<ul className={styles['main-menu']}>
 			<NavBarItem name='Home' path='/' />
 
 			<NavBarItem name='Video Search' path='/video/search' />
@@ -31,8 +29,9 @@ interface NavBarItemProps {
 	path: string
 	disabled?: boolean
 	remote?: boolean
+	children?: React.ReactNode
 }
-const NavBarItem: FC<NavBarItemProps> = ({ name, path, children, disabled = false, remote = false }) => {
+const NavBarItem = ({ name, path, children, disabled = false, remote = false }: NavBarItemProps) => {
 	if (!disabled) {
 		return (
 			<li>
@@ -43,7 +42,7 @@ const NavBarItem: FC<NavBarItemProps> = ({ name, path, children, disabled = fals
 				) : (
 					<Link href={path}>{name}</Link>
 				)}
-				{children ? <ul className='sub-menu'>{children}</ul> : null}
+				{children ? <ul className={styles['sub-menu']}>{children}</ul> : null}
 			</li>
 		)
 	}

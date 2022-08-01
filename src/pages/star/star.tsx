@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom'
 import {
 	Button,
 	TextField,
-	Box,
 	Grid,
 	Card,
 	CardActionArea,
@@ -20,20 +19,26 @@ import {
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 import { Flipper, Flipped } from 'react-flip-toolkit'
+import { useCopyToClipboard } from 'usehooks-ts'
 
 import RouterLink from '@components/router-link/router-link'
 import Modal from '@components/modal/modal'
-import { daysToYears } from '@components/date/date'
-import Ribbon from '@components/ribbon/ribbon'
+import Ribbon, { RibbonContainer } from '@components/ribbon/ribbon'
+import Dropbox from '@components/dropbox/dropbox'
+import Flag from '@components/flag/flag'
+import Icon from '@components/icon/icon'
 
-import './star.scss'
+import { daysToYears } from '@/date'
 
-import { server as serverConfig, theme as themeConfig } from '@/config'
-
-import { ICountry, IGeneral, ISetState, ISimilar, IStarVideo } from '@/interfaces'
 import { starApi } from '@/api'
 
-const ModalContext = createContext((...args: any): void => {})
+import { ICountry, IGeneral, ISetState, ISimilar, IStarVideo } from '@/interfaces'
+
+import { server as serverConfig } from '@/config'
+
+import styles from './star.module.scss'
+
+import ModalContext, { ModalContextProvider } from '@/context/modal-context'
 const UpdateContext = createContext({ star: (star: any): void => {} })
 
 interface IStar extends IGeneral {
@@ -117,18 +122,18 @@ const StarPage = () => {
 	}, [])
 
 	return (
-		<Grid container id='star-page'>
+		<Grid container>
 			<Grid item xs={8}>
 				{star.id !== 0 ? (
-					<Grid item xs={3} id='star'>
+					<Grid item xs={3} id={styles.star}>
 						<UpdateContext.Provider value={{ star: (star: any) => setStar(star) }}>
 							<StarImageDropbox star={star} />
 
-							<ModalContext.Provider
-								value={(title: any, data: any, filter: boolean) => handleModal(title, data, filter)}
+							<ModalContextProvider
+								onModal={(title: any, data: any, filter: any) => handleModal(title, data, filter)}
 							>
 								<StarTitle star={star} />
-							</ModalContext.Provider>
+							</ModalContextProvider>
 
 							<StarForm starData={starData} star={star} />
 						</UpdateContext.Provider>
@@ -153,10 +158,12 @@ interface StarTitleProps {
 	star: IStar
 }
 const StarTitle = ({ star }: StarTitleProps) => {
-	const handleModal = useContext(ModalContext)
+	const [, setClipboard] = useCopyToClipboard()
+
+	const handleModal = useContext(ModalContext).method
 	const update = useContext(UpdateContext).star
 
-	const copy = async () => await navigator.clipboard.writeText(star.name)
+	const copy = async () => await setClipboard(star.name)
 
 	const renameStar = (value: string) => {
 		starApi.renameStar(star.id, value).then(() => {
@@ -178,12 +185,12 @@ const StarTitle = ({ star }: StarTitleProps) => {
 	}
 
 	return (
-		<Box>
-			<Box className='d-inline-block'>
+		<div>
+			<div className='d-inline-block'>
 				<ContextMenuTrigger id='title'>
-					<h2 className={star.ignored ? 'ignored' : ''}>{star.name}</h2>
+					<h2 id={star.ignored ? styles.ignored : ''}>{star.name}</h2>
 				</ContextMenuTrigger>
-			</Box>
+			</div>
 
 			<ContextMenu id='title'>
 				<MenuItem
@@ -206,7 +213,7 @@ const StarTitle = ({ star }: StarTitleProps) => {
 						)
 					}}
 				>
-					<i className={themeConfig.icons.edit} /> Rename
+					<Icon code='edit' /> Rename
 				</MenuItem>
 
 				<MenuItem
@@ -228,17 +235,17 @@ const StarTitle = ({ star }: StarTitleProps) => {
 						)
 					}
 				>
-					<i className={themeConfig.icons.add} /> Add Alias
+					<Icon code='add' /> Add Alias
 				</MenuItem>
 
 				<MenuItem onClick={ignoreStar}>
 					{star.ignored ? (
 						<>
-							<i className={themeConfig.icons['toggle-yes']} /> Enable Star
+							<Icon code='toggle-yes' /> Enable Star
 						</>
 					) : (
 						<>
-							<i className={themeConfig.icons['toggle-no']} /> Ignore Star
+							<Icon code='toggle-no' /> Ignore Star
 						</>
 					)}
 				</MenuItem>
@@ -246,10 +253,10 @@ const StarTitle = ({ star }: StarTitleProps) => {
 				<MenuItem divider />
 
 				<MenuItem onClick={copy}>
-					<i className={themeConfig.icons.copy} /> Copy Star
+					<Icon code='copy' /> Copy Star
 				</MenuItem>
 			</ContextMenu>
-		</Box>
+		</div>
 	)
 }
 
@@ -264,16 +271,16 @@ const Sidebar = ({ similar }: SidebarProps) => (
 		</Typography>
 
 		<CardContent>
-			<Grid id='similar'>
+			<Grid id={styles.similar}>
 				{similar.map((similarStar) => (
-					<a key={similarStar.id} href={`${similarStar.id}`} className='similar-star ribbon-container'>
-						<Card className='star'>
+					<a key={similarStar.id} href={`${similarStar.id}`} className={styles.star}>
+						<RibbonContainer component={Card}>
 							<CardMedia component='img' src={`${serverConfig.source}/star/${similarStar.id}`} />
 
 							<Typography>{similarStar.name}</Typography>
 
 							<Ribbon label={`${similarStar.match}%`} />
-						</Card>
+						</RibbonContainer>
 					</a>
 				))}
 			</Grid>
@@ -287,10 +294,6 @@ interface StarImageDropboxProps {
 const StarImageDropbox = ({ star }: StarImageDropboxProps) => {
 	const update = useContext(UpdateContext).star
 
-	const [hover, setHover] = useState(false)
-
-	const addLocalImage = (image: any) => console.log('Adding local file is not yet supported', image)
-
 	const removeStar = () => {
 		starApi.removeStar(star.id).then(() => {
 			window.location.href = '/star'
@@ -299,7 +302,7 @@ const StarImageDropbox = ({ star }: StarImageDropboxProps) => {
 
 	const removeImage = () => {
 		Axios.delete(`${serverConfig.source}/star/${star.id}/image`).then(() => {
-			update({ ...star, image: null })
+			update({ ...star, image: '' })
 		})
 	}
 	const addImage = (url: string) => {
@@ -308,50 +311,13 @@ const StarImageDropbox = ({ star }: StarImageDropboxProps) => {
 		})
 	}
 
-	const handleDefault = (e: React.DragEvent) => {
-		e.stopPropagation()
-		e.preventDefault()
-	}
-
-	const handleEnter = (e: React.DragEvent) => {
-		handleDefault(e)
-
-		setHover(true)
-	}
-
-	const handleLeave = (e: React.DragEvent) => {
-		handleDefault(e)
-
-		setHover(false)
-	}
-
-	const handleDrop = (e: React.DragEvent) => {
-		handleDefault(e)
-
-		const image = e.dataTransfer.getData('text')
-		if (isLocalFile(image)) {
-			let imageRef = e.dataTransfer.files
-			if (imageRef.length === 1) {
-				addLocalImage(imageRef[0])
-			} else {
-				console.log('Adding multiple images is not supported')
-			}
-		} else {
-			addImage(image)
-		}
-
-		setHover(false)
-	}
-
-	const isLocalFile = (path: string) => !(path.indexOf('http://') > -1 || path.indexOf('https://') > -1)
-
 	return (
-		<Box className='d-inline-block'>
-			{star.image !== null ? (
+		<div className='d-inline-block'>
+			{star.image.length > 0 ? (
 				<>
 					<ContextMenuTrigger id='star__image'>
 						<img
-							className='star__image'
+							id={styles.profile}
 							src={`${serverConfig.source}/star/${star.id}?${Date.now()}`}
 							alt='star'
 						/>
@@ -359,33 +325,24 @@ const StarImageDropbox = ({ star }: StarImageDropboxProps) => {
 
 					<ContextMenu id='star__image'>
 						<MenuItem onClick={removeImage}>
-							<i className={themeConfig.icons.trash} /> Delete Image
+							<Icon code='trash' /> Delete Image
 						</MenuItem>
 					</ContextMenu>
 				</>
 			) : (
 				<>
 					<ContextMenuTrigger id='star__dropbox'>
-						<Box
-							id='dropbox'
-							className={`unselectable ${hover ? 'hover' : ''}`}
-							onDragEnter={handleEnter}
-							onDragOver={handleEnter}
-							onDragLeave={handleLeave}
-							onDrop={handleDrop}
-						>
-							<Box className='label'>Drop Image Here</Box>
-						</Box>
+						<Dropbox onDrop={addImage} />
 					</ContextMenuTrigger>
 
 					<ContextMenu id='star__dropbox'>
 						<MenuItem onClick={removeStar}>
-							<i className={themeConfig.icons.trash} /> Remove Star
+							<Icon code='trash' /> Remove Star
 						</MenuItem>
 					</ContextMenu>
 				</>
 			)}
-		</Box>
+		</div>
 	)
 }
 
@@ -401,7 +358,7 @@ interface StarFormProps {
 	starData: IStarData
 }
 const StarForm = ({ star, starData }: StarFormProps) => {
-	const handleModal = useContext(ModalContext)
+	const handleModal = useContext(ModalContext).method
 	const update = useContext(UpdateContext).star
 
 	const updateInfo = (value: string, label: string) => {
@@ -458,13 +415,13 @@ const StarForm = ({ star, starData }: StarFormProps) => {
 				</MenuItem>
 			</ContextMenu>
 
-			<Box className='action'>
+			<div>
 				<ContextMenuTrigger id='get-data' renderTag='span'>
 					<Button
 						variant='contained'
 						color='primary'
 						id='freeones'
-						className='action__item'
+						className={styles.action}
 						onClick={() => freeones()}
 					>
 						Get Data
@@ -475,12 +432,12 @@ const StarForm = ({ star, starData }: StarFormProps) => {
 					variant='contained'
 					color='error'
 					id='freeones_rs'
-					className='action__item'
+					className={styles.action}
 					onClick={freeonesReset}
 				>
 					Reset Data
 				</Button>
-			</Box>
+			</div>
 
 			<StarInputForm
 				update={updateInfo}
@@ -493,7 +450,7 @@ const StarForm = ({ star, starData }: StarFormProps) => {
 			<StarInputForm update={updateInfo} name='HairColor' value={star.info.haircolor} list={starData.haircolor} />
 			<StarInputForm update={updateInfo} name='Ethnicity' value={star.info.ethnicity} list={starData.ethnicity} />
 			<StarInputForm update={updateInfo} name='Country' value={star.info.country.name} list={starData.country}>
-				<i className={`flag flag-${star.info.country.code}`} />
+				<Flag code={star.info.country.code} style={{ marginLeft: 5, marginBottom: -5 }} />
 			</StarInputForm>
 			<StarInputForm update={updateInfo} name='Birthdate' value={star.info.birthdate} />
 			<StarInputForm update={updateInfo} name='Height' value={star.info.height} />
@@ -527,9 +484,9 @@ const StarVideos = ({ videos, update, similar }: StarVideosProps) => {
 	}
 
 	return (
-		<Box>
+		<div>
 			{similar.some((star) => star.match === 100) ? (
-				<Alert severity='warning' className='alert'>
+				<Alert severity='warning' id={styles.alert}>
 					<AlertTitle>
 						Possible Duplicates: <strong>{similar.filter((star) => star.match === 100).length}</strong>
 					</AlertTitle>
@@ -567,7 +524,7 @@ const StarVideos = ({ videos, update, similar }: StarVideosProps) => {
 							<Flipped key={video.id} flipId={video.id}>
 								<Link
 									component={RouterLink}
-									className={`video ${video.hidden ? 'hidden' : ''}`}
+									className={`${styles.video} ${video.hidden ? styles.hidden : ''}`}
 									href={`/video/${video.id}`}
 								>
 									<StarVideo
@@ -582,7 +539,7 @@ const StarVideos = ({ videos, update, similar }: StarVideosProps) => {
 					})}
 				</Grid>
 			</Flipper>
-		</Box>
+		</div>
 	)
 }
 
@@ -593,15 +550,9 @@ interface StarInputFormProps {
 	name: string
 	list?: (string | ICountry)[]
 	capitalize?: boolean
+	children?: React.ReactNode
 }
-const StarInputForm: React.FC<StarInputFormProps> = ({
-	update,
-	value,
-	name,
-	list = [],
-	children,
-	capitalize = false
-}) => {
+const StarInputForm = ({ update, value, name, list = [], children, capitalize = false }: StarInputFormProps) => {
 	const hasDropdown = list.length > 0
 
 	const [open, setOpen] = useState(false)
@@ -651,7 +602,8 @@ const StarInputForm: React.FC<StarInputFormProps> = ({
 							label={name}
 							error={isChanged}
 							InputLabelProps={{ shrink: shouldShrink }}
-							className={capitalize ? 'capitalize' : ''}
+							className={`${capitalize ? styles.capitalize : ''} ${isChanged ? styles.error : ''}`}
+							InputProps={{ style: { borderBottomColor: 'black' } }}
 						/>
 					)}
 					autoHighlight
@@ -744,7 +696,7 @@ const StarVideo = ({ video, isFirst, isLast, isHidden }: StarVideoProps) => {
 	}
 
 	return (
-		<Card className='ribbon-container'>
+		<RibbonContainer component={Card}>
 			<CardActionArea>
 				<CardMedia
 					component='video'
@@ -757,15 +709,15 @@ const StarVideo = ({ video, isFirst, isLast, isHidden }: StarVideoProps) => {
 					onMouseLeave={handleMouseLeave}
 				/>
 
-				<CardContent className='video__info'>
-					<Typography className='video__title'>{video.name}</Typography>
-					<Typography className='video__site-info site-info'>
-						<span className='site-info__wsite'>{video.website}</span>
+				<CardContent className={styles.info}>
+					<Typography className='text-center'>{video.name}</Typography>
+					<Typography className={styles['site-info']}>
+						<span className={styles.wsite}>{video.website}</span>
 
 						{video.site !== null ? (
 							<>
 								<span className='divider'>/</span>
-								<span className='site-info__site'>{video.site}</span>
+								<span className={styles.site}>{video.site}</span>
 							</>
 						) : null}
 					</Typography>
@@ -775,7 +727,7 @@ const StarVideo = ({ video, isFirst, isLast, isHidden }: StarVideoProps) => {
 					{video.age ? <Ribbon label={daysToYears(video.age)} /> : null}
 				</CardContent>
 			</CardActionArea>
-		</Card>
+		</RibbonContainer>
 	)
 }
 

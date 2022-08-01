@@ -4,7 +4,7 @@ import { Grid, List, ListItem, ListItemText, Badge, Typography, Link } from '@mu
 
 import Axios from 'axios'
 
-import { daysToYears } from '@components/date/date'
+import { daysToYears } from '@/date'
 import RouterLink from '@components/router-link/router-link'
 
 import { server as serverConfig } from '@/config'

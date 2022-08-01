@@ -1,4 +1,8 @@
-@import '@styles/functions';
+@mixin circle($sizeY, $sizeX: $sizeY) {
+	width: $sizeX;
+	height: $sizeY;
+	line-height: $sizeY;
+}
 
 [data-badge] {
 	&:after {
@@ -16,12 +20,12 @@
 	}
 
 	// 1-9 Videos
-	&.badge-x:after {
+	&.badge--small:after {
 		@include circle(23px);
 	}
 
 	// 10-99 videos
-	&.badge-xx:after {
+	&.badge--large:after {
 		@include circle(23px, 26px);
 	}
 }
