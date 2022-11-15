@@ -1,0 +1,23 @@
+$spinnerBlue: #3498db;
+
+#loader {
+  border: 16px solid #f3f3f3;
+  border-top-color: $spinnerBlue;
+  border-bottom-color: $spinnerBlue;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% {
+    rotate: 0;
+  }
+
+  100% {
+    rotate: 360deg;
+  }
+}

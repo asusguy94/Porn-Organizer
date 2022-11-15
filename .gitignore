@@ -1,32 +1,25 @@
-# npm / yarn1
+# dependencies
 /node_modules
+.yarn/
 
-# testing
-/coverage
+# editor
+.vscode/
+
+# next.js
+/.next/
+/out/
 
 # production
 /build
 
-# misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-npm-debug.log*
+# debug
 yarn-debug.log*
 yarn-error.log*
 
-# editor
-.vscode
-.idea
+# local env files
+.env*.local
+.env
 
-# yarn2
-.pnp.*
-/.yarn/*
-!/.yarn/patches
-!/.yarn/plugins
-!/.yarn/releases
-!/.yarn/sdks
-!/.yarn/versions
+# typescript
+*.tsbuildinfo
+next-env.d.ts

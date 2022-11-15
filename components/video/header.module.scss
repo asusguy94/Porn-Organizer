@@ -1,0 +1,32 @@
+#header {
+  margin-bottom: 15px;
+
+  #title {
+    vertical-align: middle;
+  }
+
+  #title,
+  #locations,
+  #attributes {
+    display: inline-block;
+  }
+
+  #site {
+    color: green;
+    font-weight: 700;
+
+    #wsite {
+      color: red;
+    }
+  }
+
+  button {
+    margin-left: 15px;
+    color: black;
+
+    i,
+    svg {
+      margin-right: 5px !important;
+    }
+  }
+}

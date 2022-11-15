@@ -1,4 +1,4 @@
-# Feature implementation status
+# Feature implementation status (OUTDATED)
 
 ## Priority Explanation
 
