@@ -1,12 +1,13 @@
 import axios from 'axios'
 
-import { serverConfig } from '@config'
+import apiUrl from '@utils/client/api'
+import { IndexType, MakeOptional } from '@interfaces'
 
 const api = axios.create({
-  baseURL: `${serverConfig.api}/search`
+  baseURL: apiUrl('search')
 })
 
 export default {
-  getStars: async <T>() => await api.get<T>('/star'),
-  getVideos: async <T>() => await api.get<T>('/video')
+  getStars: async <T extends IndexType>() => await api.get<MakeOptional<T, 'hidden' | 'score'>[]>('/star'),
+  getVideos: async <T extends IndexType>() => await api.get<MakeOptional<T, 'hidden'>[]>('/video')
 }

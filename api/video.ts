@@ -1,10 +1,10 @@
 import axios from 'axios'
 
-import { serverConfig } from '@config'
+import apiUrl from '@utils/client/api'
 import { IGeneral, IVideoStar } from '@interfaces'
 
 const api = axios.create({
-  baseURL: `${serverConfig.api}/video`
+  baseURL: apiUrl('video')
 })
 
 export default {

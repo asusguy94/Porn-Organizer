@@ -1,13 +1,15 @@
 import axios from 'axios'
 
+import apiUrl from '@utils/client/api'
 import { IStarVideo } from '@interfaces'
-import { serverConfig } from '@config'
 
 const api = axios.create({
-  baseURL: `${serverConfig.api}/star`
+  baseURL: apiUrl('star')
 })
 
 export default {
+  getInfo: async () => await api.get<{ breast: string[]; haircolor: string[]; ethnicity: string[] }>('/'),
+  getMissing: async <S, M>() => await api.get<{ stars: S[]; missing: M[] }>('/missing'),
   add: async (star: string) => await api.post('/', { name: star }),
   get: async <T>(id: number) => await api.get<T>(`/${id}`),
   remove: async (id: number) => await api.delete(`/${id}`),

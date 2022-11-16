@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react'
 import { Grid, Card, Typography, TextField } from '@mui/material'
 
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
-import useSWR from 'swr'
 
 import { ImageCard } from '@components/image'
 import Modal, { useModal, type IModalHandler, type IModal } from '@components/modal'
@@ -16,9 +15,8 @@ import Icon from '@components/icon'
 import Link from '@components/link'
 
 import { daysToYears } from '@utils/client/date-time'
-import fetcher from '@utils/client/fetcher'
 
-import { videoApi } from '@api'
+import { attributeApi, categoryApi, locationApi, videoApi } from '@api'
 import { IBookmark as IVideoBookmark, IVideo, IVideoStar, ISetState, IBookmark, IGeneral } from '@interfaces'
 import { serverConfig } from '@config'
 
@@ -34,15 +32,18 @@ const VideoPage: NextPage = () => {
   const [star, setStar] = useState<IVideoStar | null>()
 
   const [bookmarks, setBookmarks] = useState<IBookmark[]>([])
-  const { data: attributes } = useSWR<IGeneral[]>(`${serverConfig.api}/attribute`, fetcher)
-  const { data: categories } = useSWR<IGeneral[]>(`${serverConfig.api}/category`, fetcher)
-  const { data: locations } = useSWR<IGeneral[]>(`${serverConfig.api}/location`, fetcher)
+  const [attributes, setAttributes] = useState<IGeneral[]>([])
+  const [categories, setCategories] = useState<IGeneral[]>([])
+  const [locations, setLocations] = useState<IGeneral[]>([])
 
   useEffect(() => {
     if (typeof query.id === 'string') {
       const videoID = parseInt(query.id)
 
       Promise.all([
+        attributeApi.getAll().then(({ data }) => setAttributes(data)),
+        categoryApi.getAll().then(({ data }) => setCategories(data)),
+        locationApi.getAll().then(({ data }) => setLocations(data)),
         videoApi.get<IVideo>(videoID).then(({ data }) => setVideo(data)),
         videoApi.getBookmarks<IBookmark[]>(videoID).then(({ data }) => setBookmarks(data)),
         videoApi.getStar<IVideoStar>(videoID).then(({ data }) => setStar(data !== '' ? data : null))
@@ -56,9 +57,9 @@ const VideoPage: NextPage = () => {
         <>
           <Section
             video={video}
-            locations={locations ?? []}
-            attributes={attributes ?? []}
-            categories={categories ?? []}
+            locations={locations}
+            attributes={attributes}
+            categories={categories}
             bookmarks={bookmarks}
             star={star}
             update={{ video: setVideo, star: setStar, bookmarks: setBookmarks }}

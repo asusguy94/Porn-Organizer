@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { Grid, TextField, Card, CardActionArea, CardContent, Button, Typography } from '@mui/material'
 
 import { useSessionStorage } from 'usehooks-ts'
-import useSWR from 'swr'
 
 import Link from '@components/link'
 import { ImageCard } from '@components/image'
@@ -58,33 +57,36 @@ const Stars: NextPage = () => {
   const [starInput, setStarInput] = useSessionStorage('starInput', '')
 
   const [missing, setMissing] = useState<IMissing[]>([])
+  const [stars, setStars] = useState<IStar[]>([])
+  const [videoStars, setVideoStars] = useState<IMissing[]>([])
+
   const [input, setInput] = useState('')
   const [activeStar, setActiveStar] = useState<string>()
-
-  const { data: initialData } = useSWR<{ missing: IMissing[]; stars: IStar[] }>(`${serverConfig.api}/star/missing`)
 
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
-    if (initialData !== undefined) {
-      const imported = initialData.stars.map(item => item.name)
+    starApi.getMissing<IStar, IMissing>().then(({ data }) => {
+      const imported = data.stars.map(item => item.name)
 
-      const filtered = initialData.missing.filter((star, idx, self) => {
+      const filtered = data.missing.filter((star, idx, self) => {
         return idx !== self.findIndex(item => item.name === star.name && !imported.includes(star.name))
       })
 
+      setStars(data.stars)
       setMissing(filtered)
-    }
-  }, [initialData])
+      setVideoStars(data.missing)
+    })
+  }, [])
 
   useEffect(() => {
     if (missing.length) setInput(missing[index].name)
   }, [missing, index])
 
   useEffect(() => {
-    setActiveStar(initialData?.stars.find(s => s.name === starInput)?.name)
+    setActiveStar(stars.find(s => s.name === starInput)?.name)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialData?.stars])
+  }, [stars])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -114,7 +116,7 @@ const Stars: NextPage = () => {
       </form>
 
       <Grid container justifyContent='center' spacing={3} style={{ marginTop: 0 }}>
-        {initialData?.stars
+        {stars
           .filter(s => s.image === null)
           .filter(s => s.name.includes(' '))
           .sort((a, b) => a.name.localeCompare(b.name))
@@ -144,7 +146,7 @@ const Stars: NextPage = () => {
       </Grid>
 
       <Grid container justifyContent='center' spacing={3} style={{ marginTop: 0 }}>
-        {initialData?.missing
+        {videoStars
           .sort((a, b) => a.name.localeCompare(b.name))
           .slice(0, 500) // limit results to avoid crash
           .map(star => (

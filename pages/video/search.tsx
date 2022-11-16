@@ -17,7 +17,6 @@ import {
 import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
 import { useReadLocalStorage } from 'usehooks-ts'
-import useSWR from 'swr'
 
 import { ImageCard } from '@components/image'
 import IndeterminateItem, { HandlerProps as IndeterminateItemProps } from '@components/indeterminate'
@@ -30,8 +29,8 @@ import SortObj from '@components/search/sort'
 import Link from '@components/link'
 
 import { daysToYears } from '@utils/client/date-time'
-import fetcher from '@utils/client/fetcher'
 import { IQuality, ISetState, IWebsiteWithSites as IWebsite, IGeneral, ILocalWebsite } from '@interfaces'
+import { attributeApi, categoryApi, locationApi, searchApi, websiteApi } from '@api'
 import { serverConfig } from '@config'
 
 import styles from './search.module.scss'
@@ -78,12 +77,18 @@ const VideoSearchPage: NextPage = () => {
   const localWebsites = useReadLocalStorage<ILocalWebsite[]>('websites')
 
   const [videos, setVideos] = useState<IVideo[]>([])
-  const { data: initialVideos } = useSWR<IVideo[]>(`${serverConfig.api}/search/video`, fetcher)
 
-  const { data: categories } = useSWR<IGeneral[]>(`${serverConfig.api}/category`, fetcher)
-  const { data: attributes } = useSWR<IGeneral[]>(`${serverConfig.api}/attribute`, fetcher)
-  const { data: locations } = useSWR<IGeneral[]>(`${serverConfig.api}/location`, fetcher)
-  const { data: websites } = useSWR<IWebsite[]>(`${serverConfig.api}/website`, fetcher)
+  const [categories, setCategories] = useState<IGeneral[]>([])
+  const [attributes, setAttributes] = useState<IGeneral[]>([])
+  const [locations, setLocations] = useState<IGeneral[]>([])
+  const [websites, setWebsites] = useState<IWebsite[]>([])
+
+  useEffect(() => {
+    categoryApi.getAll().then(({ data }) => setCategories(data))
+    attributeApi.getAll().then(({ data }) => setAttributes(data))
+    locationApi.getAll().then(({ data }) => setLocations(data))
+    websiteApi.getAll<IWebsite>().then(({ data }) => setWebsites(data))
+  }, [])
 
   useEffect(() => {
     if (localWebsites !== null) {
@@ -94,9 +99,9 @@ const VideoSearchPage: NextPage = () => {
   const inputRef = useRef<HTMLInputElement>()
 
   useEffect(() => {
-    if (initialVideos !== undefined) {
+    searchApi.getVideos<IVideo>().then(({ data }) => {
       setVideos(
-        initialVideos
+        data
           .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
           .filter(v => {
             if (localWebsites === null) {
@@ -133,19 +138,14 @@ const VideoSearchPage: NextPage = () => {
             }
           }))
       )
-    }
-  }, [initialVideos, localWebsites])
+    })
+  }, [localWebsites])
 
   return (
     <Grid container>
       <Grid item xs={2} id={styles.sidebar}>
         <Sidebar
-          videoData={{
-            categories: categories ?? [],
-            attributes: attributes ?? [],
-            locations: locations ?? [],
-            websites: websites ?? []
-          }}
+          videoData={{ categories, attributes, locations, websites }}
           videos={videos}
           update={setVideos}
           inputRef={inputRef}

@@ -18,7 +18,6 @@ import {
 
 import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
-import useSWR from 'swr'
 
 import { daysToYears } from '@utils/client/date-time'
 
@@ -33,6 +32,7 @@ import Link from '@components/link'
 import SortObj from '@components/search/sort'
 
 import { IGeneral, ISetState } from '@interfaces'
+import { searchApi, starApi, websiteApi } from '@api'
 import { serverConfig } from '@config'
 
 import styles from './search.module.scss'
@@ -68,14 +68,10 @@ interface IStarData {
 
 const StarSearchPage: NextPage = () => {
   const [stars, setStars] = useState<IStar[]>([])
-  const { data: initialStars } = useSWR<IStar[]>(`${serverConfig.api}/search/star`)
-
-  const { data: websites } = useSWR<IGeneral[]>(`${serverConfig.api}/website`)
-  const { data: info } = useSWR<{
-    breast: string[]
-    haircolor: string[]
-    ethnicity: string[]
-  }>(`${serverConfig.api}/star`)
+  const [breasts, setBreasts] = useState<string[]>([])
+  const [haircolors, setHaircolors] = useState<string[]>([])
+  const [ethnicities, setEthnicities] = useState<string[]>([])
+  const [websites, setWebsites] = useState<IGeneral[]>([])
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -86,9 +82,9 @@ const StarSearchPage: NextPage = () => {
   }
 
   useEffect(() => {
-    if (initialStars !== undefined) {
+    searchApi.getStars<IStar>().then(({ data }) => {
       setStars(
-        initialStars.map(star => ({
+        data.map(star => ({
           ...star,
           score: calculateScore(star.websites.length, star.videoCount),
           hidden: {
@@ -103,19 +99,21 @@ const StarSearchPage: NextPage = () => {
           }
         }))
       )
-    }
-  }, [initialStars])
+    })
+
+    websiteApi.getAll().then(({ data }) => setWebsites(data))
+    starApi.getInfo().then(({ data }) => {
+      setBreasts(data.breast)
+      setHaircolors(data.haircolor)
+      setEthnicities(data.ethnicity)
+    })
+  }, [])
 
   return (
     <Grid container>
       <Grid item xs={2} id={styles.sidebar}>
         <Sidebar
-          starData={{
-            breasts: info?.breast ?? [],
-            haircolors: info?.haircolor ?? [],
-            ethnicities: info?.ethnicity ?? [],
-            websites: websites ?? []
-          }}
+          starData={{ breasts, haircolors, ethnicities, websites }}
           stars={stars}
           update={setStars}
           inputRef={inputRef}

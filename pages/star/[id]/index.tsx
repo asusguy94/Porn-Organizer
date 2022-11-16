@@ -19,7 +19,6 @@ import {
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 import { Flipper, Flipped } from 'react-flip-toolkit'
 import { useCopyToClipboard } from 'usehooks-ts'
-import useSWR from 'swr'
 
 import Image, { ImageCard } from '@components/image'
 import Link from '@components/link'
@@ -29,7 +28,6 @@ import Dropbox from '@components/dropbox'
 import Icon from '@components/icon'
 
 import { daysToYears } from '@utils/client/date-time'
-import fetcher from '@utils/client/fetcher'
 
 import { starApi } from '@api'
 import { ISetState, ISimilar, IStarVideo } from '@interfaces'
@@ -66,17 +64,21 @@ const StarPage: NextPage = () => {
 
   const [star, setStar] = useState<IStar>()
 
-  const { data: starData } = useSWR<{
-    breast: string[]
-    haircolor: string[]
-    ethnicity: string[]
-  }>(`${serverConfig.api}/star`, fetcher)
+  const [breast, setBreast] = useState<string[]>([])
+  const [haircolor, setHaircolor] = useState<string[]>([])
+  const [ethnicity, setEthnicity] = useState<string[]>([])
 
   const [videos, setVideos] = useState<IStarVideo[]>([])
 
   useEffect(() => {
     if (typeof query.id === 'string') {
       const starID = parseInt(query.id)
+
+      starApi.getInfo().then(({ data }) => {
+        setBreast(data.breast)
+        setHaircolor(data.haircolor)
+        setEthnicity(data.ethnicity)
+      })
 
       starApi.get<IStar>(starID).then(({ data }) => setStar(data))
       starApi.getVideos(starID).then(({ data }) => setVideos(data))
@@ -94,11 +96,7 @@ const StarPage: NextPage = () => {
 
             <StarTitle star={star} update={setStar} onModal={setModal} />
 
-            <StarForm
-              starData={starData ?? { breast: [], ethnicity: [], haircolor: [] }}
-              star={star}
-              update={setStar}
-            />
+            <StarForm starData={{ breast, ethnicity, haircolor }} star={star} update={setStar} />
           </Grid>
 
           {videos.length > 0 && <StarVideos videos={videos} update={setVideos} />}

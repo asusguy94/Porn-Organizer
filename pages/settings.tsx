@@ -4,15 +4,18 @@ import React, { useEffect, useState } from 'react'
 import { Button, Checkbox, Grid, List, TextField } from '@mui/material'
 
 import { useLocalStorage } from 'usehooks-ts'
-import useSWR from 'swr'
 
 import { IGeneral, ILocalWebsite, ISetState } from '@interfaces'
-import { serverConfig } from '@config'
+import { websiteApi } from '@api'
 
 const SettingsPage: NextPage = () => {
-  const { data: websites } = useSWR<IGeneral[]>(`${serverConfig.api}/website`)
+  const [websites, setWebsites] = useState<IGeneral[]>([])
   const [rawWebsites, setRawWebsites] = useLocalStorage<ILocalWebsite[]>('websites', [])
   const [localWebsites, setLocalWebsites] = useState<ILocalWebsite[]>([])
+
+  useEffect(() => {
+    websiteApi.getAll().then(({ data }) => setWebsites(data))
+  }, [])
 
   useEffect(() => {
     setLocalWebsites(rawWebsites)
@@ -30,7 +33,7 @@ const SettingsPage: NextPage = () => {
 
   return (
     <Grid item className='text-center'>
-      <WebsiteList websites={(websites ?? []).filter(w => !localWebsites.some(wsite => wsite.label === w.name))} />
+      <WebsiteList websites={websites.filter(w => !localWebsites.some(wsite => wsite.label === w.name))} />
       <form onSubmit={handleSubmit}>
         <Grid container alignItems='center' direction='column' justifyContent='center' spacing={1}>
           {localWebsites.map(wsite => (
