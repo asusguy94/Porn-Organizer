@@ -31,7 +31,7 @@ const Header = ({ video, attributes, locations, update, onModal }: HeaderProps) 
 
         <HeaderQuality video={video} hidden={!isFullHD} />
         <HeaderSlug video={video} hidden={video.slug !== null} onModal={onModal} />
-        <HeaderCover video={video} hidden={video.image !== null} />
+        <HeaderCover video={video} hidden={video.image !== null || video.slug === null} />
 
         <HeaderDate video={video} />
 
