@@ -9,6 +9,11 @@
 
   .title {
     text-align: center;
-    margin-top: 2px;
+
+    // restrict to 3 lines
+    -webkit-line-clamp: 3;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }

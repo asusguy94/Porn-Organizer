@@ -87,9 +87,9 @@ export const Column = ({ enabled = true, label, rows = 1, limit = -1, colSize = 
 
 const Home: NextPage = () => (
   <Grid container>
-    <Column label='recent' />
-    <Column label='newest' />
-    <Column label='popular' rows={2} />
+    <Column label='recent' colSize={12} />
+    <Column label='newest' colSize={12} />
+    <Column label='popular' rows={3} />
   </Grid>
 )
 
