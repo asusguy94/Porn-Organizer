@@ -56,16 +56,17 @@ export const noExt = (dir: string): string => {
   return parsed.dir ? `${parsed.dir}/${parsed.name}` : parsed.name
 }
 
-export const removeThumbnails = async (videoID: number): Promise<void> => {
+export const removeThumbnails = async (videoID: number) => {
+  await Promise.allSettled([
   // Remove Images
-  await fs.promises.unlink(`./media/images/videos/${videoID}.jpg`)
-  //TODO this method stops working if this setting is changed
-  await fs.promises.unlink(`./media/images/videos/${videoID}-${settingsConfig.THUMB_RES}.jpg`)
+    fs.promises.unlink(`./media/images/videos/${videoID}.jpg`),
+    fs.promises.unlink(`./media/images/videos/${videoID}-${settingsConfig.THUMB_RES}.jpg`),
 
   // Remove Previews
-  await fs.promises.unlink(`./media/images/thumbnails/${videoID}.jpg`)
-  await fs.promises.unlink(`./media/vtt/${videoID}.vtt`)
-  await fs.promises.unlink(`./media/vtt/${videoID}.jpg`)
+    fs.promises.unlink(`./media/images/thumbnails/${videoID}.jpg`),
+    fs.promises.unlink(`./media/vtt/${videoID}.vtt`),
+    fs.promises.unlink(`./media/vtt/${videoID}.jpg`)
+  ])
 }
 
 // This requires a specific pipeline, as such it is using callbacks
@@ -284,8 +285,7 @@ export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, pat
           res.writeHead(206, {
             'Accept-Ranges': 'bytes',
             'Content-Range': `bytes ${start}-${end}/${data.size}`,
-            'Content-Length': end - start + 1,
-            'Content-Type': 'video/mp4'
+            'Content-Length': end - start + 1
           })
 
           fs.createReadStream(path, { start, end }).pipe(res)

@@ -179,6 +179,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await prisma.video.delete({ where: { id: parseInt(id) } }).then(async video => {
         await removeThumbnails(video.id)
 
+        await Promise.allSettled([
         // remove video-file
         fs.promises.unlink(`./media/videos/${video.path}`)
 
