@@ -230,7 +230,7 @@ const Sidebar = ({ similar }: SidebarProps) => (
 
     <CardContent>
       <Grid id={styles.similar}>
-        {similar.map((similarStar, i) => (
+        {similar.map((similarStar, idx) => (
           <Link
             key={similarStar.id}
             href={{ pathname: '/star/[id]', query: { id: similarStar.id } }}
@@ -244,7 +244,7 @@ const Sidebar = ({ similar }: SidebarProps) => (
                 missing={similarStar.image === null}
                 scale={5}
                 alt='star'
-                priority={i === 0}
+                priority={idx === 0}
               />
 
               <Typography>{similarStar.name}</Typography>
@@ -449,7 +449,7 @@ const StarVideos = ({ videos, update }: StarVideosProps) => {
 
       <Flipper flipKey={videos}>
         <Grid container style={{ marginTop: 8 }}>
-          {videos.map((video, i) => {
+          {videos.map((video, idx) => {
             if (!websites.includes(video.website)) {
               setWebsites([...websites, video.website])
             }
@@ -464,8 +464,8 @@ const StarVideos = ({ videos, update }: StarVideosProps) => {
                 >
                   <StarVideo
                     video={video}
-                    isFirst={videos.length > 1 && i === 0}
-                    isLast={videos.length > 1 && i === videos.length - 1}
+                    isFirst={videos.length > 1 && idx === 0}
+                    isLast={videos.length > 1 && idx === videos.length - 1}
                     isHidden={video.hidden}
                   />
                 </Link>

@@ -114,7 +114,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration, update, o
 
   return (
     <Grid id={styles.timeline}>
-      {bookmarks.map((bookmark, i) => (
+      {bookmarks.map((bookmark, idx) => (
         <Fragment key={bookmark.start}>
           <ContextMenuTrigger id={`bookmark-${bookmark.start}`}>
             <Button
@@ -126,7 +126,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration, update, o
                 left: `${((bookmark.start * 100) / duration) * settingsConfig.timeline.offset}%`
               }}
               onClick={() => playVideo(bookmark.start)}
-              ref={(bookmark: HTMLButtonElement) => (bookmarksArr[i] = bookmark)}
+              ref={(bookmark: HTMLButtonElement) => (bookmarksArr[idx] = bookmark)}
               data-level={1}
             >
               {bookmark.category.name}
