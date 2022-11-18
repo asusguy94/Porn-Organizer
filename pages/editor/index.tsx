@@ -24,26 +24,17 @@ import styles from './editor.module.scss'
 
 const EditorPage: NextPage = () => (
   <Grid container>
-    <Wrapper label='attributes' name='attribute'>
-      <WrapperItem label='attribute' />
-    </Wrapper>
-
-    <Wrapper label='categories' name='category'>
-      <WrapperItem label='category' />
-    </Wrapper>
-
-    <Wrapper label='locations' name='location'>
-      <WrapperItem label='location' />
-    </Wrapper>
+    <Wrapper label='attributes' name='attribute' />
+    <Wrapper label='categories' name='category' />
+    <Wrapper label='locations' name='location' />
   </Grid>
 )
 
 interface WrapperProps {
   label: string
   name: string
-  children?: React.ReactNode
 }
-const Wrapper = ({ label, name, children }: WrapperProps) => {
+const Wrapper = ({ label, name }: WrapperProps) => {
   const [input, setInput] = useState('')
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => setInput(e.currentTarget.value)
@@ -88,7 +79,7 @@ const Wrapper = ({ label, name, children }: WrapperProps) => {
         </Grid>
       </Grid>
 
-      {children}
+      <WrapperItem label={name} />
     </Grid>
   )
 }
@@ -117,7 +108,7 @@ const WrapperItem = ({ label }: WrapperItemProps) => {
   }, [label])
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} style={{ overflowX: 'visible' }}>
       <Table size='small' className={styles['table-striped']} stickyHeader>
         <TableHead>
           <TableRow>

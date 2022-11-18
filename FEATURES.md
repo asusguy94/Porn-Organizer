@@ -23,7 +23,6 @@
 | Recent Videos  | :heavy_check_mark: |
 | Newest Videos  | :heavy_check_mark: |
 | Popular Videos | :heavy_check_mark: |
-| Random Videos  | :heavy_check_mark: |
 
 ## :x: Import Videos
 

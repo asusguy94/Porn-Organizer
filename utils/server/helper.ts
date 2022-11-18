@@ -31,16 +31,14 @@ const getClosest = (search: number, arr: number[]): number => {
   })
 }
 
-export async function downloader(url: string, dest: string): Promise<void> {
+export const downloader = async (url: string, dest: string): Promise<void> => {
   const response = await fetch(url)
   const buffer = await response.buffer()
 
   await fs.promises.writeFile(`./${dest}`, buffer)
 }
 
-export function getUnique<T = number | string>(arr: T[]): T[]
-export function getUnique<T = { [key: string]: number }>(arr: T[], prop: keyof T): T[]
-export function getUnique<T = number | string | { [key: string]: number }>(arr: T[], prop?: keyof T): T[] {
+export const getUnique = <T>(arr: T[], prop?: keyof T): T[] => {
   if (prop !== undefined) {
     return arr.filter((obj, idx) => arr.findIndex(item => item[prop] === obj[prop]) === idx)
   }
@@ -58,11 +56,11 @@ export const noExt = (dir: string): string => {
 
 export const removeThumbnails = async (videoID: number) => {
   await Promise.allSettled([
-  // Remove Images
+    // Remove Images
     fs.promises.unlink(`./media/images/videos/${videoID}.jpg`),
     fs.promises.unlink(`./media/images/videos/${videoID}-${settingsConfig.THUMB_RES}.jpg`),
 
-  // Remove Previews
+    // Remove Previews
     fs.promises.unlink(`./media/images/thumbnails/${videoID}.jpg`),
     fs.promises.unlink(`./media/vtt/${videoID}.vtt`),
     fs.promises.unlink(`./media/vtt/${videoID}.jpg`)

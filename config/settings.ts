@@ -7,5 +7,5 @@ export default {
   thumbnails: false,
   qualities: [1080, 720, 480, 360],
   THUMB_RES: parseInt(process.env.THUMBNAIL_RES ?? '290'),
-  THEPORNDB_API: process.env.THEPORNDB_API
+  THEPORNDB_API: process.env.THEPORNDB_API ?? ''
 }
