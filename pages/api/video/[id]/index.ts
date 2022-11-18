@@ -180,16 +180,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await removeThumbnails(video.id)
 
         await Promise.allSettled([
-        // remove video-file
-        fs.promises.unlink(`./media/videos/${video.path}`)
+          // remove video-file
+          fs.promises.unlink(`./media/videos/${video.path}`),
 
-        // remove stream-files
-        fs.promises.rm(`./media/videos/${noExt(video.path)}`, {
-          recursive: true,
-          force: true,
-          maxRetries: 20,
-          retryDelay: 200
-        })
+          // remove stream-files
+          fs.promises.rm(`./media/videos/${noExt(video.path)}`, { recursive: true, force: true })
+        ])
       })
 
       res.end()
