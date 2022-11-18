@@ -69,7 +69,7 @@ export interface IStarVideo {
   date: string
   fname: string
   website: string
-  site: string
+  site: string | null
   age: number
   hidden: boolean
 }
