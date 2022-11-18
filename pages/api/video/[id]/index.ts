@@ -114,10 +114,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // Update Database
         await prisma.video.update({ where: { id: parseInt(id) }, data: { path } }).then(async video => {
-          // Rename File
-          await fs.promises.rename(`./media/videos/${oldPath}`, `./media/videos/${video.path}`).then(async () => {
-            await fs.promises.rename(`./media/videos/${noExt(oldPath)}`, `./media/videos/${noExt(video.path)}`)
-          })
+          await Promise.allSettled([
+            // Rename File
+            fs.promises.rename(`./media/videos/${oldPath}`, `./media/videos/${video.path}`),
+
+            // Rename Dir
+            fs.promises.rename(`./media/videos/${noExt(oldPath)}`, `./media/videos/${noExt(video.path)}`)
+          ])
         })
       } else if (date !== undefined) {
         const video = await prisma.video.findFirstOrThrow({

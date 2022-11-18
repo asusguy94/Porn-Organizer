@@ -68,21 +68,19 @@ export const removeThumbnails = async (videoID: number) => {
 }
 
 // This requires a specific pipeline, as such it is using callbacks
-export const rebuildVideoFile = async (src: string): Promise<void> => {
+export const rebuildVideoFile = async (src: string): Promise<boolean> => {
   const { dir, ext, name } = path.parse(src)
   const newSrc = `${dir}/${name}_${ext}`
 
-  return new Promise<void>((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/require-await
-    fs.promises.rename(src, newSrc).then(async () => {
-      ffmpeg(newSrc)
-        .videoCodec('copy')
-        .audioCodec('copy')
-        .output(src)
-        .on('end', () => fs.unlink(newSrc, () => resolve()))
-        .on('error', err => reject(err))
-        .run()
-    })
+  await fs.promises.rename(src, newSrc)
+  return new Promise<boolean>((resolve, reject) => {
+    ffmpeg(newSrc)
+      .videoCodec('copy')
+      .audioCodec('copy')
+      .output(src)
+      .on('end', () => fs.unlink(newSrc, err => resolve(err !== null)))
+      .on('error', err => reject(err))
+      .run()
   })
 }
 
