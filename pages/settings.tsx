@@ -24,16 +24,20 @@ const SettingsPage: NextPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
+    // update browser-storage
     setRawWebsites(localWebsites)
   }
 
-  // list all available websites
-  // add website to form if clicked
-  // remove-button next to form
+  const handleAddWebsite = (wsite: string) => {
+    setLocalWebsites(prev => [...prev, { label: wsite, count: 0, finished: true }])
+  }
 
   return (
     <Grid item className='text-center'>
-      <WebsiteList websites={websites.filter(w => !localWebsites.some(wsite => wsite.label === w.name))} />
+      <WebsiteList
+        websites={websites.filter(w => !localWebsites.some(wsite => wsite.label === w.name))}
+        addWebsite={handleAddWebsite}
+      />
       <form onSubmit={handleSubmit}>
         <Grid container alignItems='center' direction='column' justifyContent='center' spacing={1}>
           {localWebsites.map(wsite => (
@@ -49,11 +53,17 @@ const SettingsPage: NextPage = () => {
   )
 }
 
-const WebsiteList = ({ websites }: { websites: IGeneral[] }) => {
+interface WebsiteListProps {
+  websites: IGeneral[]
+  addWebsite: (wsite: string) => void
+}
+const WebsiteList = ({ websites, addWebsite }: WebsiteListProps) => {
   return (
     <List>
       {websites.map(website => (
-        <div key={website.id}>{website.name}</div>
+        <div key={website.id} onClick={() => addWebsite(website.name)}>
+          {`ADD "${website.name}"`}
+        </div>
       ))}
     </List>
   )
