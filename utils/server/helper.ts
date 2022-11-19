@@ -38,14 +38,6 @@ export const downloader = async (url: string, dest: string): Promise<void> => {
   await fs.promises.writeFile(`./${dest}`, buffer)
 }
 
-export const getUnique = <T>(arr: T[], prop?: keyof T): T[] => {
-  if (prop !== undefined) {
-    return arr.filter((obj, idx) => arr.findIndex(item => item[prop] === obj[prop]) === idx)
-  }
-
-  return [...new Set(arr)]
-}
-
 export const dirOnly = (dir: string, root = false): string => (root ? path.parse(dir).dir : path.parse(dir).name)
 export const extOnly = (dir: string): string => path.parse(dir).ext
 export const noExt = (dir: string): string => {

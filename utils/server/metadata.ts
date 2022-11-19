@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { getUnique } from './helper'
+import { getUnique } from '../shared'
 
 import { settingsConfig } from '@config'
 

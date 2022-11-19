@@ -2,17 +2,17 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@api": ["api"], // only index-page
+      "@api": ["api"],
       "@components/*": ["components/*"],
-      "@config": ["config"], // only index-page
+      "@config": ["config"],
       "@pages/*": ["pages/*"],
       "@styles/*": ["styles/*"],
-      // "@utils/client": ["utils/client"],
+      "@utils/shared": ["utils/shared"],
       "@utils/client/*": ["utils/client/*"],
       "@utils/server": ["utils/server"],
       "@utils/server/*": ["utils/server/*"],
       "@hooks/*": ["hooks/*"],
-      "@interfaces": ["interfaces"] // only 1-file
+      "@interfaces": ["interfaces"]
     }
   }
 }

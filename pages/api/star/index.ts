@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 import Joi from 'joi'
 
 import { prisma, validate } from '@utils/server'
-import { getUnique } from '@utils/server/helper'
+import { getUnique } from '@utils/shared'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {

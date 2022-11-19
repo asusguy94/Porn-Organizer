@@ -10,6 +10,7 @@ import { ImageCard } from '@components/image'
 
 import { starApi } from '@api'
 import { serverConfig } from '@config'
+import { getUnique } from '@utils/shared'
 
 interface IStar {
   id: number
@@ -67,11 +68,7 @@ const Stars: NextPage = () => {
 
   useEffect(() => {
     starApi.getMissing<IStar, IMissing>().then(({ data }) => {
-      const imported = data.stars.map(item => item.name)
-
-      const filtered = data.missing.filter((star, idx, self) => {
-        return idx !== self.findIndex(item => item.name === star.name && !imported.includes(star.name))
-      })
+      const filtered = getUnique(data.missing, 'name').filter(star => !data.stars.some(s => s.name === star.name))
 
       setStars(data.stars)
       setMissing(filtered)
