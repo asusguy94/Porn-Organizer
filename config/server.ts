@@ -1,4 +1,4 @@
-const ip = '192.168.1.100'
+const ip = 'transcoder.local'
 
 export default {
   api: `/api`,

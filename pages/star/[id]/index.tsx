@@ -19,6 +19,7 @@ import {
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 import { Flipper, Flipped } from 'react-flip-toolkit'
 import { useCopyToClipboard } from 'usehooks-ts'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 import Image, { ImageCard } from '@components/image'
 import Link from '@components/link'
@@ -303,8 +304,7 @@ const StarImageDropbox = ({ star, update, onModal }: StarImageDropboxProps) => {
                 onModal()
               }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={image} className={styles.profile} alt='' />
+              <LazyLoadImage src={image} delayMethod='debounce' delayTime={100} className={styles.profile} alt='' />
             </ImageListItem>
           ))}
         </ImageList>

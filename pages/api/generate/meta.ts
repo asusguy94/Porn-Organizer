@@ -92,6 +92,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       where: { api: null },
       include: { site: true }
     })
+
     for await (const video of infoVideos) {
       await sleep(400) // 400ms between requests
       await findSceneSlug(generateStarName(video.path), video.name, video.site?.name)
