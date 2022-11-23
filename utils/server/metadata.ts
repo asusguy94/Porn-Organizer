@@ -4,35 +4,33 @@ import { getUnique } from '../shared'
 
 import { settingsConfig } from '@config'
 
+type IGender = 'Female' | 'Male' | null
+
+interface IExtra {
+  birthday: string | null
+  ethnicity: string | null
+  nationality: string | null
+  weight: string | null
+  height: string | null
+  cupsize: string | null
+}
+
 interface IBasicModel {
   data: {
     id: string
     slug: string
     name: string
-    extras: {
-      gender: 'Female' | 'Male' | null
-      birthday: string
-      birthday_timestamp: number
-      birthplace: string
-      birthplace_code: string
-      ethnicity: string
-      nationality: string
-      hair_colour: string
-      weight: string
-      height: string
-      measurements: string
-      cupsize: string
-      tattoos: string
-      piercings: string
-      waist: string
-      hips: string
+    extras: IExtra & {
+      gender: IGender
+      birthplace: string | null
+      birthplace_code: string | null
+      hair_colour: string | null
     }
     image: string
     thumbnail: string
     posters: {
       id: number
       url: string
-      size: number
     }[]
   }[]
 }
@@ -107,17 +105,9 @@ export const getSceneData = async (slug: string) => {
       performers: {
         id: string
         name: string
-        extra: {
-          gender: 'Female' | 'Male' | null
-          birthday: string | null
-          ethnicity: string | null
-          nationality: string | null
+        extra: IExtra & {
+          gender: IGender
           haircolor: string | null
-          height: string | null
-          weight: string | null
-          tattoos: null | null
-          piercings: string | null
-          cupsize: string | null
         }
         image: string
         thumbnail: string
@@ -157,22 +147,10 @@ export const getStarData = async (slug: string) => {
       id: string
       slug: string
       name: string
-      extras: {
-        birthday: string
-        birthday_timestamp: number
-        birthplace: string
-        birthplace_code: string
-        ethnicity: string
-        nationality: string
-        hair_colour: string
-        weight: string
-        height: string
-        measurements: string
-        cupsize: string
-        tattoos: string
-        piercings: string
-        waist: string
-        hips: string
+      extras: IExtra & {
+        birthplace: string | null
+        birthplace_code: string | null
+        hair_colour: string | null
       }
       aliases: string[]
       image: string
@@ -180,7 +158,6 @@ export const getStarData = async (slug: string) => {
       posters: {
         id: number
         url: string
-        size: number
       }[]
       site_performers: {
         id: string
@@ -191,7 +168,6 @@ export const getStarData = async (slug: string) => {
           short_name: string
           url: string
           logo: string
-          favicon: string
           poster: string
         }
       }[]
