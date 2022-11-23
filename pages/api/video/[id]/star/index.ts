@@ -42,34 +42,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         req.body
       )
 
-      let starID
-      if (!(await aliasExists(name))) {
-        starID = (
-          await prisma.star.upsert({
-            where: { name },
-            update: {},
-            create: { name }
-          })
-        ).id
-      } else {
-        starID = (await getAliasAsStar(name)).id
-      }
+      const starID = (
+        !(await aliasExists(name))
+          ? await prisma.star.upsert({ where: { name }, update: {}, create: { name } })
+          : await getAliasAsStar(name)
+      ).id
 
       // Insert VIDEOSTAR into table
-      await prisma.video.update({
+      const video = await prisma.video.update({
         where: { id: parseInt(id) },
         data: { star: { connect: { id: starID } } }
       })
 
-      const video = await prisma.video.findFirstOrThrow({
-        where: { starID },
-        include: { star: true }
+      const star = await prisma.star.findFirstOrThrow({
+        where: { id: starID },
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          birthdate: true,
+          _count: { select: { videos: true } }
+        }
       })
+
       res.json({
-        id: video.star?.id,
-        name: video.star?.name,
-        image: video.star?.image ?? null,
-        ageInVideo: video.starAge ?? dateDiff(video.star?.birthdate, video.date)
+        id: star.id,
+        name: star.name,
+        image: star.image,
+        ageInVideo: video.starAge ?? dateDiff(star.birthdate, video.date),
+        numVideos: star._count.videos
       })
     }
   } else if (req.method === 'DELETE') {
