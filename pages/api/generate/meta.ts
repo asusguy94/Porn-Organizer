@@ -5,14 +5,7 @@ import { prisma } from '@utils/server'
 import { fileExists, getClosestQ, rebuildVideoFile, sleep } from '@utils/server/helper'
 import { duration as videoDuration, height as videoHeight } from 'utils/server/ffmpeg'
 import { generateStarName } from '@utils/server/generate'
-import {
-  aliasExists,
-  aliasIsIgnored,
-  getAliasAsStarID,
-  getStarID,
-  starExists,
-  starIsIgnored
-} from '@utils/server/helper.db'
+import { aliasExists, aliasIsIgnored, getAliasAsStar, starExists, starIsIgnored } from '@utils/server/helper.db'
 import { findSceneSlug } from '@utils/server/metadata'
 
 import type { Video } from '@prisma/client'
@@ -36,9 +29,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // add star or alias to video
         if (await starExists(star)) {
-          await addVideoStar(video.id, await getStarID(star))
+          await addVideoStar(video.id, (await prisma.star.findFirstOrThrow({ where: { name: star } })).id)
         } else if (await starAliasExists(star)) {
-          await addVideoStar(video.id, await getAliasAsStarID(star))
+          await addVideoStar(video.id, (await getAliasAsStar(star)).id)
         }
       }
     }

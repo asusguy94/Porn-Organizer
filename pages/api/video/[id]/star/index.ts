@@ -4,7 +4,7 @@ import Joi from 'joi'
 
 import { prisma, validate } from '@utils/server'
 import { dateDiff } from '@utils/server/helper'
-import { aliasExists, getAliasAsStarID } from '@utils/server/helper.db'
+import { aliasExists, getAliasAsStar } from '@utils/server/helper.db'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
@@ -52,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           })
         ).id
       } else {
-        starID = await getAliasAsStarID(name)
+        starID = (await getAliasAsStar(name)).id
       }
 
       // Insert VIDEOSTAR into table

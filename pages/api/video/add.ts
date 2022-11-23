@@ -4,7 +4,7 @@ import Joi from 'joi'
 
 import { prisma, validate } from '@utils/server'
 import { getDate } from '@utils/server/helper'
-import { getSiteID, websiteExists } from '@utils/server/helper.db'
+import { websiteExists } from '@utils/server/helper.db'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Site should be used
       if (video.site.length) {
         // Create SITE if missing
-        if (!(await getSiteID(video.site))) {
+        if ((await prisma.site.findFirst({ where: { name: video.site } })) === null) {
           // Create SITE
           await prisma.site.create({
             data: {
