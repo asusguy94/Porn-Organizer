@@ -47,6 +47,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       )
 
       if (name !== undefined) {
+        //TODO this @unique-field on name-column is not working?
+        // seems to not rename, but also slow down performance on original table?
         await prisma.star.update({ where: { id: parseInt(id) }, data: { name } })
       } else if (slug !== undefined) {
         if (slug.length) {

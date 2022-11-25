@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import { prisma } from '@utils/server'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { fileExists, getClosestQ, rebuildVideoFile, sleep } from '@utils/server/helper'
 import { duration as videoDuration, height as videoHeight } from 'utils/server/ffmpeg'
 import { generateStarName } from '@utils/server/generate'
@@ -66,16 +65,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (await fileExists(absoluteVideoPath)) {
         console.log(`Rebuild: ${video.id}`)
-        // await rebuildVideoFile(absoluteVideoPath).then(async () => {
-        const duration = await videoDuration(absoluteVideoPath)
-        const height = await videoHeight(absoluteVideoPath)
+        await rebuildVideoFile(absoluteVideoPath).then(async () => {
+          const duration = await videoDuration(absoluteVideoPath)
+          const height = await videoHeight(absoluteVideoPath)
 
-        console.log(`Refreshing ${video.path}`)
-        await prisma.video.update({
-          where: { id: video.id },
-          data: { duration: Math.floor(duration), height: getClosestQ(height) }
+          console.log(`Refreshing ${video.path}`)
+          await prisma.video.update({
+            where: { id: video.id },
+            data: { duration: Math.floor(duration), height: getClosestQ(height) }
+          })
         })
-        // })
       }
     }
     console.log('Finished updating DURATION & HEIGHT')
