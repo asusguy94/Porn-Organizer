@@ -35,6 +35,8 @@ interface IBasicModel {
   }[]
 }
 
+//TODO Check if title.toLowerCase() matches videodata.title.toLowercase()
+
 const config = { headers: { Authorization: `Bearer ${settingsConfig.THEPORNDB_API}` } }
 
 const inToCm = (cm: number) => Math.round(cm * 2.54)

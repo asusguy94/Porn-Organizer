@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY package.json yarn.lock ./
-RUN yarn
+RUN yarn install
 
 # Rebuild the source code only when needed
 FROM node:16-alpine AS builder

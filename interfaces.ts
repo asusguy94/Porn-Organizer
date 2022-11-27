@@ -2,14 +2,14 @@
 export type ISetState<T> = React.Dispatch<React.SetStateAction<T>>
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 export type PickOptional<T, K extends PropertyKey> = Pick<T, Extract<keyof T, K>>
+export type IndexType<V = any> = Record<string, V>
+export type Nullable<T> = T | null
 
 // Common interface
 export interface IGeneral {
   id: number
   name: string
 }
-
-export type IndexType<V = any> = Record<string, V>
 
 // Other Types
 export type IQuality = 1080 | 720 | 480 | 360 | 0

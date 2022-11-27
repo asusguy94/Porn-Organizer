@@ -92,7 +92,7 @@ const StarPage: NextPage = () => {
     <Grid container>
       <Grid item xs={8}>
         <Grid item xs={8}>
-          <Grid item xs={3} id={styles.star}>
+          <Grid item xs={3} id={styles.star} style={{ maxWidth: '28%' }}>
             <StarImageDropbox star={star} update={setStar} onModal={setModal} />
 
             <StarTitle star={star} update={setStar} onModal={setModal} />

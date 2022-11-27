@@ -69,7 +69,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const duration = await videoDuration(absoluteVideoPath)
           const height = await videoHeight(absoluteVideoPath)
 
-          console.log(`Refreshing ${video.path}`)
+          console.log(`Refreshing: "${video.path}"`)
           await prisma.video.update({
             where: { id: video.id },
             data: { duration: Math.floor(duration), height: getClosestQ(height) }
