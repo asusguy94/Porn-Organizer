@@ -107,6 +107,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           })
         )
       }
+
+      res.end()
     }
   } else if (req.method === 'DELETE') {
     const { id } = req.query

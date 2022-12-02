@@ -19,18 +19,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             height: null,
             weight: null
           },
-          { autoTaggerIgnore: true } // disabled profile
+          { autoTaggerIgnore: true }, // disabled profile
+          { api: null } // missing profile
         ]
       }
     })
 
     // VideoStars Without STAR
-    const missing = (await prisma.video.findMany({ include: { star: true } }))
-      .filter(video => video.star === null)
-      .map(video => ({
-        videoID: video.id,
-        name: generateStarName(video.path)
-      }))
+    const missing = (await prisma.video.findMany({ where: { star: null } })).map(v => ({
+      videoID: v.id,
+      name: generateStarName(v.path)
+    }))
 
     res.json({ stars, missing })
   }

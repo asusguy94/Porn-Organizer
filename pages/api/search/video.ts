@@ -37,7 +37,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           pov: categories.every(category => category.endsWith(' (POV)')),
           categories,
           attributes: video.attributes.map(({ attribute }) => attribute.name),
-          locations: video.locations.map(({ location }) => location.name)
+          locations: video.locations.map(({ location }) => location.name),
+          api: video.api
         }
       })
     )

@@ -64,6 +64,7 @@ interface IVideo {
     notPov: boolean
     website: boolean
   }
+  api: string | null
 }
 
 interface IVideoData {
