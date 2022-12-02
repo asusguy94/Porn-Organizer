@@ -2,14 +2,13 @@ import { Fragment } from 'react'
 
 import { Button, Grid, TextField, Typography } from '@mui/material'
 
-import axios from 'axios'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import { useCopyToClipboard } from 'usehooks-ts'
 
 import Icon from '../icon'
 import type { IModalHandler } from '../modal'
 
-import { locationApi, videoApi } from '@api'
+import { attributeApi, locationApi, videoApi } from '@api'
 import { IGeneral, ISetState, IVideo } from '@interfaces'
 
 import styles from './header.module.scss'
@@ -139,7 +138,7 @@ interface HeaderLocationsProps {
 const HeaderLocations = ({ video, update }: HeaderLocationsProps) => {
   const removeLocation = (location: IGeneral) => {
     locationApi.removeVideo(video.id, location.id).then(() => {
-      update({ ...video, locations: video.locations.filter(locationItem => locationItem.id !== location.id) })
+      update({ ...video, locations: video.locations.filter(item => item.id !== location.id) })
     })
   }
 
@@ -173,7 +172,7 @@ interface HeaderAttributesProps {
 }
 const HeaderAttributes = ({ video, update }: HeaderAttributesProps) => {
   const removeAttribute = (attribute: IGeneral) => {
-    axios.delete(`/${video.id}/${attribute.id}`).then(() => {
+    attributeApi.removeVideo(video.id, attribute.id).then(() => {
       update({ ...video, attributes: video.attributes.filter(item => item.id !== attribute.id) })
     })
   }
