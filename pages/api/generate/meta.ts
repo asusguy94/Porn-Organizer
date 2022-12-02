@@ -98,8 +98,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     console.log('Finished updating VIDEO INFO')
 
-    const videos = await prisma.video.findMany({ where: { starID: null } })
     console.log('Updating STARS')
+    const videos = await prisma.video.findMany({ where: { starID: null } })
     for await (const video of videos) {
       // Only check relation if the video has not been moved!
       if (await fileExists(`./media/videos/${video.path}`)) {
