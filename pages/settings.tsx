@@ -5,7 +5,8 @@ import { Button, Checkbox, Grid, List, TextField } from '@mui/material'
 
 import { useLocalStorage } from 'usehooks-ts'
 
-import { IGeneral, ILocalWebsite, ISetState } from '@interfaces'
+import { clamp } from '@utils/shared'
+import { IGeneral, ILocalWebsite, ISetState, IWebsiteWithSites as IWebsite } from '@interfaces'
 import { websiteApi } from '@api'
 
 const SettingsPage: NextPage = () => {
@@ -41,7 +42,13 @@ const SettingsPage: NextPage = () => {
       <form onSubmit={handleSubmit}>
         <Grid container alignItems='center' direction='column' justifyContent='center' spacing={1}>
           {localWebsites.map(wsite => (
-            <Input key={wsite.label} website={wsite} update={setLocalWebsites} localWebsites={localWebsites} />
+            <Input
+              key={wsite.label}
+              website={wsite}
+              update={setLocalWebsites}
+              localWebsites={localWebsites}
+              max={websites.find(w => w.name === wsite.label)?.videos}
+            />
           ))}
         </Grid>
 
@@ -73,16 +80,16 @@ interface InputProps {
   website: ILocalWebsite
   update: ISetState<ILocalWebsite[]>
   localWebsites: ILocalWebsite[]
+  max?: number
 }
-const Input = ({ website, update, localWebsites }: InputProps) => {
+const Input = ({ website, update, localWebsites, max = 0 }: InputProps) => {
   const [count, setCount] = useState(website.count)
   const [finished, setFinished] = useState(website.finished)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value)
-    const count = value < 0 ? 0 : value
 
-    setCount(count)
+    setCount(clamp(value, max))
     update(
       localWebsites.map(wsite => {
         if (wsite.label === website.label) {
@@ -101,8 +108,6 @@ const Input = ({ website, update, localWebsites }: InputProps) => {
       localWebsites.map(wsite => {
         if (wsite.label === website.label) {
           wsite.finished = checked
-
-          console.log(wsite)
         }
 
         return wsite

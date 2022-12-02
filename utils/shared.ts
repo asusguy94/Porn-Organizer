@@ -5,3 +5,16 @@ export const getUnique = <T>(arr: T[], prop?: keyof T): T[] => {
 
   return [...new Set(arr)]
 }
+
+// eslint-disable-next-line @typescript-eslint/unified-signatures
+export function clamp(value: number, min: number, max: number): number
+export function clamp(value: number, max: number): number
+export function clamp(value: number, minOrMax: number, max?: number): number {
+  if (max === undefined) {
+    // min was not supplied, use 0 as default value
+    return Math.min(Math.max(value, 0), minOrMax)
+  }
+
+  // min was supplied, use regular clamp
+  return Math.min(Math.max(value, minOrMax), max)
+}
