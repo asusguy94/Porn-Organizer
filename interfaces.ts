@@ -19,6 +19,7 @@ export interface IWebsiteWithSites {
   id: number
   name: string
   sites: IGeneral[]
+  videos: number
 }
 
 export interface IBookmark {

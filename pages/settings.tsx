@@ -10,7 +10,7 @@ import { IGeneral, ILocalWebsite, ISetState, IWebsiteWithSites as IWebsite } fro
 import { websiteApi } from '@api'
 
 const SettingsPage: NextPage = () => {
-  const [websites, setWebsites] = useState<IGeneral[]>([])
+  const [websites, setWebsites] = useState<IWebsite[]>([])
   const [rawWebsites, setRawWebsites] = useLocalStorage<ILocalWebsite[]>('websites', [])
   const [localWebsites, setLocalWebsites] = useState<ILocalWebsite[]>([])
 

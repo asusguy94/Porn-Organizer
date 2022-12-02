@@ -87,7 +87,7 @@ const VideoSearchPage: NextPage = () => {
     categoryApi.getAll().then(({ data }) => setCategories(data))
     attributeApi.getAll().then(({ data }) => setAttributes(data))
     locationApi.getAll().then(({ data }) => setLocations(data))
-    websiteApi.getAll<IWebsite>().then(({ data }) => setWebsites(data))
+    websiteApi.getAll().then(({ data }) => setWebsites(data))
   }, [])
 
   useEffect(() => {
