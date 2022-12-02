@@ -3,10 +3,10 @@
 @import 'util';
 @import 'variables';
 
-$initialHeight: 89vh;
+$initialHeight: 88vh;
 
 .plyr {
-  max-height: calc(#{$initialHeight} - ($bookmarkSpacing *#{$bookmarkCols} + px));
+  max-height: calc(#{$initialHeight} - (#{$bookmarkSpacing}px * #{$bookmarkCols}));
 
   .plyr__progress {
     .plyr__progress__buffer {
