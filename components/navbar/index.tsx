@@ -18,6 +18,7 @@ const NavBar = () => (
       <NavBarItem name='DB' path={serverConfig.db} />
       <NavBarItem name='Import Videos' path='/video/add' />
       <NavBarItem name='DB Editor' path='/editor' />
+      <NavBarItem name='Settings' path='/settings' />
     </ul>
   </nav>
 )

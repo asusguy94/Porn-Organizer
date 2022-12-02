@@ -1,4 +1,4 @@
-$navElementsRight: 3;
+$navElementsRight: 4;
 
 #navbar {
   margin-bottom: 1em;
@@ -15,7 +15,7 @@ $navElementsRight: 3;
     background-color: green;
     padding: 0;
 
-    &>li {
+    & > li {
       display: inline-block;
 
       &:nth-last-of-type(-n + #{$navElementsRight}) {
@@ -31,7 +31,7 @@ $navElementsRight: 3;
       z-index: 1;
       padding-left: 0;
 
-      &>li {
+      & > li {
         padding: 0 8px;
       }
     }
@@ -42,10 +42,9 @@ $navElementsRight: 3;
   }
 
   #main {
-
     &,
     .sub {
-      &>li>a {
+      & > li > a {
         display: inline-block;
 
         color: white;
