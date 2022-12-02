@@ -96,6 +96,12 @@ const Stars: NextPage = () => {
     }
   }
 
+  const handleSubmitAll = () => {
+    Promise.allSettled(missing.map(m => starApi.add(m.name))).finally(() => {
+      window.location.reload()
+    })
+  }
+
   return (
     <Grid container justifyContent='center'>
       <form onSubmit={handleSubmit}>
@@ -110,6 +116,17 @@ const Stars: NextPage = () => {
           type='submit'
           style={{ marginLeft: 5, marginTop: 1 }}
         >{`Add Star ${missing.length ? `(${index + 1} of ${missing.length})` : ''}`}</Button>
+
+        <Button
+          onClick={handleSubmitAll}
+          size='small'
+          variant='contained'
+          color='primary'
+          disabled={missing.length === 0}
+          style={{ marginLeft: 5, marginTop: 1 }}
+        >
+          Add all ({missing.length})
+        </Button>
       </form>
 
       <Grid container justifyContent='center' spacing={3} style={{ marginTop: 0 }}>
