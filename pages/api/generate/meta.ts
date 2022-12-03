@@ -82,12 +82,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log('Updating VIDEO INFO')
     const infoVideos = await prisma.video.findMany({
       where: { api: null },
-      include: { site: true }
+      include: { site: true, website: true }
     })
 
     for await (const video of infoVideos) {
       await sleep(400) // 400ms between requests
-      await findSceneSlug(generateStarName(video.path), video.name, video.site?.name)
+      await findSceneSlug(generateStarName(video.path), video.name, video.site?.name ?? video.website?.name)
         .then(async slug => {
           await prisma.video.update({ where: { id: video.id }, data: { api: slug } })
         })

@@ -58,7 +58,11 @@ export const getSceneSlug = async (slug: string): Promise<string> => {
   return Promise.resolve(result.data.id)
 }
 
-export async function findSceneSlug(videoStar: string, videoTitle: string, subsite?: string): Promise<string> {
+//FIXME outdated?
+// sometimes scenes are only found using site (not wsite) >> "Reality Kings"?
+// sometimes scenes are only found using wsite (not site) >> "Cum Louder" & "Lets Doe It"
+// test solution by limiting the loop by video-id
+export async function findSceneSlug(videoStar: string, videoTitle: string, siteOrWsite?: string): Promise<string> {
   interface IScene {
     data: { id: string }[]
   }
@@ -66,20 +70,34 @@ export async function findSceneSlug(videoStar: string, videoTitle: string, subsi
   const url = getUrl('/scenes')
 
   url.searchParams.set('q', videoStar)
-  url.searchParams.set('title', videoTitle)
-  if (subsite !== undefined) {
-    url.searchParams.set('q', `${videoStar} ${subsite}`)
-  }
+  // Convert "CamelCase" >> "Camel Case"
+  url.searchParams.set('title', videoTitle.replace(/([a-z])([A-Z])/g, '$1 $2'))
+  url.searchParams.set('q', `${videoStar} ${siteOrWsite ?? ''}`)
+  // can site-param be used?
   url.searchParams.set('limit', '2')
 
   const result = (await axios.get<IScene>(url.href, config)).data
   return new Promise((resolve, reject) => {
     if (result.data.length > 1) {
+      // CHECK THE FOLLOWING
+      // if the same title
+      // and if the same date
+      // and the same models
+      // and has bookmarks
+      // choose the one with the most bookmarks
+      // throw an error if number of bookmarks are the same
+      // otherwise throw an error
       reject('too many slugs was returned!')
     } else if (result.data.length === 0) {
       reject('to few slugs was returned!')
     }
 
+    //FIXME this sometimes returns an error " cannot read 'id' of 'undefined' "
+    // 0 results returned?
+    // other invalid data returned?
+    // some other broken backend logic?
+    // test with starID=97
+    // might be one of the other methods?
     resolve(result.data[0].id)
   })
 }
@@ -104,6 +122,12 @@ export const getSceneData = async (slug: string) => {
       title: string
       date: string
       image: string
+      background: {
+        full: string
+        large: string
+        medium: string
+        small: string
+      }
       performers: {
         id: string
         name: string
