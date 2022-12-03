@@ -31,9 +31,14 @@ const getClosest = (search: number, arr: number[]): number => {
   })
 }
 
-export const downloader = async (url: string, dest: string): Promise<void> => {
-  const response = await fetch(url)
-  const buffer = await response.buffer()
+export const downloader = async (url: string, dest: string, type: 'URL' | 'FILE'): Promise<void> => {
+  let buffer: Buffer
+  if (type === 'URL') {
+    const response = await fetch(url)
+    buffer = await response.buffer()
+  } else {
+    buffer = await fs.promises.readFile(url)
+  }
 
   await fs.promises.writeFile(`./${dest}`, buffer)
 }

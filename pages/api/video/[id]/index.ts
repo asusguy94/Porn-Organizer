@@ -151,10 +151,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const imagePath_low = `images/videos/${video.id}-${settingsConfig.THUMB_RES}.jpg`
 
             console.log(`Generating HIGHRES ${video.id}`)
-            await downloader(image, `media/${imagePath}`)
+            await downloader(image, `media/${imagePath}`, 'URL')
 
             console.log(`Generating LOWRES ${video.id}`)
-            await downloader(image, `media/${imagePath_low}`)
+            await downloader(`media/${imagePath}`, `media/${imagePath_low}`, 'FILE') // copy file
             resizeImage(`./media/${imagePath_low}`, settingsConfig.THUMB_RES)
 
             await prisma.video.update({ where: { id: parseInt(id) }, data: { cover: `${video.id}.jpg` } })

@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (star.image !== null) {
         // Download Image
-        await downloader(url, `media/images/stars/${star.image}`)
+        await downloader(url, `media/images/stars/${star.image}`, 'URL')
 
         res.json({ image: star.image })
       }
