@@ -101,7 +101,6 @@ const VideoSearchPage: NextPage = () => {
 
   useEffect(() => {
     const map = new Map<string, number>()
-    const maxMap = 200
 
     searchApi.getVideos<IVideo>().then(({ data }) => {
       setVideos(
@@ -119,9 +118,7 @@ const VideoSearchPage: NextPage = () => {
             }
 
             if (v.website !== undefined) {
-              if ([...map.values()].reduce((a, b) => a + b, 0) < maxMap) {
-                map.set(v.website, (map.get(v.website) ?? 0) + 1)
-              }
+              map.set(v.website, (map.get(v.website) ?? 0) + 1)
             }
             return v.categories.length > 0
           })
@@ -148,7 +145,7 @@ const VideoSearchPage: NextPage = () => {
           }))
       )
       console.clear()
-      ;[...map].slice(2).forEach(([key, value]) => console.log(key, value))
+      ;[...map].slice(0, 2).forEach(([key, value]) => console.log(key, value))
     })
   }, [localWebsites])
 
