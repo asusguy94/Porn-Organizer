@@ -81,6 +81,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               reload = valueRef !== data
               break
             case 'birthdate':
+              // TODO date is subtracted by 1 day!, function might need an additional argument?
+              // works if "YYYY-MM-DD" is supplied
+              // doees not work if "D MMMM YYYY" is supplied
               data = getDate(formatDate(data, true))
               break
             case 'height':

@@ -100,6 +100,9 @@ const VideoSearchPage: NextPage = () => {
   const inputRef = useRef<HTMLInputElement>()
 
   useEffect(() => {
+    const map = new Map<string, number>()
+    const maxMap = 200
+
     searchApi.getVideos<IVideo>().then(({ data }) => {
       setVideos(
         data
@@ -110,12 +113,17 @@ const VideoSearchPage: NextPage = () => {
             } else if (v.website !== undefined) {
               const website = localWebsites.find(wsite => wsite.label === v.website)
 
-              if (website !== undefined) {
-                return website.count-- > 1
+              if (website !== undefined && website.count-- > (website.finished ? 0 : 1)) {
+                return true
               }
             }
 
-            return false
+            if (v.website !== undefined) {
+              if ([...map.values()].reduce((a, b) => a + b, 0) < maxMap) {
+                map.set(v.website, (map.get(v.website) ?? 0) + 1)
+              }
+            }
+            return v.categories.length > 0
           })
           // TODO move this as a toggle to the settings-page
           // also move the label/name to the settings page
@@ -139,6 +147,8 @@ const VideoSearchPage: NextPage = () => {
             }
           }))
       )
+      console.clear()
+      ;[...map].slice(2).forEach(([key, value]) => console.log(key, value))
     })
   }, [localWebsites])
 
