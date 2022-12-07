@@ -32,6 +32,7 @@ import { daysToYears } from '@utils/client/date-time'
 import { IQuality, ISetState, IWebsiteWithSites as IWebsite, IGeneral, ILocalWebsite } from '@interfaces'
 import { attributeApi, categoryApi, locationApi, searchApi, websiteApi } from '@api'
 import { serverConfig } from '@config'
+import { printWithMax } from '@utils/shared'
 
 import styles from './search.module.scss'
 
@@ -145,7 +146,7 @@ const VideoSearchPage: NextPage = () => {
           }))
       )
       console.clear()
-      ;[...map].slice(0, 2).forEach(([key, value]) => console.log(key, value))
+      ;[...map].slice(0, 2).forEach(([key, value]) => console.log(key, printWithMax(value, 200)))
     })
   }, [localWebsites])
 
