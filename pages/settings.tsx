@@ -87,13 +87,13 @@ const Input = ({ website, update, localWebsites, max = 0 }: InputProps) => {
   const [finished, setFinished] = useState(website.finished)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value)
+    const value = clamp(parseInt(e.target.value), max)
 
-    setCount(clamp(value, max))
+    setCount(value)
     update(
       localWebsites.map(wsite => {
         if (wsite.label === website.label) {
-          wsite.count = count
+          wsite.count = value
         }
 
         return wsite

@@ -12,7 +12,7 @@ export function clamp(value: number, max: number): number
 export function clamp(value: number, minOrMax: number, max?: number): number {
   if (max === undefined) {
     // min was not supplied, use 0 as default value
-    return Math.min(Math.max(value, 0), minOrMax)
+    return clamp(value, 0, minOrMax)
   }
 
   // min was supplied, use regular clamp
