@@ -4,7 +4,16 @@ import fs from 'fs'
 import Joi from 'joi'
 
 import { prisma, validate } from '@utils/server'
-import { dateDiff, downloader, formatDate, getDate, isNewDate, noExt, removeThumbnails } from '@utils/server/helper'
+import {
+  dateDiff,
+  downloader,
+  fileExists,
+  formatDate,
+  getDate,
+  isNewDate,
+  noExt,
+  removeThumbnails
+} from '@utils/server/helper'
 import { generateDate, generateStarName } from '@utils/server/generate'
 import { resizeImage } from '@utils/server/ffmpeg'
 import { getSceneData, getSceneSlug } from '@utils/server/metadata'
@@ -150,8 +159,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const imagePath = `images/videos/${video.id}.jpg`
             const imagePath_low = `images/videos/${video.id}-${settingsConfig.THUMB_RES}.jpg`
 
-            console.log(`Generating HIGHRES ${video.id}`)
-            await downloader(image, `media/${imagePath}`, 'URL')
+            // download file (if missing)
+            if (!(await fileExists(`./media/${imagePath}`))) {
+              console.log(`Generating HIGHRES ${video.id}`)
+              await downloader(image, `media/${imagePath}`, 'URL')
+            }
 
             console.log(`Generating LOWRES ${video.id}`)
             await downloader(`media/${imagePath}`, `media/${imagePath_low}`, 'FILE') // copy file
