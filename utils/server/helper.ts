@@ -291,3 +291,14 @@ export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, pat
 export const sleep = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
+
+export const fixUrl = (url: string) => {
+  switch (new URL(url).protocol) {
+    case 'https:':
+      return url.substring(url.lastIndexOf('https://'))
+    case 'http:':
+      return url.substring(url.lastIndexOf('http://'))
+  }
+
+  return url
+}

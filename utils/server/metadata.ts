@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+import { fixUrl } from './helper'
 import { getUnique } from '../shared'
 
 import { settingsConfig } from '@config'
@@ -148,7 +149,7 @@ export const getSceneData = async (slug: string) => {
     id: result.data.id,
     title: result.data.title,
     date: result.data.date,
-    image: result.data.image,
+    image: fixUrl(result.data.image),
     performers: result.data.performers
       .filter(({ extra: { gender } }) => gender === 'Female')
       .map(performer => ({
