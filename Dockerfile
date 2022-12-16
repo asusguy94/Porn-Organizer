@@ -1,5 +1,8 @@
+# Define the base image
+FROM node:alpine3.16 AS custom_node
+
 # Install dependencies only when needed
-FROM node:16-alpine AS deps
+FROM custom_node AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
@@ -8,7 +11,7 @@ COPY package.json yarn.lock ./
 RUN yarn install
 
 # Rebuild the source code only when needed
-FROM node:16-alpine AS builder
+FROM custom_node AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -16,7 +19,7 @@ RUN npx prisma generate
 RUN yarn build
 
 # Production image, copy all the files and run next
-FROM node:16-alpine AS runner
+FROM custom_node AS runner
 RUN apk add ffmpeg
 WORKDIR /app
 
