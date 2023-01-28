@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import Joi from 'joi'
+import { z } from 'zod'
 
 import { prisma, validate } from '@utils/server'
 import { starExists } from '@utils/server/helper.db'
@@ -11,8 +11,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (typeof id === 'string') {
       const { alias } = validate(
-        Joi.object({
-          alias: Joi.string().required()
+        z.object({
+          alias: z.string()
         }),
         req.body
       )
@@ -28,8 +28,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (typeof id === 'string') {
       const { alias } = validate(
-        Joi.object({
-          alias: Joi.string().required()
+        z.object({
+          alias: z.string()
         }),
         req.body
       )

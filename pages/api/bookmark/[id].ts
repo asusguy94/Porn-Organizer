@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import Joi from 'joi'
+import { z } from 'zod'
 
 import { prisma, validate } from '@utils/server'
 
@@ -10,10 +10,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (typeof id === 'string') {
       const { time, categoryID } = validate(
-        Joi.object({
-          time: Joi.number().integer().min(1),
-          categoryID: Joi.number().integer().min(1)
-        }).xor('time', 'categoryID'),
+        z.object({
+          time: z.number().int().min(1).optional(),
+          categoryID: z.number().int().min(1).optional()
+        }),
         req.body
       )
 
@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           where: { id: parseInt(id) },
           data: { start: time }
         })
-      } else {
+      } else if (categoryID !== undefined) {
         // Change CategoryID
         await prisma.bookmark.update({
           where: { id: parseInt(id) },

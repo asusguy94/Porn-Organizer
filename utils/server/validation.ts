@@ -1,11 +1,14 @@
-import Joi from 'joi'
 import { NextRequest } from 'next/server'
+// import {z} from 'zod'
+import { z } from 'zod'
 
-const validation = (schema: Joi.Schema, body: NextRequest['body']) => {
-  const { error, value } = schema.validate(body ?? {})
-  if (error) throw new Error(error.details[0].message)
+// const joiValidation = (schema: Joi.Schema, body: NextRequest['body']) => {
+//   const { error, value } = schema.validate(body ?? {})
+//   if (error) throw new Error(error.details[0].message)
 
-  return value
-}
+//   return value
+// }
 
-export default validation
+const zodValidation = <T>(schema: z.ZodType<T>, body: NextRequest['body']) => schema.parse(body)
+
+export default zodValidation

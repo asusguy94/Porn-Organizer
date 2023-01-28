@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import Joi from 'joi'
+import { z } from 'zod'
 
 import { prisma, validate } from '@utils/server'
 import { getUnique } from '@utils/shared'
@@ -27,8 +27,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
   } else if (req.method === 'POST') {
     const { name } = validate(
-      Joi.object({
-        name: Joi.string().required()
+      z.object({
+        name: z.string()
       }),
       req.body
     )

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import fs from 'fs'
-import Joi from 'joi'
+import { z } from 'zod'
 
 import { prisma, validate } from '@utils/server'
 import {
@@ -68,14 +68,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (typeof id === 'string') {
       const { title, starAge, plays, slug, path, date, cover } = validate(
-        Joi.object({
-          title: Joi.string(),
-          starAge: Joi.number().integer().min(18).max(99).allow(null),
-          plays: Joi.number().integer().min(0),
-          slug: Joi.string().allow(''),
-          path: Joi.string(),
-          date: Joi.boolean(),
-          cover: Joi.boolean()
+        z.object({
+          title: z.string().optional(),
+          starAge: z.number().int().min(18).max(99).nullable().optional(),
+          plays: z.number().int().min(0).optional(),
+          slug: z.string().optional(),
+          path: z.string().optional(),
+          date: z.boolean().optional(),
+          cover: z.boolean().optional()
         }),
         req.body
       )

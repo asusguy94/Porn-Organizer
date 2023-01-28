@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import Joi from 'joi'
+import { z } from 'zod'
 
 import { prisma, validate } from '@utils/server'
 import { formatBreastSize, formatDate, getDate, getSimilarStars } from '@utils/server/helper'
@@ -34,15 +34,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (typeof id === 'string') {
       const { name, slug, label, value, ignore } = validate(
-        Joi.object({
-          name: Joi.string(),
-          slug: Joi.string().allow(''),
-          label: Joi.string(),
-          value: Joi.string().allow(''),
-          ignore: Joi.boolean()
-        })
-          .with('label', 'value')
-          .xor('name', 'label', 'ignore', 'slug'),
+        z.object({
+          name: z.string().optional(),
+          slug: z.string().optional(),
+          label: z.string().optional(),
+          value: z.string().optional(),
+          ignore: z.boolean().optional()
+        }),
+
         req.body
       )
 
@@ -58,13 +57,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           // reset slug
           await prisma.star.update({ where: { id: parseInt(id) }, data: { api: null } })
         }
-      } else if (label !== undefined) {
+      } else if (label !== undefined && value !== undefined) {
         // TODO make code more readable
         // reusing multiple variables
         // some are not necessary
         // some are being checked in reactJS
 
-        let data = value
+        let data: string | null | Date | number = value
 
         // ALWAYS refresh page when changing AGE!
         let reload = label === 'birthdate'

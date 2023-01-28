@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import Joi from 'joi'
+import { z } from 'zod'
 
 import { prisma, validate } from '@utils/server'
 
@@ -10,8 +10,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (typeof id === 'string') {
       const { attributeID } = validate(
-        Joi.object({
-          attributeID: Joi.number().integer().required()
+        z.object({
+          attributeID: z.number().int()
         }),
         req.body
       )

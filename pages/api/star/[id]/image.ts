@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import fs from 'fs'
-import Joi from 'joi'
+import { z } from 'zod'
 
 import { prisma, validate } from '@utils/server'
 import { downloader, sendFile } from '@utils/server/helper'
@@ -22,8 +22,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (typeof id === 'string') {
       const { url } = validate(
-        Joi.object({
-          url: Joi.string().required()
+        z.object({
+          url: z.string().url()
         }),
         req.body
       )

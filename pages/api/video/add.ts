@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import Joi from 'joi'
+import { z } from 'zod'
 
 import { prisma, validate } from '@utils/server'
 import { getDate } from '@utils/server/helper'
@@ -9,8 +9,16 @@ import { websiteExists } from '@utils/server/helper.db'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const { videos } = validate(
-      Joi.object({
-        videos: Joi.array().required()
+      z.object({
+        videos: z.array(
+          z.object({
+            path: z.string(),
+            website: z.string(),
+            site: z.string(),
+            title: z.string(),
+            date: z.string()
+          })
+        )
       }),
       req.body
     )
