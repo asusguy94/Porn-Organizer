@@ -1,22 +1,21 @@
-import { NextPage } from 'next/types'
+import type { NextPage } from 'next/types'
 import React, { useEffect, useState } from 'react'
 
-import { Button, Checkbox, Grid, List, TextField } from '@mui/material'
+import { Button, Checkbox, FormControlLabel, Grid, List, TextField } from '@mui/material'
 
 import { useLocalStorage } from 'usehooks-ts'
 
 import { clamp } from '@utils/shared'
-import { IGeneral, ILocalWebsite, ISetState, IWebsiteWithSites as IWebsite } from '@interfaces'
-import { websiteApi } from '@api'
+import { General, LocalWebsite, SetState } from '@interfaces'
+import { websiteService } from '@service'
+import Spinner from '@components/spinner'
 
 const SettingsPage: NextPage = () => {
-  const [websites, setWebsites] = useState<IWebsite[]>([])
-  const [rawWebsites, setRawWebsites] = useLocalStorage<ILocalWebsite[]>('websites', [])
-  const [localWebsites, setLocalWebsites] = useState<ILocalWebsite[]>([])
+  const { data: websites } = websiteService.useWebsites()
 
-  useEffect(() => {
-    websiteApi.getAll().then(({ data }) => setWebsites(data))
-  }, [])
+  const [rawWebsites, setRawWebsites] = useLocalStorage<LocalWebsite[]>('websites', [])
+  const [localWebsites, setLocalWebsites] = useState<LocalWebsite[]>([])
+  const [changed, setChanged] = useState(false)
 
   useEffect(() => {
     setLocalWebsites(rawWebsites)
@@ -27,62 +26,97 @@ const SettingsPage: NextPage = () => {
 
     // update browser-storage
     setRawWebsites(localWebsites)
+
+    // Reset Changes
+    setChanged(false)
   }
 
   const handleAddWebsite = (wsite: string) => {
-    setLocalWebsites(prev => [...prev, { label: wsite, count: 0, finished: true }])
+    setLocalWebsites(prev => [...prev, { label: wsite, count: 0, finished: false }])
+
+    handleChanged()
   }
+
+  const handleChanged = () => {
+    setChanged(true)
+  }
+
+  if (websites === undefined) return <Spinner />
 
   return (
     <Grid item className='text-center'>
-      <WebsiteList
-        websites={websites.filter(w => !localWebsites.some(wsite => wsite.label === w.name))}
-        addWebsite={handleAddWebsite}
-      />
-      <form onSubmit={handleSubmit}>
-        <Grid container alignItems='center' direction='column' justifyContent='center' spacing={1}>
-          {localWebsites.map(wsite => (
-            <Input
-              key={wsite.label}
-              website={wsite}
-              update={setLocalWebsites}
-              localWebsites={localWebsites}
-              max={websites.find(w => w.name === wsite.label)?.videos}
-            />
-          ))}
+      <Grid container justifyContent='center'>
+        <Grid item xs={2}>
+          <WebsiteList
+            websites={websites.filter(w => !localWebsites.some(wsite => wsite.label === w.name))}
+            addWebsite={handleAddWebsite}
+          />
         </Grid>
 
-        <Button variant='contained' type='submit' style={{ marginTop: 10 }}>
-          Save Changes
-        </Button>
-      </form>
+        <Grid item xs={5} component='form' onSubmit={handleSubmit}>
+          <Grid container xs={12} alignItems='center'>
+            <Grid container xs={6} spacing={1} justifyContent='center'>
+              {localWebsites
+                .filter((_, i) => i % 2 === 0)
+                .map(wsite => (
+                  <Input
+                    key={wsite.label}
+                    website={wsite}
+                    update={setLocalWebsites}
+                    localWebsites={localWebsites}
+                    max={websites.find(w => w.name === wsite.label)?.videos}
+                    onChange={handleChanged}
+                  />
+                ))}
+            </Grid>
+
+            <Grid container xs={6} spacing={1} justifyContent='center'>
+              {localWebsites
+                .filter((_, i) => i % 2 !== 0)
+                .map(wsite => (
+                  <Input
+                    key={wsite.label}
+                    website={wsite}
+                    update={setLocalWebsites}
+                    localWebsites={localWebsites}
+                    max={websites.find(w => w.name === wsite.label)?.videos}
+                    onChange={handleChanged}
+                  />
+                ))}
+            </Grid>
+          </Grid>
+
+          <Button variant='contained' disabled={!changed} type='submit' style={{ marginTop: 10 }}>
+            Save Changes
+          </Button>
+        </Grid>
+      </Grid>
     </Grid>
   )
 }
 
-interface WebsiteListProps {
-  websites: IGeneral[]
+type WebsiteListProps = {
+  websites: General[]
   addWebsite: (wsite: string) => void
 }
-const WebsiteList = ({ websites, addWebsite }: WebsiteListProps) => {
-  return (
-    <List>
-      {websites.map(website => (
-        <div key={website.id} onClick={() => addWebsite(website.name)}>
-          {`ADD "${website.name}"`}
-        </div>
-      ))}
-    </List>
-  )
-}
+const WebsiteList = ({ websites, addWebsite }: WebsiteListProps) => (
+  <List style={{ display: 'inline-block' }}>
+    {websites.map(website => (
+      <div key={website.id} onClick={() => addWebsite(website.name)}>
+        {`ADD "${website.name}"`}
+      </div>
+    ))}
+  </List>
+)
 
-interface InputProps {
-  website: ILocalWebsite
-  update: ISetState<ILocalWebsite[]>
-  localWebsites: ILocalWebsite[]
+type InputProps = {
+  website: LocalWebsite
+  update: SetState<LocalWebsite[]>
+  localWebsites: LocalWebsite[]
   max?: number
+  onChange: () => void
 }
-const Input = ({ website, update, localWebsites, max = 0 }: InputProps) => {
+const Input = ({ website, update, localWebsites, max = 0, onChange }: InputProps) => {
   const [count, setCount] = useState(website.count)
   const [finished, setFinished] = useState(website.finished)
 
@@ -99,6 +133,9 @@ const Input = ({ website, update, localWebsites, max = 0 }: InputProps) => {
         return wsite
       })
     )
+
+    // trigger change
+    onChange()
   }
 
   const handleCheck = (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
@@ -113,22 +150,19 @@ const Input = ({ website, update, localWebsites, max = 0 }: InputProps) => {
         return wsite
       })
     )
+
+    // trigger change
+    onChange()
   }
 
   return (
-    <Grid item>
-      <TextField
-        id={`${website.label.toLowerCase()}-input`}
-        name={website.label.toLowerCase()}
-        label={website.label}
-        type='number'
-        value={count}
-        onChange={handleChange}
+    <Grid item style={{ display: 'flex', gap: 4 }}>
+      <TextField label={website.label} type='number' value={count} onChange={handleChange} />
+
+      <FormControlLabel
+        label={`finished (${finished ? 'yes' : 'no'})`}
+        control={<Checkbox checked={finished} onChange={handleCheck} />}
       />
-
-      <Checkbox checked={finished} onChange={handleCheck} />
-
-      <span>finished ({finished ? 'yes' : 'no'})</span>
     </Grid>
   )
 }
