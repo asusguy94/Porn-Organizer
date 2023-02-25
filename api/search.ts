@@ -1,13 +1,13 @@
 import axios from 'axios'
 
 import apiUrl from '@utils/client/api'
-import { IndexType, MakeOptional } from '@interfaces'
+import type { StarSearch, VideoSearch } from '@components/search/helper'
 
 const api = axios.create({
   baseURL: apiUrl('search')
 })
 
 export default {
-  getStars: async <T extends IndexType>() => await api.get<MakeOptional<T, 'hidden' | 'score'>[]>('/star'),
-  getVideos: async <T extends IndexType>() => await api.get<MakeOptional<T, 'hidden'>[]>('/video')
+  getStars: async () => await api.get<StarSearch[]>('/star'),
+  getVideos: async () => await api.get<VideoSearch[]>('/video')
 }

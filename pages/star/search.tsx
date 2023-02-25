@@ -22,8 +22,7 @@ import capitalize from 'capitalize'
 import { daysToYears } from '@utils/client/date-time'
 
 import { ImageCard } from '@components/image'
-import LabelCount from '@components/labelcount'
-import { getVisible } from '@components/search/helper'
+import { getVisible, HiddenStar as Hidden, StarSearch as Star } from '@components/search/helper'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Badge from '@components/badge'
 import Spinner from '@components/spinner'
@@ -46,44 +45,32 @@ type StarData = Partial<{
 
 const StarSearchPage: NextPage = () => {
   const { data: websites } = websiteService.useWebsites()
+  const { data: stars } = searchService.useStars()
   const { breast, ethnicity, haircolor } = starService.useStarInfo().data ?? {}
 
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const calculateScore = (websites: number, videos: number) => {
-    const multiplier = 5
-
-    return videos + (websites > 1 ? websites * multiplier : websites)
-  }
-
-  useEffect(() => {
-    searchApi.getStars<IStar>().then(({ data }) => {
-      setStars(
-        data.map(star => ({
-          ...star,
-          score: calculateScore(star.websites.length, star.videoCount),
-          hidden: {
-            titleSearch: false,
-
-            breast: false,
-            haircolor: false,
-            ethnicity: false,
-            website: false,
-
-            noBreast: false
-          }
-        }))
-      )
+  const [hidden, setHidden] = useState<Hidden>({
+    titleSearch: '',
+    breast: '',
+    haircolor: '',
+    ethnicity: '',
+    website: ''
     })
 
   return (
     <Grid container>
       <Grid item xs={2} id={styles.sidebar}>
         <Sidebar
-          starData={{ breasts, haircolors, ethnicities, websites }}
-          stars={stars}
-          update={setStars}
+          starData={{
+            breasts: breast,
+            haircolors: haircolor,
+            ethnicities: ethnicity,
+            websites: websites
+          }}
           inputRef={inputRef}
+          setHidden={setHidden}
+          hidden={hidden}
         />
       </Grid>
 
@@ -96,28 +83,23 @@ const StarSearchPage: NextPage = () => {
   )
 }
 
-interface StarsProps {
-  stars: IStar[]
+type StarsProps = {
+  stars?: Star[]
+  hidden: Hidden
 }
 const Stars = ({ stars }: StarsProps) => {
   const visibleStars = getVisible(stars)
 
   return (
     <div id={styles.stars}>
-      {stars.length ? (
-        <>
           <Typography variant='h6' className='text-center'>
-            <span className={styles.count}>{visibleStars.length}</span> Stars
+        <span id={styles.count}>{stars.length}</span> Stars
           </Typography>
 
-          <VGrid
-            itemHeight={309}
-            total={visibleStars.length}
-            renderData={idx => <StarCard star={visibleStars[idx]} />}
-          />
-        </>
+      {stars.length > 0 ? (
+        <VGrid itemHeight={309} total={visible.length} renderData={idx => <StarCard star={visible[idx]} />} />
       ) : (
-        <Loader />
+        <Spinner />
       )}
     </div>
   )
@@ -156,110 +138,58 @@ const StarCard = ({ star }: StarCardProps) => {
 type SidebarProps = {
   starData: StarData
   inputRef: React.Ref<HTMLInputElement>
+  setHidden: SetState<Hidden>
+  hidden: Hidden
 }
 const Sidebar = ({ starData, stars, update, inputRef }: SidebarProps) => (
   <>
-    <TitleSearch stars={stars} update={update} inputRef={inputRef} />
-
-    <Sort stars={stars} update={update} />
-
-    <Filter starData={starData} stars={stars} update={update} />
+    <TitleSearch inputRef={inputRef} setHidden={setHidden} />
+    <Filter starData={starData} setHidden={setHidden} hidden={hidden} />
   </>
 )
 
-interface FilterProps {
-  stars: IStar[]
-  starData: IStarData
-  update: ISetState<IStar[]>
+type FilterProps = {
+  starData: StarData
+  setHidden: SetState<Hidden>
+  hidden: Hidden
 }
-const Filter = ({ stars, starData, update }: FilterProps) => {
+const Filter = ({ starData, setHidden, hidden }: FilterProps) => {
   const breast = (target: string) => {
-    stars = stars.map(star => {
-      star.hidden.noBreast = false
-      star.hidden.breast = star.breast === null || star.breast.toLowerCase() !== target.toLowerCase()
-
-      return star
-    })
-
-    update(stars)
+    setHidden(prev => ({ ...prev, breast: target.toLowerCase() }))
   }
 
   const haircolor = (target: string) => {
-    stars = stars.map(star => {
-      console.log(star.haircolor)
-
-      star.hidden.haircolor = star.haircolor === null || star.haircolor.toLowerCase() !== target.toLowerCase()
-
-      return star
-    })
-
-    update(stars)
+    setHidden(prev => ({ ...prev, haircolor: target.toLowerCase() }))
   }
 
   const ethnicity = (target: string) => {
-    stars = stars.map(star => {
-      star.hidden.ethnicity = star.ethnicity === null || star.ethnicity.toLowerCase() !== target.toLowerCase()
-
-      return star
-    })
-
-    update(stars)
+    setHidden(prev => ({ ...prev, ethnicity: target.toLowerCase() }))
   }
 
   const website_DROP = (e: SelectChangeEvent) => {
     const targetLower = e.target.value.toLowerCase()
 
         if (targetLower === 'all') {
-          return { ...star, hidden: { ...star.hidden, website: false } }
+      setHidden(prev => ({ ...prev, website: '' }))
         } else {
-          return {
-            ...star,
-            hidden: {
-              ...star.hidden,
-              website: !star.websites.some(website => website.toLowerCase() === targetLower)
+      setHidden(prev => ({ ...prev, website: targetLower }))
             }
   }
 
-  const breast_NULL = (e: React.ChangeEvent<HTMLFormElement>) => {
-    stars = stars.map(star => {
-      star.hidden.noBreast = e.currentTarget.checked && star.breast !== null
-      star.hidden.breast = false
-
-      return star
-    })
-
-    update(stars)
+  const breast_NULL = () => {
+    setHidden(prev => ({ ...prev, breast: null }))
   }
 
   const breast_ALL = () => {
-    stars = stars.map(star => {
-      star.hidden.breast = false
-      star.hidden.noBreast = false
-
-      return star
-    })
-
-    update(stars)
+    setHidden(prev => ({ ...prev, breast: '' }))
   }
 
   const haircolor_ALL = () => {
-    stars = stars.map(star => {
-      star.hidden.haircolor = false
-
-      return star
-    })
-
-    update(stars)
+    setHidden(prev => ({ ...prev, haircolor: '' }))
   }
 
   const ethnicity_ALL = () => {
-    stars = stars.map(star => {
-      star.hidden.ethnicity = false
-
-      return star
-    })
-
-    update(stars)
+    setHidden(prev => ({ ...prev, ethnicity: '' }))
   }
 
   return (
@@ -267,6 +197,7 @@ const Filter = ({ stars, starData, update }: FilterProps) => {
       <FilterDropdown data={starData.websites} label='website' callback={website_DROP} />
 
       <FilterItem
+        hidden={hidden}
         data={starData.breasts}
         label='breast'
         callback={breast}
@@ -275,6 +206,7 @@ const Filter = ({ stars, starData, update }: FilterProps) => {
       />
 
       <FilterItem
+        hidden={hidden}
         data={starData.haircolors}
         label='haircolor'
         callback={haircolor}
@@ -282,6 +214,7 @@ const Filter = ({ stars, starData, update }: FilterProps) => {
       />
 
       <FilterItem
+        hidden={hidden}
         data={starData.ethnicities}
         label='ethnicity'
         callback={ethnicity}
@@ -358,38 +291,31 @@ const Sort = ({ stars, update }: SortProps) => {
   )
 }
 
-interface TitleSearchProps {
-  stars: IStar[]
-  update: ISetState<IStar[]>
+type TitleSearchProps = {
   inputRef: React.Ref<HTMLInputElement>
+  setHidden: SetState<Hidden>
 }
-const TitleSearch = ({ stars, update, inputRef }: TitleSearchProps) => {
+const TitleSearch = ({ inputRef, setHidden }: TitleSearchProps) => {
   const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.currentTarget.value.toLowerCase()
 
-    update(
-      stars.map(star => ({
-        ...star,
-        hidden: {
-          ...star.hidden,
-          titleSearch: !star.name.toLowerCase().includes(searchValue)
-        }
-      }))
-    )
+    setHidden(prev => ({ ...prev, titleSearch: searchValue }))
   }
 
   return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} inputRef={inputRef} />
 }
 
-interface FilterItemProps {
-  data: string[]
-  label: string
-  obj: IStar[]
-  callback: any
+type FilterItemProps<T = Star> = {
+  data?: string[]
+  label: keyof T
+  callback: (label: string) => void
   globalCallback?: () => void
-  nullCallback?: any
+  nullCallback?: () => void
+  hidden: Hidden
 }
 const FilterItem = ({ data, label, callback, globalCallback, nullCallback }: FilterItemProps) => {
+  if (data === undefined) return <Spinner />
+
   return (
   <>
     <h2>{capitalize(label, true)}</h2>
@@ -435,6 +361,8 @@ type FilterDropdownProps = {
   callback: (e: SelectChangeEvent) => void
 }
 const FilterDropdown = ({ data, label, callback }: FilterDropdownProps) => {
+  if (data === undefined) return <Spinner />
+
   return (
   <>
     <h2>{capitalize(label, true)}</h2>

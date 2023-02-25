@@ -48,17 +48,34 @@ const VideoSearchPage: NextPage = () => {
 
   const [videos, setVideos] = useState<IVideo[]>([])
 
-  const [categories, setCategories] = useState<IGeneral[]>([])
-  const [attributes, setAttributes] = useState<IGeneral[]>([])
-  const [locations, setLocations] = useState<IGeneral[]>([])
-  const [websites, setWebsites] = useState<IWebsite[]>([])
+  return (
+    <Grid container>
+      <Grid item xs={2} id={styles.sidebar}>
+        <Sidebar
+          videoData={{
+            categories,
+            attributes,
+            locations,
+            websites
+          }}
+          setHidden={setHidden}
+        />
+      </Grid>
 
-  useEffect(() => {
-    categoryApi.getAll().then(({ data }) => setCategories(data))
-    attributeApi.getAll().then(({ data }) => setAttributes(data))
-    locationApi.getAll().then(({ data }) => setLocations(data))
-    websiteApi.getAll().then(({ data }) => setWebsites(data))
-  }, [])
+      <Grid item xs={10}>
+      </Grid>
+
+      <ScrollToTop smooth />
+    </Grid>
+  )
+}
+
+type VideosProps = {
+  videos?: Video[]
+  hidden: Hidden
+}
+  const localWebsites = useReadLocalStorage<LocalWebsite[]>('websites')
+  const [filtered, setFiltered] = useState<Video[]>([])
 
   useEffect(() => {
     if (localWebsites !== null) {
@@ -69,10 +86,7 @@ const VideoSearchPage: NextPage = () => {
   useEffect(() => {
     const map = new Map<string, number>()
 
-    searchApi.getVideos<IVideo>().then(({ data }) => {
-      setVideos(
-        data
-          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    setFiltered(
           .filter(v => {
             if (localWebsites === null) {
               return true
@@ -87,34 +101,18 @@ const VideoSearchPage: NextPage = () => {
             if (v.website !== undefined) {
               map.set(v.website, (map.get(v.website) ?? 0) + 1)
             }
+
             return v.categories.length > 0
           })
           // TODO move this as a toggle to the settings-page
           // also move the label/name to the settings page
           // add dropdown from attributes? instead of input-field?
           .filter(v => !v.attributes.includes('video-unplayable')) //FIXME broken file/stream?
-          .map(video => ({
-            ...video,
-            hidden: {
-              category: [],
-              notCategory: [],
-              attribute: [],
-              notAttribute: [],
-              location: [],
-              notLocation: [],
-              titleSearch: false,
-              noCategory: !(video.categories.length === 0),
-              notNoCategory: false,
-              pov: false,
-              notPov: false,
-              website: false
-            }
-          }))
       )
+
       console.clear()
       ;[...map].slice(0, 2).forEach(([key, value]) => console.log(key, printWithMax(value, 200)))
-    })
-  }, [localWebsites])
+  }, [localWebsites, videos, hidden])
 
   return (
     <Grid container>
@@ -145,14 +143,14 @@ const Videos = ({ videos }: VideosProps) => {
   return (
     <div id={styles.videos}>
       <Typography variant='h6' className='text-center'>
-        <span id={styles.count}>{visibleVideos.length}</span> Videos
+        <span id={styles.count}>{visible.length}</span> Videos
       </Typography>
 
-      <VGrid
-        itemHeight={300}
-        total={visibleVideos.length}
-        renderData={idx => <VideoCard video={visibleVideos[idx]} />}
-      />
+      {videos.length > 0 ? (
+        <VGrid itemHeight={300} total={visible.length} renderData={idx => <VideoCard video={visible[idx]} />} />
+      ) : (
+        <Spinner />
+      )}
     </div>
   )
 }
@@ -187,41 +185,27 @@ const VideoCard = ({ video }: VideoCardProps) => {
   )
 }
 
-interface SidebarProps {
-  videoData: IVideoData
-  videos: IVideo[]
-  update: ISetState<IVideo[]>
-  inputRef: any
+type SidebarProps = {
+  videoData: VideoData
+  setHidden: SetState<Hidden>
 }
 const Sidebar = ({ videoData, videos, update, inputRef }: SidebarProps) => (
   <>
-    <TitleSearch videos={videos} update={update} inputRef={inputRef} />
-
-    <Sort videos={videos} update={update} />
-
-    <Filter videoData={videoData} videos={videos} update={update} />
+    <TitleSearch setHidden={setHidden} />
+    <Filter videoData={videoData} setHidden={setHidden} />
   </>
 )
 
-interface TitleSearchProps {
-  update: ISetState<IVideo[]>
-  videos: IVideo[]
-  inputRef: any
+type TitleSearchProps = {
+  setHidden: SetState<Hidden>
 }
+const TitleSearch = ({ setHidden }: TitleSearchProps) => {
   const inputRef = useRef<HTMLInputElement>()
 
   const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.currentTarget.value.toLowerCase()
 
-    update(
-      [...videos].map(video => ({
-        ...video,
-        hidden: {
-          ...video.hidden,
-          titleSearch: !video.name.toLowerCase().includes(searchValue)
-        }
-      }))
-    )
+    setHidden(prev => ({ ...prev, titleSearch: searchValue }))
   }
 
   return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} inputRef={inputRef} />
@@ -311,12 +295,11 @@ const Sort = ({ videos, update }: SortProps) => {
   )
 }
 
-interface FilterProps {
-  videoData: IVideoData
-  videos: IVideo[]
-  update: ISetState<IVideo[]>
+type FilterProps = {
+  videoData: VideoData
+  setHidden: SetState<Hidden>
 }
-const Filter = ({ videoData, videos, update }: FilterProps) => {
+const Filter = ({ videoData, setHidden }: FilterProps) => {
   const website = (e: SelectChangeEvent) => {
     const websiteObj: IWebsite = JSON.parse(e.target.value)
 
@@ -345,136 +328,42 @@ const Filter = ({ videoData, videos, update }: FilterProps) => {
     )
   }
 
-  const category = (ref: IndeterminateItemProps, target: IGeneral) => {
+  const category = (ref: RegularHandlerProps, target: General) => {
     const targetLower = target.name.toLowerCase()
 
-    update(
-      [...videos].map(video => {
-        if (ref.indeterminate) {
-          const match = video.categories.some(category => category.toLowerCase() === targetLower)
-
-          if (match) {
-            video.hidden.notCategory.push(targetLower)
-          } else {
-            // Remove checked-status from filtering
-            video.hidden.category.splice(video.hidden.category.indexOf(targetLower), 1)
-          }
-        } else if (!ref.checked) {
-          video.hidden.noCategory = false
-
-          const match = video.categories.map(category => category.toLowerCase()).includes(targetLower)
-
-          if (match) {
-            // Remove indeterminate-status from filtering
-            video.hidden.notCategory.splice(video.hidden.notCategory.indexOf(targetLower), 1)
-          }
+    if (!ref.checked) {
+      setHidden(prev => ({ ...prev, category: prev.category.filter(cat => cat !== targetLower) }))
         } else {
-          const match = !video.categories.map(category => category.toLowerCase()).includes(targetLower)
-
-          if (match) video.hidden.category.push(targetLower)
+      setHidden(prev => ({ ...prev, category: [...prev.category, targetLower] }))
         }
-
-        return video
-      })
-    )
   }
 
-  const attribute = (ref: IndeterminateItemProps, target: IGeneral) => {
+  const attribute = (ref: RegularHandlerProps, target: General) => {
     const targetLower = target.name.toLowerCase()
 
-    update(
-      [...videos].map(video => {
-        if (ref.indeterminate) {
-          const match = video.attributes.some(attribute => attribute.toLowerCase() === targetLower)
-
-          if (match) {
-            video.hidden.notAttribute.push(targetLower)
+    if (!ref.checked) {
+      setHidden(prev => ({ ...prev, attribute: prev.attribute.filter(attr => attr !== targetLower) }))
           } else {
-            // Remove checked-status from filtering
-            video.hidden.attribute.splice(video.hidden.attribute.indexOf(targetLower), 1)
+      setHidden(prev => ({ ...prev, attribute: [...prev.attribute, targetLower] }))
           }
-        } else if (!ref.checked) {
-          const match = video.attributes.map(attribute => attribute.toLowerCase()).includes(targetLower)
-
-          if (match) {
-            // Remove indeterminate-status from filtering
-            video.hidden.notAttribute.splice(video.hidden.notAttribute.indexOf(targetLower), 1)
           }
-        } else {
-          const match = !video.attributes.map(attribute => attribute.toLowerCase()).includes(targetLower)
 
-          if (match) video.hidden.attribute.push(targetLower)
-        }
-
-        return video
-      })
-    )
-  }
-
-  const location = (ref: IndeterminateItemProps, target: IGeneral) => {
+  const location = (ref: RegularHandlerProps, target: General) => {
     const targetLower = target.name.toLowerCase()
 
-    update(
-      [...videos].map(video => {
-        if (ref.indeterminate) {
-          const match = video.locations.some(location => location.toLowerCase() === targetLower)
-
-          if (match) {
-            video.hidden.notLocation.push(targetLower)
-          } else {
-            // Remove checked-status from filtering
-            video.hidden.location.splice(video.hidden.location.indexOf(targetLower), 1)
-          }
-        } else if (!ref.checked) {
-          const match = video.locations.map(location => location.toLowerCase()).includes(targetLower)
-
-          if (match) {
-            // Remove indeterminate-status from filtering
-            video.hidden.notLocation.splice(video.hidden.notLocation.indexOf(targetLower), 1)
-          }
+    if (!ref.checked) {
+      setHidden(prev => ({ ...prev, location: prev.location.filter(loc => loc !== targetLower) }))
         } else {
-          const match = !video.locations.map(location => location.toLowerCase()).includes(targetLower)
-
-          if (match) video.hidden.location.push(targetLower)
+      setHidden(prev => ({ ...prev, location: [...prev.location, targetLower] }))
         }
-
-        return video
-      })
-    )
   }
 
-  const category_NULL = (ref: IndeterminateItemProps) => {
-    update(
-      [...videos].map(video => {
-        if (ref.indeterminate) {
-          video.hidden.noCategory = false
-          video.hidden.notNoCategory = video.categories.length === 0
-        } else if (!ref.checked) {
-          video.hidden.notNoCategory = false
+  const category_NULL = (ref: RegularHandlerProps) => {
+    if (!ref.checked) {
+      setHidden(prev => ({ ...prev, category: prev.category.filter(category => category !== null) }))
         } else {
-          video.hidden.noCategory = video.categories.length !== 0
+      setHidden(prev => ({ ...prev, category: [...prev.category, null] }))
         }
-
-        return video
-      })
-    )
-  }
-
-  const category_POV = (ref: IndeterminateItemProps) => {
-    update(
-      [...videos].map(video => {
-        if (ref.indeterminate) {
-          video.hidden.pov = false
-          video.hidden.notPov = video.pov
-        } else if (!ref.checked) {
-          video.hidden.notPov = false
-        } else {
-          video.hidden.pov = !video.pov
-        }
-
-        return video
-      })
-    )
   }
 
   return (
