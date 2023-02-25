@@ -287,14 +287,14 @@ export const sendFile = async (res: NextApiResponse, path: string) => {
     } else if (isImage) {
       path = './public/image.jpg'
     } else {
-    res.status(404).end()
+      res.status(404).end()
       return
     }
   }
 
-    res.writeHead(200)
-    fs.createReadStream(path).pipe(res)
-  }
+  res.writeHead(200)
+  fs.createReadStream(path).pipe(res)
+}
 
 export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, path: string, mb = 2): Promise<void> => {
   const chunkSize = 1024 * 1024 * mb
@@ -305,36 +305,36 @@ export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, pat
     if (isVideo) {
       path = './public/video.mp4'
     } else {
-    res.status(404).end()
+      res.status(404).end()
       return
     }
   }
 
-    fs.stat(path, (err, data) => {
-      if (err) {
-        throw err
+  fs.stat(path, (err, data) => {
+    if (err) {
+      throw err
+    }
+
+    if (req.headers.range !== undefined) {
+      const range = req.headers.range
+
+      // extract start and end / empty
+      const ranges = range.match(/^bytes=(\d+)-(.*)$/)?.slice(1, 2)
+      if (ranges !== undefined) {
+        const start = parseInt(ranges[0])
+        const end = Math.min(start + chunkSize, data.size - 1)
+
+        res.writeHead(206, {
+          'Accept-Ranges': 'bytes',
+          'Content-Range': `bytes ${start}-${end}/${data.size}`,
+          'Content-Length': end - start + 1
+        })
+
+        fs.createReadStream(path, { start, end }).pipe(res)
       }
-
-      if (req.headers.range !== undefined) {
-        const range = req.headers.range
-
-        // extract start and end / empty
-        const ranges = range.match(/^bytes=(\d+)-(.*)$/)?.slice(1, 2)
-        if (ranges !== undefined) {
-          const start = parseInt(ranges[0])
-          const end = Math.min(start + chunkSize, data.size - 1)
-
-          res.writeHead(206, {
-            'Accept-Ranges': 'bytes',
-            'Content-Range': `bytes ${start}-${end}/${data.size}`,
-            'Content-Length': end - start + 1
-          })
-
-          fs.createReadStream(path, { start, end }).pipe(res)
-        }
-      }
-    })
-  }
+    }
+  })
+}
 
 export const sleep = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -347,7 +347,79 @@ export const generateHash = (str: string) => crypto.MD5(str).toString()
 export const validateHash = (str: string, hash: string) => generateHash(str) === hash
 
 export const toCamelCase = (str: string) => str.replace(/([a-z])([A-Z])/g, '$1 $2')
+
+/**
+ * Append Text to file
+ * @param path file to be written to
+ * @param content text to write to file
+ */
+const writeToFile = async (path: string, content: string) => fs.promises.appendFile(path, content)
+
+const calculateTime = (secs: number) =>
+  dayjs(0)
+    .hour(0)
+    .millisecond(secs * 1000)
+
+export const generateVTTData = async (
+  videoID: number,
+  frameDelay: number,
+  tiles: { rows: number; cols: number },
+  dimension: { height: number; width: number }
+) => {
+  const vtt = `./media/vtt/${videoID}.vtt`
+
+  let nextTimeCode = 0
+  const generateTimeCodes = () => {
+    const timeCodeFormat = 'HH:mm:ss.SSS'
+
+    const start = calculateTime(nextTimeCode)
+    const end = calculateTime(nextTimeCode + frameDelay)
+
+    nextTimeCode += frameDelay
+
+    return {
+      start: start.format(timeCodeFormat),
+      end: end.format(timeCodeFormat)
+    }
   }
 
-  return url
+  await writeToFile(vtt, 'WEBVTT')
+  for (let row = 0, counter = 0; row < tiles.rows; row++) {
+    const posY = row * dimension.height
+    for (let col = 0; col < tiles.cols; col++) {
+      const posX = col * dimension.width
+
+      const { start, end } = generateTimeCodes()
+
+      await writeToFile(vtt, '\n')
+      await writeToFile(vtt, `\n${++counter}`)
+      await writeToFile(vtt, `\n${start} --> ${end}`)
+      await writeToFile(vtt, `\nvtt/thumb#xywh=${posX},${posY},${dimension.width},${dimension.height}`)
+    }
+  }
+}
+
+// sizes are based on "6.jpg"
+export function getDividableWidth(width: number, limits = { min: 120, max: 240 }): number {
+  const MIN = 10 * 2
+  const MAX = width / 2
+
+  const increment = 10
+  for (let dividend = limits.max; dividend >= limits.min; dividend--) {
+    if (width % dividend === 0) return dividend
+  }
+
+  // Check if calculation is out-of-bounds
+  if (limits.max + increment < MAX || limits.min - increment > MIN) {
+    if (limits.max + increment < MAX) {
+      limits.max += increment
+    }
+
+    if (limits.min - increment > MIN) {
+      limits.min -= increment
+    }
+
+    return getDividableWidth(width, limits)
+  }
+  throw new Error(`Could not find dividable width for ${width}`)
 }

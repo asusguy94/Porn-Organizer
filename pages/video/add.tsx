@@ -17,7 +17,7 @@ import {
 
 import Spinner from '@components/spinner'
 
-import { generateApi, videoApi } from '@api'
+import { generateService, videoService } from '@service'
 
 import styles from './add.module.scss'
 
@@ -40,48 +40,49 @@ const AddVideoPage: NextPage = () => {
     <Grid className='text-center'>
       <Typography style={{ marginBottom: 8 }}>Import Videos</Typography>
       {!videos.length ? (
-          <div className='text-center'>
+        <div className='text-center'>
           <Action label='Generate Metadata' callback={() => void generateService.metadata()} />
-          </div>
-        ) : (
-          <>
-            <TableContainer component={Paper}>
-              <Table size='small' className={styles['table-striped']}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>website</TableCell>
-                    <TableCell>site</TableCell>
-                    <TableCell>path</TableCell>
-                    <TableCell>title</TableCell>
-                  </TableRow>
-                </TableHead>
+          <Action label='Generate VTT' callback={() => void generateService.vtt()} />
+        </div>
+      ) : (
+        <>
+          <TableContainer component={Paper}>
+            <Table size='small' className={styles['table-striped']}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>website</TableCell>
+                  <TableCell>site</TableCell>
+                  <TableCell>path</TableCell>
+                  <TableCell>title</TableCell>
+                </TableRow>
+              </TableHead>
 
-                <TableBody>
-                  {videos.map(video => {
-                    return (
-                      <TableRow key={video.path}>
-                        <TableCell>{video.website}</TableCell>
-                        <TableCell>{video.site}</TableCell>
-                        <TableCell>{video.path}</TableCell>
-                        <TableCell>{video.title}</TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
+              <TableBody>
+                {videos.map(video => {
+                  return (
+                    <TableRow key={video.path}>
+                      <TableCell>{video.website}</TableCell>
+                      <TableCell>{video.site}</TableCell>
+                      <TableCell>{video.path}</TableCell>
+                      <TableCell>{video.title}</TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-            <div style={{ marginTop: 8 }}>
-              <Action
+          <div style={{ marginTop: 8 }}>
+            <Action
               label={`Add Videos (page 1 of ${pages ?? 0})`}
-                callback={() =>
+              callback={() =>
                 void videoService.addVideos(videos).then(() => {
                   router.reload()
-                  })
-                }
-              />
-            </div>
-          </>
+                })
+              }
+            />
+          </div>
+        </>
       )}
     </Grid>
   )
