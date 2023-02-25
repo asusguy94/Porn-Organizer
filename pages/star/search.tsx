@@ -20,7 +20,6 @@ import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
 
 import { daysToYears } from '@utils/client/date-time'
-import { mergeSort } from '@utils/client/sort'
 
 import { ImageCard } from '@components/image'
 import { getVisible, HiddenStar as Hidden, StarSearch as Star } from '@components/search/helper'
@@ -89,12 +88,12 @@ type StarsProps = {
   sortMethod: SortMethodStar
 }
 const Stars = ({ stars = [], hidden, sortMethod }: StarsProps) => {
-  const visible = getVisible(mergeSort(stars, sortMethod), hidden)
+  const visible = getVisible(stars.sort(sortMethod), hidden)
 
   return (
     <div id={styles.stars}>
       <Typography variant='h6' className='text-center'>
-        <span id={styles.count}>{stars.length}</span> Stars
+        <span id={styles.count}>{visible.length}</span> Stars
       </Typography>
 
       {stars.length > 0 ? (

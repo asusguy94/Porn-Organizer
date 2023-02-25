@@ -198,7 +198,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               await downloader(`media/${imagePath}`, `media/${imagePath_low}`, 'FILE') // copy file
               resizeImage(`./media/${imagePath_low}`, settingsConfig.THUMB_RES)
 
-              await prisma.video.update({ where: { id: parseInt(id) }, data: { cover: `${video.id}.jpg` } })
+              await prisma.video.update({ where: { id: video.id }, data: { cover: `${video.id}.jpg` } })
             }
           } catch (error) {
             printError(error)

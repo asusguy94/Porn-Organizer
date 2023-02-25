@@ -28,7 +28,6 @@ import SortObj, { getVideoSort, SortMethodVideo, SortTypeVideo as VideoSort } fr
 import Link from '@components/link'
 
 import { daysToYears } from '@utils/client/date-time'
-import { mergeSort } from '@utils/client/sort'
 import { SetState, WebsiteWithSites as Website, General, LocalWebsite } from '@interfaces'
 import { attributeService, categoryService, locationService, searchService, websiteService } from '@service'
 import { serverConfig } from '@config'
@@ -93,21 +92,19 @@ const Videos = ({ videos = [], hidden, sortMethod }: VideosProps) => {
   const [filtered, setFiltered] = useState<Video[]>([])
 
   useEffect(() => {
-    if (localWebsites !== null) {
-      localWebsites.map(wsite => ({ ...wsite, count: wsite.finished ? wsite.count + 1 : wsite.count }))
-    }
-  }, [localWebsites])
-
-  useEffect(() => {
     const map = new Map<string, number>()
 
+    const initialData = (localWebsites !== null ? [...localWebsites] : []).map(wsite => ({
+      ...wsite,
+      count: wsite.finished ? wsite.count + 1 : wsite.count
+    }))
+
     setFiltered(
-      mergeSort(videos, getVideoSort({ type: 'date', reverse: false }))
+      videos
+        .sort(getVideoSort({ type: 'date', reverse: false }))
           .filter(v => {
-            if (localWebsites === null) {
-              return true
-            } else if (v.website !== undefined) {
-              const website = localWebsites.find(wsite => wsite.label === v.website)
+          if (v.website !== undefined) {
+            const website = initialData.find(wsite => wsite.label === v.website)
 
               if (website !== undefined && website.count-- > (website.finished ? 0 : 1)) {
                 return true
@@ -130,7 +127,7 @@ const Videos = ({ videos = [], hidden, sortMethod }: VideosProps) => {
       ;[...map].slice(0, 2).forEach(([key, value]) => console.log(key, printWithMax(value, 200)))
   }, [localWebsites, videos, hidden])
 
-  const visible = getVisible(mergeSort(filtered, sortMethod), hidden)
+  const visible = getVisible(filtered.sort(sortMethod), hidden)
 
   return (
     <div id={styles.videos}>
@@ -346,7 +343,7 @@ function FilterObj<T extends General>({ data, label, callback, nullCallback, def
           <RegularItem
           label={<div className={styles.global}>NULL</div>}
           value='NULL'
-            callback={ref => nullCallback(ref)}
+            callback={nullCallback}
             defaultChecked={defaultNull}
         />
       )}

@@ -106,16 +106,13 @@ function isWebsiteHidden(obj: StarSearch | VideoSearch, hidden: HiddenStar | Hid
 }
 
 const isCategoryHidden = (video: VideoSearch, hidden: HiddenVideo) => {
-  const categories = video.categories.map(loc => loc.toLowerCase())
+  const categories = video.categories.map(cat => cat.toLowerCase())
 
   // hidden is empty
   if (hidden.category.length === 0) return true
 
-  // check if hidden.category only contains null
-
-  // category is only null
-  // this works since category cannot by both null and not null
-  if (hidden.category.length === 1 && hidden.category[0] === null) {
+  // category is null
+  if (hidden.category.length > 0 && hidden.category.includes(null)) {
     // video is shown if unrated
     // video is always shown if rated and has invalid date
     return video.categories.length === 0 || (video.categories.length > 0 && video.date === null)
