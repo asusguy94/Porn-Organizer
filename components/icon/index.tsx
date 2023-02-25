@@ -1,6 +1,6 @@
 import { themeConfig } from '@config'
 
-interface IconProps {
+type IconProps = {
   code: keyof typeof themeConfig
   className?: string
 }

@@ -20,27 +20,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
           orderBy: { name: 'asc' }
         })
-      ).map(video => {
-        const categories = getUnique(video.bookmarks.map(({ category }) => category).map(({ name }) => name))
-
-        return {
-          id: video.id,
-          quality: video.height,
-          date: video.date,
-          name: video.name,
-          image: video.cover ? getResizedThumb(video.id) : null,
-          star: video.star?.name ?? null,
-          ageInVideo: dateDiff(video.star?.birthdate, video.date),
-          website: video.website?.name,
-          site: video.site?.name ?? null,
-          plays: video.plays.length,
-          pov: categories.every(category => category.endsWith(' (POV)')),
-          categories,
-          attributes: video.attributes.map(({ attribute }) => attribute.name),
-          locations: video.locations.map(({ location }) => location.name),
-          api: video.api
-        }
-      })
+      ).map(video => ({
+        id: video.id,
+        quality: video.height,
+        date: video.apiDateHash === null || (video.api !== null && video.cover === null) ? null : video.date,
+        name: video.name,
+        image: video.cover ? getResizedThumb(video.id) : null,
+        star: video.star?.name ?? null,
+        ageInVideo: dateDiff(video.star?.birthdate, video.date),
+        website: video.website?.name,
+        site: video.site?.name ?? null,
+        plays: video.plays.length,
+        categories: getUnique(video.bookmarks.map(({ category }) => category.name)),
+        attributes: video.attributes.map(({ attribute }) => attribute.name),
+        locations: video.locations.map(({ location }) => location.name),
+        api: video.api
+      }))
     )
   }
 

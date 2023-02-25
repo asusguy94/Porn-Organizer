@@ -1,4 +1,5 @@
-import React, { RefObject, useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
 
 import { Button, Card, List, ListItem, TextField } from '@mui/material'
 
@@ -9,26 +10,27 @@ import { useKey } from 'react-use'
 
 import Plyr from '../plyr'
 import Icon from '../icon'
-import type { IModalHandler, IModal } from '../modal'
+import type { ModalHandler, Modal } from '../modal'
+import Spinner from '../spinner'
 
-import { videoApi } from '@api'
-import { IBookmark, IGeneral, IndexType, ISetState, IVideo, IVideoStar } from '@interfaces'
+import { videoService } from '@service'
+import { Bookmark, General, SetState, Video, VideoStar } from '@interfaces'
 import { serverConfig } from '@config'
 
-interface VideoPlayerProps {
-  video: IVideo
-  categories: IGeneral[]
-  bookmarks: IBookmark[]
-  star: IVideoStar | null
-  plyrRef: RefObject<any>
-  updateDuration: any
+type VideoPlayerProps = {
+  video: Video
+  categories?: General[]
+  bookmarks: Bookmark[]
+  star: VideoStar | null
+  plyrRef: React.MutableRefObject<HTMLVideoElement | Plyr | undefined>
+  updateDuration: SetState<number>
   update: {
-    video: ISetState<IVideo | undefined>
-    star: ISetState<IVideoStar | null | undefined>
-    bookmarks: ISetState<IBookmark[]>
+    video: SetState<Video | undefined>
+    star: SetState<VideoStar | null | undefined>
+    bookmarks: SetState<Bookmark[]>
   }
-  onModal: IModalHandler
-  modalData: IModal
+  onModal: ModalHandler
+  modalData: Modal
 }
 const VideoPlayer = ({
   video,
@@ -41,6 +43,8 @@ const VideoPlayer = ({
   onModal,
   modalData
 }: VideoPlayerProps) => {
+  const router = useRouter()
+
   const playAddedRef = useRef(false)
   const [localVideo, setLocalVideo] = useSessionStorage('video', 0)
   const [localBookmark, setLocalBookmark] = useSessionStorage('bookmark', 0)
@@ -53,7 +57,7 @@ const VideoPlayer = ({
   const isMute = (e: KeyboardEvent) => e.code === 'KeyM'
   const isSpace = (e: KeyboardEvent) => e.code === 'Space'
 
-  const getPlayer = () => plyrRef.current
+  const getPlayer = () => plyrRef.current as unknown as Plyr
 
   useKey(
     e => !modalData.visible && (isArrow(e) || isMute(e) || isSpace(e)),
@@ -119,7 +123,7 @@ const VideoPlayer = ({
         if (newVideo && !playAddedRef.current) {
           playAddedRef.current = true
 
-          videoApi
+          videoService
             .addPlay(video.id)
             .then(() => {
               console.log('Play Added')
@@ -137,7 +141,7 @@ const VideoPlayer = ({
   // Initialize HLS
   useEffect(() => {
     if (events) {
-      const player = getPlayer()
+      const player = getPlayer() as Plyr & { media: HTMLVideoElement }
 
       if (Hls.isSupported()) {
         const hls = new Hls({
@@ -174,7 +178,7 @@ const VideoPlayer = ({
 
   useEffect(() => {
     if (fallback) {
-      const player = getPlayer()
+      const player = getPlayer() as unknown as HTMLVideoElement & { media: HTMLVideoElement }
 
       player.media.src = `${serverConfig.api}/video/${video.id}/file`
       player.media.ondurationchange = () => updateDuration(player.media.duration)
@@ -185,15 +189,15 @@ const VideoPlayer = ({
   const handleWheel = (e: React.WheelEvent) => (getPlayer().currentTime += 10 * Math.sign(e.deltaY) * -1)
 
   const deleteVideo = () => {
-    videoApi.delete(video.id).then(() => {
-      window.location.href = '/'
+    videoService.delete(video.id).then(() => {
+      router.replace('/')
     })
   }
 
-  const addBookmark = (category: IGeneral) => {
+  const addBookmark = (category: General) => {
     const time = Math.round(getPlayer().currentTime)
     if (time) {
-      videoApi.addBookmark(video.id, category.id, time).then(({ data }) => {
+      videoService.addBookmark(video.id, category.id, time).then(({ data }) => {
         bookmarks.push({
           id: data.id,
           category: { id: category.id, name: category.name },
@@ -206,30 +210,23 @@ const VideoPlayer = ({
   }
 
   const clearBookmarks = () => {
-    videoApi.removeBookmark(video.id).then(() => update.bookmarks([]))
+    videoService.removeBookmark(video.id).then(() => update.bookmarks([]))
   }
 
   const resetPlays = () => {
-    videoApi.removePlays(video.id).then(() => {
+    videoService.removePlays(video.id).then(() => {
       update.video({ ...video, plays: 0 })
     })
   }
 
   const renameVideo = (path: string) => {
-    videoApi.rename(video.id, path).then(() => {
-      window.location.reload()
+    videoService.rename(video.id, path).then(() => {
+      router.reload()
     })
   }
 
   const getStarInfo = () => {
-    interface IStar {
-      id: string
-      title: string
-      date: string
-      performers: IndexType[]
-    }
-
-    videoApi.getStarInfo<IStar>(video.id).then(({ data }) => {
+    videoService.getStarInfo(video.id).then(({ data }) => {
       onModal(
         'Star Details',
         <List dense>
@@ -254,11 +251,13 @@ const VideoPlayer = ({
     })
   }
 
+  if (categories === undefined) return <Spinner />
+
   return (
     <div onWheel={handleWheel}>
       <ContextMenuTrigger id='video' holdToDisplay={-1}>
         <Plyr
-          plyrRef={plyrRef}
+          plyrRef={plyrRef as React.MutableRefObject<Plyr>}
           source={`${serverConfig.api}/video/${video.id}/file`}
           poster={`${serverConfig.api}/video/${video.id}/image`}
           thumbnail={`${serverConfig.api}/video/${video.id}/vtt`}

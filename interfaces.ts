@@ -1,28 +1,23 @@
 // Common types
-export type ISetState<T> = React.Dispatch<React.SetStateAction<T>>
+export type SetState<T> = React.Dispatch<React.SetStateAction<T>>
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
-export type PickOptional<T, K extends PropertyKey> = Pick<T, Extract<keyof T, K>>
-export type IndexType<V = any> = Record<string, V>
-export type Nullable<T> = T | null
 
-// Common interface
-export interface IGeneral {
+export type General = {
   id: number
   name: string
 }
 
 // Other Types
-export type IQuality = 1080 | 720 | 480 | 360 | 0
+export type Quality = 1080 | 720 | 480 | 360 | 0
 
-// Other Interfaces
-export interface IWebsiteWithSites {
+export type WebsiteWithSites = {
   id: number
   name: string
-  sites: IGeneral[]
+  sites: General[]
   videos: number
 }
 
-export interface IBookmark {
+export type Bookmark = {
   id: number
   category: {
     id: number
@@ -31,14 +26,14 @@ export interface IBookmark {
   start: number
 }
 
-export interface ISimilar {
+export type Similar = {
   id: number
   name: string
   image: string | null
   match: number
 }
 
-export interface IVideo {
+export type Video = {
   id: number
   name: string
   image: string | null
@@ -49,13 +44,13 @@ export interface IVideo {
   star: string
   website: string
   subsite: string
-  locations: IGeneral[]
-  attributes: IGeneral[]
+  locations: General[]
+  attributes: General[]
   date: { added: string; published?: string; invalid: boolean }
   path: { file: string; stream: string }
 }
 
-export interface IVideoStar {
+export type VideoStar = {
   id: number
   name: string
   image: string | null
@@ -63,7 +58,7 @@ export interface IVideoStar {
   numVideos: number
 }
 
-export interface IStarVideo {
+export type StarVideo = {
   id: number
   name: string
   image: string
@@ -75,8 +70,30 @@ export interface IStarVideo {
   hidden: boolean
 }
 
-export interface ILocalWebsite {
+export type LocalWebsite = {
   label: string
   count: number
   finished: boolean
+}
+
+export type Gender = 'Female' | 'Male' | null
+
+export type Extra = {
+  birthday: string | null
+  ethnicity: string | null
+  nationality: string | null
+  weight: string | null
+  height: string | null
+  cupsize: string | null
+}
+
+export type Performer = {
+  id: string
+  name: string
+  extra: Extra & {
+    gender: Gender
+    haircolor: string | null
+  }
+  image: string
+  thumbnail: string
 }

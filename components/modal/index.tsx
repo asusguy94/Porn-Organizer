@@ -6,30 +6,30 @@ import { useKey } from 'react-use'
 
 import styles from './modal.module.scss'
 
-export interface IModal {
+export type Modal = {
   visible: boolean
   title: string
   data: React.ReactNode
   filter: boolean
   width: null | 'wide' | 'wider'
 }
-export type IModalHandler = (title?: IModal['title'], data?: IModal['data'], filter?: IModal['filter']) => void
+export type ModalHandler = (title?: Modal['title'], data?: Modal['data'], filter?: Modal['filter']) => void
 
 export const useModal = () => {
-  const [modal, setModal] = useState<IModal>({ visible: false, title: '', data: null, filter: false, width: null })
+  const [modal, setModal] = useState<Modal>({ visible: false, title: '', data: null, filter: false, width: null })
 
-  const handleModal: IModalHandler = (title = '', data = null, filter = false) => {
+  const handleModal: ModalHandler = (title = '', data = null, filter = false) => {
     setModal(prevModal => ({ title, data, visible: !prevModal.visible, filter, width: null }))
   }
 
-  const handleModalWidth = (width: IModal['width'] = null) => {
+  const handleModalWidth = (width: Modal['width'] = null) => {
     setModal(prevModal => ({ ...prevModal, width }))
   }
 
   return { modal, setModal: handleModal, setWidth: handleModalWidth }
 }
 
-interface ModalProps {
+type ModalProps = {
   title: string
   visible: boolean
   filter: boolean
@@ -37,7 +37,7 @@ interface ModalProps {
   onClose: () => void
 }
 
-const Modal = ({ title, visible, filter, children, onClose }: ModalProps) => {
+const ModalComponent = ({ title, visible, filter, children, onClose }: ModalProps) => {
   const [query, setQuery] = useState('')
 
   const isLetter = (e: KeyboardEvent) => /^Key([A-Z])$/.test(e.code)
@@ -66,7 +66,7 @@ const Modal = ({ title, visible, filter, children, onClose }: ModalProps) => {
   )
 }
 
-interface ModalChildProps {
+type ModalChildProps = {
   title: string
   children: React.ReactNode
   query: string
@@ -75,19 +75,21 @@ interface ModalChildProps {
 }
 
 const ModalChild = ({ title, filter, children, query, onClose }: ModalChildProps) => {
+  const lowerQuery = query.toLowerCase()
+
   const handleFilter = () => {
     return (
       children
         //@ts-expect-error: ReactNode mapped as any[]
-        ?.filter((item: any) => item.props.children.toLowerCase().includes(query))
+        ?.filter((item: any) => item.props.children.toLowerCase().includes(lowerQuery))
         .sort((a: any, b: any) => {
           const valA = a.props.children.toLowerCase()
           const valB = b.props.children.toLowerCase()
 
           if (query.length > 0) {
-            if (valA.startsWith(query) && valB.startsWith(query)) return 0
-            else if (valA.startsWith(query)) return -1
-            else if (valB.startsWith(query)) return 1
+            if (valA.startsWith(lowerQuery) && valB.startsWith(lowerQuery)) return 0
+            else if (valA.startsWith(lowerQuery)) return -1
+            else if (valB.startsWith(lowerQuery)) return 1
           }
 
           return valA.localeCompare(valB)
@@ -118,4 +120,4 @@ const ModalChild = ({ title, filter, children, query, onClose }: ModalChildProps
   )
 }
 
-export default Modal
+export default ModalComponent

@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import apiUrl from '@utils/client/api'
-import { IStarVideo } from '@interfaces'
+import type { Similar, StarVideo } from '@interfaces'
 
 const api = axios.create({
   baseURL: apiUrl('star')
@@ -13,7 +13,7 @@ export default {
   add: async (star: string) => await api.post('/', { name: star }),
   get: async <T>(id: number) => await api.get<T>(`/${id}`),
   remove: async (id: number) => await api.delete(`/${id}`),
-  getVideos: async (id: number) => await api.get<IStarVideo[]>(`/${id}/video`),
+  getVideos: async (id: number) => await api.get<StarVideo[]>(`/${id}/video`),
   renameStar: async (id: number, name: string) => await api.put(`/${id}`, { name }),
   setSlug: async (id: number, slug: string) => await api.put(`/${id}`, { slug }),
   ignoreStar: async <T extends { id: number; ignored: boolean }>(star: T) => {
@@ -21,9 +21,13 @@ export default {
   },
   addAlias: async (id: number, alias: string) => await api.post(`/${id}/alias`, { alias }),
   removeImage: async (id: number) => await api.delete(`/${id}/image`),
-  addImage: async <T = any>(id: number, url: string) => await api.post<T>(`/${id}/image`, { url }),
+  addImage: async (id: number, url: string) => await api.post<{ image: string }>(`/${id}/image`, { url }),
   getImages: async (id: number) => await api.post<{ images: string[] }>(`/${id}/api/image`),
-  updateInfo: async <T = any>(id: number, label: string, value: string) => await api.put<T>(`/${id}`, { label, value }),
+  updateInfo: async (id: number, label: string, value: string) =>
+    await api.put<{ reload: boolean; content: string | Date | number | null; similar: Similar[] }>(`/${id}`, {
+      label,
+      value
+    }),
   resetInfo: async (id: number) => await api.delete(`/${id}/api`),
-  getData: async <T = any>(id: number) => await api.post<T>(`/${id}/api`)
+  getData: async (id: number) => await api.post(`/${id}/api`)
 }

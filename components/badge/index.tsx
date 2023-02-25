@@ -1,10 +1,10 @@
 import styles from './badge.module.scss'
 
-interface IBadge {
+type BadgeProps = {
   content: number
   children: React.ReactNode
 }
-const Badge = ({ content, children }: IBadge) => {
+const Badge = ({ content, children }: BadgeProps) => {
   const badgeClass = content < 10 ? styles.small : styles.large
 
   return (

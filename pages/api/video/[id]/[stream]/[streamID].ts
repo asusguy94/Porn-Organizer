@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { id, stream, streamID } = req.query
 
     if (typeof id === 'string' && typeof stream === 'string' && typeof streamID === 'string') {
-      if (stream.match(/^stream\d+$/) !== null && streamID.match(/^\d{4}\.ts$/) !== null) {
+      if (/^stream\d+$/.test(stream) && /^\d{4}\.ts$/.test(streamID)) {
         const video = await prisma.video.findFirstOrThrow({
           where: { id: parseInt(id) }
         })

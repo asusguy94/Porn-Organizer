@@ -123,20 +123,23 @@ model VideoLocations {
 }
 
 model Video {
-  id        Int       @id @default(autoincrement())
-  name      String
-  path      String    @unique
-  date      DateTime? @db.Date
-  duration  Int       @default(0)
-  height    Int       @default(0)
-  starAge   Int?
-  siteID    Int?
-  websiteID Int?
-  starID    Int?
-  thumbnail Int       @default(100)
-  added     DateTime  @default(now()) @db.Date
-  api       String?   @unique @db.VarChar(36)
-  cover     String?   @unique
+  id          Int       @id @default(autoincrement())
+  name        String
+  path        String    @unique
+  date        DateTime? @db.Date
+  duration    Int       @default(0)
+  height      Int       @default(0)
+  width       Int       @default(0)
+  starAge     Int?
+  siteID      Int?
+  websiteID   Int?
+  starID      Int?
+  thumbnail   Int       @default(100)
+  added       DateTime  @default(now()) @db.Date
+  api         String?   @unique @db.VarChar(36)
+  cover       String?   @unique
+  apiDateHash String?   @db.Char(32)
+  ignoreMeta  Boolean   @default(false)
 
   site    Site?    @relation(fields: [siteID], references: [id], onDelete: Restrict, onUpdate: Cascade)
   website Website? @relation(fields: [websiteID], references: [id], onDelete: Restrict, onUpdate: Cascade)

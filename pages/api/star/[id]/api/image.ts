@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import { prisma } from '@utils/server'
 import { getStarData, getStarSlug } from '@utils/server/metadata'
+import { printError } from '@utils/shared'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -17,8 +18,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       if (star.api) {
-        const starData = await getStarData(star.api)
-        res.json({ images: starData.posters })
+        try {
+          const starData = await getStarData(star.api)
+          res.json({ images: starData.posters })
+        } catch (error) {
+          printError(error)
+        }
 
         // get a list of images that can be used!
         // return a list of images as url string[]

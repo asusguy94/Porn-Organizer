@@ -1,6 +1,7 @@
 import { FormControlLabel, Radio } from '@mui/material'
+import { StarSearch as Star, VideoSearch as Video } from './helper'
 
-interface SortObjProps {
+type SortObjProps = {
   label: {
     asc: string
     desc: string

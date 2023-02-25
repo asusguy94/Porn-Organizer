@@ -11,6 +11,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { id } = req.query
 
     if (typeof id === 'string') {
+      if (id === '0') {
+        res.end()
+        return
+      }
+
       const star = await prisma.star.findFirst({
         where: { videos: { some: { id: parseInt(id) } } }
       })
@@ -27,9 +32,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           ageInVideo: dateDiff(videos.find(v => v.id === parseInt(id))?.date, star.birthdate),
           numVideos: videos.length
         })
+      } else {
+        res.json(null)
       }
 
-      res.end() // same as return null
+      res.end()
     }
   } else if (req.method === 'POST') {
     const { id } = req.query

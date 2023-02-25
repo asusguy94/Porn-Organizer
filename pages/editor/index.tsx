@@ -1,5 +1,6 @@
-import { NextPage } from 'next/types'
-import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from 'react'
+import type { NextPage } from 'next/types'
+import { useRouter } from 'next/router'
+import { useState, useEffect, ChangeEvent, KeyboardEvent } from 'react'
 
 import {
   Grid,
@@ -17,7 +18,7 @@ import {
 import axios from 'axios'
 import capitalize from 'capitalize'
 
-import { IGeneral } from '@interfaces'
+import { General } from '@interfaces'
 import { serverConfig } from '@config'
 
 import styles from './editor.module.scss'
@@ -30,11 +31,13 @@ const EditorPage: NextPage = () => (
   </Grid>
 )
 
-interface WrapperProps {
+type WrapperProps = {
   label: string
   name: string
 }
 const Wrapper = ({ label, name }: WrapperProps) => {
+  const router = useRouter()
+
   const [input, setInput] = useState('')
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => setInput(e.currentTarget.value)
@@ -44,9 +47,7 @@ const Wrapper = ({ label, name }: WrapperProps) => {
       if (input.toLowerCase() === input) return false
 
       axios.post(`${serverConfig.api}/${name}`, { name: input }).then(() => {
-        window.location.reload()
-
-        //TODO use stateObj instead
+        router.reload()
       })
     }
   }
@@ -84,13 +85,13 @@ const Wrapper = ({ label, name }: WrapperProps) => {
   )
 }
 
-interface WrapperItemProps {
+type WrapperItemProps = {
   label: string
 }
 const WrapperItem = ({ label }: WrapperItemProps) => {
-  const [data, setData] = useState<IGeneral[]>([])
+  const [data, setData] = useState<General[]>([])
 
-  const updateItem = (ref: IGeneral, value: string) => {
+  const updateItem = (ref: General, value: string) => {
     axios.put(`${serverConfig.api}/${label}/${ref.id}`, { value }).then(() => {
       setData(
         data.map(item => ({
@@ -102,7 +103,7 @@ const WrapperItem = ({ label }: WrapperItemProps) => {
   }
 
   useEffect(() => {
-    axios.get<IGeneral[]>(`${serverConfig.api}/${label}`).then(({ data }) => {
+    axios.get<General[]>(`${serverConfig.api}/${label}`).then(({ data }) => {
       setData(data.sort((a, b) => a.id - b.id))
     })
   }, [label])
@@ -127,9 +128,9 @@ const WrapperItem = ({ label }: WrapperItemProps) => {
   )
 }
 
-interface ItemProps {
-  update: (ref: IGeneral, value: string) => void
-  data: IGeneral
+type ItemProps = {
+  update: (ref: General, value: string) => void
+  data: General
 }
 const Item = ({ update, data }: ItemProps) => {
   const [edit, setEdit] = useState(false)

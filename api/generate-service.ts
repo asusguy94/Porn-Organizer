@@ -1,12 +1,12 @@
 import axios from 'axios'
 
 import apiUrl from '@utils/client/api'
-import { General } from '@interfaces'
 
 const api = axios.create({
-  baseURL: apiUrl('category')
+  baseURL: apiUrl('generate')
 })
 
 export default {
-  getAll: async () => api.get<General[]>('/')
+  metadata: () => api.post('/meta'),
+  vtt: () => api.post('/vtt')
 }

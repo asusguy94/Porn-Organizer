@@ -1,5 +1,6 @@
-import { NextPage } from 'next/types'
-import { useState, useEffect } from 'react'
+import type { NextPage } from 'next/types'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 
 import {
   Grid,
@@ -21,34 +22,26 @@ import { generateApi, videoApi } from '@api'
 import styles from './add.module.scss'
 
 const AddVideoPage: NextPage = () => {
-  interface IVideoFile {
+  const router = useRouter()
+
+  type VideoFile = {
     path: string
     website: string
     site: string
     title: string
+    date: string
   }
 
-  const [videos, setVideos] = useState<IVideoFile[]>([])
-  const [loaded, setLoaded] = useState(false)
-  const [pages, setPages] = useState(0)
+  const { files: videos, pages } = videoService.useNewVideos<{ files: VideoFile[]; pages: number }>().data ?? {}
 
-  useEffect(() => {
-    videoApi
-      .newVideos<{ files: IVideoFile[]; pages: number }>()
-      .then(({ data }) => {
-        setVideos(data.files)
-        setPages(data.pages)
-      })
-      .finally(() => setLoaded(true))
-  }, [])
+  if (videos === undefined) return <Spinner />
 
   return (
     <Grid className='text-center'>
       <Typography style={{ marginBottom: 8 }}>Import Videos</Typography>
-      {loaded ? (
-        !videos.length ? (
+      {!videos.length ? (
           <div className='text-center'>
-            <Action label='Generate Metadata' callback={() => void generateApi.metadata()} />
+          <Action label='Generate Metadata' callback={() => void generateService.metadata()} />
           </div>
         ) : (
           <>
@@ -80,24 +73,21 @@ const AddVideoPage: NextPage = () => {
 
             <div style={{ marginTop: 8 }}>
               <Action
-                label={`Add Videos (page 1 of ${pages})`}
+              label={`Add Videos (page 1 of ${pages ?? 0})`}
                 callback={() =>
-                  void videoApi.addVideos(videos).then(() => {
-                    window.location.reload()
+                void videoService.addVideos(videos).then(() => {
+                  router.reload()
                   })
                 }
               />
             </div>
           </>
-        )
-      ) : (
-        <Spinner />
       )}
     </Grid>
   )
 }
 
-interface ActionProps {
+type ActionProps = {
   label: string
   callback?: () => void
   disabled?: boolean

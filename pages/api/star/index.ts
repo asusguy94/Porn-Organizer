@@ -9,19 +9,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'GET') {
     res.json({
       breast: getUnique(
-        (await prisma.star.findMany({ where: { breast: { not: null } }, orderBy: { breast: 'asc' } })).map(
-          ({ breast }) => breast!
-        )
+        (
+          await prisma.star.findMany({
+            where: { breast: { not: null } },
+            orderBy: { breast: 'asc' }
+          })
+        ).flatMap(({ breast }) => (breast !== null ? [breast] : []))
       ),
       haircolor: getUnique(
-        (await prisma.star.findMany({ where: { haircolor: { not: null } }, orderBy: { haircolor: 'asc' } })).map(
-          ({ haircolor }) => haircolor!
-        )
+        (
+          await prisma.star.findMany({
+            where: { haircolor: { not: null } },
+            orderBy: { haircolor: 'asc' }
+          })
+        ).flatMap(({ haircolor }) => (haircolor !== null ? [haircolor] : []))
       ),
       ethnicity: getUnique(
-        (await prisma.star.findMany({ where: { ethnicity: { not: null } }, orderBy: { ethnicity: 'asc' } })).map(
-          ({ ethnicity }) => ethnicity!
-        )
+        (
+          await prisma.star.findMany({
+            where: { ethnicity: { not: null } },
+            orderBy: { ethnicity: 'asc' }
+          })
+        ).flatMap(({ ethnicity }) => (ethnicity !== null ? [ethnicity] : []))
       ),
       websites: (await prisma.website.findMany({ orderBy: { name: 'asc' } })).map(website => website.name)
     })

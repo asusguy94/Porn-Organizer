@@ -9,14 +9,17 @@ import {
   downloader,
   fileExists,
   formatDate,
+  generateHash,
   getDate,
   isNewDate,
   noExt,
-  removeThumbnails
+  removeThumbnails,
+  validateHash
 } from '@utils/server/helper'
 import { generateDate, generateStarName } from '@utils/server/generate'
 import { resizeImage } from '@utils/server/ffmpeg'
 import { getSceneData, getSceneSlug } from '@utils/server/metadata'
+import { printError } from '@utils/shared'
 import { settingsConfig } from '@config'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -24,6 +27,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { id } = req.query
 
     if (typeof id === 'string') {
+      if (id === '0') {
+        res.end()
+        return
+      }
+
       const video = await prisma.video.findFirstOrThrow({
         where: { id: parseInt(id) },
         include: {
@@ -35,6 +43,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           attributes: { include: { attribute: true } }
         }
       })
+
+      let invalid = false
+      if (video.api !== null && video.date !== null) {
+        // check if date has been validated
+        if (!(video.apiDateHash !== null && validateHash(formatDate(video.date, true), video.apiDateHash))) {
+          try {
+            const apiDate = (await getSceneData(video.api)).date.trim()
+
+            // date don't match either
+            invalid = apiDate !== formatDate(video.date, true)
+
+            // ony update database with new hash if nessesary
+            await prisma.video.update({
+              where: { id: video.id },
+              data: {
+                apiDateHash: generateHash(apiDate)
+              }
+            })
+          } catch (error) {
+            console.error(error)
+          }
+        }
+      }
 
       res.json({
         id: video.id,
@@ -48,10 +79,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         date: {
           added: formatDate(video.added),
           published: video.date ? formatDate(video.date) : undefined,
-          invalid:
-            video.api && video.date
-              ? (await getSceneData(video.api)).date.trim() !== formatDate(video.date, true)
-              : false
+          invalid
         },
         duration: video.duration,
         height: video.height,
@@ -105,14 +133,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           // Reset SLUG
           await prisma.video.update({
             where: { id: parseInt(id) },
-            data: { api: null }
+            data: { api: null, apiDateHash: null }
           })
         } else {
           // Add Slug
           await getSceneSlug(slug).then(async data => {
             await prisma.video.update({
               where: { id: parseInt(id) },
-              data: { api: data }
+              data: { api: data, apiDateHash: null }
             })
           })
         }
@@ -154,22 +182,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           where: { id: parseInt(id) }
         })
         if (video.api) {
-          const { image } = await getSceneData(video.api)
-          if (image) {
-            const imagePath = `images/videos/${video.id}.jpg`
-            const imagePath_low = `images/videos/${video.id}-${settingsConfig.THUMB_RES}.jpg`
+          try {
+            const { image } = await getSceneData(video.api)
+            if (image) {
+              const imagePath = `images/videos/${video.id}.jpg`
+              const imagePath_low = `images/videos/${video.id}-${settingsConfig.THUMB_RES}.jpg`
 
-            // download file (if missing)
-            if (!(await fileExists(`./media/${imagePath}`))) {
-              console.log(`Generating HIGHRES ${video.id}`)
-              await downloader(image, `media/${imagePath}`, 'URL')
+              // download file (if missing)
+              if (!(await fileExists(`./media/${imagePath}`))) {
+                console.log(`Generating HIGHRES ${video.id}`)
+                await downloader(image, `media/${imagePath}`, 'URL')
+              }
+
+              console.log(`Generating LOWRES ${video.id}`)
+              await downloader(`media/${imagePath}`, `media/${imagePath_low}`, 'FILE') // copy file
+              resizeImage(`./media/${imagePath_low}`, settingsConfig.THUMB_RES)
+
+              await prisma.video.update({ where: { id: parseInt(id) }, data: { cover: `${video.id}.jpg` } })
             }
-
-            console.log(`Generating LOWRES ${video.id}`)
-            await downloader(`media/${imagePath}`, `media/${imagePath_low}`, 'FILE') // copy file
-            resizeImage(`./media/${imagePath_low}`, settingsConfig.THUMB_RES)
-
-            await prisma.video.update({ where: { id: parseInt(id) }, data: { cover: `${video.id}.jpg` } })
+          } catch (error) {
+            printError(error)
           }
         }
       } else {

@@ -1,4 +1,5 @@
-import { Fragment } from 'react'
+import { useRouter } from 'next/router'
+import { Fragment, useState } from 'react'
 
 import { Button, Grid, TextField, Typography } from '@mui/material'
 
@@ -6,19 +7,20 @@ import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import { useCopyToClipboard } from 'usehooks-ts'
 
 import Icon from '../icon'
-import type { IModalHandler } from '../modal'
+import type { ModalHandler } from '../modal'
+import Spinner from '../spinner'
 
-import { attributeApi, locationApi, videoApi } from '@api'
-import { IGeneral, ISetState, IVideo } from '@interfaces'
+import { attributeService, locationService, videoService } from '@service'
+import { General, SetState, Video } from '@interfaces'
 
 import styles from './header.module.scss'
 
-interface HeaderProps {
-  video: IVideo
-  attributes: IGeneral[]
-  locations: IGeneral[]
-  update: ISetState<IVideo | undefined>
-  onModal: IModalHandler
+type HeaderProps = {
+  video: Video
+  attributes?: General[]
+  locations?: General[]
+  update: SetState<Video | undefined>
+  onModal: ModalHandler
 }
 const Header = ({ video, attributes, locations, update, onModal }: HeaderProps) => {
   const isFullHD = video.height ? video.height > 720 : false
@@ -43,8 +45,8 @@ const Header = ({ video, attributes, locations, update, onModal }: HeaderProps) 
   )
 }
 
-interface HeaderSiteProps {
-  video: IVideo
+type HeaderSiteProps = {
+  video: Video
 }
 const HeaderSite = ({ video }: HeaderSiteProps) => (
   <div id={styles.site}>
@@ -58,7 +60,7 @@ const HeaderSite = ({ video }: HeaderSiteProps) => (
   </div>
 )
 
-interface HeaderQualityProps {
+type HeaderQualityProps = {
   video: IVideo
   hidden?: boolean
 }
@@ -72,15 +74,17 @@ const HeaderQuality = ({ video, hidden = false }: HeaderQualityProps) => {
   )
 }
 
-interface HeaderSlugProps {
-  video: IVideo
+type HeaderSlugProps = {
+  video: Video
   hidden?: boolean
-  onModal: IModalHandler
+  onModal: ModalHandler
 }
 const HeaderSlug = ({ video, hidden = false, onModal }: HeaderSlugProps) => {
+  const router = useRouter()
+
   const setSlug = (slug: string) => {
-    videoApi.setSlug(video.id, slug).then(() => {
-      window.location.reload()
+    videoService.setSlug(video.id, slug).then(() => {
+      router.reload()
     })
   }
 
@@ -111,33 +115,39 @@ const HeaderSlug = ({ video, hidden = false, onModal }: HeaderSlugProps) => {
   )
 }
 
-interface HeaderCoverProps {
-  video: IVideo
+type HeaderCoverProps = {
+  video: Video
   hidden?: boolean
 }
 const HeaderCover = ({ video, hidden = false }: HeaderCoverProps) => {
-  const setCover = () => {
-    videoApi.setThumbnail(video.id).then(() => {
-      window.location.reload()
+  const router = useRouter()
+
+  const [clicked, setClicked] = useState(false)
+
+  const handleClick = () => {
+    setClicked(true)
+
+    videoService.setThumbnail(video.id).then(() => {
+      router.reload()
     })
   }
 
   if (hidden) return null
 
   return (
-    <Button size='small' variant='outlined' onClick={() => setCover()}>
+    <Button size='small' variant='outlined' disabled={clicked} onClick={handleClick}>
       Missing Cover
     </Button>
   )
 }
 
-interface HeaderLocationsProps {
-  video: IVideo
-  update: ISetState<IVideo | undefined>
+type HeaderLocationsProps = {
+  video: Video
+  update: SetState<Video | undefined>
 }
 const HeaderLocations = ({ video, update }: HeaderLocationsProps) => {
-  const removeLocation = (location: IGeneral) => {
-    locationApi.removeVideo(video.id, location.id).then(() => {
+  const removeLocation = (location: General) => {
+    locationService.removeVideo(video.id, location.id).then(() => {
       update({ ...video, locations: video.locations.filter(item => item.id !== location.id) })
     })
   }
@@ -166,13 +176,13 @@ const HeaderLocations = ({ video, update }: HeaderLocationsProps) => {
   )
 }
 
-interface HeaderAttributesProps {
-  video: IVideo
-  update: ISetState<IVideo | undefined>
+type HeaderAttributesProps = {
+  video: Video
+  update: SetState<Video | undefined>
 }
 const HeaderAttributes = ({ video, update }: HeaderAttributesProps) => {
-  const removeAttribute = (attribute: IGeneral) => {
-    attributeApi.removeVideo(video.id, attribute.id).then(() => {
+  const removeAttribute = (attribute: General) => {
+    attributeService.removeVideo(video.id, attribute.id).then(() => {
       update({ ...video, attributes: video.attributes.filter(item => item.id !== attribute.id) })
     })
   }
@@ -201,13 +211,15 @@ const HeaderAttributes = ({ video, update }: HeaderAttributesProps) => {
   )
 }
 
-interface HeaderDateProps {
-  video: IVideo
+type HeaderDateProps = {
+  video: Video
 }
 const HeaderDate = ({ video }: HeaderDateProps) => {
+  const router = useRouter()
+
   const fixDate = () => {
-    videoApi.fixDate(video.id).then(() => {
-      window.location.reload()
+    videoService.fixDate(video.id).then(() => {
+      router.reload()
     })
   }
 
@@ -229,18 +241,18 @@ const HeaderDate = ({ video }: HeaderDateProps) => {
   )
 }
 
-interface HeaderTitleProps {
-  video: IVideo
-  attributes: IGeneral[]
-  locations: IGeneral[]
-  update: ISetState<IVideo | undefined>
-  onModal: IModalHandler
+type HeaderTitleProps = {
+  video: Video
+  attributes?: General[]
+  locations?: General[]
+  update: SetState<Video | undefined>
+  onModal: ModalHandler
 }
 const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTitleProps) => {
   const [, setClipboard] = useCopyToClipboard()
 
-  const addLocationHandler = (location: IGeneral) => {
-    videoApi.addLocation(video.id, location.id).then(({ data }) => {
+  const addLocationHandler = (location: General) => {
+    videoService.addLocation(video.id, location.id).then(({ data }) => {
       update({
         ...video,
         locations: [...video.locations, data].sort((a, b) => {
@@ -250,18 +262,20 @@ const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTi
     })
   }
 
-  const addAttribute = (attribute: IGeneral) => {
-    videoApi.addAttribute(video.id, attribute.id).then(({ data }) => {
+  const addAttribute = (attribute: General) => {
+    videoService.addAttribute(video.id, attribute.id).then(({ data }) => {
       update({ ...video, attributes: [...video.attributes, data].sort((a, b) => a.name.localeCompare(b.name)) })
     })
   }
 
   const renameTitle = (title: string) => {
-    videoApi.renameTitle(video.id, title).then(() => update({ ...video, name: title }))
+    videoService.renameTitle(video.id, title).then(() => update({ ...video, name: title }))
   }
 
   const copyTitle = async () => await setClipboard(video.name)
   const copyStar = async () => await setClipboard(video.star)
+
+  if (attributes === undefined || locations === undefined) return <Spinner />
 
   return (
     <Typography variant='h4' id={styles.title}>
@@ -299,12 +313,7 @@ const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTi
             onModal(
               'Add Attribute',
               attributes
-                .filter(item => {
-                  const match = video.attributes.some(videoAttribute => videoAttribute.name === item.name)
-
-                  if (!match) return item
-                  return null
-                })
+                .filter(item => !video.attributes.some(videoAttribute => videoAttribute.name === item.name))
                 .map(item => (
                   <Button
                     variant='outlined'

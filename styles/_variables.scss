@@ -1,12 +1,14 @@
+$initialHeight: 88vh;
+
 // Bookmarks
-$bookmarkCols: 11; // max column size
-$bookmarkRows: 2; // max adjacent rows
+$bookmarkCols: 6; // max column size
+$bookmarkRows: 3; // max adjacent rows
 $bookmarkSpacing: 36; // vertical bookmark spacing
 
 // Video Thumbnails
-$thumbnailWidth: 290;
+$thumbnailWidth: 290px;
 $thumbnailHeight: $thumbnailWidth / (16/9);
 
 // Star Image
-$starWidth: 200;
-$starHeight: 275;
+$starWidth: 200px;
+$starHeight: 275px;

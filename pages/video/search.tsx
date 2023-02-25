@@ -1,4 +1,4 @@
-import { NextPage } from 'next/types'
+import type { NextPage } from 'next/types'
 import React, { useState, useEffect, useRef } from 'react'
 
 import {
@@ -29,51 +29,19 @@ import SortObj from '@components/search/sort'
 import Link from '@components/link'
 
 import { daysToYears } from '@utils/client/date-time'
-import { IQuality, ISetState, IWebsiteWithSites as IWebsite, IGeneral, ILocalWebsite } from '@interfaces'
-import { attributeApi, categoryApi, locationApi, searchApi, websiteApi } from '@api'
+import { SetState, WebsiteWithSites as Website, General, LocalWebsite } from '@interfaces'
+import { attributeService, categoryService, locationService, searchService, websiteService } from '@service'
 import { serverConfig } from '@config'
 import { printWithMax } from '@utils/shared'
 
 import styles from './search.module.scss'
 
-interface IVideo {
-  id: number
-  name: string
-  ageInVideo: number
-  attributes: string[]
-  categories: string[]
-  date: string
-  image: string | null
-  locations: string[]
-  plays: number
-  pov: boolean
-  quality: IQuality
-  site: string | null
-  star: string | null
-  website?: string
-  hidden: {
-    category: string[]
-    notCategory: string[]
-    attribute: string[]
-    notAttribute: string[]
-    location: string[]
-    notLocation: string[]
-    titleSearch: boolean
-    noCategory: boolean
-    notNoCategory: boolean
-    pov: boolean
-    notPov: boolean
-    website: boolean
-  }
-  api: string | null
-}
-
-interface IVideoData {
-  categories: IGeneral[]
-  attributes: IGeneral[]
-  locations: IGeneral[]
-  websites: IWebsite[]
-}
+type VideoData = Partial<{
+  categories: General[]
+  attributes: General[]
+  locations: General[]
+  websites: Website[]
+}>
 
 const VideoSearchPage: NextPage = () => {
   const localWebsites = useReadLocalStorage<ILocalWebsite[]>('websites')
@@ -97,8 +65,6 @@ const VideoSearchPage: NextPage = () => {
       localWebsites.map(wsite => ({ ...wsite, count: wsite.finished ? wsite.count + 1 : wsite.count }))
     }
   }, [localWebsites])
-
-  const inputRef = useRef<HTMLInputElement>()
 
   useEffect(() => {
     const map = new Map<string, number>()
@@ -191,8 +157,8 @@ const Videos = ({ videos }: VideosProps) => {
   )
 }
 
-interface VideoCardProps {
-  video?: IVideo
+type VideoCardProps = {
+  video?: Video
 }
 const VideoCard = ({ video }: VideoCardProps) => {
   if (video === undefined) return null
@@ -242,7 +208,8 @@ interface TitleSearchProps {
   videos: IVideo[]
   inputRef: any
 }
-const TitleSearch = ({ update, videos, inputRef }: TitleSearchProps) => {
+  const inputRef = useRef<HTMLInputElement>()
+
   const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.currentTarget.value.toLowerCase()
 
@@ -326,7 +293,7 @@ const Sort = ({ videos, update }: SortProps) => {
     <>
       <h2>Sort</h2>
       <FormControl>
-        <RadioGroup name='sort' defaultValue='alphabetically'>
+        <RadioGroup name='sort' defaultValue='date_reverse'>
           <SortObj id='alphabetically' label={{ asc: 'A-Z', desc: 'Z-A' }} callback={sortDefault} />
           <SortObj id='added' label={{ asc: 'Old Upload', desc: 'Recent Upload' }} callback={sortAdded} reversed />
           <SortObj id='date' label={{ asc: 'Oldest', desc: 'Newest' }} callback={sortDate} reversed />
@@ -354,7 +321,7 @@ const Filter = ({ videoData, videos, update }: FilterProps) => {
     const websiteObj: IWebsite = JSON.parse(e.target.value)
 
     update(
-      [...videos].map(video => {
+      videos.map(video => {
         if (websiteObj.name === 'ALL') {
           return { ...video, hidden: { ...video.hidden, website: false } }
         } else if (websiteObj.sites.length === 0) {
@@ -516,104 +483,71 @@ const Filter = ({ videoData, videos, update }: FilterProps) => {
 
       <FilterObj
         data={videoData.categories}
-        obj={videos}
         label='category'
-        labelPlural='categories'
         callback={category}
         nullCallback={category_NULL}
-        otherCallback={category_POV}
-        otherCallbackLabel='pov'
+        defaultNull
       />
 
-      <FilterObj data={videoData.attributes} obj={videos} label='attribute' callback={attribute} />
-
-      <FilterObj data={videoData.locations} obj={videos} label='location' callback={location} />
+      <FilterObj data={videoData.attributes} label='attribute' callback={attribute} />
+      <FilterObj data={videoData.locations} label='location' callback={location} />
     </>
   )
 }
 
-interface FilterObjProps {
-  data: IGeneral[] | string[]
+type FilterObjProps<T extends General> = {
+  data?: T[]
   label: string
-  labelPlural?: string
-  obj: IVideo[]
-  callback: any
-  nullCallback?: any
-  otherCallback?: any
-  otherCallbackLabel?: string
+  callback: (ref: RegularHandlerProps, item: T) => void
+  nullCallback?: (ref: RegularHandlerProps) => void
+  otherCallback?: { label: string; cb: (ref: RegularHandlerProps) => void }
+  defaultNull?: boolean
+  defaultOther?: boolean
 }
-const FilterObj = ({
-  data,
-  label,
-  labelPlural,
-  obj,
-  callback,
-  nullCallback,
-  otherCallback,
-  otherCallbackLabel = ''
-}: FilterObjProps) => (
+function FilterObj<T extends General>({ data, label, callback, nullCallback, defaultNull = false }: FilterObjProps<T>) {
+  if (data === undefined) return <Spinner />
+
+  return (
   <>
     <h2>{capitalize(label, true)}</h2>
 
     <FormControl>
       {nullCallback !== undefined && (
-        <IndeterminateItem
+          <RegularItem
           label={<div className={styles.global}>NULL</div>}
           value='NULL'
-          callback={(ref: any) => nullCallback(ref)}
+            callback={ref => nullCallback(ref)}
+            defaultChecked={defaultNull}
         />
       )}
 
-      {otherCallback !== undefined && (
-        <IndeterminateItem
-          label={<div className={styles.global}>{otherCallbackLabel.toUpperCase()}</div>}
-          value='OTHER'
-          callback={(ref: any) => otherCallback(ref)}
-        />
-      )}
-
-      {data.map((item: any) => (
-        <IndeterminateItem
-          key={item.id}
-          label={
-            <>
-              {item.name} <LabelCount prop={labelPlural ?? `${label}s`} label={item.name} obj={obj} />
-            </>
-          }
-          value={item.name}
-          item={item}
-          callback={(ref: any, item: any) => callback(ref, item)}
-        />
+        {data.map(item => (
+          <RegularItem key={item.id} label={item.name} value={item.name} item={item} callback={callback} />
       ))}
     </FormControl>
   </>
 )
-
-interface WebsiteDropdownProps {
-  websites: IWebsite[]
-  label: string
-  labelPlural?: string
-  callback: (e: SelectChangeEvent) => void
 }
-const WebsiteDropdown = ({ websites, label, labelPlural, callback }: WebsiteDropdownProps) => {
-  const defaultValue = JSON.stringify({ name: 'ALL' })
+
+type WebsiteDropdownProps = {
+  websites?: Website[]
+  label: string
+  callback: (e: SelectChangeEvent) => void
+  defaultValue?: string
+}
+const WebsiteDropdown = ({ websites, label, callback, defaultValue = 'ALL' }: WebsiteDropdownProps) => {
+  if (websites === undefined) return <Spinner />
 
   return (
     <>
       <h2>{capitalize(label, true)}</h2>
 
       <FormControl>
-        <Select
-          variant='standard'
-          id={label}
-          name={labelPlural ?? `${label}s`}
-          defaultValue={defaultValue}
-          onChange={callback}
-        >
-          <MenuItem value={defaultValue}>All</MenuItem>
+        <Select variant='standard' name={label} defaultValue={defaultValue} onChange={callback}>
+          <MenuItem value='ALL'>All</MenuItem>
 
           {websites.map(website => [
-            <MenuItem key={website.id.toString()} value={JSON.stringify({ ...website, sites: [] })}>
+            <MenuItem key={website.id} value={JSON.stringify({ ...website, sites: [] })}>
               {website.name}
             </MenuItem>,
             website.sites.map(site => (

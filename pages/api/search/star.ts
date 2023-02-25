@@ -21,8 +21,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ethnicity: star.ethnicity,
         age: dateDiff(star.birthdate),
         videoCount: star.videos.length,
-        websites: getUnique(star.videos.map(video => video.website!.name)),
-        sites: getUnique(star.videos.filter(({ site }) => site !== null).map(({ site }) => site!.name))
+
+        websites: getUnique(star.videos.flatMap(({ website }) => (website !== null ? [website.name] : []))),
+        sites: getUnique(star.videos.flatMap(({ site }) => (site !== null ? [site.name] : [])))
       }))
     )
   }

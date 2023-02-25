@@ -1,5 +1,5 @@
-import { NextPage } from 'next/types'
-import React, { useState, useEffect, useRef } from 'react'
+import type { NextPage } from 'next/types'
+import React, { useState, useRef } from 'react'
 
 import {
   Grid,
@@ -26,52 +26,27 @@ import LabelCount from '@components/labelcount'
 import { getVisible } from '@components/search/helper'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Badge from '@components/badge'
-import Loader from '@components/spinner'
+import Spinner from '@components/spinner'
 import VGrid from '@components/virtualized/virtuoso'
 import Link from '@components/link'
 import SortObj from '@components/search/sort'
 
-import { IGeneral, ISetState } from '@interfaces'
-import { searchApi, starApi, websiteApi } from '@api'
+import { General, SetState } from '@interfaces'
+import { searchService, starService, websiteService } from '@service'
 import { serverConfig } from '@config'
 
 import styles from './search.module.scss'
 
-interface IStar {
-  id: number
-  name: string
-  image: string | null
-  age: number
-  breast: string | null
-  ethnicity: string | null
-  haircolor: string | null
-  websites: string[]
-  sites: string[]
-  videoCount: number
-  hidden: {
-    titleSearch: boolean
-    breast: boolean
-    haircolor: boolean
-    ethnicity: boolean
-    website: boolean
-    noBreast: boolean
-  }
-  score: number
-}
-
-interface IStarData {
+type StarData = Partial<{
   breasts: string[]
   haircolors: string[]
   ethnicities: string[]
-  websites: IGeneral[]
-}
+  websites: General[]
+}>
 
 const StarSearchPage: NextPage = () => {
-  const [stars, setStars] = useState<IStar[]>([])
-  const [breasts, setBreasts] = useState<string[]>([])
-  const [haircolors, setHaircolors] = useState<string[]>([])
-  const [ethnicities, setEthnicities] = useState<string[]>([])
-  const [websites, setWebsites] = useState<IGeneral[]>([])
+  const { data: websites } = websiteService.useWebsites()
+  const { breast, ethnicity, haircolor } = starService.useStarInfo().data ?? {}
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -100,14 +75,6 @@ const StarSearchPage: NextPage = () => {
         }))
       )
     })
-
-    websiteApi.getAll().then(({ data }) => setWebsites(data))
-    starApi.getInfo().then(({ data }) => {
-      setBreasts(data.breast)
-      setHaircolors(data.haircolor)
-      setEthnicities(data.ethnicity)
-    })
-  }, [])
 
   return (
     <Grid container>
@@ -156,8 +123,8 @@ const Stars = ({ stars }: StarsProps) => {
   )
 }
 
-interface StarCardProps {
-  star?: IStar
+type StarCardProps = {
+  star?: Star
 }
 const StarCard = ({ star }: StarCardProps) => {
   if (star === undefined) return null
@@ -186,10 +153,8 @@ const StarCard = ({ star }: StarCardProps) => {
   )
 }
 
-interface SidebarProps {
-  starData: IStarData
-  stars: IStar[]
-  update: ISetState<IStar[]>
+type SidebarProps = {
+  starData: StarData
   inputRef: React.Ref<HTMLInputElement>
 }
 const Sidebar = ({ starData, stars, update, inputRef }: SidebarProps) => (
@@ -244,8 +209,6 @@ const Filter = ({ stars, starData, update }: FilterProps) => {
   const website_DROP = (e: SelectChangeEvent) => {
     const targetLower = e.target.value.toLowerCase()
 
-    update(
-      [...stars].map(star => {
         if (targetLower === 'all') {
           return { ...star, hidden: { ...star.hidden, website: false } }
         } else {
@@ -255,10 +218,6 @@ const Filter = ({ stars, starData, update }: FilterProps) => {
               ...star.hidden,
               website: !star.websites.some(website => website.toLowerCase() === targetLower)
             }
-          }
-        }
-      })
-    )
   }
 
   const breast_NULL = (e: React.ChangeEvent<HTMLFormElement>) => {
@@ -309,7 +268,6 @@ const Filter = ({ stars, starData, update }: FilterProps) => {
 
       <FilterItem
         data={starData.breasts}
-        obj={stars}
         label='breast'
         callback={breast}
         globalCallback={breast_ALL}
@@ -318,7 +276,6 @@ const Filter = ({ stars, starData, update }: FilterProps) => {
 
       <FilterItem
         data={starData.haircolors}
-        obj={stars}
         label='haircolor'
         callback={haircolor}
         globalCallback={haircolor_ALL}
@@ -326,7 +283,6 @@ const Filter = ({ stars, starData, update }: FilterProps) => {
 
       <FilterItem
         data={starData.ethnicities}
-        obj={stars}
         label='ethnicity'
         callback={ethnicity}
         globalCallback={ethnicity_ALL}
@@ -433,7 +389,8 @@ interface FilterItemProps {
   globalCallback?: () => void
   nullCallback?: any
 }
-const FilterItem = ({ data, label, obj, callback, globalCallback, nullCallback }: FilterItemProps) => (
+const FilterItem = ({ data, label, callback, globalCallback, nullCallback }: FilterItemProps) => {
+  return (
   <>
     <h2>{capitalize(label, true)}</h2>
 
@@ -462,11 +419,7 @@ const FilterItem = ({ data, label, obj, callback, globalCallback, nullCallback }
             key={item}
             value={item}
             onChange={() => callback(item)}
-            label={
-              <>
-                {item} <LabelCount prop={label} label={item} obj={obj} isArr />
-              </>
-            }
+              label={item}
             control={<Radio />}
           />
         ))}
@@ -474,13 +427,15 @@ const FilterItem = ({ data, label, obj, callback, globalCallback, nullCallback }
     </FormControl>
   </>
 )
+}
 
-interface FilterDropdownProps {
-  data: IStarData['websites']
+type FilterDropdownProps = {
+  data?: StarData['websites']
   label: string
   callback: (e: SelectChangeEvent) => void
 }
-const FilterDropdown = ({ data, label, callback }: FilterDropdownProps) => (
+const FilterDropdown = ({ data, label, callback }: FilterDropdownProps) => {
+  return (
   <>
     <h2>{capitalize(label, true)}</h2>
 
@@ -496,5 +451,6 @@ const FilterDropdown = ({ data, label, callback }: FilterDropdownProps) => (
     </FormControl>
   </>
 )
+}
 
 export default StarSearchPage

@@ -23,7 +23,7 @@ const NavBar = () => (
   </nav>
 )
 
-interface NavBarItemProps {
+type NavBarItemProps = {
   name: string
   path: string
   disabled?: boolean

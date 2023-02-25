@@ -1,4 +1,5 @@
-import { NextPage } from 'next/types'
+import type { NextPage } from 'next/types'
+import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 
 import { Grid, TextField, Card, CardActionArea, CardContent, Button, Typography } from '@mui/material'
@@ -7,28 +8,29 @@ import { useSessionStorage } from 'usehooks-ts'
 
 import Link from '@components/link'
 import { ImageCard } from '@components/image'
+import Spinner from '@components/spinner'
 
-import { starApi } from '@api'
+import { starService } from '@service'
 import { serverConfig } from '@config'
 import { getUnique } from '@utils/shared'
 
-interface IStar {
+type Star = {
   id: number
   name: string
   image: string | null
 }
 
-interface IMissing {
+type Missing = {
   videoID: number
   name: string
 }
 
-interface IIndexChanger {
-  total: IMissing[]
+type IndexChanger = {
+  total: Missing[]
   index: number
   setIndex: (index: number) => void
 }
-const IndexChanger = ({ total, index, setIndex }: IIndexChanger) => (
+const IndexChanger = ({ total, index, setIndex }: IndexChanger) => (
   <span className='mx-1' style={total.length ? {} : { display: 'none' }}>
     <Button
       variant='outlined'
@@ -55,52 +57,54 @@ const IndexChanger = ({ total, index, setIndex }: IIndexChanger) => (
 )
 
 const Stars: NextPage = () => {
+  const router = useRouter()
+
   const [starInput, setStarInput] = useSessionStorage('starInput', '')
 
-  const [missing, setMissing] = useState<IMissing[]>([])
-  const [stars, setStars] = useState<IStar[]>([])
-  const [videoStars, setVideoStars] = useState<IMissing[]>([])
+  const { stars, missing: videoStars } = starService.useStarMissing<Star, Missing>().data ?? {}
 
+  const [missing, setMissing] = useState<Missing[]>([])
   const [input, setInput] = useState('')
   const [activeStar, setActiveStar] = useState<string>()
 
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
-    starApi.getMissing<IStar, IMissing>().then(({ data }) => {
-      const filtered = getUnique(data.missing, 'name').filter(star => !data.stars.some(s => s.name === star.name))
+    if (videoStars !== undefined && stars !== undefined) {
+      const filtered = getUnique(videoStars, 'name').filter(star => !stars.some(s => s.name === star.name))
 
-      setStars(data.stars)
       setMissing(filtered)
-      setVideoStars(data.missing)
-    })
-  }, [])
+    }
+  }, [videoStars, stars])
 
   useEffect(() => {
     if (missing.length) setInput(missing[index].name)
   }, [missing, index])
 
   useEffect(() => {
-    setActiveStar(stars.find(s => s.name === starInput)?.name)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stars])
+    if (stars !== undefined && starInput.length > 0) {
+      setActiveStar(stars.find(s => s.name === starInput)?.name)
+    }
+  }, [starInput, stars])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (input.length) {
       setStarInput(input)
-      starApi.add(input).finally(() => {
-        window.location.reload()
+      starService.add(input).finally(() => {
+        router.reload()
       })
     }
   }
 
   const handleSubmitAll = () => {
-    Promise.allSettled(missing.map(m => starApi.add(m.name))).finally(() => {
-      window.location.reload()
+    Promise.allSettled(missing.map(m => starService.add(m.name))).finally(() => {
+      router.reload()
     })
   }
+
+  if (videoStars === undefined || stars === undefined) return <Spinner />
 
   return (
     <Grid container justifyContent='center'>

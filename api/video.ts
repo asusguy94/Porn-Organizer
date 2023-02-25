@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import apiUrl from '@utils/client/api'
-import { IGeneral, IVideoStar } from '@interfaces'
+import { Bookmark, General, VideoStar } from '@interfaces'
 
 const api = axios.create({
   baseURL: apiUrl('video')
@@ -10,17 +10,17 @@ const api = axios.create({
 export default {
   get: async <T>(id: number) => await api.get<T>(`/${id}`),
   getBookmarks: async <T>(id: number) => await api.get<T>(`/${id}/bookmark`),
-  addBookmark: async <T = any>(id: number, categoryID: number, time: number) => {
-    return await api.post<T>(`/${id}/bookmark`, { categoryID, time })
+  addBookmark: async (id: number, categoryID: number, time: number) => {
+    return await api.post<Bookmark>(`/${id}/bookmark`, { categoryID, time })
   },
   getStar: async <T>(id: number) => await api.get<T | ''>(`/${id}/star`),
-  addStar: async (id: number, star: string) => await api.post<IVideoStar>(`/${id}/star`, { name: star }),
+  addStar: async (id: number, star: string) => await api.post<VideoStar>(`/${id}/star`, { name: star }),
   removeStar: async (id: number) => await api.delete(`/${id}/star`),
   addLocation: async (id: number, locationID: number) => {
-    return await api.post<IGeneral>(`/${id}/location`, { locationID })
+    return await api.post<General>(`/${id}/location`, { locationID })
   },
   addAttribute: async (id: number, attributeID: number) => {
-    return await api.post<IGeneral>(`/${id}/attribute`, { attributeID })
+    return await api.post<General>(`/${id}/attribute`, { attributeID })
   },
   fixDate: async (id: number) => await api.put(`/${id}/fix-date`),
   renameTitle: async (id: number, title: string) => await api.put(`/${id}`, { title }),

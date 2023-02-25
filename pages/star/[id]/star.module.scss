@@ -17,15 +17,15 @@
 
 // When changing images
 .profile {
-  max-height: $starHeight + px;
-  width: $starWidth + px !important;
+  max-height: $starHeight;
+  width: $starWidth !important;
   object-fit: inherit !important;
 }
 
 #star {
   #profile {
-    max-height: $starHeight + px;
-    width: $starWidth + px;
+    max-height: $starHeight;
+    width: $starWidth;
   }
 
   #ignored {
@@ -57,7 +57,7 @@
 
 .video {
   margin: 0 10px 10px 5px !important;
-  width: $thumbnailWidth + px;
+  width: $thumbnailWidth;
 
   &.hidden {
     opacity: 0.2;

@@ -10,6 +10,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { id } = req.query
 
     if (typeof id === 'string') {
+      if (id === '0') {
+        res.end()
+        return
+      }
+
       const star = await prisma.star.findFirstOrThrow({ where: { id: parseInt(id) } })
 
       res.json({
@@ -63,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // some are not necessary
         // some are being checked in reactJS
 
-        let data: string | null | Date | number = value
+        let data: string | Date | number | null = value
 
         // ALWAYS refresh page when changing AGE!
         let reload = label === 'birthdate'

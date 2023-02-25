@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import { prisma } from '@utils/server'
 import { getSceneData } from '@utils/server/metadata'
+import { printError } from '@utils/shared'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
@@ -13,7 +14,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
 
       if (video.api) {
-        res.json(await getSceneData(video.api))
+        try {
+          res.json(await getSceneData(video.api))
+        } catch (error) {
+          printError(error)
+        }
       }
 
       res.end()

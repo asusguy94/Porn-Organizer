@@ -18,9 +18,9 @@
   .video {
     margin: 5px;
 
-    width: $thumbnailWidth + px;
+    width: $thumbnailWidth;
     img {
-      height: $thumbnailHeight + px;
+      height: $thumbnailHeight;
     }
 
     .title {

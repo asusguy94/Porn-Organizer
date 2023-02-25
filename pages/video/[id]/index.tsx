@@ -1,4 +1,4 @@
-import { NextPage } from 'next/types'
+import type { NextPage } from 'next/types'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
@@ -7,97 +7,106 @@ import { Grid, Card, Typography, TextField } from '@mui/material'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 
 import { ImageCard } from '@components/image'
-import Modal, { useModal, type IModalHandler, type IModal } from '@components/modal'
+import ModalComponent, { useModal, type ModalHandler, type Modal } from '@components/modal'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Badge from '@components/badge'
 import { Header, Player as VideoPlayer, Timeline } from '@components/video'
 import Icon from '@components/icon'
 import Link from '@components/link'
+import Spinner from '@components/spinner'
 
-import { daysToYears } from '@utils/client/date-time'
-
-import { attributeApi, categoryApi, locationApi, videoApi } from '@api'
-import { IBookmark as IVideoBookmark, IVideo, IVideoStar, ISetState, IBookmark, IGeneral } from '@interfaces'
+import { Bookmark as VideoBookmark, Video, VideoStar, SetState, Bookmark, General } from '@interfaces'
+import { attributeService, categoryService, locationService, videoService } from '@service'
 import { serverConfig } from '@config'
+import { daysToYears } from '@utils/client/date-time'
 
 import styles from './video.module.scss'
 
 const VideoPage: NextPage = () => {
-  const { query } = useRouter()
+  const { query, isReady } = useRouter()
+
+  const { data: attributes } = attributeService.useAttributes()
+  const { data: categories } = categoryService.useCategories()
+  const { data: locations } = locationService.useLocations()
+
+  const videoID = isReady && typeof query.id === 'string' ? parseInt(query.id) : undefined
+  const { data: videoData } = videoService.useVideo<Video>(videoID)
+  const { data: starData } = videoService.useStar(videoID)
+  const { data: bookmarksData } = videoService.useBookmarks<Bookmark[]>(videoID)
+
+  const [video, setVideo] = useState<Video>()
+  const [star, setStar] = useState<VideoStar | null>()
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
 
   const { modal, setModal } = useModal()
 
-  const [video, setVideo] = useState<IVideo>()
-
-  const [star, setStar] = useState<IVideoStar | null>()
-
-  const [bookmarks, setBookmarks] = useState<IBookmark[]>([])
-  const [attributes, setAttributes] = useState<IGeneral[]>([])
-  const [categories, setCategories] = useState<IGeneral[]>([])
-  const [locations, setLocations] = useState<IGeneral[]>([])
+  useEffect(() => {
+    setVideo(videoData)
+  }, [videoData])
 
   useEffect(() => {
-    if (typeof query.id === 'string') {
-      const videoID = parseInt(query.id)
-
-      Promise.all([
-        attributeApi.getAll().then(({ data }) => setAttributes(data)),
-        categoryApi.getAll().then(({ data }) => setCategories(data)),
-        locationApi.getAll().then(({ data }) => setLocations(data)),
-        videoApi.get<IVideo>(videoID).then(({ data }) => setVideo(data)),
-        videoApi.getBookmarks<IBookmark[]>(videoID).then(({ data }) => setBookmarks(data)),
-        videoApi.getStar<IVideoStar>(videoID).then(({ data }) => setStar(data !== '' ? data : null))
-      ])
+    if (starData !== undefined) {
+      setStar(starData)
     }
-  }, [query.id])
+  }, [starData])
+
+  useEffect(() => {
+    if (bookmarksData !== undefined) {
+      setBookmarks(bookmarksData)
+    }
+  }, [bookmarksData])
 
   return (
-    <Grid container id='video-page'>
-      {video !== undefined && star !== undefined && (
-        <>
-          <Section
-            video={video}
-            locations={locations}
-            attributes={attributes}
-            categories={categories}
-            bookmarks={bookmarks}
-            star={star}
-            update={{ video: setVideo, star: setStar, bookmarks: setBookmarks }}
-            onModal={setModal}
-            modalData={modal}
-          />
+    <Grid container>
+      <Section
+        video={video}
+        locations={locations}
+        attributes={attributes}
+        categories={categories}
+        bookmarks={bookmarks}
+        star={star}
+        update={{ video: setVideo, star: setStar, bookmarks: setBookmarks }}
+        onModal={setModal}
+        modalData={modal}
+      />
 
-          <Grid item xs={2} id={styles.sidebar}>
-            <div id={styles.stars}>
-              {star !== null && <Star video={video} star={star} update={setStar} />}
+      <Grid item xs={2} id={styles.sidebar}>
+        <div id={styles.stars}>
+          {star !== undefined ? (
+            video !== undefined && (
+              <>
+                {star !== null && <Star video={video} star={star} update={setStar} />}
 
-              <StarInput video={video} disabled={star !== null} update={setStar} />
-            </div>
-          </Grid>
-        </>
-      )}
+                <StarInput video={video} disabled={star !== null} update={setStar} />
+              </>
+            )
+          ) : (
+            <Spinner />
+          )}
+        </div>
+      </Grid>
 
-      <Modal visible={modal.visible} title={modal.title} filter={modal.filter} onClose={setModal}>
+      <ModalComponent visible={modal.visible} title={modal.title} filter={modal.filter} onClose={setModal}>
         {modal.data}
-      </Modal>
+      </ModalComponent>
     </Grid>
   )
 }
 
-interface SectionProps {
-  video: IVideo
-  locations: IGeneral[]
-  attributes: IGeneral[]
-  categories: IGeneral[]
-  bookmarks: IVideoBookmark[]
-  star: IVideoStar | null
+type SectionProps = {
+  video?: Video
+  locations?: General[]
+  attributes?: General[]
+  categories?: General[]
+  bookmarks: VideoBookmark[]
+  star?: VideoStar | null
   update: {
-    video: ISetState<IVideo | undefined>
-    star: ISetState<IVideoStar | undefined | null>
-    bookmarks: ISetState<IBookmark[]>
+    video: SetState<Video | undefined>
+    star: SetState<VideoStar | null | undefined>
+    bookmarks: SetState<Bookmark[]>
   }
-  onModal: IModalHandler
-  modalData: IModal
+  onModal: ModalHandler
+  modalData: Modal
 }
 const Section = ({
   video,
@@ -105,13 +114,13 @@ const Section = ({
   attributes,
   categories,
   bookmarks,
-  star,
+  star = null,
   update,
   onModal,
   modalData
 }: SectionProps) => {
   const [duration, setDuration] = useState(0)
-  const plyrRef = useRef<HTMLVideoElement>()
+  const plyrRef = useRef<HTMLVideoElement | Plyr>()
 
   // Helper script for getting the player
   const playVideo = (time: number) => {
@@ -122,6 +131,8 @@ const Section = ({
       player.play()
     }
   }
+
+  if (video === undefined) return <Spinner />
 
   return (
     <Grid item xs={10}>
@@ -152,14 +163,14 @@ const Section = ({
   )
 }
 
-interface StarProps {
-  star: IVideoStar
-  video: IVideo
-  update: ISetState<IVideoStar | null | undefined>
+type StarProps = {
+  star: VideoStar
+  video: Video
+  update: SetState<VideoStar | null | undefined>
 }
 const Star = ({ star, video, update }: StarProps) => {
   const removeStarHandler = () => {
-    videoApi.removeStar(video.id).then(() => {
+    videoService.removeStar(video.id).then(() => {
       update(null)
     })
   }
@@ -199,14 +210,14 @@ const Star = ({ star, video, update }: StarProps) => {
   )
 }
 
-interface StarInputProps {
-  video: IVideo
-  update: ISetState<IVideoStar | null | undefined>
+type StarInputProps = {
+  video: Video
+  update: SetState<VideoStar | null | undefined>
   disabled?: boolean
 }
 const StarInput = ({ video, update, disabled = false }: StarInputProps) => {
   const addStar = (star: string) => {
-    videoApi.addStar(video.id, star).then(({ data }) => update(data))
+    videoService.addStar(video.id, star).then(({ data }) => update(data))
   }
 
   if (disabled) return null

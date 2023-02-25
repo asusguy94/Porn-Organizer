@@ -4,12 +4,14 @@ import fs from 'fs'
 import path from 'path'
 import fetch from 'node-fetch'
 import ffmpeg from 'fluent-ffmpeg'
+import crypto from 'crypto-js'
 
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 dayjs.extend(utc)
 
 import prisma from './prisma'
+
 import { settingsConfig } from '@config'
 
 export const dateDiff = (date1?: string | Date | null, date2: string | Date | null = new Date()): number => {
@@ -58,7 +60,6 @@ export const removeThumbnails = async (videoID: number) => {
     fs.promises.unlink(`./media/images/videos/${videoID}-${settingsConfig.THUMB_RES}.jpg`),
 
     // Remove Previews
-    fs.promises.unlink(`./media/images/thumbnails/${videoID}.jpg`),
     fs.promises.unlink(`./media/vtt/${videoID}.vtt`),
     fs.promises.unlink(`./media/vtt/${videoID}.jpg`)
   ])
@@ -89,6 +90,11 @@ export const getClosestQ = (quality: number): number => {
   return getClosest(quality, settingsConfig.qualities)
 }
 
+/**
+ * Check if a file exists
+ * @param {string} path Path to check
+ * @return {Promise<boolean>} Returns true if the file exists
+ */
 export const fileExists = async (path: string): Promise<boolean> => {
   return new Promise<boolean>(resolve => fs.access(path, fs.constants.F_OK, err => resolve(!err)))
 }
@@ -196,13 +202,13 @@ export const formatBreastSize = (input: string): string => {
   return breast.trim()
 }
 
-interface ISimilarStar {
+type SimilarStar = {
   id: number
   name: string
   image: string | null
   match: number
 }
-export const getSimilarStars = async (starID: number, maxMaxLength = 9): Promise<ISimilarStar[]> => {
+export const getSimilarStars = async (starID: number, maxMaxLength = 9): Promise<SimilarStar[]> => {
   const currentStar = await prisma.star.findFirstOrThrow({ where: { id: starID } })
 
   const match_default = 2
@@ -237,6 +243,12 @@ export const getSimilarStars = async (starID: number, maxMaxLength = 9): Promise
     .slice(0, maxMaxLength)
 }
 
+/**
+ * Check two dates are identical
+ * @param {string|Date} dateStr1 First date
+ * @param {string|Date} dateStr2 Second date
+ * @return {boolean} Returns false if dates are identical
+ */
 export const isNewDate = (dateStr1: string | Date, dateStr2: string | Date): boolean => {
   const date1 = dayjs(dateStr1)
   const date2 = dayjs(dateStr2)
@@ -244,23 +256,60 @@ export const isNewDate = (dateStr1: string | Date, dateStr2: string | Date): boo
   return date1.diff(date2) !== 0
 }
 
-export const getResizedThumb = (id: number) => `${id}-${settingsConfig.THUMB_RES}.jpg`
+/**
+ * @param {number} id The id of the image
+ * @return {string} Returns the resized thumbnail path
+ */
+export const getResizedThumb = (id: number): string => `${id}-${settingsConfig.THUMB_RES}.jpg`
+
+/**
+ * @param {string} path the path of video/image
+ * @return {{isVideo: boolean, isImage:boolean}} Returns an object with isImage and isVideo
+ */
+const getFileType = (path: string): { isVideo: boolean; isImage: boolean } => {
+  if (process.env.NODE_ENV === 'production') {
+    return { isImage: false, isVideo: false }
+  }
+
+  const isVideo = extOnly(path) === '.mp4'
+  const isImage = ['.jpg', '.png'].includes(extOnly(path))
+  if (isVideo && isImage) throw new Error('Invalid image/video type')
+
+  return { isVideo, isImage }
+}
 
 export const sendFile = async (res: NextApiResponse, path: string) => {
   if (!(await fileExists(path))) {
+    const { isImage, isVideo } = getFileType(path)
+
+    if (isVideo) {
+      path = './public/video.mp4'
+    } else if (isImage) {
+      path = './public/image.jpg'
+    } else {
     res.status(404).end()
-  } else {
+      return
+    }
+  }
+
     res.writeHead(200)
     fs.createReadStream(path).pipe(res)
   }
-}
 
 export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, path: string, mb = 2): Promise<void> => {
   const chunkSize = 1024 * 1024 * mb
 
   if (!(await fileExists(path))) {
+    const { isVideo } = getFileType(path)
+
+    if (isVideo) {
+      path = './public/video.mp4'
+    } else {
     res.status(404).end()
-  } else {
+      return
+    }
+  }
+
     fs.stat(path, (err, data) => {
       if (err) {
         throw err
@@ -286,18 +335,18 @@ export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, pat
       }
     })
   }
-}
 
 export const sleep = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-export const fixUrl = (url: string) => {
-  switch (new URL(url).protocol) {
-    case 'https:':
-      return url.substring(url.lastIndexOf('https://'))
-    case 'http:':
-      return url.substring(url.lastIndexOf('http://'))
+export const fixUrl = (url: string) => url
+
+// Indetity Hashing
+export const generateHash = (str: string) => crypto.MD5(str).toString()
+export const validateHash = (str: string, hash: string) => generateHash(str) === hash
+
+export const toCamelCase = (str: string) => str.replace(/([a-z])([A-Z])/g, '$1 $2')
   }
 
   return url

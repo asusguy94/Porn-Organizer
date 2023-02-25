@@ -6,22 +6,23 @@ import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import { useWindowSize } from 'usehooks-ts'
 
 import Icon from '../icon'
-import type { IModalHandler } from '../modal'
+import type { ModalHandler } from '../modal'
+import Spinner from '../spinner'
 
-import { IBookmark, IGeneral, ISetState, IVideo } from '@interfaces'
+import { Bookmark, General, SetState, Video } from '@interfaces'
+import { bookmarkService } from '@service'
 import { settingsConfig } from '@config'
 
 import styles from './timeline.module.scss'
-import { bookmarkApi } from '@api'
 
-interface TimelineProps {
-  video: IVideo
-  bookmarks: IBookmark[]
-  categories: IGeneral[]
+type TimelineProps = {
+  video: Video
+  bookmarks: Bookmark[]
+  categories?: General[]
   playVideo: (time: number) => void
   duration: number
-  update: ISetState<IBookmark[]>
-  onModal: IModalHandler
+  update: SetState<Bookmark[]>
+  onModal: ModalHandler
 }
 const Timeline = ({ bookmarks, video, playVideo, categories, duration, update, onModal }: TimelineProps) => {
   const windowSize = useWindowSize()
@@ -43,11 +44,11 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration, update, o
     }
   }, [duration, video.duration])
 
-  const setTime = (bookmark: IBookmark) => {
+  const setTime = (bookmark: Bookmark) => {
     const player = document.getElementsByTagName('video')[0]
     const time = Math.round(player.currentTime)
 
-    bookmarkApi.setTime(bookmark.id, time).then(() => {
+    bookmarkService.setTime(bookmark.id, time).then(() => {
       update(
         [...bookmarks]
           .map(bookmarkItem => {
@@ -61,16 +62,16 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration, update, o
     })
   }
 
-  const removeBookmark = (bookmark: IBookmark) => {
-    bookmarkApi.delete(bookmark.id).then(() => {
-      update([...bookmarks].filter(item => item.start !== bookmark.start))
+  const removeBookmark = (bookmark: Bookmark) => {
+    bookmarkService.delete(bookmark.id).then(() => {
+      update(bookmarks.filter(item => item.start !== bookmark.start))
     })
   }
 
-  const changeCategory = (category: IGeneral, bookmark: IBookmark) => {
-    bookmarkApi.setCategory(bookmark.id, category.id).then(() => {
+  const changeCategory = (category: General, bookmark: Bookmark) => {
+    bookmarkService.setCategory(bookmark.id, category.id).then(() => {
       update(
-        [...bookmarks].map(bookmarkItem => {
+        bookmarks.map(bookmarkItem => {
           if (bookmarkItem.start === bookmark.start) bookmarkItem.category = category
 
           return bookmarkItem
@@ -111,6 +112,8 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration, update, o
       setDataLevel(item, level)
     })
   }, [bookmarksArr, windowSize.width])
+
+  if (categories === undefined) return <Spinner />
 
   return (
     <Grid id={styles.timeline}>

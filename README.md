@@ -43,3 +43,13 @@ Change this if you want to alter the functionality of the app
 ### `theme.ts`
 
 Change this if you want a different look/feel of the app
+
+## Recommendations
+
+### Screen resolution
+
+| Resolution | Attributes / Locations / Categories |
+| ---------- | ----------------------------------- |
+| 1080p      | 0-18                                |
+| 1440p      | 19-37                               |
+| 2160p      | 38+                                 |

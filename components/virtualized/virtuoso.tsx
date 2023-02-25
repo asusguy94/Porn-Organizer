@@ -2,7 +2,7 @@ import { VirtuosoGrid } from 'react-virtuoso'
 
 import styles from './virtuoso.module.scss'
 
-interface GridProps {
+type GridProps = {
   renderData: (id: number) => JSX.Element
   total: number
   itemHeight: number

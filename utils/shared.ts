@@ -20,3 +20,9 @@ export function clamp(value: number, minOrMax: number, max?: number): number {
 }
 
 export const printWithMax = (value: number, max: number): string => `${value < max ? value : `${max - 1}+`}`
+
+export const printError = (error: unknown) => {
+  if (error instanceof Error) {
+    console.error(`Error: ${error.message}`)
+  }
+}

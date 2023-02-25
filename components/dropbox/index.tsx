@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import styles from './dropbox.module.scss'
 
-interface DropboxProps {
+type DropboxProps = {
   onDrop: (e: string) => void
 }
 const Dropbox = ({ onDrop }: DropboxProps) => {

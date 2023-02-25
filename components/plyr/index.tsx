@@ -4,8 +4,8 @@ import Plyr from 'plyr'
 
 import { settingsConfig } from '@config'
 
-interface PlyrProps {
-  plyrRef: React.MutableRefObject<any>
+type PlyrProps = {
+  plyrRef: React.MutableRefObject<Plyr | null>
   source: string
   poster: string
   thumbnail: string

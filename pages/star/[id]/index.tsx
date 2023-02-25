@@ -1,4 +1,4 @@
-import { NextPage } from 'next/types'
+import type { NextPage } from 'next/types'
 import { useRouter } from 'next/router'
 import React, { useState, useRef, useEffect } from 'react'
 
@@ -23,20 +23,22 @@ import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 import Image, { ImageCard } from '@components/image'
 import Link from '@components/link'
-import Modal, { type IModalHandler, useModal } from '@components/modal'
+import ModalComponent, { type ModalHandler, useModal } from '@components/modal'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Dropbox from '@components/dropbox'
 import Icon from '@components/icon'
 
 import { daysToYears } from '@utils/client/date-time'
+import { getUnique } from '@utils/shared'
 
-import { starApi } from '@api'
-import { ISetState, ISimilar, IStarVideo } from '@interfaces'
+import { starService } from '@service'
+import { SetState, Similar, StarVideo } from '@interfaces'
 import { serverConfig } from '@config'
 
 import styles from './star.module.scss'
+import Spinner from '@components/spinner'
 
-interface IStar {
+type Star = {
   id: number
   name: string
   image: string | null
@@ -49,96 +51,89 @@ interface IStar {
     height: number
     weight: number
   }
-  similar: ISimilar[]
+  similar: Similar[]
 }
 
-interface IStarData {
+type StarData = Partial<{
   breast: string[]
   ethnicity: string[]
   haircolor: string[]
-}
+}>
 
 const StarPage: NextPage = () => {
-  const { query } = useRouter()
+  const { query, isReady } = useRouter()
+
+  const { breast, haircolor, ethnicity } = starService.useStarInfo().data ?? {}
+
+  const starID = isReady && typeof query.id === 'string' ? parseInt(query.id) : undefined
+  const { data: starData } = starService.useStar<Star>(starID)
+  const { data: videos } = starService.useStarVideos(starID)
+
+  const [star, setStar] = useState<Star>()
 
   const { modal, setModal } = useModal()
 
-  const [star, setStar] = useState<IStar>()
-
-  const [breast, setBreast] = useState<string[]>([])
-  const [haircolor, setHaircolor] = useState<string[]>([])
-  const [ethnicity, setEthnicity] = useState<string[]>([])
-
-  const [videos, setVideos] = useState<IStarVideo[]>([])
-
   useEffect(() => {
-    if (typeof query.id === 'string') {
-      const starID = parseInt(query.id)
-
-      starApi.getInfo().then(({ data }) => {
-        setBreast(data.breast)
-        setHaircolor(data.haircolor)
-        setEthnicity(data.ethnicity)
-      })
-
-      starApi.get<IStar>(starID).then(({ data }) => setStar(data))
-      starApi.getVideos(starID).then(({ data }) => setVideos(data))
+    if (starData !== undefined) {
+      setStar(starData)
     }
-  }, [query.id])
+  }, [starData])
 
-  if (star === undefined) return null
+  if (star === undefined) return <Spinner />
 
   return (
     <Grid container>
-      <Grid item xs={8}>
-        <Grid item xs={8}>
-          <Grid item xs={3} id={styles.star} style={{ maxWidth: '28%' }}>
-            <StarImageDropbox star={star} update={setStar} onModal={setModal} />
+      <Grid item xs={7}>
+        <div id={styles.star} style={{ maxWidth: '32%' }}>
+          <StarImageDropbox star={star} update={setStar} onModal={setModal} />
 
-            <StarTitle star={star} update={setStar} onModal={setModal} />
+          <StarTitle star={star} update={setStar} onModal={setModal} />
 
-            <StarForm starData={{ breast, ethnicity, haircolor }} star={star} update={setStar} />
-          </Grid>
+          <StarForm starData={{ breast, ethnicity, haircolor }} star={star} update={setStar} />
+        </div>
 
-          {videos.length > 0 && <StarVideos videos={videos} update={setVideos} />}
+        <Grid item xs={12}>
+          {<StarVideos videos={videos} />}
         </Grid>
       </Grid>
 
-      <Grid item xs={4}>
+      <Grid item xs={5}>
         <Sidebar similar={star.similar} />
       </Grid>
 
-      <Modal title={modal.title} visible={modal.visible} filter={modal.filter} onClose={setModal}>
+      <ModalComponent title={modal.title} visible={modal.visible} filter={modal.filter} onClose={setModal}>
         {modal.data}
-      </Modal>
+      </ModalComponent>
     </Grid>
   )
 }
 
-interface StarTitleProps {
-  star: IStar
-  update: ISetState<IStar | undefined>
-  onModal: IModalHandler
+type StarTitleProps = {
+  star: Star
+  update: SetState<Star | undefined>
+  onModal: ModalHandler
 }
 const StarTitle = ({ star, update, onModal }: StarTitleProps) => {
+  const router = useRouter()
+
   const [, setClipboard] = useCopyToClipboard()
 
   const copy = async () => await setClipboard(star.name)
 
   const renameStar = (value: string) => {
-    starApi.renameStar(star.id, value).then(() => {
+    starService.renameStar(star.id, value).then(() => {
       update({ ...star, name: value })
     })
   }
 
   const setSlug = (value: string) => {
-    starApi.setSlug(star.id, value).then(() => {
-      window.location.reload()
+    starService.setSlug(star.id, value).then(() => {
+      router.reload()
     })
   }
 
   const ignoreStar = () => {
-    starApi.ignoreStar(star).then(({ data }) => {
+    starService.ignoreStar(star).then(({ data }) => {
       update({ ...star, ignored: data.autoTaggerIgnore })
     })
   }
@@ -219,8 +214,8 @@ const StarTitle = ({ star, update, onModal }: StarTitleProps) => {
   )
 }
 
-interface SidebarProps {
-  similar: ISimilar[]
+type SidebarProps = {
+  similar: Similar[]
 }
 
 const Sidebar = ({ similar }: SidebarProps) => (
@@ -259,26 +254,28 @@ const Sidebar = ({ similar }: SidebarProps) => (
   </Card>
 )
 
-interface StarImageDropboxProps {
-  star: IStar
-  update: ISetState<IStar | undefined>
-  onModal: IModalHandler
+type StarImageDropboxProps = {
+  star: Star
+  update: SetState<Star | undefined>
+  onModal: ModalHandler
 }
 const StarImageDropbox = ({ star, update, onModal }: StarImageDropboxProps) => {
+  const router = useRouter()
+
   const removeStar = () => {
-    starApi.remove(star.id).then(() => {
-      window.location.href = '/star'
+    starService.remove(star.id).then(() => {
+      router.replace('/star')
     })
   }
 
   const removeImage = () => {
-    starApi.removeImage(star.id).then(() => {
+    starService.removeImage(star.id).then(() => {
       update({ ...star, image: null })
     })
   }
 
   const addImage = (url: string) => {
-    starApi.addImage(star.id, url).then(({ data }) => {
+    starService.addImage(star.id, url).then(({ data }) => {
       update({ ...star, image: data.image })
     })
   }
@@ -288,10 +285,10 @@ const StarImageDropbox = ({ star, update, onModal }: StarImageDropboxProps) => {
     const MAX_ROWS = 4
     const MAX_COLS = 8
 
-    const calcCols = (images: string[]) => Math.min(Math.ceil(images.length / MAX_ROWS), MAX_COLS)
+    const calcCols = (images: string[]) => Math.min(Math.ceil(images.length / Math.floor(MAX_ROWS)), MAX_COLS)
     const calcRows = (images: string[]) => Math.min(images.length, MAX_ROWS)
 
-    starApi.getImages(star.id).then(({ data }) => {
+    starService.getImages(star.id).then(({ data }) => {
       onModal(
         'Change Image',
         <ImageList cols={calcCols(data.images)} sx={{ margin: 0, height: (275 + GAP) * calcRows(data.images) }}>
@@ -350,18 +347,20 @@ const StarImageDropbox = ({ star, update, onModal }: StarImageDropboxProps) => {
   )
 }
 
-interface StarFormProps {
-  star: IStar
-  starData: IStarData
-  update: ISetState<IStar | undefined>
+type StarFormProps = {
+  star: Star
+  starData: StarData
+  update: SetState<Star | undefined>
 }
 const StarForm = ({ star, starData, update }: StarFormProps) => {
+  const router = useRouter()
+
   const updateInfo = (value: string, label: string) => {
-    starApi.updateInfo(star.id, label, value).then(({ data }) => {
+    starService.updateInfo(star.id, label, value).then(({ data }) => {
       if (data.reload) {
-        window.location.reload()
+        router.reload()
       } else {
-        if (data.content !== null) value = data.content
+        if (typeof data.content === 'string') value = data.content
 
         update({ ...star, info: { ...star.info, [label]: value }, similar: data.similar })
       }
@@ -369,16 +368,14 @@ const StarForm = ({ star, starData, update }: StarFormProps) => {
   }
 
   const resetData = () => {
-    starApi.resetInfo(star.id).then(() => {
-      window.location.reload()
+    starService.resetInfo(star.id).then(() => {
+      router.reload()
     })
   }
 
   const getData = () => {
-    starApi.getData(star.id).then(({ data }) => {
-      if (typeof data !== 'string') {
-        window.location.reload()
-      }
+    starService.getData(star.id).then(() => {
+      router.reload()
     })
   }
 
@@ -397,25 +394,19 @@ const StarForm = ({ star, starData, update }: StarFormProps) => {
       <StarInputForm update={updateInfo} name='Breast' value={star.info.breast} list={starData.breast} capitalize />
       <StarInputForm update={updateInfo} name='HairColor' value={star.info.haircolor} list={starData.haircolor} />
       <StarInputForm update={updateInfo} name='Ethnicity' value={star.info.ethnicity} list={starData.ethnicity} />
-      <StarInputForm update={updateInfo} name='Birthdate' value={star.info.birthdate} />
-      <StarInputForm update={updateInfo} name='Height' value={star.info.height.toString()} />
-      <StarInputForm update={updateInfo} name='Weight' value={star.info.weight.toString()} />
+      <StarInputForm update={updateInfo} name='Birthdate' value={star.info.birthdate} noDropdown />
+      <StarInputForm update={updateInfo} name='Height' value={star.info.height.toString()} noDropdown />
+      <StarInputForm update={updateInfo} name='Weight' value={star.info.weight.toString()} noDropdown />
     </>
   )
 }
 
-interface StarVideosProps {
-  videos: IStarVideo[]
-  update: ISetState<IStarVideo[]>
+type StarVideosProps = {
+  videos?: StarVideo[]
 }
-const StarVideos = ({ videos, update }: StarVideosProps) => {
+const StarVideos = ({ videos }: StarVideosProps) => {
   const [websites, setWebsites] = useState<string[]>([])
   const [websiteFocus, setWebsiteFocus] = useState<string[]>([])
-
-  useEffect(() => {
-    update([...videos].sort((a, b) => a.age - b.age).sort((a, b) => Number(a.hidden) - Number(b.hidden)))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [websiteFocus])
 
   const toggleWebsiteFocus = (website: string) => {
     // allow multiple websites to be selected
@@ -427,6 +418,15 @@ const StarVideos = ({ videos, update }: StarVideosProps) => {
       setWebsiteFocus([...websiteFocus, website])
     }
   }
+
+  useEffect(() => {
+    if (videos !== undefined) {
+      setWebsiteFocus([])
+      setWebsites(getUnique(videos.map(v => v.website)))
+    }
+  }, [videos])
+
+  if (videos === undefined) return <Spinner />
 
   return (
     <div>
@@ -447,48 +447,52 @@ const StarVideos = ({ videos, update }: StarVideosProps) => {
           ))}
       </Typography>
 
-      <Flipper flipKey={videos}>
+      <Flipper flipKey={videos.map(v => v.id)}>
         <Grid container style={{ marginTop: 8 }}>
-          {videos.map((video, idx) => {
-            if (!websites.includes(video.website)) {
-              setWebsites([...websites, video.website])
-            }
-
-            video.hidden = websiteFocus.length > 0 && !websiteFocus.includes(video.website)
-
-            return (
-              <Flipped key={video.id} flipId={video.id}>
+          {videos
+            .map(video => ({ ...video, hidden: websiteFocus.length > 0 && !websiteFocus.includes(video.website) }))
+            .sort((a, b) => a.age - b.age)
+            .sort((a, b) => Number(a.hidden) - Number(b.hidden))
+            .map((v, idx) => (
+              <Flipped key={v.id} flipId={v.id}>
                 <Link
-                  className={`${styles.video} ${video.hidden ? styles.hidden : ''}`}
-                  href={{ pathname: '/video/[id]', query: { id: video.id } }}
+                  className={`${styles.video} ${v.hidden ? styles.hidden : ''}`}
+                  href={{ pathname: '/video/[id]', query: { id: v.id } }}
                 >
                   <StarVideo
-                    video={video}
+                    video={v}
                     isFirst={videos.length > 1 && idx === 0}
                     isLast={videos.length > 1 && idx === videos.length - 1}
-                    isHidden={video.hidden}
+                    isHidden={v.hidden}
                   />
                 </Link>
               </Flipped>
-            )
-          })}
+            ))}
         </Grid>
       </Flipper>
     </div>
   )
 }
 
-// ContainerItem
-interface StarInputFormProps {
+type StarInputFormProps = {
   update: (value: string, label: string) => void
   value: string
   name: string
   list?: string[]
   capitalize?: boolean
   children?: React.ReactNode
+  noDropdown?: boolean
 }
-const StarInputForm = ({ update, value, name, list = [], children, capitalize = false }: StarInputFormProps) => {
-  const hasDropdown = list.length > 0
+const StarInputForm = ({
+  update,
+  value,
+  name,
+  list,
+  children,
+  capitalize = false,
+  noDropdown = false
+}: StarInputFormProps) => {
+  const hasDropdown = !noDropdown
 
   const [open, setOpen] = useState(false)
   const [inputValue, setInputValue] = useState('')
@@ -505,14 +509,21 @@ const StarInputForm = ({ update, value, name, list = [], children, capitalize = 
     }
   }
 
-  const isChanged = inputValue.toLowerCase() !== (value || '').toLowerCase()
-  const shouldShrink = isChanged || (typeof value === 'string' && value.length > 0)
+  const isChanged = inputValue.toLowerCase() !== value.toLowerCase()
+  const shouldShrink = isChanged || value.length > 0
 
   useEffect(() => {
     if (value) {
       setInputValue(value)
     }
+
+    return () => {
+      // reset input value when changing urls
+      setInputValue('')
+    }
   }, [value])
+
+  if (hasDropdown && list === undefined) return <Spinner />
 
   return (
     <Grid container style={{ marginBottom: 4 }}>
@@ -529,7 +540,7 @@ const StarInputForm = ({ update, value, name, list = [], children, capitalize = 
           onKeyPress={handleKeyPress}
           //
           // OPTIONS
-          options={list}
+          options={list ?? []}
           renderInput={params => (
             <TextField
               {...params}
@@ -560,8 +571,8 @@ const StarInputForm = ({ update, value, name, list = [], children, capitalize = 
   )
 }
 
-interface StarVideoProps {
-  video: IStarVideo
+type StarVideoProps = {
+  video: StarVideo
   isFirst: boolean
   isLast: boolean
   isHidden: boolean

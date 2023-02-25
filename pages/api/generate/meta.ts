@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import { prisma } from '@utils/server'
-import { fileExists, getClosestQ, rebuildVideoFile, sleep } from '@utils/server/helper'
-import { duration as videoDuration, height as videoHeight } from 'utils/server/ffmpeg'
+import { fileExists, rebuildVideoFile, sleep } from '@utils/server/helper'
+import { getDuration as videoDuration, getHeight as videoHeight, getWidth as videoWidth } from 'utils/server/ffmpeg'
 import { generateStarName } from '@utils/server/generate'
 import { aliasExists, aliasIsIgnored, getAliasAsStar, starExists, starIsIgnored } from '@utils/server/helper.db'
 import { findSceneSlug } from '@utils/server/metadata'
@@ -58,21 +58,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     console.log('Updating DURATION & HEIGHT')
-    const fixVideos = await prisma.video.findMany({ where: { OR: [{ duration: 0 }, { height: 0 }] } })
+    const fixVideos = await prisma.video.findMany({ where: { OR: [{ duration: 0 }, { height: 0 }, { width: 0 }] } })
     for await (const video of fixVideos) {
       const videoPath = `videos/${video.path}`
       const absoluteVideoPath = `./media/${videoPath}`
 
       if (await fileExists(absoluteVideoPath)) {
-        console.log(`Rebuild: ${video.id}`)
         await rebuildVideoFile(absoluteVideoPath).then(async () => {
-          const duration = await videoDuration(absoluteVideoPath)
+          console.log(`Rebuild: ${video.id}`)
+
+          // TODO Remove stream-directory in videos/
+          // TODO Remove VTT & JPG files in /vtt
+
+          const width = await videoWidth(absoluteVideoPath)
           const height = await videoHeight(absoluteVideoPath)
+          const duration = await videoDuration(absoluteVideoPath)
 
           console.log(`Refreshing: "${video.path}"`)
           await prisma.video.update({
             where: { id: video.id },
-            data: { duration: Math.floor(duration), height: getClosestQ(height) }
+            data: { duration, height, width }
           })
         })
       }
@@ -81,7 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     console.log('Updating VIDEO INFO')
     const infoVideos = await prisma.video.findMany({
-      where: { api: null },
+      where: { api: null, ignoreMeta: false },
       include: { site: true, website: true }
     })
 
@@ -89,9 +94,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await sleep(400) // 400ms between requests
       await findSceneSlug(generateStarName(video.path), video.name, video.site?.name ?? video.website?.name)
         .then(async slug => {
-          await prisma.video.update({ where: { id: video.id }, data: { api: slug } })
+          await prisma.video.update({ where: { id: video.id }, data: { api: slug, ignoreMeta: true } })
         })
-        .catch(reason => {
+        .catch(async reason => {
+          if (reason === 'too few slugs' || reason === 'too many slugs') {
+            await prisma.video.update({ where: { id: video.id }, data: { ignoreMeta: true } })
+          }
           console.log('cannot generate slug for ' + video.name)
           console.log(reason)
         })

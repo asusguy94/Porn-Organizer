@@ -3,6 +3,7 @@
     "baseUrl": ".",
     "paths": {
       "@api": ["api"],
+      "@service": ["api/service"],
       "@components/*": ["components/*"],
       "@config": ["config"],
       "@pages/*": ["pages/*"],

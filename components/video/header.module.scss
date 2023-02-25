@@ -21,8 +21,11 @@
   }
 
   button {
+    &:not([disabled]) {
+      color: black;
+    }
+
     margin-left: 15px;
-    color: black;
 
     i,
     svg {

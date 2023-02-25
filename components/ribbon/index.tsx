@@ -1,6 +1,6 @@
 import styles from './ribbon.module.scss'
 
-interface RibbonProps {
+type RibbonProps = {
   isFirst?: boolean
   isLast?: boolean
   align?: string
@@ -20,7 +20,7 @@ const Ribbon = ({ isFirst = false, isLast = false, align, label }: RibbonProps) 
   return null
 }
 
-interface ContainerProps {
+type ContainerProps = {
   children: React.ReactNode
   component?: React.ElementType
   className?: string
