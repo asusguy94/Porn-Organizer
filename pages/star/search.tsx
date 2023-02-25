@@ -20,6 +20,7 @@ import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
 
 import { daysToYears } from '@utils/client/date-time'
+import { mergeSort } from '@utils/client/sort'
 
 import { ImageCard } from '@components/image'
 import { getVisible, HiddenStar as Hidden, StarSearch as Star } from '@components/search/helper'
@@ -28,7 +29,7 @@ import Badge from '@components/badge'
 import Spinner from '@components/spinner'
 import VGrid from '@components/virtualized/virtuoso'
 import Link from '@components/link'
-import SortObj from '@components/search/sort'
+import SortObj, { getStarSort, SortMethodStar, SortTypeStar as StarSort } from '@components/search/sort'
 
 import { General, SetState } from '@interfaces'
 import { searchService, starService, websiteService } from '@service'
@@ -50,13 +51,14 @@ const StarSearchPage: NextPage = () => {
 
   const inputRef = useRef<HTMLInputElement>(null)
 
+  const [sort, setSort] = useState<StarSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
     titleSearch: '',
     breast: '',
     haircolor: '',
     ethnicity: '',
     website: ''
-    })
+  })
 
   return (
     <Grid container>
@@ -71,11 +73,12 @@ const StarSearchPage: NextPage = () => {
           inputRef={inputRef}
           setHidden={setHidden}
           hidden={hidden}
+          setSort={setSort}
         />
       </Grid>
 
       <Grid item xs={10}>
-        <Stars stars={stars} />
+        <Stars stars={stars} hidden={hidden} sortMethod={getStarSort(sort)} />
       </Grid>
 
       <ScrollToTop smooth />
@@ -86,15 +89,16 @@ const StarSearchPage: NextPage = () => {
 type StarsProps = {
   stars?: Star[]
   hidden: Hidden
+  sortMethod: SortMethodStar
 }
-const Stars = ({ stars }: StarsProps) => {
-  const visibleStars = getVisible(stars)
+const Stars = ({ stars = [], hidden, sortMethod }: StarsProps) => {
+  const visible = getVisible(mergeSort(stars, sortMethod), hidden)
 
   return (
     <div id={styles.stars}>
-          <Typography variant='h6' className='text-center'>
+      <Typography variant='h6' className='text-center'>
         <span id={styles.count}>{stars.length}</span> Stars
-          </Typography>
+      </Typography>
 
       {stars.length > 0 ? (
         <VGrid itemHeight={309} total={visible.length} renderData={idx => <StarCard star={visible[idx]} />} />
@@ -140,10 +144,12 @@ type SidebarProps = {
   inputRef: React.Ref<HTMLInputElement>
   setHidden: SetState<Hidden>
   hidden: Hidden
+  setSort: SetState<StarSort>
 }
-const Sidebar = ({ starData, stars, update, inputRef }: SidebarProps) => (
+const Sidebar = ({ starData, inputRef, setHidden, hidden, setSort }: SidebarProps) => (
   <>
     <TitleSearch inputRef={inputRef} setHidden={setHidden} />
+    <Sort setSort={setSort} />
     <Filter starData={starData} setHidden={setHidden} hidden={hidden} />
   </>
 )
@@ -169,11 +175,11 @@ const Filter = ({ starData, setHidden, hidden }: FilterProps) => {
   const website_DROP = (e: SelectChangeEvent) => {
     const targetLower = e.target.value.toLowerCase()
 
-        if (targetLower === 'all') {
+    if (targetLower === 'all') {
       setHidden(prev => ({ ...prev, website: '' }))
-        } else {
+    } else {
       setHidden(prev => ({ ...prev, website: targetLower }))
-            }
+    }
   }
 
   const breast_NULL = () => {
@@ -224,55 +230,15 @@ const Filter = ({ starData, setHidden, hidden }: FilterProps) => {
   )
 }
 
-interface SortProps {
-  stars: IStar[]
-  update: ISetState<IStar[]>
+type SortProps = {
+  setSort: SetState<StarSort>
 }
-const Sort = ({ stars, update }: SortProps) => {
-  const sortDefault = (reverse = false) => {
-    update(
-      [...stars].sort((a, b) => {
-        const result = a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en')
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortAdded = (reverse = false) => {
-    update(
-      [...stars].sort((a, b) => {
-        const result = a.id - b.id
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortAge = (reverse = false) => {
-    update(
-      [...stars].sort((a, b) => {
-        const result = a.age - b.age
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortVideos = (reverse = false) => {
-    update(
-      [...stars].sort((a, b) => {
-        const result = a.videoCount - b.videoCount
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortScore = (reverse = false) => {
-    update(
-      [...stars].sort((a, b) => {
-        const result = a.score - b.score
-        return reverse ? result * -1 : result
-      })
-    )
-  }
+const Sort = ({ setSort }: SortProps) => {
+  const sortDefault = (reverse = false) => setSort({ type: 'alphabetically', reverse })
+  const sortAdded = (reverse = false) => setSort({ type: 'added', reverse })
+  const sortAge = (reverse = false) => setSort({ type: 'age', reverse })
+  const sortVideos = (reverse = false) => setSort({ type: 'videos', reverse })
+  const sortScore = (reverse = false) => setSort({ type: 'score', reverse })
 
   return (
     <>
@@ -317,42 +283,42 @@ const FilterItem = ({ data, label, callback, globalCallback, nullCallback }: Fil
   if (data === undefined) return <Spinner />
 
   return (
-  <>
-    <h2>{capitalize(label, true)}</h2>
+    <>
+      <h2>{capitalize(label, true)}</h2>
 
-    <FormControl>
-      <RadioGroup name={label} defaultValue='ALL'>
-        {globalCallback !== undefined && (
-          <FormControlLabel
-            value='ALL'
-            label={<div className={styles.global}>ALL</div>}
-            onChange={globalCallback}
-            control={<Radio />}
-          />
-        )}
+      <FormControl>
+        <RadioGroup name={label} defaultValue='ALL'>
+          {globalCallback !== undefined && (
+            <FormControlLabel
+              value='ALL'
+              label={<div className={styles.global}>ALL</div>}
+              onChange={globalCallback}
+              control={<Radio />}
+            />
+          )}
 
-        {nullCallback !== undefined && (
-          <FormControlLabel
-            value='NULL'
-            label={<div className={styles.global}>NULL</div>}
-            onChange={nullCallback}
-            control={<Radio />}
-          />
-        )}
+          {nullCallback !== undefined && (
+            <FormControlLabel
+              value='NULL'
+              label={<div className={styles.global}>NULL</div>}
+              onChange={nullCallback}
+              control={<Radio />}
+            />
+          )}
 
-        {data.map(item => (
-          <FormControlLabel
-            key={item}
-            value={item}
-            onChange={() => callback(item)}
+          {data.map(item => (
+            <FormControlLabel
+              key={item}
+              value={item}
+              onChange={() => callback(item)}
               label={item}
-            control={<Radio />}
-          />
-        ))}
-      </RadioGroup>
-    </FormControl>
-  </>
-)
+              control={<Radio />}
+            />
+          ))}
+        </RadioGroup>
+      </FormControl>
+    </>
+  )
 }
 
 type FilterDropdownProps = {
@@ -364,21 +330,21 @@ const FilterDropdown = ({ data, label, callback }: FilterDropdownProps) => {
   if (data === undefined) return <Spinner />
 
   return (
-  <>
-    <h2>{capitalize(label, true)}</h2>
+    <>
+      <h2>{capitalize(label, true)}</h2>
 
-    <FormControl>
-      <Select variant='standard' id={label} defaultValue='ALL' onChange={callback}>
-        <MenuItem value='ALL'>All</MenuItem>
-        {data.map(item => (
-          <MenuItem key={item.name} value={item.name}>
-            {item.name}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-  </>
-)
+      <FormControl>
+        <Select variant='standard' id={label} defaultValue='ALL' onChange={callback}>
+          <MenuItem value='ALL'>All</MenuItem>
+          {data.map(item => (
+            <MenuItem key={item.name} value={item.name}>
+              {item.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </>
+  )
 }
 
 export default StarSearchPage

@@ -19,16 +19,16 @@ import capitalize from 'capitalize'
 import { useReadLocalStorage } from 'usehooks-ts'
 
 import { ImageCard } from '@components/image'
-import IndeterminateItem, { HandlerProps as IndeterminateItemProps } from '@components/indeterminate'
-import LabelCount from '@components/labelcount'
-import { getVisible } from '@components/search/helper'
+import { RegularHandlerProps, RegularItem } from '@components/indeterminate'
+import { getVisible, HiddenVideo as Hidden, VideoSearch as Video } from '@components/search/helper'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import VGrid from '@components/virtualized/virtuoso'
 import Spinner from '@components/spinner'
-import SortObj from '@components/search/sort'
+import SortObj, { getVideoSort, SortMethodVideo, SortTypeVideo as VideoSort } from '@components/search/sort'
 import Link from '@components/link'
 
 import { daysToYears } from '@utils/client/date-time'
+import { mergeSort } from '@utils/client/sort'
 import { SetState, WebsiteWithSites as Website, General, LocalWebsite } from '@interfaces'
 import { attributeService, categoryService, locationService, searchService, websiteService } from '@service'
 import { serverConfig } from '@config'
@@ -44,9 +44,20 @@ type VideoData = Partial<{
 }>
 
 const VideoSearchPage: NextPage = () => {
-  const localWebsites = useReadLocalStorage<ILocalWebsite[]>('websites')
+  const { data: attributes } = attributeService.useAttributes()
+  const { data: categories } = categoryService.useCategories()
+  const { data: locations } = locationService.useLocations()
+  const { data: websites } = websiteService.useWebsites()
+  const { data: videos } = searchService.useVideos()
 
-  const [videos, setVideos] = useState<IVideo[]>([])
+  const [sort, setSort] = useState<VideoSort>({ type: 'date', reverse: false })
+  const [hidden, setHidden] = useState<Hidden>({
+    titleSearch: '',
+    category: [null],
+    attribute: [],
+    location: [],
+    website: ''
+  })
 
   return (
     <Grid container>
@@ -59,10 +70,12 @@ const VideoSearchPage: NextPage = () => {
             websites
           }}
           setHidden={setHidden}
+          setSort={setSort}
         />
       </Grid>
 
       <Grid item xs={10}>
+        <Videos videos={videos} hidden={hidden} sortMethod={getVideoSort(sort)} />
       </Grid>
 
       <ScrollToTop smooth />
@@ -73,7 +86,9 @@ const VideoSearchPage: NextPage = () => {
 type VideosProps = {
   videos?: Video[]
   hidden: Hidden
+  sortMethod: SortMethodVideo
 }
+const Videos = ({ videos = [], hidden, sortMethod }: VideosProps) => {
   const localWebsites = useReadLocalStorage<LocalWebsite[]>('websites')
   const [filtered, setFiltered] = useState<Video[]>([])
 
@@ -87,6 +102,7 @@ type VideosProps = {
     const map = new Map<string, number>()
 
     setFiltered(
+      mergeSort(videos, getVideoSort({ type: 'date', reverse: false }))
           .filter(v => {
             if (localWebsites === null) {
               return true
@@ -114,31 +130,7 @@ type VideosProps = {
       ;[...map].slice(0, 2).forEach(([key, value]) => console.log(key, printWithMax(value, 200)))
   }, [localWebsites, videos, hidden])
 
-  return (
-    <Grid container>
-      <Grid item xs={2} id={styles.sidebar}>
-        <Sidebar
-          videoData={{ categories, attributes, locations, websites }}
-          videos={videos}
-          update={setVideos}
-          inputRef={inputRef}
-        />
-      </Grid>
-
-      <Grid item xs={10}>
-        {videos.length ? <Videos videos={videos} /> : <Spinner />}
-      </Grid>
-
-      <ScrollToTop smooth />
-    </Grid>
-  )
-}
-
-interface VideosProps {
-  videos: IVideo[]
-}
-const Videos = ({ videos }: VideosProps) => {
-  const visibleVideos = getVisible(videos)
+  const visible = getVisible(mergeSort(filtered, sortMethod), hidden)
 
   return (
     <div id={styles.videos}>
@@ -188,10 +180,12 @@ const VideoCard = ({ video }: VideoCardProps) => {
 type SidebarProps = {
   videoData: VideoData
   setHidden: SetState<Hidden>
+  setSort: SetState<VideoSort>
 }
-const Sidebar = ({ videoData, videos, update, inputRef }: SidebarProps) => (
+const Sidebar = ({ videoData, setHidden, setSort }: SidebarProps) => (
   <>
     <TitleSearch setHidden={setHidden} />
+    <Sort setSort={setSort} />
     <Filter videoData={videoData} setHidden={setHidden} />
   </>
 )
@@ -211,67 +205,16 @@ const TitleSearch = ({ setHidden }: TitleSearchProps) => {
   return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} inputRef={inputRef} />
 }
 
-interface SortProps {
-  videos: IVideo[]
-  update: ISetState<IVideo[]>
+type SortProps = {
+  setSort: SetState<VideoSort>
 }
-const Sort = ({ videos, update }: SortProps) => {
-  const sortDefault = (reverse = false) => {
-    update(
-      [...videos].sort((a, b) => {
-        const result = a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en')
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortAdded = (reverse = false) => {
-    update(
-      [...videos].sort((a, b) => {
-        const result = a.id - b.id
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortDate = (reverse = false) => {
-    update(
-      [...videos].sort((a, b) => {
-        const dateA: Date = new Date(a.date)
-        const dateB: Date = new Date(b.date)
-
-        const result = dateA.getTime() - dateB.getTime()
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortAge = (reverse = false) => {
-    update(
-      [...videos].sort((a, b) => {
-        const result = a.ageInVideo - b.ageInVideo
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortPlays = (reverse = false) => {
-    update(
-      [...videos].sort((a, b) => {
-        const result = a.plays - b.plays
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortTitleLength = (reverse = false) => {
-    update(
-      [...videos].sort((a, b) => {
-        const result = a.name.length - b.name.length
-        return reverse ? result * -1 : result
-      })
-    )
-  }
+const Sort = ({ setSort }: SortProps) => {
+  const sortDefault = (reverse = false) => setSort({ type: 'alphabetically', reverse })
+  const sortAdded = (reverse = false) => setSort({ type: 'added', reverse })
+  const sortDate = (reverse = false) => setSort({ type: 'date', reverse })
+  const sortAge = (reverse = false) => setSort({ type: 'age', reverse })
+  const sortPlays = (reverse = false) => setSort({ type: 'plays', reverse })
+  const sortTitleLength = (reverse = false) => setSort({ type: 'title-length', reverse })
 
   return (
     <>
