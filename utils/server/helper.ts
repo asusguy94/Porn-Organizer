@@ -34,15 +34,15 @@ const getClosest = (search: number, arr: number[]): number => {
 }
 
 export const downloader = async (url: string, dest: string, type: 'URL' | 'FILE'): Promise<void> => {
-  let buffer: Buffer
+  let buffer: ArrayBuffer
   if (type === 'URL') {
     const response = await fetch(url)
-    buffer = await response.buffer()
+    buffer = await response.arrayBuffer()
   } else {
     buffer = await fs.promises.readFile(url)
   }
 
-  await fs.promises.writeFile(`./${dest}`, buffer)
+  await fs.promises.writeFile(`./${dest}`, Buffer.from(buffer))
 }
 
 export const dirOnly = (dir: string, root = false): string => (root ? path.parse(dir).dir : path.parse(dir).name)
