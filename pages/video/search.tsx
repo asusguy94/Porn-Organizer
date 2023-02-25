@@ -194,15 +194,13 @@ type TitleSearchProps = {
   setHidden: SetState<Hidden>
 }
 const TitleSearch = ({ setHidden }: TitleSearchProps) => {
-  const inputRef = useRef<HTMLInputElement>()
-
   const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.currentTarget.value.toLowerCase()
 
     setHidden(prev => ({ ...prev, titleSearch: searchValue }))
   }
 
-  return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} inputRef={inputRef} />
+  return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} />
 }
 
 type SortProps = {

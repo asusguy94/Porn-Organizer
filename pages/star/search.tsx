@@ -49,8 +49,6 @@ const StarSearchPage: NextPage = () => {
   const { data: stars } = searchService.useStars()
   const { breast, ethnicity, haircolor } = starService.useStarInfo().data ?? {}
 
-  const inputRef = useRef<HTMLInputElement>(null)
-
   const [sort, setSort] = useState<StarSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
     titleSearch: '',
@@ -70,7 +68,6 @@ const StarSearchPage: NextPage = () => {
             ethnicities: ethnicity,
             websites: websites
           }}
-          inputRef={inputRef}
           setHidden={setHidden}
           hidden={hidden}
           setSort={setSort}
@@ -141,14 +138,13 @@ const StarCard = ({ star }: StarCardProps) => {
 
 type SidebarProps = {
   starData: StarData
-  inputRef: React.Ref<HTMLInputElement>
   setHidden: SetState<Hidden>
   hidden: Hidden
   setSort: SetState<StarSort>
 }
-const Sidebar = ({ starData, inputRef, setHidden, hidden, setSort }: SidebarProps) => (
+const Sidebar = ({ starData, setHidden, hidden, setSort }: SidebarProps) => (
   <>
-    <TitleSearch inputRef={inputRef} setHidden={setHidden} />
+    <TitleSearch setHidden={setHidden} />
     <Sort setSort={setSort} />
     <Filter starData={starData} setHidden={setHidden} hidden={hidden} />
   </>
@@ -258,17 +254,16 @@ const Sort = ({ setSort }: SortProps) => {
 }
 
 type TitleSearchProps = {
-  inputRef: React.Ref<HTMLInputElement>
   setHidden: SetState<Hidden>
 }
-const TitleSearch = ({ inputRef, setHidden }: TitleSearchProps) => {
+const TitleSearch = ({ setHidden }: TitleSearchProps) => {
   const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.currentTarget.value.toLowerCase()
 
     setHidden(prev => ({ ...prev, titleSearch: searchValue }))
   }
 
-  return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} inputRef={inputRef} />
+  return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} />
 }
 
 type FilterItemProps<T = Star> = {
