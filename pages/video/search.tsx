@@ -1,5 +1,5 @@
 import type { NextPage } from 'next/types'
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 
 import {
   Card,

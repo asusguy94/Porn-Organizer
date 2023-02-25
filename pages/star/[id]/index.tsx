@@ -1,6 +1,6 @@
 import type { NextPage } from 'next/types'
 import { useRouter } from 'next/router'
-import React, { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 import {
   Button,

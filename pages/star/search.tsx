@@ -1,5 +1,5 @@
 import type { NextPage } from 'next/types'
-import React, { useState, useRef } from 'react'
+import { useState } from 'react'
 
 import {
   Grid,
