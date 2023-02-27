@@ -1,11 +1,15 @@
+import { getValue } from '@config'
+
 export default {
-  timeline: {
-    offset: 0.89,
-    spacing: 2
-  },
-  maxDurationDiff: 1,
-  thumbnails: true,
   qualities: [1080, 720, 480, 360],
-  THUMB_RES: parseInt(process.env.THUMBNAIL_RES ?? '290'),
-  THEPORNDB_API: process.env.THEPORNDB_API ?? ''
+  timeline: {
+    offset: parseFloat(getValue('NEXT_PUBLIC_TIMELINE_OFFSET', '1')),
+    spacing: parseFloat(getValue('NEXT_PUBLIC_TIMELINE_SPACING', '0'))
+  },
+  player: {
+    maxDurationDiff: parseInt(getValue('NEXT_PUBLIC_PLAYER_DURATIONDIFF', '1')),
+    thumbnails: getValue('NEXT_PUBLIC_PLAYER_THUMBNAILS', 'false') === 'true'
+  },
+  THUMB_RES: parseInt(getValue('THUMBNAIL_RES', '290')),
+  THEPORNDB_API: getValue('THEPORNDB_API', '')
 }

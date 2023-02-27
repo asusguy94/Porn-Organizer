@@ -21,7 +21,7 @@ export const PlyrComponent = ({ plyrRef, source, poster, thumbnail }: PlyrProps)
       keyboard: { focused: false },
       fullscreen: { enabled: false },
       previewThumbnails: {
-        enabled: settingsConfig.thumbnails,
+        enabled: settingsConfig.player.thumbnails,
         src: thumbnail
       }
     })

@@ -1,6 +1,6 @@
-const ip = '127.0.0.1'
+import { getValue } from '@config'
 
 export default {
-  api: `/api`,
-  db: `http://${ip}:8080`
+  api: '/api',
+  db: getValue('NEXT_PUBLIC_DB_ADMIN', '/db')
 }
