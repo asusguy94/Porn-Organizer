@@ -1,4 +1,10 @@
-import { getValue } from '@config'
+function getValue(label: string, defaultValue: string): string {
+  try {
+    return process.env[label] ?? localStorage[label] ?? defaultValue
+  } catch (e) {
+    return defaultValue
+  }
+}
 
 export default {
   qualities: [1080, 720, 480, 360],
@@ -10,6 +16,6 @@ export default {
     maxDurationDiff: parseInt(getValue('NEXT_PUBLIC_PLAYER_DURATIONDIFF', '1')),
     thumbnails: getValue('NEXT_PUBLIC_PLAYER_THUMBNAILS', 'false') === 'true'
   },
-  THUMB_RES: parseInt(getValue('THUMBNAIL_RES', '290')),
-  THEPORNDB_API: getValue('THEPORNDB_API', '')
+  THUMB_RES: parseInt(process.env.THUMBNAIL_RES ?? '290'),
+  THEPORNDB_API: process.env.THEPORNDB_API ?? ''
 }

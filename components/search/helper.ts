@@ -113,12 +113,14 @@ const isCategoryHidden = (video: VideoSearch, hidden: HiddenVideo) => {
 
   // category is null
   if (hidden.category.length > 0 && hidden.category.includes(null)) {
+    // hidden and !hidden should always be hidden
+    if (hidden.category.length > 1) {
+      return false
+    }
+
     // video is shown if unrated
     // video is always shown if rated and has invalid date
     return video.categories.length === 0 || (video.categories.length > 0 && video.date === null)
-
-    // uncomment the above line if server is back to normal
-    // return video.categories.length === 0
   }
 
   // video has no category

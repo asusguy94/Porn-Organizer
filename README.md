@@ -3,7 +3,7 @@
 ## Requirements
 
 1. Modern Web Browser
-2. Browser resolution set to 1920x1010 (not a hard requirement, but some stuff might be visually bugged otherwise)
+2. Browser resolution set to 1920x1080 (not a hard requirement, but some stuff might be visually bugged otherwise)
 3. Yarn package manger
 4. Database (preferable mariaDB)
    - host
