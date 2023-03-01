@@ -51,11 +51,11 @@ const isHiddenStar = (hidden: HiddenVideo | HiddenStar): hidden is HiddenStar =>
 const isVideo = (obj: StarSearch | VideoSearch): obj is VideoSearch => 'ageInVideo' in obj
 const isStar = (obj: StarSearch | VideoSearch): obj is StarSearch => 'videoCount' in obj
 
-const isTitleHidden = (obj: StarSearch | VideoSearch, hidden: HiddenStar | HiddenVideo) => {
+const isTitleVisible = (obj: StarSearch | VideoSearch, hidden: HiddenStar | HiddenVideo) => {
   return obj.name.toLowerCase().includes(hidden.titleSearch.toLowerCase())
 }
 
-const isBreastHidden = (star: StarSearch, hidden: HiddenStar) => {
+const isBreastVisible = (star: StarSearch, hidden: HiddenStar) => {
   // hidden is empty
   if (hidden.breast?.length === 0) return true
 
@@ -69,7 +69,7 @@ const isBreastHidden = (star: StarSearch, hidden: HiddenStar) => {
   return hidden.breast?.toLowerCase() === star.breast?.toLowerCase()
 }
 
-const isHaircolorHidden = (star: StarSearch, hidden: HiddenStar) => {
+const isHaircolorVisible = (star: StarSearch, hidden: HiddenStar) => {
   // hidden is empty
   if (hidden.haircolor.length === 0) return true
 
@@ -80,7 +80,7 @@ const isHaircolorHidden = (star: StarSearch, hidden: HiddenStar) => {
   return hidden.haircolor.toLowerCase() === star.haircolor.toLowerCase()
 }
 
-const isEthnicityHidden = (star: StarSearch, hidden: HiddenStar) => {
+const isEthnicityVisible = (star: StarSearch, hidden: HiddenStar) => {
   // hidden is empty
   if (hidden.ethnicity.length === 0) return true
 
@@ -91,9 +91,9 @@ const isEthnicityHidden = (star: StarSearch, hidden: HiddenStar) => {
   return hidden.ethnicity.toLowerCase() === star.ethnicity.toLowerCase()
 }
 
-function isWebsiteHidden(video: VideoSearch, hidden: HiddenVideo): boolean
-function isWebsiteHidden(star: StarSearch, hidden: HiddenStar): boolean
-function isWebsiteHidden(obj: StarSearch | VideoSearch, hidden: HiddenStar | HiddenVideo) {
+function isWebsiteVisible(video: VideoSearch, hidden: HiddenVideo): boolean
+function isWebsiteVisible(star: StarSearch, hidden: HiddenStar): boolean
+function isWebsiteVisible(obj: StarSearch | VideoSearch, hidden: HiddenStar | HiddenVideo) {
   // hidden is empty
   if (hidden.website.length === 0) return true
 
@@ -105,7 +105,7 @@ function isWebsiteHidden(obj: StarSearch | VideoSearch, hidden: HiddenStar | Hid
   }
 }
 
-const isCategoryHidden = (video: VideoSearch, hidden: HiddenVideo) => {
+const isCategoryVisible = (video: VideoSearch, hidden: HiddenVideo) => {
   const categories = video.categories.map(cat => cat.toLowerCase())
 
   // hidden is empty
@@ -119,8 +119,7 @@ const isCategoryHidden = (video: VideoSearch, hidden: HiddenVideo) => {
     }
 
     // video is shown if unrated
-    // video is always shown if rated and has invalid date
-    return video.categories.length === 0 || (video.categories.length > 0 && video.date === null)
+    return video.categories.length === 0
   }
 
   // video has no category
@@ -130,7 +129,7 @@ const isCategoryHidden = (video: VideoSearch, hidden: HiddenVideo) => {
   return hidden.category.every(cat => cat !== null && categories.includes(cat.toLowerCase()))
 }
 
-const isAttributeHidden = (video: VideoSearch, hidden: HiddenVideo) => {
+const isAttributeVisible = (video: VideoSearch, hidden: HiddenVideo) => {
   const attributes = video.attributes.map(attr => attr.toLowerCase())
 
   // hidden is empty
@@ -143,7 +142,7 @@ const isAttributeHidden = (video: VideoSearch, hidden: HiddenVideo) => {
   return hidden.attribute.every(attr => attributes.includes(attr.toLowerCase()))
 }
 
-const isLocationHidden = (video: VideoSearch, hidden: HiddenVideo) => {
+const isLocationVisible = (video: VideoSearch, hidden: HiddenVideo) => {
   const locations = video.locations.map(location => location.toLowerCase())
 
   // hidden is empty
@@ -158,20 +157,20 @@ const isLocationHidden = (video: VideoSearch, hidden: HiddenVideo) => {
 
 const isStarHidden = (star: StarSearch, hidden: HiddenStar) => {
   return !(
-    isTitleHidden(star, hidden) &&
-    isBreastHidden(star, hidden) &&
-    isHaircolorHidden(star, hidden) &&
-    isEthnicityHidden(star, hidden) &&
-    isWebsiteHidden(star, hidden)
+    isTitleVisible(star, hidden) &&
+    isBreastVisible(star, hidden) &&
+    isHaircolorVisible(star, hidden) &&
+    isEthnicityVisible(star, hidden) &&
+    isWebsiteVisible(star, hidden)
   )
 }
 
 const isVideoHidden = (video: VideoSearch, hidden: HiddenVideo) => {
   return !(
-    isTitleHidden(video, hidden) &&
-    isCategoryHidden(video, hidden) &&
-    isAttributeHidden(video, hidden) &&
-    isLocationHidden(video, hidden)
+    isTitleVisible(video, hidden) &&
+    isCategoryVisible(video, hidden) &&
+    isAttributeVisible(video, hidden) &&
+    isLocationVisible(video, hidden)
   )
 }
 
