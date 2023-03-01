@@ -26,6 +26,7 @@ Any setting ending with `*` is required
 | NEXT_PUBLIC_TIMELINE_SPACING    | The max allowed horizontal spacing between bookmarks (default=`0`)                                 |
 | NEXT_PUBLIC_PLAYER_DURATIONDIFF | The max allowed difference of a video's duration and the reported duration (default=`1`)           |
 | NEXT_PUBLIC_THUMBNAILS          | Weather generated thumbnails should be used (default=`false`)                                      |
+| NEXT_PUBLIC_USER_THUMB          | Weather window should be closed after a thumbnail has been created (default=`false`)               |
 | THUMBNAIL_RES                   | The height used for thumbnails (default=`290`)                                                     |
 | THEPORNDB_API                   | The API-KEY used, for getting data                                                                 |
 | PORT\*                          | _Only required for docker._ The port used for the application (default=`3000`)                     |

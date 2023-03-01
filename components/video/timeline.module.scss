@@ -10,14 +10,12 @@
     white-space: nowrap;
 
     $levelSelector: 1;
-    $margin: 0;
-
     @for $i from 1 through ($bookmarkRows * $bookmarkCols) {
       $modLevelSelector: (($levelSelector - 1) % $bookmarkCols);
-      $margin: ($modLevelSelector) * $bookmarkSpacing;
+      $margin: $modLevelSelector * $bookmarkSpacing;
 
       &[data-level='#{$i}'] {
-        margin-top: $margin + px;
+        margin-top: $margin;
       }
 
       $levelSelector: $levelSelector + 1;

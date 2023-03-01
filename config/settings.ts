@@ -17,5 +17,11 @@ export default {
     thumbnails: getValue('NEXT_PUBLIC_PLAYER_THUMBNAILS', 'false') === 'true'
   },
   THUMB_RES: parseInt(process.env.THUMBNAIL_RES ?? '290'),
-  THEPORNDB_API: process.env.THEPORNDB_API ?? ''
+  THEPORNDB_API: process.env.THEPORNDB_API ?? '',
+  userAction: {
+    thumbnail: {
+      close: getValue('NEXT_PUBLIC_USER_THUMB', 'reload') === 'close',
+      reload: getValue('NEXT_PUBLIC_USER_THUMB', 'reload') === 'reload'
+    }
+  }
 }

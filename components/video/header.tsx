@@ -12,6 +12,7 @@ import Spinner from '../spinner'
 
 import { attributeService, locationService, videoService } from '@service'
 import { General, SetState, Video } from '@interfaces'
+import { settingsConfig } from '@config'
 
 import styles from './header.module.scss'
 
@@ -128,7 +129,11 @@ const HeaderCover = ({ video, hidden = false }: HeaderCoverProps) => {
     setClicked(true)
 
     videoService.setThumbnail(video.id).then(() => {
+      if (settingsConfig.userAction.thumbnail.reload) {
       router.reload()
+      } else if (settingsConfig.userAction.thumbnail.close) {
+        window.close()
+      }
     })
   }
 
