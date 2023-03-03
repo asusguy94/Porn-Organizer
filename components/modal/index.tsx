@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-
+import React, { useEffect, useState } from 'react'
 import { Button, Card, Modal as MUIModal, Typography } from '@mui/material'
 
 import { useKey } from 'react-use'
@@ -77,28 +76,24 @@ type ModalChildProps = {
 const ModalChild = ({ title, filter, children, query, onClose }: ModalChildProps) => {
   const lowerQuery = query.toLowerCase()
 
-  const handleFilter = () => {
-    return (
-      children
-        //@ts-expect-error: ReactNode mapped as any[]
-        ?.filter((item: any) => item.props.children.toLowerCase().includes(lowerQuery))
-        .sort((a: any, b: any) => {
-          const valA = a.props.children.toLowerCase()
-          const valB = b.props.children.toLowerCase()
+  const handleFilter = () =>
+    React.Children.toArray(children)
+      .filter((item: any) => item.props.children.toLowerCase().includes(lowerQuery))
+      .sort((a: any, b: any) => {
+        const valA = a.props.children.toLowerCase()
+        const valB = b.props.children.toLowerCase()
 
-          if (query.length > 0) {
-            if (valA.startsWith(lowerQuery) && valB.startsWith(lowerQuery)) return 0
-            else if (valA.startsWith(lowerQuery)) return -1
-            else if (valB.startsWith(lowerQuery)) return 1
-          }
+        if (query.length > 0) {
+          if (valA.startsWith(lowerQuery) && valB.startsWith(lowerQuery)) return 0
+          else if (valA.startsWith(lowerQuery)) return -1
+          else if (valB.startsWith(lowerQuery)) return 1
+        }
 
-          return valA.localeCompare(valB)
-        })
-    )
-  }
+        return valA.localeCompare(valB)
+      })
 
   return (
-    <MUIModal open={true} onClose={onClose}>
+    <MUIModal open onClose={onClose}>
       <Card id={styles.modal}>
         <div id={styles.header}>
           <Typography variant='h5' id={styles.label}>
