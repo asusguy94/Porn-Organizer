@@ -38,12 +38,7 @@ export const Column = ({ label, rows = 1, limit = -1, colSize = 10 }: ColumnProp
 
   return (
     <Grid container component='section' style={{ marginBottom: '0.5em' }}>
-      <h2
-        style={{
-          marginTop: 0,
-          marginBottom: 0
-        }}
-      >
+      <h2 style={{ marginTop: 0, marginBottom: 0 }}>
         {capitalize(label)} (<span style={{ color: 'green' }}>{data.length}</span>)
       </h2>
 

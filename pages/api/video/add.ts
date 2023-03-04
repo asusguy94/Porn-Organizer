@@ -1,8 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import { z } from 'zod'
-
-import { prisma, validate } from '@utils/server'
+import { prisma } from '@utils/server'
+import validate, { z } from '@utils/server/validation'
 import { getDate } from '@utils/server/helper'
 import { websiteExists } from '@utils/server/helper.db'
 

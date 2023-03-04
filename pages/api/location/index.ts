@@ -1,8 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import { z } from 'zod'
-
-import { prisma, validate } from '@utils/server'
+import { prisma } from '@utils/server'
+import validate, { z } from '@utils/server/validation'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {

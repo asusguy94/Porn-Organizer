@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import fs from 'fs'
-import { z } from 'zod'
 
-import { prisma, validate } from '@utils/server'
+import { prisma } from '@utils/server'
+import validate, { z } from '@utils/server/validation'
 import { downloader, sendFile } from '@utils/server/helper'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
