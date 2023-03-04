@@ -84,7 +84,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         duration: video.duration,
         height: video.height,
         plays: video.plays.length,
-        website: video.website!.name,
+        website: video.website.name,
         star: generateStarName(video.path),
         locations: video.locations.map(({ location }) => location),
         attributes: video.attributes.map(({ attribute }) => attribute),

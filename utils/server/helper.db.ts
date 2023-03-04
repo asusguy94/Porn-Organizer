@@ -1,10 +1,6 @@
 import prisma from './prisma'
 import { Star } from '@prisma/client'
 
-export const websiteExists = async (website: string): Promise<boolean> => {
-  return (await prisma.website.count({ where: { name: website } })) > 0
-}
-
 export const getAliasAsStar = async (alias: string): Promise<Star> => {
   return (await prisma.starAlias.findFirstOrThrow({ where: { name: alias }, include: { star: true } })).star
 }

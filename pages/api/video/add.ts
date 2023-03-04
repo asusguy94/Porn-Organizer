@@ -3,7 +3,6 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 import { prisma } from '@utils/server'
 import validate, { z } from '@utils/server/validation'
 import { getDate } from '@utils/server/helper'
-import { websiteExists } from '@utils/server/helper.db'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -23,52 +22,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     )
 
     for await (const video of videos) {
+      // Create WEBSITE if missing
+      const website = await prisma.website.upsert({
+        where: { name: video.website },
+        create: { name: video.website },
+        update: {}
+      })
+
       const newVideo = await prisma.video.create({
         data: {
           path: video.path,
           name: video.title,
-          date: getDate(video.date)
+          date: getDate(video.date),
+          website: { connect: website }
         },
         include: { site: true, website: true }
-      })
-
-      // Create WEBSITE if missing
-      if (!(await websiteExists(video.website))) {
-        // Create WEBSITE
-        await prisma.website.create({ data: { name: video.website } })
-      }
-      const website = await prisma.website.findFirstOrThrow({
-        where: { name: video.website }
       })
 
       // Site should be used
       if (video.site.length) {
         // Create SITE if missing
-        if ((await prisma.site.findFirst({ where: { name: video.site } })) === null) {
-          // Create SITE
-          await prisma.site.create({
-            data: {
-              name: video.site,
-              website: { connect: { id: website.id } }
-            }
-          })
-        }
-        const site = await prisma.site.findFirstOrThrow({
-          where: { name: video.site }
+        const site = await prisma.site.upsert({
+          where: { name: video.site },
+          create: { name: video.site, website: { connect: website } },
+          update: {}
         })
 
         // Set SITE
         await prisma.video.update({
           where: { id: newVideo.id },
-          data: { site: { connect: { id: site.id } } }
+          data: { site: { connect: site } }
         })
       }
-
-      // Set WEBSITE
-      await prisma.video.update({
-        where: { id: newVideo.id },
-        data: { website: { connect: { id: website.id } } }
-      })
     }
 
     res.end()

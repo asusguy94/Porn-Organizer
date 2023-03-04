@@ -92,7 +92,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     for await (const video of infoVideos) {
       await sleep(400) // 400ms between requests
-      await findSceneSlug(generateStarName(video.path), video.name, video.site?.name ?? video.website?.name)
+      await findSceneSlug(generateStarName(video.path), video.name, video.site?.name ?? video.website.name)
         .then(async slug => {
           await prisma.video.update({ where: { id: video.id }, data: { api: slug, ignoreMeta: true } })
         })

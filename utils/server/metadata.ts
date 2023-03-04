@@ -58,7 +58,7 @@ export const getSceneSlug = async (slug: string): Promise<string> => {
 // sometimes scenes are only found using site (not wsite) >> "Reality Kings"?
 // sometimes scenes are only found using wsite (not site) >> "Lets Doe It"
 // test solution by limiting the loop by video-id
-export async function findSceneSlug(videoStar: string, videoTitle: string, siteOrWsite?: string): Promise<string> {
+export async function findSceneSlug(videoStar: string, videoTitle: string, siteOrWsite: string): Promise<string> {
   type Scene = {
     data: { id: string }[]
   }
@@ -68,7 +68,7 @@ export async function findSceneSlug(videoStar: string, videoTitle: string, siteO
   url.searchParams.set('q', videoStar)
   // Convert "CamelCase" >> "Camel Case"
   url.searchParams.set('title', toCamelCase(videoTitle))
-  url.searchParams.set('q', `${videoStar} ${siteOrWsite ?? ''}`)
+  url.searchParams.set('q', `${videoStar} ${siteOrWsite}`)
   // can site-param be used?
   url.searchParams.set('limit', '2')
 

@@ -42,7 +42,7 @@ export type VideoSearch = {
   quality: Quality
   site: string | null
   star: string | null
-  website?: string
+  website: string
   api: string | null
 }
 
@@ -99,7 +99,7 @@ function isWebsiteVisible(obj: StarSearch | VideoSearch, hidden: HiddenStar | Hi
 
   // hidden is not empty
   if (isHiddenVideo(hidden) && isVideo(obj)) {
-    return obj.website?.toLowerCase() === hidden.website.toLowerCase()
+    return obj.website.toLowerCase() === hidden.website.toLowerCase()
   } else if (isHiddenStar(hidden) && isStar(obj)) {
     return obj.websites.some(ws => ws.toLowerCase() === hidden.website.toLowerCase())
   }

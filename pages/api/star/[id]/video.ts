@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             name: video.name,
             date: video.date,
             fname: video.path,
-            website: video.website!.name,
+            website: video.website.name,
             site: video.site?.name ?? null,
             age: video.starAge ?? dateDiff(video.star?.birthdate, video.date)
           }))

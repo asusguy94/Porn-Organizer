@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         image: video.cover ? getResizedThumb(video.id) : null,
         star: video.star?.name ?? null,
         ageInVideo: dateDiff(video.star?.birthdate, video.date),
-        website: video.website?.name,
+        website: video.website.name,
         site: video.site?.name ?? null,
         plays: video.plays.length,
         categories: getUnique(video.bookmarks.map(({ category }) => category.name)),
