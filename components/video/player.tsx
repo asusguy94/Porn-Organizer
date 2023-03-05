@@ -3,12 +3,12 @@ import { useEffect, useRef, useState } from 'react'
 
 import { Button, Card, List, ListItem, TextField } from '@mui/material'
 
-import Hls, { ErrorDetails, HlsConfig } from 'hls.js'
+import Hls, { ErrorDetails, HlsConfig, HlsListeners } from 'hls.js'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import { useSessionStorage } from 'usehooks-ts'
 import { useKey } from 'react-use'
 
-import Plyr from '../plyr'
+import Plyr, { PlyrWithMetadata } from '../plyr'
 import Icon from '../icon'
 import type { ModalHandler, Modal } from '../modal'
 import Spinner from '../spinner'
@@ -19,25 +19,22 @@ import { serverConfig } from '@config'
 
 const useHls = (
   video: Video,
-  plyrRef: React.MutableRefObject<HTMLVideoElement | Plyr | null>,
+  plyrRef: React.MutableRefObject<PlyrWithMetadata | null>,
   hlsConfig: Partial<HlsConfig>
 ) => {
   const playAddedRef = useRef(false)
+  const newVideoRef = useRef(false)
+
   const [localVideo, setLocalVideo] = useSessionStorage('video', 0)
   const [localBookmark, setLocalBookmark] = useSessionStorage('bookmark', 0)
-  const [newVideo, setNewVideo] = useState<boolean>()
+
   const [events, setEvents] = useState(false)
   const [fallback, setFallback] = useState(false)
 
-  const getPlayer = () => plyrRef.current as unknown as Plyr
-
-  // Start other Effects
   useEffect(() => {
     if (plyrRef.current !== null) {
-      if (localVideo === video.id) {
-        setNewVideo(false)
-      } else {
-        setNewVideo(true)
+      newVideoRef.current = localVideo !== video.id
+      if (localVideo !== video.id) {
         setLocalVideo(video.id)
         setLocalBookmark(0)
       }
@@ -46,40 +43,44 @@ const useHls = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plyrRef])
 
-  // Video Events
   useEffect(() => {
-    if (events) {
-      const player = getPlayer()
+    if (plyrRef.current === null) return
 
-      player.on('timeupdate', () => {
+    if (events) {
+      const player = plyrRef.current
+
+      const onTimeupdate = () => {
         if (player.currentTime > 0) {
           setLocalBookmark(Math.round(player.currentTime))
         }
-      })
+      }
 
-      player.on('play', () => {
-        if (newVideo && !playAddedRef.current) {
+      const onPlay = () => {
+        if (newVideoRef.current && !playAddedRef.current) {
           playAddedRef.current = true
 
           videoService
             .addPlay(video.id)
             .then(() => {
               console.log('Play Added')
-              playAddedRef.current = true
             })
             .catch(() => {
               playAddedRef.current = false
             })
         }
-      })
+      }
+
+      player.on('timeupdate', onTimeupdate)
+      player.on('play', onPlay)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [events])
 
-  // Initialize HLS
   useEffect(() => {
+    if (plyrRef.current === null) return
+
     if (events) {
-      const player = getPlayer() as Plyr & { media: HTMLVideoElement }
+      const player = plyrRef.current
 
       if (Hls.isSupported()) {
         const hls = new Hls(hlsConfig)
@@ -87,21 +88,19 @@ const useHls = (
         hls.loadSource(`${serverConfig.api}/video/${video.id}/hls`)
         hls.attachMedia(player.media)
 
-        hls.once(Hls.Events.MANIFEST_PARSED, () => {
+        const onLoad = () => {
           hls.autoLevelCapping = 1
+          hls.startLoad(localBookmark)
+        }
 
-          if (!newVideo) {
-            hls.startLoad(localBookmark)
-          } else {
-            hls.startLoad()
-          }
-        })
-
-        hls.on(Hls.Events.ERROR, (e, { details }) => {
+        const onError: HlsListeners['hlsError'] = (e, { details }) => {
           if (details === ErrorDetails.MANIFEST_LOAD_ERROR) {
             setFallback(true)
           }
-        })
+        }
+
+        hls.once(Hls.Events.MANIFEST_PARSED, onLoad)
+        hls.on(Hls.Events.ERROR, onError)
       } else {
         setFallback(true)
       }
@@ -109,12 +108,11 @@ const useHls = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [events])
 
-  // Fallback player
   useEffect(() => {
-    if (fallback) {
-      const player = getPlayer() as unknown as HTMLVideoElement & { media: HTMLVideoElement }
+    if (plyrRef.current === null) return
 
-      player.media.src = `${serverConfig.api}/video/${video.id}/file`
+    if (fallback) {
+      plyrRef.current.media.src = `${serverConfig.api}/video/${video.id}/file`
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fallback])
@@ -125,7 +123,7 @@ type VideoPlayerProps = {
   categories?: General[]
   bookmarks: Bookmark[]
   star: VideoStar | null
-  plyrRef: React.MutableRefObject<HTMLVideoElement | Plyr | null>
+  plyrRef: React.MutableRefObject<PlyrWithMetadata | null>
   update: {
     video: SetState<Video | undefined>
     star: SetState<VideoStar | null | undefined>
@@ -144,16 +142,15 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
   const isMute = (e: KeyboardEvent) => e.code === 'KeyM'
   const isSpace = (e: KeyboardEvent) => e.code === 'Space'
 
-  const getPlayer = () => plyrRef.current as unknown as Plyr
-
   useKey(
     e => !modalData.visible && (isArrow(e) || isMute(e) || isSpace(e)),
     e => {
-      if ((e.target as HTMLElement).tagName === 'INPUT') return
+      const player = plyrRef.current
+
+      if (player === null || (e.target as HTMLElement).tagName === 'INPUT') return
 
       e.preventDefault()
 
-      const player = getPlayer()
       const getSeekTime = (multiplier = 1) => 1 * multiplier
 
       if (isMute(e)) {
@@ -180,7 +177,11 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
     }
   )
 
-  const handleWheel = (e: React.WheelEvent) => (getPlayer().currentTime += 10 * Math.sign(e.deltaY) * -1)
+  const handleWheel = (e: React.WheelEvent) => {
+    if (plyrRef.current === null) return
+
+    plyrRef.current.currentTime += 10 * Math.sign(e.deltaY) * -1
+  }
 
   const deleteVideo = () => {
     videoService.delete(video.id).then(() => {
@@ -189,7 +190,9 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
   }
 
   const addBookmark = (category: General) => {
-    const time = Math.round(getPlayer().currentTime)
+    if (plyrRef.current === null) return null
+
+    const time = Math.round(plyrRef.current.currentTime)
     if (time) {
       videoService.addBookmark(video.id, category.id, time).then(({ data }) => {
         bookmarks.push({
@@ -251,7 +254,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
     <div onWheel={handleWheel}>
       <ContextMenuTrigger id='video' holdToDisplay={-1}>
         <Plyr
-          plyrRef={plyrRef as React.MutableRefObject<Plyr | null>}
+          plyrRef={plyrRef}
           source={`${serverConfig.api}/video/${video.id}/file`}
           poster={`${serverConfig.api}/video/${video.id}/image`}
           thumbnail={`${serverConfig.api}/video/${video.id}/vtt`}

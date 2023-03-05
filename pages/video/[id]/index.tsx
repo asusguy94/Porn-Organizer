@@ -14,6 +14,7 @@ import { Header, Player as VideoPlayer, Timeline } from '@components/video'
 import Icon from '@components/icon'
 import Link from '@components/link'
 import Spinner from '@components/spinner'
+import { PlyrWithMetadata } from '@components/plyr'
 
 import { Bookmark as VideoBookmark, Video, VideoStar, SetState, Bookmark, General } from '@interfaces'
 import { attributeService, categoryService, locationService, videoService } from '@service'
@@ -119,7 +120,7 @@ const Section = ({
   onModal,
   modalData
 }: SectionProps) => {
-  const plyrRef = useRef<HTMLVideoElement | Plyr | null>(null)
+  const plyrRef = useRef<PlyrWithMetadata | null>(null)
 
   // Helper script for getting the player
   const playVideo = (time: number) => {
