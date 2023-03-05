@@ -1,18 +1,7 @@
 import type { NextPage } from 'next/types'
 import { useState, useEffect } from 'react'
 
-import {
-  Card,
-  CardActionArea,
-  FormControl,
-  Grid,
-  MenuItem,
-  RadioGroup,
-  Select,
-  SelectChangeEvent,
-  TextField,
-  Typography
-} from '@mui/material'
+import { Card, CardActionArea, FormControl, Grid, RadioGroup, TextField, Typography } from '@mui/material'
 
 import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
@@ -28,27 +17,14 @@ import SortObj, { getVideoSort, SortMethodVideo, SortTypeVideo as VideoSort } fr
 import Link from '@components/link'
 
 import { daysToYears } from '@utils/client/date-time'
-import { SetState, WebsiteWithSites as Website, General, LocalWebsite } from '@interfaces'
-import { attributeService, categoryService, locationService, searchService, websiteService } from '@service'
+import { SetState, General, LocalWebsite } from '@interfaces'
+import { attributeService, categoryService, locationService, searchService } from '@service'
 import { serverConfig } from '@config'
 import { printWithMax } from '@utils/shared'
 
 import styles from './search.module.scss'
 
-type VideoData = Partial<{
-  categories: General[]
-  attributes: General[]
-  locations: General[]
-  websites: Website[]
-}>
-
 const VideoSearchPage: NextPage = () => {
-  const { data: attributes } = attributeService.useAttributes()
-  const { data: categories } = categoryService.useCategories()
-  const { data: locations } = locationService.useLocations()
-  const { data: websites } = websiteService.useWebsites()
-  const { data: videos } = searchService.useVideos()
-
   const [sort, setSort] = useState<VideoSort>({ type: 'date', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
     titleSearch: '',
@@ -61,20 +37,11 @@ const VideoSearchPage: NextPage = () => {
   return (
     <Grid container>
       <Grid item xs={2} id={styles.sidebar}>
-        <Sidebar
-          videoData={{
-            categories,
-            attributes,
-            locations,
-            websites
-          }}
-          setHidden={setHidden}
-          setSort={setSort}
-        />
+        <Sidebar setHidden={setHidden} setSort={setSort} />
       </Grid>
 
       <Grid item xs={10}>
-        <Videos videos={videos} hidden={hidden} sortMethod={getVideoSort(sort)} />
+        <Videos hidden={hidden} sortMethod={getVideoSort(sort)} />
       </Grid>
 
       <ScrollToTop smooth />
@@ -83,15 +50,18 @@ const VideoSearchPage: NextPage = () => {
 }
 
 type VideosProps = {
-  videos?: Video[]
   hidden: Hidden
   sortMethod: SortMethodVideo
 }
-const Videos = ({ videos = [], hidden, sortMethod }: VideosProps) => {
+const Videos = ({ hidden, sortMethod }: VideosProps) => {
+  const { data: videos } = searchService.useVideos()
+
   const localWebsites = useReadLocalStorage<LocalWebsite[]>('websites')
   const [filtered, setFiltered] = useState<Video[]>([])
 
   useEffect(() => {
+    if (videos === undefined) return
+
     const map = new Map<string, number>()
 
     const initialData = (localWebsites !== null ? [...localWebsites] : []).map(wsite => ({
@@ -102,30 +72,28 @@ const Videos = ({ videos = [], hidden, sortMethod }: VideosProps) => {
     setFiltered(
       videos
         .sort(getVideoSort({ type: 'date', reverse: false }))
-          .filter(v => {
-          if (v.website !== undefined) {
-            const website = initialData.find(wsite => wsite.label === v.website)
+        .filter(v => {
+          const website = initialData.find(wsite => wsite.label === v.website)
 
-              if (website !== undefined && website.count-- > (website.finished ? 0 : 1)) {
-                return true
-              }
-            }
+          if (website !== undefined && website.count-- > (website.finished ? 0 : 1)) {
+            return true
+          }
 
-            if (v.website !== undefined) {
-              map.set(v.website, (map.get(v.website) ?? 0) + 1)
-            }
+          map.set(v.website, (map.get(v.website) ?? 0) + 1)
 
-            return v.categories.length > 0
-          })
-          // TODO move this as a toggle to the settings-page
-          // also move the label/name to the settings page
-          // add dropdown from attributes? instead of input-field?
-          .filter(v => !v.attributes.includes('video-unplayable')) //FIXME broken file/stream?
-      )
+          return v.categories.length > 0
+        })
+        // TODO move this as a toggle to the settings-page
+        // also move the label/name to the settings page
+        // add dropdown from attributes? instead of input-field?
+        .filter(v => !v.attributes.includes('video-unplayable')) //FIXME broken file/stream?
+    )
 
-      console.clear()
-      ;[...map].slice(0, 2).forEach(([key, value]) => console.log(key, printWithMax(value, 200)))
+    console.clear()
+    ;[...map].slice(0, 2).forEach(([key, value]) => console.log(key, printWithMax(value, 200)))
   }, [localWebsites, videos, hidden])
+
+  if (videos === undefined) return <Spinner />
 
   const visible = getVisible(filtered.sort(sortMethod), hidden)
 
@@ -135,11 +103,7 @@ const Videos = ({ videos = [], hidden, sortMethod }: VideosProps) => {
         <span id={styles.count}>{visible.length}</span> Videos
       </Typography>
 
-      {videos.length > 0 ? (
-        <VGrid itemHeight={300} total={visible.length} renderData={idx => <VideoCard video={visible[idx]} />} />
-      ) : (
-        <Spinner />
-      )}
+      <VGrid itemHeight={300} total={visible.length} renderData={idx => <VideoCard video={visible[idx]} />} />
     </div>
   )
 }
@@ -175,15 +139,14 @@ const VideoCard = ({ video }: VideoCardProps) => {
 }
 
 type SidebarProps = {
-  videoData: VideoData
   setHidden: SetState<Hidden>
   setSort: SetState<VideoSort>
 }
-const Sidebar = ({ videoData, setHidden, setSort }: SidebarProps) => (
+const Sidebar = ({ setHidden, setSort }: SidebarProps) => (
   <>
     <TitleSearch setHidden={setHidden} />
     <Sort setSort={setSort} />
-    <Filter videoData={videoData} setHidden={setHidden} />
+    <Filter setHidden={setHidden} />
   </>
 )
 
@@ -234,46 +197,21 @@ const Sort = ({ setSort }: SortProps) => {
 }
 
 type FilterProps = {
-  videoData: VideoData
   setHidden: SetState<Hidden>
 }
-const Filter = ({ videoData, setHidden }: FilterProps) => {
-  const website = (e: SelectChangeEvent) => {
-    const websiteObj: IWebsite = JSON.parse(e.target.value)
-
-    update(
-      videos.map(video => {
-        if (websiteObj.name === 'ALL') {
-          return { ...video, hidden: { ...video.hidden, website: false } }
-        } else if (websiteObj.sites.length === 0) {
-          return {
-            ...video,
-            hidden: {
-              ...video.hidden,
-              website: !(video.website !== undefined && video.website.toLowerCase() === websiteObj.name.toLowerCase())
-            }
-          }
-        }
-
-        return {
-          ...video,
-          hidden: {
-            ...video.hidden,
-            website: !(video.site !== null && video.site.toLowerCase() === websiteObj.sites[0].name.toLowerCase())
-          }
-        }
-      })
-    )
-  }
+const Filter = ({ setHidden }: FilterProps) => {
+  const { data: attributes } = attributeService.useAttributes()
+  const { data: categories } = categoryService.useCategories()
+  const { data: locations } = locationService.useLocations()
 
   const category = (ref: RegularHandlerProps, target: General) => {
     const targetLower = target.name.toLowerCase()
 
     if (!ref.checked) {
       setHidden(prev => ({ ...prev, category: prev.category.filter(cat => cat !== targetLower) }))
-        } else {
+    } else {
       setHidden(prev => ({ ...prev, category: [...prev.category, targetLower] }))
-        }
+    }
   }
 
   const attribute = (ref: RegularHandlerProps, target: General) => {
@@ -281,43 +219,37 @@ const Filter = ({ videoData, setHidden }: FilterProps) => {
 
     if (!ref.checked) {
       setHidden(prev => ({ ...prev, attribute: prev.attribute.filter(attr => attr !== targetLower) }))
-          } else {
+    } else {
       setHidden(prev => ({ ...prev, attribute: [...prev.attribute, targetLower] }))
-          }
-          }
+    }
+  }
 
   const location = (ref: RegularHandlerProps, target: General) => {
     const targetLower = target.name.toLowerCase()
 
     if (!ref.checked) {
       setHidden(prev => ({ ...prev, location: prev.location.filter(loc => loc !== targetLower) }))
-        } else {
+    } else {
       setHidden(prev => ({ ...prev, location: [...prev.location, targetLower] }))
-        }
+    }
   }
 
   const category_NULL = (ref: RegularHandlerProps) => {
     if (!ref.checked) {
       setHidden(prev => ({ ...prev, category: prev.category.filter(category => category !== null) }))
-        } else {
+    } else {
       setHidden(prev => ({ ...prev, category: [...prev.category, null] }))
-        }
+    }
   }
 
   return (
     <>
-      <WebsiteDropdown websites={videoData.websites} label='website' callback={website} />
+      {/* <WebsiteDropdown websites={videoData.websites} label='website' callback={website} /> */}
 
-      <FilterObj
-        data={videoData.categories}
-        label='category'
-        callback={category}
-        nullCallback={category_NULL}
-        defaultNull
-      />
+      <FilterObj data={categories} label='category' callback={category} nullCallback={category_NULL} defaultNull />
 
-      <FilterObj data={videoData.attributes} label='attribute' callback={attribute} />
-      <FilterObj data={videoData.locations} label='location' callback={location} />
+      <FilterObj data={attributes} label='attribute' callback={attribute} />
+      <FilterObj data={locations} label='location' callback={location} />
     </>
   )
 }
@@ -335,61 +267,22 @@ function FilterObj<T extends General>({ data, label, callback, nullCallback, def
   if (data === undefined) return <Spinner />
 
   return (
-  <>
-    <h2>{capitalize(label, true)}</h2>
-
-    <FormControl>
-      {nullCallback !== undefined && (
-          <RegularItem
-          label={<div className={styles.global}>NULL</div>}
-          value='NULL'
-            callback={nullCallback}
-            defaultChecked={defaultNull}
-        />
-      )}
-
-        {data.map(item => (
-          <RegularItem key={item.id} label={item.name} value={item.name} item={item} callback={callback} />
-      ))}
-    </FormControl>
-  </>
-)
-}
-
-type WebsiteDropdownProps = {
-  websites?: Website[]
-  label: string
-  callback: (e: SelectChangeEvent) => void
-  defaultValue?: string
-}
-const WebsiteDropdown = ({ websites, label, callback, defaultValue = 'ALL' }: WebsiteDropdownProps) => {
-  if (websites === undefined) return <Spinner />
-
-  return (
     <>
       <h2>{capitalize(label, true)}</h2>
 
       <FormControl>
-        <Select variant='standard' name={label} defaultValue={defaultValue} onChange={callback}>
-          <MenuItem value='ALL'>All</MenuItem>
+        {nullCallback !== undefined && (
+          <RegularItem
+            label={<div className={styles.global}>NULL</div>}
+            value='NULL'
+            callback={nullCallback}
+            defaultChecked={defaultNull}
+          />
+        )}
 
-          {websites.map(website => [
-            <MenuItem key={website.id} value={JSON.stringify({ ...website, sites: [] })}>
-              {website.name}
-            </MenuItem>,
-            website.sites.map(site => (
-              <MenuItem
-                key={`${website.id}-${site.id}`}
-                value={JSON.stringify({
-                  ...website,
-                  sites: [site]
-                })}
-              >
-                {website.name} / {site.name}
-              </MenuItem>
-            ))
-          ])}
-        </Select>
+        {data.map(item => (
+          <RegularItem key={item.id} label={item.name} value={item.name} item={item} callback={callback} />
+        ))}
       </FormControl>
     </>
   )

@@ -44,10 +44,6 @@ type StarData = Partial<{
 }>
 
 const StarSearchPage: NextPage = () => {
-  const { data: websites } = websiteService.useWebsites()
-  const { data: stars } = searchService.useStars()
-  const { breast, ethnicity, haircolor } = starService.useStarInfo().data ?? {}
-
   const [sort, setSort] = useState<StarSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
     titleSearch: '',
@@ -60,21 +56,11 @@ const StarSearchPage: NextPage = () => {
   return (
     <Grid container>
       <Grid item xs={2} id={styles.sidebar}>
-        <Sidebar
-          starData={{
-            breasts: breast,
-            haircolors: haircolor,
-            ethnicities: ethnicity,
-            websites: websites
-          }}
-          setHidden={setHidden}
-          hidden={hidden}
-          setSort={setSort}
-        />
+        <Sidebar setHidden={setHidden} hidden={hidden} setSort={setSort} />
       </Grid>
 
       <Grid item xs={10}>
-        <Stars stars={stars} hidden={hidden} sortMethod={getStarSort(sort)} />
+        <Stars hidden={hidden} sortMethod={getStarSort(sort)} />
       </Grid>
 
       <ScrollToTop smooth />
@@ -83,11 +69,14 @@ const StarSearchPage: NextPage = () => {
 }
 
 type StarsProps = {
-  stars?: Star[]
   hidden: Hidden
   sortMethod: SortMethodStar
 }
-const Stars = ({ stars = [], hidden, sortMethod }: StarsProps) => {
+const Stars = ({ hidden, sortMethod }: StarsProps) => {
+  const { data: stars } = searchService.useStars()
+
+  if (stars === undefined) return <Spinner />
+
   const visible = getVisible(stars.sort(sortMethod), hidden)
 
   return (
@@ -96,11 +85,7 @@ const Stars = ({ stars = [], hidden, sortMethod }: StarsProps) => {
         <span id={styles.count}>{visible.length}</span> Stars
       </Typography>
 
-      {stars.length > 0 ? (
-        <VGrid itemHeight={309} total={visible.length} renderData={idx => <StarCard star={visible[idx]} />} />
-      ) : (
-        <Spinner />
-      )}
+      <VGrid itemHeight={309} total={visible.length} renderData={idx => <StarCard star={visible[idx]} />} />
     </div>
   )
 }
@@ -136,25 +121,26 @@ const StarCard = ({ star }: StarCardProps) => {
 }
 
 type SidebarProps = {
-  starData: StarData
   setHidden: SetState<Hidden>
   hidden: Hidden
   setSort: SetState<StarSort>
 }
-const Sidebar = ({ starData, setHidden, hidden, setSort }: SidebarProps) => (
+const Sidebar = ({ setHidden, hidden, setSort }: SidebarProps) => (
   <>
     <TitleSearch setHidden={setHidden} />
     <Sort setSort={setSort} />
-    <Filter starData={starData} setHidden={setHidden} hidden={hidden} />
+    <Filter setHidden={setHidden} hidden={hidden} />
   </>
 )
 
 type FilterProps = {
-  starData: StarData
   setHidden: SetState<Hidden>
   hidden: Hidden
 }
-const Filter = ({ starData, setHidden, hidden }: FilterProps) => {
+const Filter = ({ setHidden, hidden }: FilterProps) => {
+  const { data: starData } = starService.useStarInfo()
+  const { data: websites } = websiteService.useWebsites()
+
   const breast = (target: string) => {
     setHidden(prev => ({ ...prev, breast: target.toLowerCase() }))
   }
@@ -193,13 +179,15 @@ const Filter = ({ starData, setHidden, hidden }: FilterProps) => {
     setHidden(prev => ({ ...prev, ethnicity: '' }))
   }
 
+  if (starData === undefined || websites === undefined) return <Spinner />
+
   return (
     <>
-      <FilterDropdown data={starData.websites} label='website' callback={website_DROP} />
+      <FilterDropdown data={websites} label='website' callback={website_DROP} />
 
       <FilterItem
         hidden={hidden}
-        data={starData.breasts}
+        data={starData.breast}
         label='breast'
         callback={breast}
         globalCallback={breast_ALL}
@@ -208,7 +196,7 @@ const Filter = ({ starData, setHidden, hidden }: FilterProps) => {
 
       <FilterItem
         hidden={hidden}
-        data={starData.haircolors}
+        data={starData.haircolor}
         label='haircolor'
         callback={haircolor}
         globalCallback={haircolor_ALL}
@@ -216,7 +204,7 @@ const Filter = ({ starData, setHidden, hidden }: FilterProps) => {
 
       <FilterItem
         hidden={hidden}
-        data={starData.ethnicities}
+        data={starData.ethnicity}
         label='ethnicity'
         callback={ethnicity}
         globalCallback={ethnicity_ALL}
