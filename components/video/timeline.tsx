@@ -20,29 +20,11 @@ type TimelineProps = {
   bookmarks: Bookmark[]
   categories?: General[]
   playVideo: (time: number) => void
-  duration: number
   update: SetState<Bookmark[]>
   onModal: ModalHandler
 }
-const Timeline = ({ bookmarks, video, playVideo, categories, duration, update, onModal }: TimelineProps) => {
+const Timeline = ({ bookmarks, video, playVideo, categories, update, onModal }: TimelineProps) => {
   const windowSize = useWindowSize()
-
-  // Only show warning once
-  useEffect(() => {
-    if (duration && video.duration) {
-      if (Math.abs(duration - video.duration) >= settingsConfig.player.maxDurationDiff) {
-        alert('invalid video-duration')
-
-        console.log('dur', duration)
-        console.log('vDur', video.duration)
-        console.log(`difference of ${(video.duration - duration).toFixed(2)}`)
-
-        console.log('')
-
-        console.log('Re-Transcode to fix this issue')
-      }
-    }
-  }, [duration, video.duration])
 
   const setTime = (bookmark: Bookmark) => {
     const player = document.getElementsByTagName('video')[0]
@@ -126,7 +108,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, duration, update, o
               variant='outlined'
               color='primary'
               style={{
-                left: `${((bookmark.start * 100) / duration) * settingsConfig.timeline.offset}%`
+                left: `${((bookmark.start * 100) / video.duration) * settingsConfig.timeline.offset}%`
               }}
               onClick={() => playVideo(bookmark.start)}
               ref={(bookmark: HTMLButtonElement) => (bookmarksArr[idx] = bookmark)}

@@ -119,14 +119,13 @@ const Section = ({
   onModal,
   modalData
 }: SectionProps) => {
-  const [duration, setDuration] = useState(0)
-  const plyrRef = useRef<HTMLVideoElement | Plyr>()
+  const plyrRef = useRef<HTMLVideoElement | Plyr | null>(null)
 
   // Helper script for getting the player
   const playVideo = (time: number) => {
     const player = plyrRef.current
 
-    if (player !== undefined) {
+    if (player !== null) {
       player.currentTime = time
       player.play()
     }
@@ -144,7 +143,6 @@ const Section = ({
         bookmarks={bookmarks}
         star={star}
         plyrRef={plyrRef}
-        updateDuration={setDuration}
         update={update}
         onModal={onModal}
         modalData={modalData}
@@ -155,7 +153,6 @@ const Section = ({
         video={video}
         categories={categories}
         playVideo={playVideo}
-        duration={duration}
         update={update.bookmarks}
         onModal={onModal}
       />

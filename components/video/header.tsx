@@ -23,28 +23,23 @@ type HeaderProps = {
   update: SetState<Video | undefined>
   onModal: ModalHandler
 }
-const Header = ({ video, attributes, locations, update, onModal }: HeaderProps) => {
-  const isFullHD = video.height ? video.height > 720 : false
+const Header = ({ video, attributes, locations, update, onModal }: HeaderProps) => (
+  <Grid container component='header' id={styles.header}>
+    <Grid item>
+      <HeaderTitle video={video} attributes={attributes} locations={locations} update={update} onModal={onModal} />
 
-  return (
-    <Grid container component='header' id={styles.header}>
-      <Grid item>
-        <HeaderTitle video={video} attributes={attributes} locations={locations} update={update} onModal={onModal} />
+      <HeaderSlug video={video} hidden={video.slug !== null} onModal={onModal} />
+      <HeaderCover video={video} hidden={video.image !== null || video.slug === null} />
 
-        <HeaderQuality video={video} hidden={!isFullHD} />
-        <HeaderSlug video={video} hidden={video.slug !== null} onModal={onModal} />
-        <HeaderCover video={video} hidden={video.image !== null || video.slug === null} />
+      <HeaderDate video={video} />
 
-        <HeaderDate video={video} />
+      <HeaderLocations video={video} update={update} />
+      <HeaderAttributes video={video} update={update} />
 
-        <HeaderLocations video={video} update={update} />
-        <HeaderAttributes video={video} update={update} />
-
-        <HeaderSite video={video} />
-      </Grid>
+      <HeaderSite video={video} />
     </Grid>
-  )
-}
+  </Grid>
+)
 
 type HeaderSiteProps = {
   video: Video
@@ -60,20 +55,6 @@ const HeaderSite = ({ video }: HeaderSiteProps) => (
     )}
   </div>
 )
-
-type HeaderQualityProps = {
-  video: IVideo
-  hidden?: boolean
-}
-const HeaderQuality = ({ video, hidden = false }: HeaderQualityProps) => {
-  if (hidden) return null
-
-  return (
-    <Button size='small' variant='outlined'>
-      <Icon code='film' className='mr-0' /> {video.height}
-    </Button>
-  )
-}
 
 type HeaderSlugProps = {
   video: Video
@@ -130,7 +111,7 @@ const HeaderCover = ({ video, hidden = false }: HeaderCoverProps) => {
 
     videoService.setThumbnail(video.id).then(() => {
       if (settingsConfig.userAction.thumbnail.reload) {
-      router.reload()
+        router.reload()
       } else if (settingsConfig.userAction.thumbnail.close) {
         window.close()
       }

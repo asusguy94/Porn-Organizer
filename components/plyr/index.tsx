@@ -10,7 +10,7 @@ type PlyrProps = {
   poster: string
   thumbnail: string
 }
-export const PlyrComponent = ({ plyrRef, source, poster, thumbnail }: PlyrProps) => {
+const PlyrComponent = ({ plyrRef, source, poster, thumbnail }: PlyrProps) => {
   useEffect(() => {
     const player = new Plyr('.plyr-js', {
       controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'settings'],
@@ -34,8 +34,7 @@ export const PlyrComponent = ({ plyrRef, source, poster, thumbnail }: PlyrProps)
 
       player.destroy()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [plyrRef, poster, thumbnail])
 
   return <video className='plyr-js' src={source} />
 }

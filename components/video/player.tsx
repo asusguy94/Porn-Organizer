@@ -22,8 +22,7 @@ type VideoPlayerProps = {
   categories?: General[]
   bookmarks: Bookmark[]
   star: VideoStar | null
-  plyrRef: React.MutableRefObject<HTMLVideoElement | Plyr | undefined>
-  updateDuration: SetState<number>
+  plyrRef: React.MutableRefObject<HTMLVideoElement | Plyr | null>
   update: {
     video: SetState<Video | undefined>
     star: SetState<VideoStar | null | undefined>
@@ -32,17 +31,7 @@ type VideoPlayerProps = {
   onModal: ModalHandler
   modalData: Modal
 }
-const VideoPlayer = ({
-  video,
-  categories,
-  bookmarks,
-  star,
-  plyrRef,
-  updateDuration,
-  update,
-  onModal,
-  modalData
-}: VideoPlayerProps) => {
+const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onModal, modalData }: VideoPlayerProps) => {
   const router = useRouter()
 
   const playAddedRef = useRef(false)
@@ -95,7 +84,7 @@ const VideoPlayer = ({
 
   // Start other Effects
   useEffect(() => {
-    if (plyrRef.current !== undefined) {
+    if (plyrRef.current !== null) {
       if (localVideo === video.id) {
         setNewVideo(false)
       } else {
@@ -167,8 +156,6 @@ const VideoPlayer = ({
             setFallback(true)
           }
         })
-
-        hls.on(Hls.Events.LEVEL_LOADED, (e, data) => updateDuration(data.details.totalduration))
       } else {
         setFallback(true)
       }
@@ -181,7 +168,6 @@ const VideoPlayer = ({
       const player = getPlayer() as unknown as HTMLVideoElement & { media: HTMLVideoElement }
 
       player.media.src = `${serverConfig.api}/video/${video.id}/file`
-      player.media.ondurationchange = () => updateDuration(player.media.duration)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fallback])
@@ -257,7 +243,7 @@ const VideoPlayer = ({
     <div onWheel={handleWheel}>
       <ContextMenuTrigger id='video' holdToDisplay={-1}>
         <Plyr
-          plyrRef={plyrRef as React.MutableRefObject<Plyr>}
+          plyrRef={plyrRef as React.MutableRefObject<Plyr | null>}
           source={`${serverConfig.api}/video/${video.id}/file`}
           poster={`${serverConfig.api}/video/${video.id}/image`}
           thumbnail={`${serverConfig.api}/video/${video.id}/vtt`}
