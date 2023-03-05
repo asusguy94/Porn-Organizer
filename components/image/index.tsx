@@ -2,14 +2,15 @@ import { CardMedia as MUICardMedia } from '@mui/material'
 import NextImage, { type ImageProps as NextImageProps } from 'next/image'
 import ImageNotSupportedOutlinedIcon from '@mui/icons-material/ImageNotSupportedOutlined'
 
-export const ResponsiveImage = ({ alt, ...other }: Omit<NextImageProps, 'sizes'> & MissingImage) => {
-  return <Image sizes='100vw' style={{ width: '100%', height: 'auto' }} alt={alt} {...other} />
+export const ResponsiveImage = ({ alt, ...other }: NextImageProps & MissingImage) => {
+  return <Image style={{ width: '100%', height: 'auto' }} alt={alt} {...other} />
 }
 
-const Image = ({ missing, scale, renderStyle, ...nextProps }: NextImageProps & MissingImage) => {
+const Image = ({ missing, scale, renderStyle, sizes, ...nextProps }: NextImageProps & MissingImage) => {
   if (missing) return <MissingImage scale={scale} renderStyle={renderStyle} />
 
-  return <NextImage {...nextProps} />
+  // Main Image Component
+  return <NextImage sizes={sizes} {...nextProps} />
 }
 
 type CardProps = {

@@ -187,6 +187,7 @@ const Star = ({ star, video, update }: StarProps) => {
               alt='star'
               priority
               responsive
+              sizes={`${(100 / 12) * 2}vw`}
             />
 
             <Link href={{ pathname: '/star/[id]', query: { id: star.id } }}>

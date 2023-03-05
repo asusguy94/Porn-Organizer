@@ -58,6 +58,7 @@ export const Column = ({ label, rows = 1, limit = -1, colSize = 10 }: ColumnProp
                     className={classes.thumb}
                     alt='video'
                     priority={idx % colSize === 0}
+                    sizes={`${100 / colSize}vw`}
                   />
 
                   <div className={classes.title}>{video.name}</div>

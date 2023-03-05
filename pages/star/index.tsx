@@ -151,6 +151,7 @@ const Stars: NextPage = () => {
                       missing={star.image === null}
                       scale={4}
                       alt='star'
+                      sizes={`(min-width: 1200px) ${100 / 12}vw, (min-width: 900px) ${100 / 6}vw, ${100 / 4}vw`}
                     />
 
                     <CardContent style={activeStar === star.name ? { backgroundColor: 'orange' } : {}}>
