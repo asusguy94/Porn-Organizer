@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { Button, Card, List, ListItem, TextField } from '@mui/material'
 
-import Hls, { ErrorDetails } from 'hls.js'
+import Hls, { ErrorDetails, HlsConfig } from 'hls.js'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import { useSessionStorage } from 'usehooks-ts'
 import { useKey } from 'react-use'
@@ -17,70 +17,19 @@ import { videoService } from '@service'
 import { Bookmark, General, SetState, Video, VideoStar } from '@interfaces'
 import { serverConfig } from '@config'
 
-type VideoPlayerProps = {
-  video: Video
-  categories?: General[]
-  bookmarks: Bookmark[]
-  star: VideoStar | null
-  plyrRef: React.MutableRefObject<HTMLVideoElement | Plyr | null>
-  update: {
-    video: SetState<Video | undefined>
-    star: SetState<VideoStar | null | undefined>
-    bookmarks: SetState<Bookmark[]>
-  }
-  onModal: ModalHandler
-  modalData: Modal
-}
-const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onModal, modalData }: VideoPlayerProps) => {
-  const router = useRouter()
-
+const useHls = (
+  video: Video,
+  plyrRef: React.MutableRefObject<HTMLVideoElement | Plyr | null>,
+  hlsConfig: Partial<HlsConfig>
+) => {
   const playAddedRef = useRef(false)
   const [localVideo, setLocalVideo] = useSessionStorage('video', 0)
   const [localBookmark, setLocalBookmark] = useSessionStorage('bookmark', 0)
-
   const [newVideo, setNewVideo] = useState<boolean>()
   const [events, setEvents] = useState(false)
   const [fallback, setFallback] = useState(false)
 
-  const isArrow = (e: KeyboardEvent) => /^Arrow(Left|Right|Up|Down)$/.test(e.code)
-  const isMute = (e: KeyboardEvent) => e.code === 'KeyM'
-  const isSpace = (e: KeyboardEvent) => e.code === 'Space'
-
   const getPlayer = () => plyrRef.current as unknown as Plyr
-
-  useKey(
-    e => !modalData.visible && (isArrow(e) || isMute(e) || isSpace(e)),
-    e => {
-      if ((e.target as HTMLElement).tagName === 'INPUT') return
-
-      e.preventDefault()
-
-      const player = getPlayer()
-      const getSeekTime = (multiplier = 1) => 1 * multiplier
-
-      if (isMute(e)) {
-        player.muted = !player.muted
-      } else if (isSpace(e)) {
-        if (player.playing) player.pause()
-        else player.play()
-      } else {
-        switch (e.code) {
-          case 'ArrowLeft':
-            player.currentTime -= getSeekTime()
-            break
-          case 'ArrowRight':
-            player.currentTime += getSeekTime()
-            break
-          case 'ArrowUp':
-            player.volume = Math.ceil((player.volume + 0.1) * 10) / 10
-            break
-          case 'ArrowDown':
-            player.volume = Math.floor((player.volume - 0.1) * 10) / 10
-            break
-        }
-      }
-    }
-  )
 
   // Start other Effects
   useEffect(() => {
@@ -133,10 +82,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
       const player = getPlayer() as Plyr & { media: HTMLVideoElement }
 
       if (Hls.isSupported()) {
-        const hls = new Hls({
-          maxBufferLength: Infinity,
-          autoStartLoad: false
-        })
+        const hls = new Hls(hlsConfig)
 
         hls.loadSource(`${serverConfig.api}/video/${video.id}/hls`)
         hls.attachMedia(player.media)
@@ -163,6 +109,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [events])
 
+  // Fallback player
   useEffect(() => {
     if (fallback) {
       const player = getPlayer() as unknown as HTMLVideoElement & { media: HTMLVideoElement }
@@ -171,6 +118,67 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fallback])
+}
+
+type VideoPlayerProps = {
+  video: Video
+  categories?: General[]
+  bookmarks: Bookmark[]
+  star: VideoStar | null
+  plyrRef: React.MutableRefObject<HTMLVideoElement | Plyr | null>
+  update: {
+    video: SetState<Video | undefined>
+    star: SetState<VideoStar | null | undefined>
+    bookmarks: SetState<Bookmark[]>
+  }
+  onModal: ModalHandler
+  modalData: Modal
+}
+
+const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onModal, modalData }: VideoPlayerProps) => {
+  const router = useRouter()
+
+  useHls(video, plyrRef, { maxBufferLength: Infinity, autoStartLoad: false })
+
+  const isArrow = (e: KeyboardEvent) => /^Arrow(Left|Right|Up|Down)$/.test(e.code)
+  const isMute = (e: KeyboardEvent) => e.code === 'KeyM'
+  const isSpace = (e: KeyboardEvent) => e.code === 'Space'
+
+  const getPlayer = () => plyrRef.current as unknown as Plyr
+
+  useKey(
+    e => !modalData.visible && (isArrow(e) || isMute(e) || isSpace(e)),
+    e => {
+      if ((e.target as HTMLElement).tagName === 'INPUT') return
+
+      e.preventDefault()
+
+      const player = getPlayer()
+      const getSeekTime = (multiplier = 1) => 1 * multiplier
+
+      if (isMute(e)) {
+        player.muted = !player.muted
+      } else if (isSpace(e)) {
+        if (player.playing) player.pause()
+        else player.play()
+      } else {
+        switch (e.code) {
+          case 'ArrowLeft':
+            player.currentTime -= getSeekTime()
+            break
+          case 'ArrowRight':
+            player.currentTime += getSeekTime()
+            break
+          case 'ArrowUp':
+            player.volume = Math.ceil((player.volume + 0.1) * 10) / 10
+            break
+          case 'ArrowDown':
+            player.volume = Math.floor((player.volume - 0.1) * 10) / 10
+            break
+        }
+      }
+    }
+  )
 
   const handleWheel = (e: React.WheelEvent) => (getPlayer().currentTime += 10 * Math.sign(e.deltaY) * -1)
 
