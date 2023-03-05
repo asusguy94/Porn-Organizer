@@ -76,10 +76,15 @@ type ModalChildProps = {
 const ModalChild = ({ title, filter, children, query, onClose }: ModalChildProps) => {
   const lowerQuery = query.toLowerCase()
 
-  const handleFilter = () =>
-    React.Children.toArray(children)
-      .filter((item: any) => item.props.children.toLowerCase().includes(lowerQuery))
-      .sort((a: any, b: any) => {
+  const handleFilter = () => {
+    return React.Children.toArray(children)
+      .flatMap(child => {
+        if (!React.isValidElement(child)) return []
+
+        return typeof child.props.children === 'string' ? [child as React.ReactElement] : []
+      })
+      .filter(item => item.props.children.toLowerCase().includes(lowerQuery))
+      .sort((a, b) => {
         const valA = a.props.children.toLowerCase()
         const valB = b.props.children.toLowerCase()
 
@@ -91,6 +96,7 @@ const ModalChild = ({ title, filter, children, query, onClose }: ModalChildProps
 
         return valA.localeCompare(valB)
       })
+  }
 
   return (
     <MUIModal open onClose={onClose}>

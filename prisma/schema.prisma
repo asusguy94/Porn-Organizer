@@ -132,7 +132,7 @@ model Video {
   width       Int       @default(0)
   starAge     Int?
   siteID      Int?
-  websiteID   Int?
+  websiteID   Int
   starID      Int?
   thumbnail   Int       @default(100)
   added       DateTime  @default(now()) @db.Date
@@ -141,9 +141,9 @@ model Video {
   apiDateHash String?   @db.Char(32)
   ignoreMeta  Boolean   @default(false)
 
-  site    Site?    @relation(fields: [siteID], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  website Website? @relation(fields: [websiteID], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  star    Star?    @relation(fields: [starID], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  site    Site?   @relation(fields: [siteID], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  website Website @relation(fields: [websiteID], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  star    Star?   @relation(fields: [starID], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   attributes VideoAttributes[]
   locations  VideoLocations[]
