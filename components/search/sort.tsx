@@ -80,21 +80,13 @@ export function getStarSort(sort: SortTypeStar): SortMethodStar {
       sortMethod = (a, b) => a.videoCount - b.videoCount
       break
     case 'score':
-      sortMethod = (a, b) => {
-        return calculateScore(a.websites.length, a.videoCount) - calculateScore(b.websites.length, b.videoCount)
-      }
+      sortMethod = (a, b) => a.score - b.score
       break
     default:
       sortMethod = (a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en')
   }
 
   return sort.reverse ? (a, b) => sortMethod(b, a) : sortMethod
-}
-
-const calculateScore = (websites: number, videos: number) => {
-  const multiplier = 5
-
-  return videos + (websites > 1 ? websites * multiplier : websites)
 }
 
 export default SortObj

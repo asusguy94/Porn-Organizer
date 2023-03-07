@@ -24,6 +24,7 @@ export type StarSearch = {
   breast: string | null
   ethnicity: string | null
   haircolor: string | null
+  score: number
   websites: string[]
   sites: string[]
   videoCount: number
