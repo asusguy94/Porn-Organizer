@@ -88,12 +88,12 @@ const useHls = (
         hls.loadSource(`${serverConfig.api}/video/${video.id}/hls`)
         hls.attachMedia(player.media)
 
-        const onLoad = () => {
-          hls.autoLevelCapping = 1
+        const onLoad: HlsListeners[typeof Hls.Events.MANIFEST_PARSED] = (e, data) => {
+          hls.autoLevelCapping = data.levels.filter(l => l.height >= 1080).length
           hls.startLoad(localBookmark)
         }
 
-        const onError: HlsListeners['hlsError'] = (e, { details }) => {
+        const onError: HlsListeners[typeof Hls.Events.ERROR] = (e, { details }) => {
           if (details === ErrorDetails.MANIFEST_LOAD_ERROR) {
             setFallback(true)
           }
