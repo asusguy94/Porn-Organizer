@@ -36,13 +36,6 @@ import { serverConfig } from '@config'
 
 import styles from './search.module.scss'
 
-type StarData = Partial<{
-  breasts: string[]
-  haircolors: string[]
-  ethnicities: string[]
-  websites: General[]
-}>
-
 const StarSearchPage: NextPage = () => {
   const [sort, setSort] = useState<StarSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
@@ -304,7 +297,7 @@ const FilterItem = ({ data, label, callback, globalCallback, nullCallback }: Fil
 }
 
 type FilterDropdownProps = {
-  data?: StarData['websites']
+  data?: General[]
   label: string
   callback: (e: SelectChangeEvent) => void
 }
