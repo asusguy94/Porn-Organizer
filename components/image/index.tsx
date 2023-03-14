@@ -6,11 +6,11 @@ export const ResponsiveImage = ({ alt, ...other }: NextImageProps & MissingImage
   return <Image style={{ width: '100%', height: 'auto' }} alt={alt} {...other} />
 }
 
-const Image = ({ missing, scale, renderStyle, sizes, ...nextProps }: NextImageProps & MissingImage) => {
+const Image = ({ missing, scale, renderStyle, ...nextProps }: NextImageProps & MissingImage) => {
   if (missing) return <MissingImage scale={scale} renderStyle={renderStyle} />
 
   // Main Image Component
-  return <NextImage sizes={sizes} {...nextProps} />
+  return <NextImage {...nextProps} />
 }
 
 type CardProps = {
