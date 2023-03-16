@@ -107,9 +107,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, update, onModal }: 
               size='small'
               variant='outlined'
               color='primary'
-              style={{
-                left: `${((bookmark.start * 100) / video.duration) * settingsConfig.timeline.offset}%`
-              }}
+              style={{ left: `${((bookmark.start * 100) / video.duration) * settingsConfig.timeline.offset}%` }}
               onClick={() => playVideo(bookmark.start)}
               ref={(bookmark: HTMLButtonElement) => (bookmarksArr[idx] = bookmark)}
               data-level={1}

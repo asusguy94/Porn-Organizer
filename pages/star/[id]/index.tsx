@@ -173,7 +173,7 @@ const StarTitle = ({ star, update, onModal }: StarTitleProps) => {
         <MenuItem
           onClick={() => {
             onModal(
-              'Rename',
+              'Set Slug',
               <TextField
                 variant='outlined'
                 label='Slug'
