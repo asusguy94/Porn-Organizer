@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           path: video.path,
           name: video.title,
           date: getDate(video.date),
-          website: { connect: website }
+          website: { connect: { id: website.id } }
         },
         include: { site: true, website: true }
       })
@@ -44,14 +44,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Create SITE if missing
         const site = await prisma.site.upsert({
           where: { name: video.site },
-          create: { name: video.site, website: { connect: website } },
+          create: { name: video.site, website: { connect: { id: website.id } } },
           update: {}
         })
 
         // Set SITE
         await prisma.video.update({
           where: { id: newVideo.id },
-          data: { site: { connect: site } }
+          data: { site: { connect: { id: site.id } } }
         })
       }
     }

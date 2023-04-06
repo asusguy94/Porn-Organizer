@@ -103,9 +103,22 @@ const WrapperItem = ({ label }: WrapperItemProps) => {
   }
 
   useEffect(() => {
-    axios.get<General[]>(`${serverConfig.api}/${label}`).then(({ data }) => {
-      setData(data.sort((a, b) => a.id - b.id))
-    })
+    const abortController = new AbortController()
+
+    axios
+      .get<General[]>(`${serverConfig.api}/${label}`, {
+        signal: abortController.signal
+      })
+      .then(({ data }) => {
+        setData(data.sort((a, b) => a.id - b.id))
+      })
+      .catch(err => {
+        if (err.name === 'AbortError') {
+          setData([])
+        }
+      })
+
+    return () => abortController.abort()
   }, [label])
 
   return (

@@ -63,6 +63,7 @@ const Videos = ({ hidden, sortMethod }: VideosProps) => {
     if (videos === undefined) return
 
     const map = new Map<string, number>()
+    const allMap = new Map<string, number>()
 
     const initialData = (localWebsites !== null ? [...localWebsites] : []).map(wsite => ({
       ...wsite,
@@ -79,9 +80,14 @@ const Videos = ({ hidden, sortMethod }: VideosProps) => {
             return true
           }
 
-          map.set(v.website, (map.get(v.website) ?? 0) + 1)
+          if (v.categories.length === 0) {
+            map.set(v.website, (map.get(v.website) ?? 0) + 1)
+          }
+          allMap.set(v.website, (allMap.get(v.website) ?? 0) + 1)
 
-          return v.categories.length > 0
+          return false
+
+          // return v.categories.length > 0
         })
         // TODO move this as a toggle to the settings-page
         // also move the label/name to the settings page
@@ -90,7 +96,8 @@ const Videos = ({ hidden, sortMethod }: VideosProps) => {
     )
 
     console.clear()
-    ;[...map].slice(0, 2).forEach(([key, value]) => console.log(key, printWithMax(value, 200)))
+    const selectedMap = [...(map.size > 0 ? map : allMap)]
+    selectedMap.slice(0, 2).forEach(([key, value]) => console.log(key, printWithMax(value, 200)))
   }, [localWebsites, videos, hidden])
 
   if (videos === undefined) return <Spinner />
