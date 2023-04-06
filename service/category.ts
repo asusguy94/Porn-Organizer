@@ -1,9 +1,9 @@
 import { useFetch } from 'usehooks-ts'
 
-import apiUrl from '@utils/client/api'
 import { General } from '@interfaces'
 
-const baseURL = apiUrl('category')
+import { createApi } from '@config'
+const { baseURL } = createApi('/category')
 
 export default {
   useCategories: () => useFetch<General[]>(baseURL)

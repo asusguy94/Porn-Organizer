@@ -1,11 +1,9 @@
-import axios from 'axios'
 import { useFetch } from 'usehooks-ts'
 
-import apiUrl from '@utils/client/api'
 import { Bookmark, General, Performer, VideoStar } from '@interfaces'
 
-const baseURL = apiUrl('video')
-const api = axios.create({ baseURL })
+import { createApi } from '@config'
+const { api, baseURL } = createApi('/video')
 
 const defaultNumber = 0
 export default {

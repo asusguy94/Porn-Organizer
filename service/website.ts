@@ -1,9 +1,9 @@
 import { useFetch } from 'usehooks-ts'
 
-import apiUrl from '@utils/client/api'
 import { WebsiteWithSites } from '@interfaces'
 
-const baseURL = apiUrl('website')
+import { createApi } from '@config'
+const { baseURL } = createApi('/website')
 
 export default {
   useWebsites: () => useFetch<WebsiteWithSites[]>(baseURL)

@@ -1,9 +1,9 @@
 import { useFetch } from 'usehooks-ts'
 
-import apiUrl from '@utils/client/api'
 import type { StarSearch, VideoSearch } from '@components/search/helper'
 
-const baseURL = apiUrl('search')
+import { createApi } from '@config'
+const { baseURL } = createApi('/search')
 
 export default {
   useStars: () => useFetch<StarSearch[]>(`${baseURL}/star`),

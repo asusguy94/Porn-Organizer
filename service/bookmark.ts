@@ -1,10 +1,5 @@
-import axios from 'axios'
-
-import apiUrl from '@utils/client/api'
-
-const api = axios.create({
-  baseURL: apiUrl('bookmark')
-})
+import { createApi } from '@config'
+const { api } = createApi('/bookmark')
 
 export default {
   setTime: (id: number, time: number) => api.put(`/${id}`, { time }),
