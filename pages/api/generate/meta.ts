@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import { prisma } from '@utils/server'
 import { fileExists, rebuildVideoFile, sleep } from '@utils/server/helper'
-import { getDuration as videoDuration, getHeight as videoHeight, getWidth as videoWidth } from 'utils/server/ffmpeg'
+import { getDuration as videoDuration, getHeight as videoHeight, getWidth as videoWidth } from '@utils/server/ffmpeg'
 import { generateStarName } from '@utils/server/generate'
 import { aliasExists, aliasIsIgnored, getAliasAsStar, starExists, starIsIgnored } from '@utils/server/helper.db'
 import { findSceneSlug } from '@utils/server/metadata'

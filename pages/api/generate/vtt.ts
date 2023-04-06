@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next/types'
 
 import { prisma } from '@utils/server'
 import { fileExists } from '@utils/server/helper'
-import { extractVtt } from 'utils/server/ffmpeg'
+import { extractVtt } from '@utils/server/ffmpeg'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {

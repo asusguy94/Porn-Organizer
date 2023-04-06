@@ -23,7 +23,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ).map(video => ({
         id: video.id,
         quality: video.height,
-        date: video.apiDateHash === null || (video.api !== null && video.cover === null) ? null : video.date,
+        date: video.date,
+        invalidDate: video.apiDateHash === null || (video.api !== null && video.cover === null),
         name: video.name,
         image: video.cover ? getResizedThumb(video.id) : null,
         star: video.star?.name ?? null,

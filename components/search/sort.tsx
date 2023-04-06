@@ -42,13 +42,7 @@ export function getVideoSort(sort: SortTypeVideo): SortMethodVideo {
       sortMethod = (a, b) => a.id - b.id
       break
     case 'date':
-      sortMethod = (a, b) => {
-        if (a.date === null && b.date === null) return 0
-        if (a.date === null) return 1
-        if (b.date === null) return -1
-
-        return new Date(a.date).getTime() - new Date(b.date).getTime()
-      }
+      sortMethod = (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
       break
     case 'age':
       sortMethod = (a, b) => a.ageInVideo - b.ageInVideo

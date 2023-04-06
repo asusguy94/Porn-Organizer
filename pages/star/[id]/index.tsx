@@ -517,10 +517,7 @@ const StarInputForm = ({
       setInputValue(value)
     }
 
-    return () => {
-      // reset input value when changing urls
-      setInputValue('')
-    }
+    return () => setInputValue('')
   }, [value])
 
   if (hasDropdown && list === undefined) return <Spinner />

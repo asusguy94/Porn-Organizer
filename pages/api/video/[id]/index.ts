@@ -45,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
 
       let invalid = false
-      if (video.api !== null && video.date !== null) {
+      if (video.api !== null) {
         // check if date has been validated
         if (!(video.apiDateHash !== null && validateHash(formatDate(video.date, true), video.apiDateHash))) {
           try {
@@ -78,7 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
         date: {
           added: formatDate(video.added),
-          published: video.date ? formatDate(video.date) : undefined,
+          published: formatDate(video.date),
           invalid
         },
         duration: video.duration,
@@ -166,7 +166,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         const fileDate = generateDate(video.path)
 
-        if (video.date !== null && isNewDate(video.date, fileDate)) {
+        if (isNewDate(video.date, fileDate)) {
           await prisma.video.update({
             where: { id: parseInt(id) },
             data: { date: getDate(fileDate) }

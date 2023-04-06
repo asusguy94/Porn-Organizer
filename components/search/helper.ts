@@ -36,7 +36,8 @@ export type VideoSearch = {
   ageInVideo: number
   attributes: string[]
   categories: string[]
-  date: string | null
+  date: string
+  invalidDate: boolean
   image: string | null
   locations: string[]
   plays: number
