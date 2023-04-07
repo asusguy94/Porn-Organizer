@@ -1,5 +1,9 @@
 # Porn NextJS
 
+## :warning: Important
+
+The image server is currently broken, I recommend not generating cover-images, deleting all files in `images/videos`, and running `UPDATE VIDEO SET COVER = NULL` on the database to prevent issues. I have disabled the generation logic from the browser, but if you still want to do it, you can clone this repo and revert the last change.
+
 ## Requirements
 
 1. Modern Web Browser

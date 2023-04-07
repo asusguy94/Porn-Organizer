@@ -104,7 +104,8 @@ type HeaderCoverProps = {
 const HeaderCover = ({ video, hidden = false }: HeaderCoverProps) => {
   const router = useRouter()
 
-  const [clicked, setClicked] = useState(false)
+  //FIXME covers-server is broken, so this button is disabled for now, set to false to re-enable
+  const [clicked, setClicked] = useState(true)
 
   const handleClick = () => {
     setClicked(true)
