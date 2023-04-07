@@ -1,4 +1,4 @@
-import type { NextPage } from 'next/types'
+import { NextPage } from 'next/types'
 import { useRouter } from 'next/router'
 import { useState, useRef, useEffect } from 'react'
 

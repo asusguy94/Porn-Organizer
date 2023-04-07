@@ -1,4 +1,4 @@
-import type { NextPage } from 'next/types'
+import { NextPage } from 'next/types'
 import { useEffect, useState } from 'react'
 
 import { Button, Checkbox, FormControlLabel, Grid, List, TextField } from '@mui/material'

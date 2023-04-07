@@ -1,4 +1,4 @@
-import type { NextPage } from 'next/types'
+import { NextPage } from 'next/types'
 import { useState, useEffect } from 'react'
 
 import { Card, CardActionArea, FormControl, Grid, RadioGroup, TextField, Typography } from '@mui/material'

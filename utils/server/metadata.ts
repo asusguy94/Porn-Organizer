@@ -4,7 +4,7 @@ import { fixUrl, toCamelCase } from './helper'
 import { getUnique } from '../shared'
 
 import { settingsConfig } from '@config'
-import type { Extra, Gender, Performer } from '@interfaces'
+import { Extra, Gender, Performer } from '@interfaces'
 
 type BasicModel = {
   data: {
