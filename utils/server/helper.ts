@@ -300,8 +300,6 @@ export const sleep = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-export const fixUrl = (url: string) => url
-
 // Indetity Hashing
 export const generateHash = (str: string) => crypto.MD5(str).toString()
 export const validateHash = (str: string, hash: string) => generateHash(str) === hash
