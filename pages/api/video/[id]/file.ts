@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import { prisma } from '@utils/server'
-import { sendFile } from '@utils/server/helper'
+import { sendPartial } from '@utils/server/helper'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where: { id: parseInt(id) }
       })
 
-      await sendFile(res, `./media/videos/${video.path}`)
+      await sendPartial(req, res, `./media/videos/${video.path}`)
     }
   }
 

@@ -1,4 +1,4 @@
-import { NextApiResponse } from 'next/types'
+import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import fs from 'fs'
 import path from 'path'
@@ -294,6 +294,40 @@ export const sendFile = async (res: NextApiResponse, path: string) => {
 
   res.writeHead(200)
   fs.createReadStream(path).pipe(res)
+}
+
+export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, path: string, mb = 2) => {
+  const chunkSize = 1024 * 1024 * mb
+
+  if (!(await fileExists(path))) {
+    const { isVideo } = getFileType(path)
+
+    if (isVideo) {
+      path = './public/video.mp4'
+    } else {
+      res.status(404).end()
+      return
+    }
+  }
+
+  fs.stat(path, (err, data) => {
+    if (err) {
+      throw err
+    }
+
+    // extract start and end / empty
+    const ranges = req.headers.range?.match(/^bytes=(\d+)-/)?.slice(1)
+    const start = parseInt(ranges?.[0] ?? '0')
+    const end = Math.min(start + chunkSize, data.size - 1)
+
+    res.writeHead(206, {
+      'Accept-Ranges': 'bytes',
+      'Content-Range': `bytes ${start}-${end}/${data.size}`,
+      'Content-Length': end - start + 1
+    })
+
+    fs.createReadStream(path, { start, end }).pipe(res)
+  })
 }
 
 export const sleep = (ms: number): Promise<void> => {
