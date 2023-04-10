@@ -7,5 +7,5 @@ const { api, baseURL } = createApi('/attribute')
 
 export default {
   useAttributes: () => useFetch<General[]>(baseURL),
-  removeVideo: (videoID: number, attributeID: number) => api.delete(`${baseURL}/${videoID}/${attributeID}`)
+  removeVideo: (videoID: number, attributeID: number) => api.delete(`/${videoID}/${attributeID}`)
 }
