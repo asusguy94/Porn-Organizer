@@ -71,7 +71,7 @@ const VideoPage: NextPage = () => {
         modalData={modal}
       />
 
-      <Grid item xs={2} id={styles.sidebar}>
+      <Grid item xs={2} id={styles.sidebar} component='aside'>
         <div id={styles.stars}>
           {star !== undefined ? (
             video !== undefined && (
@@ -135,7 +135,7 @@ const Section = ({
   if (video === undefined) return <Spinner />
 
   return (
-    <Grid item xs={10}>
+    <Grid item xs={10} component='section'>
       <Header video={video} locations={locations} attributes={attributes} update={update.video} onModal={onModal} />
 
       <VideoPlayer
