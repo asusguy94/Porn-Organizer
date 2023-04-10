@@ -27,7 +27,7 @@ const SortObj = ({ id, label, callback, reversed = false }: SortObjProps) => (
   </>
 )
 
-type Sort<T extends string> = { type: T; reverse: boolean }
+type Sort<T extends string> = { type: T; reverse?: boolean }
 
 export type SortTypeVideo = Sort<'alphabetically' | 'added' | 'date' | 'age' | 'plays' | 'title-length'>
 export type SortTypeStar = Sort<'alphabetically' | 'added' | 'age' | 'videos' | 'score'>

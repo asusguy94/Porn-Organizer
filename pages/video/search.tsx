@@ -72,7 +72,7 @@ const Videos = ({ hidden, sortMethod }: VideosProps) => {
 
     setFiltered(
       videos
-        .sort(getVideoSort({ type: 'date', reverse: false }))
+        .sort(getVideoSort({ type: 'date' }))
         .filter(v => {
           const website = initialData.find(wsite => wsite.label === v.website)
 
