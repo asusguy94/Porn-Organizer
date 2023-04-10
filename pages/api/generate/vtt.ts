@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import { prisma } from '@utils/server'
+import prisma from '@utils/server/prisma'
 import { fileExists } from '@utils/server/helper'
 import { extractVtt } from '@utils/server/ffmpeg'
 

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import { prisma } from '@utils/server'
+import prisma from '@utils/server/prisma'
 import { fileExists, rebuildVideoFile, sleep } from '@utils/server/helper'
 import { getDuration as videoDuration, getHeight as videoHeight, getWidth as videoWidth } from '@utils/server/ffmpeg'
 import { generateStarName } from '@utils/server/generate'

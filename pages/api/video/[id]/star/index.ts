@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import { prisma } from '@utils/server'
+import prisma from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 import { dateDiff } from '@utils/server/helper'
 import { aliasExists, getAliasAsStar } from '@utils/server/helper.db'

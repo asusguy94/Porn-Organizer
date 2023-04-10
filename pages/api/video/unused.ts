@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import fs from 'fs'
 
-import { prisma } from '@utils/server'
+import prisma from '@utils/server/prisma'
 import { fileExists } from '@utils/server/helper'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

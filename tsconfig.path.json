@@ -9,7 +9,6 @@
       "@styles/*": ["./styles/*"],
       "@utils/shared": ["./utils/shared"],
       "@utils/client/*": ["./utils/client/*"],
-      "@utils/server": ["./utils/server"],
       "@utils/server/*": ["./utils/server/*"],
       "@hooks/*": ["./hooks/*"],
       "@interfaces": ["./interfaces"]

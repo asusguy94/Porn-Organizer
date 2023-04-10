@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import capitalize from 'capitalize'
 
-import { prisma } from '@utils/server'
+import prisma from '@utils/server/prisma'
 import { formatBreastSize, getDate } from '@utils/server/helper'
 import { getStarData, getStarSlug } from '@utils/server/metadata'
 import { printError } from '@utils/shared'
