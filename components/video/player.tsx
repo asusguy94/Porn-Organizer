@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Button, Card, List, ListItem, TextField } from '@mui/material'
 
 import Hls, { ErrorDetails, HlsConfig, HlsListeners } from 'hls.js'
-import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
+import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import { useSessionStorage } from 'usehooks-ts'
 import { useKey } from 'react-use'
 
@@ -252,7 +252,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
 
   return (
     <div onWheel={handleWheel}>
-      <ContextMenuTrigger id='video' holdToDisplay={-1}>
+      <ContextMenuTrigger id='video'>
         <Plyr
           plyrRef={plyrRef}
           source={`${serverConfig.api}/video/${video.id}/file`}
@@ -286,7 +286,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
           <Icon code='add' /> Add Bookmark
         </MenuItem>
 
-        <MenuItem divider />
+        <hr />
 
         <MenuItem
           onClick={() => {
@@ -316,7 +316,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
           <Icon code='add' /> Get Star Info
         </MenuItem>
 
-        <MenuItem divider />
+        <hr />
 
         <MenuItem disabled={!bookmarks.length} onClick={clearBookmarks}>
           <Icon code='trash' /> Remove Bookmarks

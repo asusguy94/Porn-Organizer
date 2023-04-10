@@ -16,7 +16,7 @@ import {
   ImageListItem
 } from '@mui/material'
 
-import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
+import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import { Flipper, Flipped } from 'react-flip-toolkit'
 import { useCopyToClipboard } from 'usehooks-ts'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
@@ -141,7 +141,7 @@ const StarTitle = ({ star, update, onModal }: StarTitleProps) => {
   return (
     <div>
       <div className='d-inline-block'>
-        <ContextMenuTrigger id='title' holdToDisplay={-1}>
+        <ContextMenuTrigger id='title'>
           <h2 id={star.ignored ? styles.ignored : ''}>{star.name}</h2>
         </ContextMenuTrigger>
       </div>
@@ -204,7 +204,7 @@ const StarTitle = ({ star, update, onModal }: StarTitleProps) => {
           )}
         </MenuItem>
 
-        <MenuItem divider />
+        <hr />
 
         <MenuItem onClick={() => void copy()}>
           <Icon code='copy' /> Copy Star

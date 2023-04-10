@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { Grid, Card, Typography, TextField } from '@mui/material'
 
-import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
+import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 
 import { ImageCard } from '@components/image'
 import ModalComponent, { useModal, type ModalHandler, type Modal } from '@components/modal'

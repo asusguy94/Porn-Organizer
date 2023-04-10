@@ -3,7 +3,7 @@ import { Fragment, useState } from 'react'
 
 import { Button, Grid, TextField, Typography } from '@mui/material'
 
-import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
+import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import { useCopyToClipboard } from 'usehooks-ts'
 
 import Icon from '../icon'
@@ -145,7 +145,7 @@ const HeaderLocations = ({ video, update }: HeaderLocationsProps) => {
         .sort((a, b) => a.name.localeCompare(b.name))
         .map(item => (
           <Fragment key={item.id}>
-            <ContextMenuTrigger id={`location-${item.id}`} renderTag='span'>
+            <ContextMenuTrigger id={`location-${item.id}`} className='d-inline-block'>
               <Button size='small' variant='outlined' color='secondary'>
                 <Icon code='map' />
                 {item.name}
@@ -180,7 +180,7 @@ const HeaderAttributes = ({ video, update }: HeaderAttributesProps) => {
         .sort((a, b) => a.name.localeCompare(b.name))
         .map(item => (
           <Fragment key={item.id}>
-            <ContextMenuTrigger id={`attribute-${item.id}`} renderTag='span'>
+            <ContextMenuTrigger id={`attribute-${item.id}`} className='d-inline-block'>
               <Button size='small' variant='outlined' color='primary'>
                 <Icon code='tag' />
                 {item.name}
@@ -212,7 +212,7 @@ const HeaderDate = ({ video }: HeaderDateProps) => {
 
   return (
     <>
-      <ContextMenuTrigger id='menu__date' renderTag='span'>
+      <ContextMenuTrigger id='menu__date' className='d-inline-block'>
         <Button size='small' variant='outlined' id={styles.date}>
           <Icon code='calendar' />
           {video.date.invalid ? 'INVALID_DATE' : video.date.published}

@@ -2,6 +2,7 @@
   "name": "pornts-next",
   "version": "0.1.0",
   "license": "MIT",
+  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -36,8 +37,8 @@
     "node-fetch": "^3.3.1",
     "plyr": "^3.7.8",
     "prisma": "^4.12.0",
+    "rctx-contextmenu": "^1.4.1",
     "react": "18.2.0",
-    "react-contextmenu": "^2.14.0",
     "react-dom": "18.2.0",
     "react-flip-toolkit": "^7.0.17",
     "react-lazy-load-image-component": "^1.5.6",

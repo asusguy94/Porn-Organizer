@@ -2,7 +2,7 @@ import { Fragment, useEffect } from 'react'
 
 import { Button, Grid } from '@mui/material'
 
-import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
+import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import { useWindowSize } from 'usehooks-ts'
 
 import Icon from '../icon'
@@ -147,7 +147,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, update, onModal }: 
               <Icon code='clock' /> Change Time
             </MenuItem>
 
-            <MenuItem divider />
+            <hr />
 
             <MenuItem onClick={() => removeBookmark(bookmark)}>
               <Icon code='trash' /> Delete
