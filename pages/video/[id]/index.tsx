@@ -11,7 +11,7 @@ import ModalComponent, { useModal, type ModalHandler, type Modal } from '@compon
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Badge from '@components/badge'
 import { Header, Player as VideoPlayer, Timeline } from '@components/video'
-import Icon from '@components/icon'
+import { IconWithText } from '@components/icon'
 import Link from '@components/link'
 import Spinner from '@components/spinner'
 import { PlyrWithMetadata } from '@components/plyr'
@@ -201,9 +201,7 @@ const Star = ({ star, video, update }: StarProps) => {
       </RibbonContainer>
 
       <ContextMenu id='star'>
-        <MenuItem onClick={removeStarHandler}>
-          <Icon code='trash' /> Remove
-        </MenuItem>
+        <IconWithText component={MenuItem} icon='delete' text='Remove' onClick={removeStarHandler} />
       </ContextMenu>
     </div>
   )

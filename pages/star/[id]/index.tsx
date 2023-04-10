@@ -26,7 +26,7 @@ import Link from '@components/link'
 import ModalComponent, { type ModalHandler, useModal } from '@components/modal'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Dropbox from '@components/dropbox'
-import Icon from '@components/icon'
+import { IconWithText } from '@components/icon'
 
 import { daysToYears } from '@utils/client/date-time'
 import { getUnique } from '@utils/shared'
@@ -147,7 +147,10 @@ const StarTitle = ({ star, update, onModal }: StarTitleProps) => {
       </div>
 
       <ContextMenu id='title'>
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='edit'
+          text='Rename'
           onClick={() => {
             onModal(
               'Rename',
@@ -166,11 +169,12 @@ const StarTitle = ({ star, update, onModal }: StarTitleProps) => {
               />
             )
           }}
-        >
-          <Icon code='edit' /> Rename
-        </MenuItem>
+        />
 
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='edit'
+          text='Set Slug'
           onClick={() => {
             onModal(
               'Set Slug',
@@ -188,27 +192,18 @@ const StarTitle = ({ star, update, onModal }: StarTitleProps) => {
               />
             )
           }}
-        >
-          <Icon code='edit' /> Set Slug
-        </MenuItem>
+        />
 
-        <MenuItem onClick={ignoreStar}>
-          {star.ignored ? (
-            <>
-              <Icon code='toggle-yes' /> Enable Star
-            </>
-          ) : (
-            <>
-              <Icon code='toggle-no' /> Ignore Star
-            </>
-          )}
-        </MenuItem>
+        <IconWithText
+          component={MenuItem}
+          icon={star.ignored ? 'toggle-yes' : 'toggle-no'}
+          text={star.ignored ? 'Enable Star' : 'Ignore Star'}
+          onClick={ignoreStar}
+        />
 
         <hr />
 
-        <MenuItem onClick={() => void copy()}>
-          <Icon code='copy' /> Copy Star
-        </MenuItem>
+        <IconWithText component={MenuItem} icon='copy' text='Copy Star' onClick={() => void copy()} />
       </ContextMenu>
     </div>
   )
@@ -325,9 +320,7 @@ const StarImageDropbox = ({ star, update, onModal }: StarImageDropboxProps) => {
           </ContextMenuTrigger>
 
           <ContextMenu id='star__image'>
-            <MenuItem onClick={removeImage}>
-              <Icon code='trash' /> Delete Image
-            </MenuItem>
+            <IconWithText component={MenuItem} icon='delete' text='Delete Image' onClick={removeImage} />
           </ContextMenu>
         </>
       ) : (
@@ -337,9 +330,7 @@ const StarImageDropbox = ({ star, update, onModal }: StarImageDropboxProps) => {
           </ContextMenuTrigger>
 
           <ContextMenu id='star__dropbox'>
-            <MenuItem onClick={removeStar}>
-              <Icon code='trash' /> Remove Star
-            </MenuItem>
+            <IconWithText component={MenuItem} icon='delete' text='Remove Star' onClick={removeStar} />
           </ContextMenu>
         </>
       )}

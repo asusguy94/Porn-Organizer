@@ -5,7 +5,7 @@ import { Button, Grid } from '@mui/material'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import { useWindowSize } from 'usehooks-ts'
 
-import Icon from '../icon'
+import { IconWithText } from '../icon'
 import type { ModalHandler } from '../modal'
 import Spinner from '../spinner'
 
@@ -117,7 +117,10 @@ const Timeline = ({ bookmarks, video, playVideo, categories, update, onModal }: 
           </ContextMenuTrigger>
 
           <ContextMenu id={`bookmark-${bookmark.start}`}>
-            <MenuItem
+            <IconWithText
+              component={MenuItem}
+              icon='edit'
+              text='Change Category'
               onClick={() => {
                 onModal(
                   'Change Category',
@@ -139,19 +142,13 @@ const Timeline = ({ bookmarks, video, playVideo, categories, update, onModal }: 
                   true
                 )
               }}
-            >
-              <Icon code='edit' /> Change Category
-            </MenuItem>
+            />
 
-            <MenuItem onClick={() => setTime(bookmark)}>
-              <Icon code='clock' /> Change Time
-            </MenuItem>
+            <IconWithText component={MenuItem} icon='time' text='Change Time' onClick={() => setTime(bookmark)} />
 
             <hr />
 
-            <MenuItem onClick={() => removeBookmark(bookmark)}>
-              <Icon code='trash' /> Delete
-            </MenuItem>
+            <IconWithText component={MenuItem} icon='delete' text='Delete' onClick={() => removeBookmark(bookmark)} />
           </ContextMenu>
         </Fragment>
       ))}

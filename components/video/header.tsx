@@ -6,7 +6,7 @@ import { Button, Grid, TextField, Typography } from '@mui/material'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import { useCopyToClipboard } from 'usehooks-ts'
 
-import Icon from '../icon'
+import Icon, { IconWithText } from '../icon'
 import type { ModalHandler } from '../modal'
 import Spinner from '../spinner'
 
@@ -24,8 +24,8 @@ type HeaderProps = {
   onModal: ModalHandler
 }
 const Header = ({ video, attributes, locations, update, onModal }: HeaderProps) => (
-  <Grid container component='header' id={styles.header}>
-    <Grid item>
+  <Grid container>
+    <Grid container item alignItems='center' component='header' id={styles.header}>
       <HeaderTitle video={video} attributes={attributes} locations={locations} update={update} onModal={onModal} />
 
       <HeaderSlug video={video} hidden={video.slug !== null} onModal={onModal} />
@@ -35,7 +35,6 @@ const Header = ({ video, attributes, locations, update, onModal }: HeaderProps) 
 
       <HeaderLocations video={video} update={update} />
       <HeaderAttributes video={video} update={update} />
-
       <HeaderSite video={video} />
     </Grid>
   </Grid>
@@ -45,7 +44,7 @@ type HeaderSiteProps = {
   video: Video
 }
 const HeaderSite = ({ video }: HeaderSiteProps) => (
-  <div id={styles.site}>
+  <Grid item xs={12} id={styles.site}>
     <span id={styles.wsite}>{video.website}</span>
     {video.subsite && (
       <>
@@ -53,7 +52,7 @@ const HeaderSite = ({ video }: HeaderSiteProps) => (
         <span id={styles.site}>{video.subsite}</span>
       </>
     )}
-  </div>
+  </Grid>
 )
 
 type HeaderSlugProps = {
@@ -140,7 +139,7 @@ const HeaderLocations = ({ video, update }: HeaderLocationsProps) => {
   }
 
   return (
-    <div id={styles.locations}>
+    <>
       {video.locations
         .sort((a, b) => a.name.localeCompare(b.name))
         .map(item => (
@@ -153,13 +152,11 @@ const HeaderLocations = ({ video, update }: HeaderLocationsProps) => {
             </ContextMenuTrigger>
 
             <ContextMenu id={`location-${item.id}`}>
-              <MenuItem onClick={() => removeLocation(item)}>
-                <Icon code='trash' /> Remove
-              </MenuItem>
+              <IconWithText component={MenuItem} icon='delete' text='Remove' onClick={() => removeLocation(item)} />
             </ContextMenu>
           </Fragment>
         ))}
-    </div>
+    </>
   )
 }
 
@@ -175,7 +172,7 @@ const HeaderAttributes = ({ video, update }: HeaderAttributesProps) => {
   }
 
   return (
-    <div id={styles.attributes}>
+    <>
       {video.attributes
         .sort((a, b) => a.name.localeCompare(b.name))
         .map(item => (
@@ -188,13 +185,11 @@ const HeaderAttributes = ({ video, update }: HeaderAttributesProps) => {
             </ContextMenuTrigger>
 
             <ContextMenu id={`attribute-${item.id}`}>
-              <MenuItem onClick={() => removeAttribute(item)}>
-                <Icon code='trash' /> Remove
-              </MenuItem>
+              <IconWithText component={MenuItem} icon='delete' text='Remove' onClick={() => removeAttribute(item)} />
             </ContextMenu>
           </Fragment>
         ))}
-    </div>
+    </>
   )
 }
 
@@ -213,16 +208,14 @@ const HeaderDate = ({ video }: HeaderDateProps) => {
   return (
     <>
       <ContextMenuTrigger id='menu__date' className='d-inline-block'>
-        <Button size='small' variant='outlined' id={styles.date}>
+        <Button size='small' variant='outlined'>
           <Icon code='calendar' />
           {video.date.invalid ? 'INVALID_DATE' : video.date.published}
         </Button>
       </ContextMenuTrigger>
 
       <ContextMenu id='menu__date'>
-        <MenuItem onClick={() => fixDate()}>
-          <Icon code='sync' /> Refresh Date
-        </MenuItem>
+        <IconWithText component={MenuItem} icon='sync' text='Refresh Date' onClick={() => fixDate()} />
       </ContextMenu>
     </>
   )
@@ -265,13 +258,16 @@ const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTi
   if (attributes === undefined || locations === undefined) return <Spinner />
 
   return (
-    <Typography variant='h4' id={styles.title}>
+    <Typography variant='h4'>
       <div className='d-inline-block'>
         <ContextMenuTrigger id='title'>{video.name}</ContextMenuTrigger>
       </div>
 
       <ContextMenu id='title'>
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='edit'
+          text='Rename Title'
           onClick={() => {
             onModal(
               'Change Title',
@@ -291,11 +287,12 @@ const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTi
               />
             )
           }}
-        >
-          <Icon code='edit' /> Rename Title
-        </MenuItem>
+        />
 
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='add'
+          text='Add Attribute'
           onClick={() => {
             onModal(
               'Add Attribute',
@@ -317,11 +314,12 @@ const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTi
               true
             )
           }}
-        >
-          <Icon code='tag' /> Add Attribute
-        </MenuItem>
+        />
 
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='add'
+          text='Add Location'
           onClick={() => {
             onModal(
               'Add Location',
@@ -348,19 +346,12 @@ const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTi
               true
             )
           }}
-        >
-          <Icon code='map' /> Add Location
-        </MenuItem>
+        />
 
-        <MenuItem divider />
+        <hr />
 
-        <MenuItem onClick={() => void copyTitle()}>
-          <Icon code='copy' /> Copy Title
-        </MenuItem>
-
-        <MenuItem onClick={() => void copyStar()}>
-          <Icon code='user' /> Copy Star
-        </MenuItem>
+        <IconWithText component={MenuItem} icon='copy' text='Copy Title' onClick={() => void copyTitle()} />
+        <IconWithText component={MenuItem} icon='person' text='Copy Star' onClick={() => void copyStar()} />
       </ContextMenu>
     </Typography>
   )

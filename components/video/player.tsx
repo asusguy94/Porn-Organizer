@@ -9,7 +9,7 @@ import { useSessionStorage } from 'usehooks-ts'
 import { useKey } from 'react-use'
 
 import Plyr, { PlyrWithMetadata } from '../plyr'
-import Icon from '../icon'
+import { IconWithText } from '../icon'
 import type { ModalHandler, Modal } from '../modal'
 import Spinner from '../spinner'
 
@@ -262,7 +262,10 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
       </ContextMenuTrigger>
 
       <ContextMenu id='video'>
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='add'
+          text='Add Bookmark'
           onClick={() => {
             onModal(
               'Add Bookmark',
@@ -282,13 +285,14 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
               true
             )
           }}
-        >
-          <Icon code='add' /> Add Bookmark
-        </MenuItem>
+        />
 
         <hr />
 
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='edit'
+          text='Rename File'
           onClick={() => {
             onModal(
               'Rename Video',
@@ -308,27 +312,35 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
               />
             )
           }}
-        >
-          <Icon code='edit' /> Rename File
-        </MenuItem>
+        />
 
-        <MenuItem onClick={getStarInfo} disabled={video.slug === null}>
-          <Icon code='add' /> Get Star Info
-        </MenuItem>
+        <IconWithText
+          component={MenuItem}
+          icon='add'
+          text='Get Star Info'
+          onClick={getStarInfo}
+          disabled={video.slug === null}
+        />
 
         <hr />
 
-        <MenuItem disabled={!bookmarks.length} onClick={clearBookmarks}>
-          <Icon code='trash' /> Remove Bookmarks
-        </MenuItem>
+        <IconWithText
+          component={MenuItem}
+          icon='delete'
+          text='Remove Bookmarks'
+          disabled={!bookmarks.length}
+          onClick={clearBookmarks}
+        />
 
-        <MenuItem onClick={() => resetPlays()}>
-          <Icon code='trash' /> Remove Plays
-        </MenuItem>
+        <IconWithText component={MenuItem} icon='delete' text='Remove Plays' onClick={() => resetPlays()} />
 
-        <MenuItem disabled={star !== null || bookmarks.length > 0} onClick={deleteVideo}>
-          <Icon code='trash' /> Remove Video
-        </MenuItem>
+        <IconWithText
+          component={MenuItem}
+          icon='delete'
+          text='Remove Video'
+          disabled={star !== null || bookmarks.length > 0}
+          onClick={deleteVideo}
+        />
       </ContextMenu>
     </div>
   )

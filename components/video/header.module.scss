@@ -1,24 +1,7 @@
+$spacing: 5px;
+
 #header {
   margin-bottom: 15px;
-
-  #title {
-    vertical-align: middle;
-  }
-
-  #title,
-  #locations,
-  #attributes {
-    display: inline-block;
-  }
-
-  #site {
-    color: green;
-    font-weight: 700;
-
-    #wsite {
-      color: red;
-    }
-  }
 
   button {
     &:not([disabled]) {
@@ -27,9 +10,17 @@
 
     margin-left: 15px;
 
-    i,
     svg {
-      margin-right: 5px !important;
+      margin-right: $spacing !important;
     }
+  }
+}
+
+#site {
+  color: green;
+  font-weight: 700;
+
+  #wsite {
+    color: red;
   }
 }
