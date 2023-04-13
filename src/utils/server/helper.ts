@@ -278,6 +278,10 @@ const getFileType = (path: string): { isVideo: boolean; isImage: boolean } => {
   return { isVideo, isImage }
 }
 
+const setCache = (res: NextApiResponse, ageInSeconds: number) => {
+  res.setHeader('Cache-Control', `public, max-age=${ageInSeconds}`)
+}
+
 export const sendFile = async (res: NextApiResponse, path: string) => {
   if (!(await fileExists(path))) {
     const { isImage, isVideo } = getFileType(path)
@@ -292,6 +296,7 @@ export const sendFile = async (res: NextApiResponse, path: string) => {
     }
   }
 
+  setCache(res, 1) // set cahce-control to 1 second
   res.writeHead(200)
   fs.createReadStream(path).pipe(res)
 }

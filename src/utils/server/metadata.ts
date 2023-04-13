@@ -30,7 +30,7 @@ type BasicModel = {
 
 const config: AxiosRequestConfig = {
   headers: { Authorization: `Bearer ${settingsConfig.THEPORNDB_API}` },
-  timeout: 2 * 1000 // 2 seconds timeout
+  timeout: 5 * 1000 // 5 seconds timeout
 }
 
 const SERVER_ERROR = 'Server might be down'
@@ -136,8 +136,7 @@ export const getSceneData = async (slug: string) => {
       id: result.data.id,
       title: result.data.title,
       date: result.data.date,
-      // image: fixUrl(result.data.image),
-      image: result.data.background.large,
+      image: result.data.background.full, // large is larger, but currently generates white background
       performers: result.data.performers
         .filter(({ extra: { gender } }) => gender === 'Female')
         .map(performer => ({

@@ -192,11 +192,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               if (!(await fileExists(`./media/${imagePath}`))) {
                 console.log(`Generating HIGHRES ${video.id}`)
                 await downloader(image, `media/${imagePath}`, 'URL')
+
+                // upscale image to w=1920
+                await resizeImage(`./media/${imagePath}`, settingsConfig.IMAGE_RES)
               }
 
-              console.log(`Generating LOWRES ${video.id}`)
-              await downloader(`media/${imagePath}`, `media/${imagePath_low}`, 'FILE') // copy file
-              resizeImage(`./media/${imagePath_low}`, settingsConfig.THUMB_RES)
+              {
+                console.log(`Generating LOWRES ${video.id}`)
+                await downloader(`media/${imagePath}`, `media/${imagePath_low}`, 'FILE') // copy file
+
+                // downscale image to w=290
+                await resizeImage(`./media/${imagePath_low}`, settingsConfig.THUMB_RES)
+              }
 
               await prisma.video.update({ where: { id: video.id }, data: { cover: `${video.id}.jpg` } })
             }

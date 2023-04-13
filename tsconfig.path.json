@@ -1,17 +1,15 @@
 {
   "compilerOptions": {
     "paths": {
-      "@api": ["./api"],
-      "@service": ["./service"],
-      "@components/*": ["./components/*"],
-      "@config": ["./config"],
-      "@pages/*": ["./pages/*"],
-      "@styles/*": ["./styles/*"],
-      "@utils/shared": ["./utils/shared"],
-      "@utils/client/*": ["./utils/client/*"],
-      "@utils/server/*": ["./utils/server/*"],
-      "@hooks/*": ["./hooks/*"],
-      "@interfaces": ["./interfaces"]
+      "@service": ["./src/service"],
+      "@components/*": ["./src/components/*"],
+      "@config": ["./src/config"],
+      "@pages/*": ["./src/pages/*"],
+      "@styles/*": ["./src/styles/*"],
+      "@utils/shared": ["./src/utils/shared"],
+      "@utils/client/*": ["./src/utils/client/*"],
+      "@utils/server/*": ["./src/utils/server/*"],
+      "@interfaces": ["./src/interfaces"]
     }
   }
 }

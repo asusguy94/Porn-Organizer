@@ -17,6 +17,7 @@ export default {
     thumbnails: getValue('NEXT_PUBLIC_PLAYER_THUMBNAILS', 'false') === 'true'
   },
   THUMB_RES: parseInt(process.env.THUMBNAIL_RES ?? '290'),
+  IMAGE_RES: parseInt(process.env.IMAGE_RES ?? '1920'),
   THEPORNDB_API: process.env.THEPORNDB_API ?? '',
   userAction: {
     thumbnail: {
