@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { Button, Card, List, ListItem, TextField } from '@mui/material'
 
-import Hls, { ErrorDetails, HlsConfig, HlsListeners } from 'hls.js'
+import Hls, { HlsConfig, HlsListeners } from 'hls.js'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import { useSessionStorage } from 'usehooks-ts'
 import { useKey } from 'react-use'
@@ -93,8 +93,10 @@ const useHls = (
           hls.startLoad(localBookmark)
         }
 
-        const onError: HlsListeners[typeof Hls.Events.ERROR] = (e, { details }) => {
-          if (details === ErrorDetails.MANIFEST_LOAD_ERROR) {
+        const onError: HlsListeners[typeof Hls.Events.ERROR] = (e, data) => {
+          if (data.fatal) {
+            hls.off(Hls.Events.ERROR, onError)
+            hls.off(Hls.Events.MANIFEST_PARSED, onLoad)
             setFallback(true)
           }
         }
