@@ -28,9 +28,14 @@ type BasicModel = {
 
 //TODO Check if title.toLowerCase() matches videodata.title.toLowercase()
 
-const config: AxiosRequestConfig = {
-  headers: { Authorization: `Bearer ${settingsConfig.THEPORNDB_API}` },
-  timeout: 5 * 1000 // 5 seconds timeout
+const createConfig = (longTimeout = false): AxiosRequestConfig => {
+  const TIMEOUT_DEFAULT = 5
+  const TIMEOUT_LONG = 20
+
+  return {
+    headers: { Authorization: `Bearer ${settingsConfig.THEPORNDB_API}` },
+    timeout: (longTimeout ? TIMEOUT_LONG : TIMEOUT_DEFAULT) * 1000
+  }
 }
 
 const SERVER_ERROR = 'Server might be down'
@@ -48,7 +53,7 @@ export const getSceneSlug = async (slug: string): Promise<string> => {
 
   const url = getUrl(`/scenes/${slug}`)
 
-  const result = (await axios.get<Scene>(url.href, config)).data
+  const result = (await axios.get<Scene>(url.href, createConfig())).data
 
   // TODO find out if this ever throws?
   return Promise.resolve(result.data.id)
@@ -72,7 +77,7 @@ export async function findSceneSlug(videoStar: string, videoTitle: string, siteO
   // can site-param be used?
   url.searchParams.set('limit', '2')
 
-  const result = (await axios.get<Scene>(url.href, config)).data
+  const result = (await axios.get<Scene>(url.href, createConfig())).data
   return new Promise((resolve, reject) => {
     if (result.data.length > 1) {
       // CHECK THE FOLLOWING
@@ -102,7 +107,7 @@ export const getStarSlug = async (star: string): Promise<string> => {
   const url = getUrl('/performers')
   url.searchParams.set('q', star)
 
-  const result = (await axios.get<BasicModel>(url.href, config)).data
+  const result = (await axios.get<BasicModel>(url.href, createConfig())).data
 
   let data = result.data.filter(s => s.extras.gender === 'Female')
   if (data.length > 1) data = data.filter(s => s.posters.length > 0)
@@ -111,7 +116,7 @@ export const getStarSlug = async (star: string): Promise<string> => {
   return data[0].id
 }
 
-export const getSceneData = async (slug: string) => {
+export const getSceneData = async (slug: string, longTimeout = false) => {
   type Scene = {
     data: {
       id: string
@@ -130,7 +135,7 @@ export const getSceneData = async (slug: string) => {
 
   try {
     const url = getUrl(`/scenes/${slug}`)
-    const result = (await axios.get<Scene>(url.href, config)).data
+    const result = (await axios.get<Scene>(url.href, createConfig(longTimeout))).data
 
     return {
       id: result.data.id,
@@ -193,7 +198,7 @@ export const getStarData = async (slug: string) => {
 
   try {
     const url = getUrl(`/performers/${slug}`)
-    const result = (await axios.get<Data>(url.href, config)).data
+    const result = (await axios.get<Data>(url.href, createConfig())).data
 
     return {
       cupsize: result.data.extras.cupsize ? getCupSize(result.data.extras.cupsize) : null,

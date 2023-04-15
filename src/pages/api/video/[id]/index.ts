@@ -183,7 +183,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         if (video.api) {
           try {
-            const { image } = await getSceneData(video.api)
+            const { image } = await getSceneData(video.api, true)
             if (image) {
               const imagePath = `images/videos/${video.id}.jpg`
               const imagePath_low = `images/videos/${video.id}-${settingsConfig.THUMB_RES}.jpg`
