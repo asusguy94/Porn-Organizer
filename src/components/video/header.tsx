@@ -317,7 +317,7 @@ const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTi
 
         <IconWithText
           component={MenuItem}
-          icon='add'
+          icon='add-map'
           text='Add Location'
           onClick={() => {
             onModal(

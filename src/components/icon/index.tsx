@@ -1,6 +1,7 @@
 import { Grid, SvgIconTypeMap } from '@mui/material'
 import {
   AccessTimeOutlined,
+  AddLocationAltOutlined,
   AddOutlined,
   BlockOutlined,
   BorderColorOutlined,
@@ -8,29 +9,20 @@ import {
   ContentCopyOutlined,
   DeleteOutline,
   EventAvailableOutlined,
+  LocationOnOutlined,
   PersonOutline,
-  RoomOutlined,
   SellOutlined,
   SlideshowOutlined,
   SyncOutlined
 } from '@mui/icons-material'
 import { ContextMenuItem } from 'rctx-contextmenu'
 
+type Toggle = 'toggle-no' | 'toggle-yes'
+type Map = 'map' | 'add-map'
+type Basic = 'add' | 'edit' | 'delete'
+
 type IconProps = Omit<SvgIconTypeMap['props'], 'children'> & {
-  code:
-    | 'edit'
-    | 'add'
-    | 'toggle-no'
-    | 'toggle-yes'
-    | 'delete'
-    | 'copy'
-    | 'time'
-    | 'calendar'
-    | 'film'
-    | 'map'
-    | 'tag'
-    | 'person'
-    | 'sync'
+  code: Basic | Toggle | Map | 'copy' | 'time' | 'calendar' | 'film' | 'tag' | 'person' | 'sync'
   style?: React.CSSProperties
 }
 export const Icon = ({ code, ...other }: IconProps) => {
@@ -54,7 +46,9 @@ export const Icon = ({ code, ...other }: IconProps) => {
     case 'film':
       return <SlideshowOutlined {...other} />
     case 'map':
-      return <RoomOutlined {...other} />
+      return <LocationOnOutlined {...other} />
+    case 'add-map':
+      return <AddLocationAltOutlined {...other} />
     case 'tag':
       return <SellOutlined {...other} />
     case 'person':
