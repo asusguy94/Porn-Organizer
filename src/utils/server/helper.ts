@@ -262,41 +262,17 @@ export const isNewDate = (dateStr1: string | Date, dateStr2: string | Date): boo
  */
 export const getResizedThumb = (id: number): string => `${id}-${settingsConfig.THUMB_RES}.jpg`
 
-/**
- * @param {string} path the path of video/image
- * @return {{isVideo: boolean, isImage:boolean}} Returns an object with isImage and isVideo
- */
-const getFileType = (path: string): { isVideo: boolean; isImage: boolean } => {
-  if (process.env.NODE_ENV === 'production') {
-    return { isImage: false, isVideo: false }
-  }
-
-  const isVideo = extOnly(path) === '.mp4'
-  const isImage = ['.jpg', '.png'].includes(extOnly(path))
-  if (isVideo && isImage) throw new Error('Invalid image/video type')
-
-  return { isVideo, isImage }
-}
-
 const setCache = (res: NextApiResponse, ageInSeconds: number) => {
   res.setHeader('Cache-Control', `public, max-age=${ageInSeconds}`)
 }
 
 export const sendFile = async (res: NextApiResponse, path: string) => {
   if (!(await fileExists(path))) {
-    const { isImage, isVideo } = getFileType(path)
-
-    if (isVideo) {
-      path = './public/video.mp4'
-    } else if (isImage) {
-      path = './public/image.jpg'
-    } else {
-      res.status(404).end()
-      return
-    }
+    res.status(404).end()
+    return
   }
 
-  setCache(res, 1) // set cahce-control to 1 second
+  setCache(res, 1)
   res.writeHead(200)
   fs.createReadStream(path).pipe(res)
 }
@@ -305,14 +281,8 @@ export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, pat
   const chunkSize = 1024 * 1024 * mb
 
   if (!(await fileExists(path))) {
-    const { isVideo } = getFileType(path)
-
-    if (isVideo) {
-      path = './public/video.mp4'
-    } else {
-      res.status(404).end()
-      return
-    }
+    res.status(404).end()
+    return
   }
 
   fs.stat(path, (err, data) => {
