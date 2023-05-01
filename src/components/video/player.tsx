@@ -10,7 +10,7 @@ import { useKey } from 'react-use'
 
 import Plyr, { PlyrWithMetadata } from '../plyr'
 import { IconWithText } from '../icon'
-import type { ModalHandler, Modal } from '../modal'
+import { ModalHandler, Modal } from '../modal'
 import Spinner from '../spinner'
 
 import { videoService } from '@service'

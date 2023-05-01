@@ -54,8 +54,8 @@ const SettingsPage: NextPage = () => {
         </Grid>
 
         <Grid item xs={5} component='form' onSubmit={handleSubmit}>
-          <Grid container xs={12} alignItems='center'>
-            <Grid container xs={6} spacing={1} justifyContent='center'>
+          <Grid container item xs={12} alignItems='center'>
+            <Grid container item xs={6} spacing={1} justifyContent='center'>
               {localWebsites
                 .filter((_, i) => i % 2 === 0)
                 .map(wsite => (
@@ -70,7 +70,7 @@ const SettingsPage: NextPage = () => {
                 ))}
             </Grid>
 
-            <Grid container xs={6} spacing={1} justifyContent='center'>
+            <Grid container item xs={6} spacing={1} justifyContent='center'>
               {localWebsites
                 .filter((_, i) => i % 2 !== 0)
                 .map(wsite => (

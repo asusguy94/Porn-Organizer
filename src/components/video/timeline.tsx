@@ -6,7 +6,7 @@ import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rc
 import { useWindowSize } from 'usehooks-ts'
 
 import { IconWithText } from '../icon'
-import type { ModalHandler } from '../modal'
+import { ModalHandler } from '../modal'
 import Spinner from '../spinner'
 
 import { Bookmark, General, SetState, Video } from '@interfaces'

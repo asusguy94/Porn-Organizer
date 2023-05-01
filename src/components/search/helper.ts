@@ -1,5 +1,3 @@
-import { Quality } from '@interfaces'
-
 export type HiddenStar = {
   titleSearch: string
   breast: string | null
@@ -41,7 +39,7 @@ export type VideoSearch = {
   image: string | null
   locations: string[]
   plays: number
-  quality: Quality
+  quality: number
   site: string | null
   star: string | null
   website: string

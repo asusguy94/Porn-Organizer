@@ -1,13 +1,13 @@
 import { useRouter } from 'next/router'
 import { Fragment, useState } from 'react'
 
-import { Button, Grid, TextField, Typography } from '@mui/material'
+import { Button, Grid, ImageList, ImageListItem, TextField, Typography } from '@mui/material'
 
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import { useCopyToClipboard } from 'usehooks-ts'
 
 import Icon, { IconWithText } from '../icon'
-import type { ModalHandler } from '../modal'
+import { ModalHandler } from '../modal'
 import Spinner from '../spinner'
 
 import { attributeService, locationService, videoService } from '@service'
@@ -15,6 +15,7 @@ import { General, SetState, Video } from '@interfaces'
 import { settingsConfig } from '@config'
 
 import styles from './header.module.scss'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 type HeaderProps = {
   video: Video
@@ -63,6 +64,45 @@ type HeaderSlugProps = {
 const HeaderSlug = ({ video, hidden = false, onModal }: HeaderSlugProps) => {
   const router = useRouter()
 
+  const viewSlugs = () => {
+    const GAP = 4
+    const MAX_ROWS = 4
+    const MAX_COLS = 8
+
+    const calcCols = (images: unknown[]) => Math.min(Math.ceil(images.length / Math.floor(MAX_ROWS)), MAX_COLS)
+    const calcRows = (images: unknown[]) => Math.min(images.length, MAX_ROWS)
+
+    videoService.getSlugs(video.id).then(({ data }) => {
+      onModal(
+        'Select Slug',
+        <ImageList cols={calcCols(data)} sx={{ margin: 0, height: (275 + GAP) * calcRows(data) }}>
+          {data.map(item => (
+            <ImageListItem
+              key={item.id}
+              onClick={() => {
+                setSlug(item.id)
+                onModal()
+              }}
+              style={{ alignItems: 'center' }}
+            >
+              <pre>{item.title}</pre>
+              <LazyLoadImage
+                src={item.image}
+                delayMethod='debounce'
+                delayTime={100}
+                className={styles['select-slug']}
+                alt=''
+              />
+              <pre>[{item.site}]</pre>
+
+              {data.length > 1 && <pre>{item.date}</pre>}
+            </ImageListItem>
+          ))}
+        </ImageList>
+      )
+    })
+  }
+
   const setSlug = (slug: string) => {
     videoService.setSlug(video.id, slug).then(() => {
       router.reload()
@@ -72,25 +112,7 @@ const HeaderSlug = ({ video, hidden = false, onModal }: HeaderSlugProps) => {
   if (hidden) return null
 
   return (
-    <Button
-      size='small'
-      variant='outlined'
-      onClick={() => {
-        onModal(
-          'Set Slug',
-          <TextField
-            variant='outlined'
-            label='Slug'
-            autoFocus
-            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === 'Enter') {
-                setSlug((e.target as HTMLInputElement).value)
-              }
-            }}
-          />
-        )
-      }}
-    >
+    <Button size='small' variant='outlined' onClick={viewSlugs}>
       Missing Slug
     </Button>
   )

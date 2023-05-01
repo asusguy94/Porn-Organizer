@@ -16,6 +16,12 @@ $spacing: 5px;
   }
 }
 
+.select-slug {
+  max-height: 275px;
+  max-width: 275px;
+  object-fit: inherit;
+}
+
 #site {
   color: green;
   font-weight: 700;
