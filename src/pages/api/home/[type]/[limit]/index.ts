@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import prisma from '@utils/server/prisma'
+import { HomeVideo } from '@interfaces/api'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<HomeVideo[]>) {
   if (req.method === 'GET') {
     const { type, limit } = req.query
 
@@ -48,8 +49,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               })
             ).map(({ cover, plays, ...video }) => ({
               ...video,
-              total: plays.length,
-              image: cover
+              image: cover,
+              total: plays.length
             }))
           )
           break

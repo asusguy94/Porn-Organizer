@@ -2,8 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import prisma from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
+import { Attribute } from '@interfaces/api'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<Attribute>) {
   if (req.method === 'POST') {
     const { id } = req.query
 

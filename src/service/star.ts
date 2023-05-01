@@ -8,7 +8,6 @@ const { api, baseURL } = createApi('/star')
 const defaultNumber = 0
 export default {
   useStarInfo: () => useFetch<{ breast: string[]; haircolor: string[]; ethnicity: string[] }>(baseURL),
-  useStarMissing: <S, M>() => useFetch<{ stars: S[]; missing: M[] }>(`${baseURL}/missing`),
   add: (star: string) => api.post('/', { name: star }),
   useStar: <T>(id: number = defaultNumber) => useFetch<T>(`${baseURL}/${id}`),
   remove: (id: number) => api.delete(`/${id}`),

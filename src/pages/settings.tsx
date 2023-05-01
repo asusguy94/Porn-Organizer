@@ -1,4 +1,4 @@
-import { NextPage } from 'next/types'
+import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next/types'
 import { useEffect, useState } from 'react'
 
 import { Button, Checkbox, FormControlLabel, Grid, List, TextField } from '@mui/material'
@@ -6,13 +6,21 @@ import { Button, Checkbox, FormControlLabel, Grid, List, TextField } from '@mui/
 import { useLocalStorage } from 'usehooks-ts'
 
 import { clamp } from '@utils/shared'
-import { General, LocalWebsite, SetState } from '@interfaces'
-import { websiteService } from '@service'
-import Spinner from '@components/spinner'
+import { General, LocalWebsite, SetState, WebsiteWithCount } from '@interfaces'
+import prisma from '@utils/server/prisma'
 
-const SettingsPage: NextPage = () => {
-  const { data: websites } = websiteService.useWebsites()
+export const getServerSideProps: GetServerSideProps<{ websites: WebsiteWithCount[] }> = async () => {
+  const websites = await prisma.website.findMany({
+    include: { _count: { select: { videos: true } } },
+    orderBy: { name: 'asc' }
+  })
 
+  return {
+    props: { websites }
+  }
+}
+
+const SettingsPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ websites }) => {
   const [rawWebsites, setRawWebsites] = useLocalStorage<LocalWebsite[]>('websites', [])
   const [localWebsites, setLocalWebsites] = useState<LocalWebsite[]>([])
   const [changed, setChanged] = useState(false)
@@ -41,8 +49,6 @@ const SettingsPage: NextPage = () => {
     setChanged(true)
   }
 
-  if (websites === undefined) return <Spinner />
-
   return (
     <Grid item className='text-center'>
       <Grid container justifyContent='center'>
@@ -64,7 +70,7 @@ const SettingsPage: NextPage = () => {
                     website={wsite}
                     update={setLocalWebsites}
                     localWebsites={localWebsites}
-                    max={websites.find(w => w.name === wsite.label)?.videos}
+                    max={websites.find(w => w.name === wsite.label)?._count.videos}
                     onChange={handleChanged}
                   />
                 ))}
@@ -79,7 +85,7 @@ const SettingsPage: NextPage = () => {
                     website={wsite}
                     update={setLocalWebsites}
                     localWebsites={localWebsites}
-                    max={websites.find(w => w.name === wsite.label)?.videos}
+                    max={websites.find(w => w.name === wsite.label)?._count.videos}
                     onChange={handleChanged}
                   />
                 ))}

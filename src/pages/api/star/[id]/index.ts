@@ -3,8 +3,9 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 import prisma from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 import { formatBreastSize, formatDate, getDate, getSimilarStars } from '@utils/server/helper'
+import { PutStar, RawStar, Star } from '@interfaces/api'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<Star | PutStar | RawStar>) {
   if (req.method === 'GET') {
     const { id } = req.query
 
@@ -14,21 +15,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return
       }
 
-      const star = await prisma.star.findFirstOrThrow({ where: { id: parseInt(id) } })
+      const star = await prisma.star.findFirstOrThrow({
+        where: { id: parseInt(id) },
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          autoTaggerIgnore: true,
+          breast: true,
+          haircolor: true,
+          ethnicity: true,
+          birthdate: true,
+          height: true,
+          weight: true
+        }
+      })
 
+      const { autoTaggerIgnore, breast, haircolor, ethnicity, birthdate, height, weight, ...rest } = star
       res.json({
-        id: star.id,
-        name: star.name,
-        image: star.image,
-        ignored: star.autoTaggerIgnore,
+        ...rest,
+        ignored: autoTaggerIgnore,
         info: {
-          breast: star.breast ?? '',
-          haircolor: star.haircolor ?? '',
-          ethnicity: star.ethnicity ?? '',
+          breast: breast ?? '',
+          haircolor: haircolor ?? '',
+          ethnicity: ethnicity ?? '',
           // items without autocomplete
-          birthdate: star.birthdate ? formatDate(star.birthdate, true) : '',
-          height: star.height?.toString() ?? '',
-          weight: star.weight?.toString() ?? ''
+          birthdate: birthdate ? formatDate(birthdate, true) : '',
+          height: height?.toString() ?? '',
+          weight: weight?.toString() ?? ''
         },
         similar: await getSimilarStars(star.id)
       })

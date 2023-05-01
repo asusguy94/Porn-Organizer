@@ -6,8 +6,9 @@ import prisma from '@utils/server/prisma'
 import { formatBreastSize, getDate } from '@utils/server/helper'
 import { getStarData, getStarSlug } from '@utils/server/metadata'
 import { printError } from '@utils/shared'
+import { RawStar } from '@interfaces/api'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<RawStar>) {
   if (req.method === 'POST') {
     const { id } = req.query
 

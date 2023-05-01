@@ -2,8 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import prisma from '@utils/server/prisma'
 import { dateDiff } from '@utils/server/helper'
+import { VideoStar } from '@interfaces/api'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<VideoStar[]>) {
   if (req.method === 'GET') {
     const { id } = req.query
 
@@ -12,18 +13,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         (
           await prisma.video.findMany({
             where: { starID: parseInt(id) },
-            include: { star: true, website: true, site: true },
+            select: {
+              id: true,
+              name: true,
+              date: true,
+              path: true,
+              starAge: true,
+              star: { select: { birthdate: true } },
+              website: { select: { name: true } },
+              site: { select: { name: true } }
+            },
             orderBy: { date: 'asc' }
           })
         )
-          .map(video => ({
-            id: video.id,
-            name: video.name,
-            date: video.date,
-            fname: video.path,
-            website: video.website.name,
-            site: video.site?.name ?? null,
-            age: video.starAge ?? dateDiff(video.star?.birthdate, video.date)
+          .map(({ path, website, site, starAge, star, ...video }) => ({
+            ...video,
+            fname: path,
+            website: website.name,
+            site: site?.name ?? null,
+            age: starAge ?? dateDiff(star?.birthdate, video.date)
           }))
           .sort((a, b) => a.age - b.age)
       )

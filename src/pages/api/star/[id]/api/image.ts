@@ -3,8 +3,9 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 import prisma from '@utils/server/prisma'
 import { getStarData, getStarSlug } from '@utils/server/metadata'
 import { printError } from '@utils/shared'
+import { StarImages } from '@interfaces/api'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<StarImages>) {
   if (req.method === 'POST') {
     const { id } = req.query
 

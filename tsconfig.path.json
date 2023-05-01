@@ -9,7 +9,8 @@
       "@utils/shared": ["./src/utils/shared"],
       "@utils/client/*": ["./src/utils/client/*"],
       "@utils/server/*": ["./src/utils/server/*"],
-      "@interfaces": ["./src/interfaces"]
+      "@interfaces/*": ["./src/types/*"],
+      "@interfaces": ["./src/types"]
     }
   }
 }

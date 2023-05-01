@@ -1,4 +1,4 @@
-import { NextPage } from 'next/types'
+import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next/types'
 import { useState } from 'react'
 
 import {
@@ -22,7 +22,7 @@ import capitalize from 'capitalize'
 import { daysToYears } from '@utils/client/date-time'
 
 import { ImageCard } from '@components/image'
-import { getVisible, HiddenStar as Hidden, StarSearch as Star } from '@components/search/helper'
+import { getVisible, HiddenStar as Hidden, StarSearch as Star, StarSearch } from '@components/search/helper'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Badge from '@components/badge'
 import Spinner from '@components/spinner'
@@ -31,12 +31,105 @@ import Link from '@components/link'
 import SortObj, { getStarSort, SortMethodStar, SortTypeStar as StarSort } from '@components/search/sort'
 
 import { General, SetState } from '@interfaces'
-import { searchService, starService, websiteService } from '@service'
 import { serverConfig } from '@config'
+import { Site, Website } from '@prisma/client'
+import prisma from '@utils/server/prisma'
+import { getUnique } from '@utils/shared'
+import { dateDiff } from '@utils/server/helper'
 
 import styles from './search.module.scss'
 
-const StarSearchPage: NextPage = () => {
+export const getServerSideProps: GetServerSideProps<{
+  websites: Website[]
+  starInfo: { breast: string[]; haircolor: string[]; ethnicity: string[] }
+  stars: StarSearch[]
+}> = async () => {
+  const websites = await prisma.website.findMany({ orderBy: { name: 'asc' } })
+
+  const breast = await prisma.star.findMany({
+    select: { breast: true },
+    where: { breast: { not: null } },
+    orderBy: { breast: 'asc' }
+  })
+
+  const ethnicity = await prisma.star.findMany({
+    select: { ethnicity: true },
+    where: { ethnicity: { not: null } },
+    orderBy: { ethnicity: 'asc' }
+  })
+
+  const haircolor = await prisma.star.findMany({
+    select: { haircolor: true },
+    where: { haircolor: { not: null } },
+    orderBy: { haircolor: 'asc' }
+  })
+
+  /**
+   * Returns a site-activity percentage as a decimal
+   * @param website the website to compare with
+   * @param sites the sites to check
+   * @returns a number between 0 and 1
+   */
+  const calculateSiteScore = (website: Website & { sites: Site[] }, sites: Site[]): number => {
+    return sites.filter(s => s.websiteID === website.id).length / website.sites.length
+  }
+
+  // highest siteScore is currently 2.6, or 26 when *10
+  const calculateScore = (websitesWithSites: (Website & { sites: Site[] })[], sites: Site[]) => {
+    const siteScore = websitesWithSites
+      .map(website => calculateSiteScore(website, sites) * 10)
+      .filter(score => !isNaN(score))
+      .reduce((sum, score) => sum + score, 0)
+
+    return siteScore
+  }
+
+  const stars = await prisma.star.findMany({
+    orderBy: { name: 'asc' },
+    include: { videos: { include: { website: { include: { sites: true } }, site: true } } }
+  })
+
+  return {
+    props: {
+      websites,
+      starInfo: {
+        breast: getUnique(breast.flatMap(({ breast }) => (breast !== null ? [breast] : []))),
+        ethnicity: getUnique(ethnicity.flatMap(({ ethnicity }) => (ethnicity !== null ? [ethnicity] : []))),
+        haircolor: getUnique(haircolor.flatMap(({ haircolor }) => (haircolor !== null ? [haircolor] : [])))
+      },
+      stars: stars.map(star => {
+        const websites = getUnique(
+          star.videos.map(({ website }) => website),
+          'id'
+        )
+        const sites = getUnique(
+          star.videos.flatMap(({ site }) => (site !== null ? [site] : [])),
+          'id'
+        )
+
+        return {
+          id: star.id,
+          name: star.name,
+          image: star.image,
+          breast: star.breast,
+          haircolor: star.haircolor,
+          ethnicity: star.ethnicity,
+          age: dateDiff(star.birthdate),
+          videoCount: star.videos.length,
+          score: calculateScore(websites, sites),
+          websites: websites.map(w => w.name),
+          sites: sites.map(s => s.name)
+        }
+      })
+    }
+  }
+}
+
+const StarSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
+  websites,
+  starInfo,
+  stars
+}) => {
   const [sort, setSort] = useState<StarSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
     titleSearch: '',
@@ -49,11 +142,11 @@ const StarSearchPage: NextPage = () => {
   return (
     <Grid container>
       <Grid item xs={2} id={styles.sidebar}>
-        <Sidebar setHidden={setHidden} hidden={hidden} setSort={setSort} />
+        <Sidebar starData={starInfo} websites={websites} setHidden={setHidden} hidden={hidden} setSort={setSort} />
       </Grid>
 
       <Grid item xs={10}>
-        <Stars hidden={hidden} sortMethod={getStarSort(sort)} />
+        <Stars stars={stars} hidden={hidden} sortMethod={getStarSort(sort)} />
       </Grid>
 
       <ScrollToTop smooth />
@@ -62,14 +155,11 @@ const StarSearchPage: NextPage = () => {
 }
 
 type StarsProps = {
+  stars: StarSearch[]
   hidden: Hidden
   sortMethod: SortMethodStar
 }
-const Stars = ({ hidden, sortMethod }: StarsProps) => {
-  const { data: stars } = searchService.useStars()
-
-  if (stars === undefined) return <Spinner />
-
+const Stars = ({ stars, hidden, sortMethod }: StarsProps) => {
   const visible = getVisible(stars.sort(sortMethod), hidden)
 
   return (
@@ -114,26 +204,27 @@ const StarCard = ({ star }: StarCardProps) => {
 }
 
 type SidebarProps = {
+  starData: InferGetServerSidePropsType<typeof getServerSideProps>['starInfo']
+  websites: Website[]
   setHidden: SetState<Hidden>
   hidden: Hidden
   setSort: SetState<StarSort>
 }
-const Sidebar = ({ setHidden, hidden, setSort }: SidebarProps) => (
+const Sidebar = ({ starData, websites, setHidden, hidden, setSort }: SidebarProps) => (
   <>
     <TitleSearch setHidden={setHidden} />
     <Sort setSort={setSort} />
-    <Filter setHidden={setHidden} hidden={hidden} />
+    <Filter starData={starData} websites={websites} setHidden={setHidden} hidden={hidden} />
   </>
 )
 
 type FilterProps = {
+  starData: InferGetServerSidePropsType<typeof getServerSideProps>['starInfo']
+  websites: Website[]
   setHidden: SetState<Hidden>
   hidden: Hidden
 }
-const Filter = ({ setHidden, hidden }: FilterProps) => {
-  const { data: starData } = starService.useStarInfo()
-  const { data: websites } = websiteService.useWebsites()
-
+const Filter = ({ starData, websites, setHidden, hidden }: FilterProps) => {
   const breast = (target: string) => {
     setHidden(prev => ({ ...prev, breast: target.toLowerCase() }))
   }
@@ -171,8 +262,6 @@ const Filter = ({ setHidden, hidden }: FilterProps) => {
   const ethnicity_ALL = () => {
     setHidden(prev => ({ ...prev, ethnicity: '' }))
   }
-
-  if (starData === undefined || websites === undefined) return <Spinner />
 
   return (
     <>

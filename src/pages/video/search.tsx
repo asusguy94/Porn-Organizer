@@ -1,4 +1,4 @@
-import { NextPage } from 'next/types'
+import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next/types'
 import { useState, useEffect } from 'react'
 
 import { Card, CardActionArea, FormControl, Grid, RadioGroup, TextField, Typography } from '@mui/material'
@@ -9,7 +9,7 @@ import { useReadLocalStorage } from 'usehooks-ts'
 
 import { ImageCard } from '@components/image'
 import { RegularHandlerProps, RegularItem } from '@components/indeterminate'
-import { getVisible, HiddenVideo as Hidden, VideoSearch as Video } from '@components/search/helper'
+import { getVisible, HiddenVideo as Hidden, VideoSearch as Video, VideoSearch } from '@components/search/helper'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import VGrid from '@components/virtualized/virtuoso'
 import Spinner from '@components/spinner'
@@ -18,13 +18,73 @@ import Link from '@components/link'
 
 import { daysToYears } from '@utils/client/date-time'
 import { SetState, General, LocalWebsite } from '@interfaces'
-import { attributeService, categoryService, locationService, searchService } from '@service'
 import { serverConfig } from '@config'
-import { printWithMax } from '@utils/shared'
+import { getUnique, printWithMax } from '@utils/shared'
+import prisma from '@utils/server/prisma'
+import { dateDiff, formatDate } from '@utils/server/helper'
 
 import styles from './search.module.scss'
 
-const VideoSearchPage: NextPage = () => {
+export const getServerSideProps: GetServerSideProps<{
+  videos: VideoSearch[]
+  attributes: General[]
+  categories: General[]
+  locations: General[]
+}> = async () => {
+  const videos = await prisma.video.findMany({
+    select: {
+      id: true,
+      height: true,
+      date: true,
+      api: true,
+      apiDateHash: true,
+      cover: true,
+      name: true,
+      star: { select: { name: true, birthdate: true } },
+      website: { select: { name: true } },
+      site: { select: { name: true } },
+      plays: { select: { video: true } },
+      bookmarks: { select: { category: { select: { name: true } } } },
+      attributes: { select: { attribute: { select: { name: true } } } },
+      locations: { select: { location: { select: { name: true } } } }
+    },
+    orderBy: { name: 'asc' }
+  })
+
+  const attributes = await prisma.attribute.findMany()
+  const locations = await prisma.location.findMany()
+  const categories = await prisma.category.findMany()
+
+  return {
+    props: {
+      videos: videos.map(({ height, cover, bookmarks, apiDateHash, ...video }) => ({
+        ...video,
+        quality: height,
+        date: formatDate(video.date),
+        invalidDate: apiDateHash === null || (video.api !== null && cover === null),
+        image: cover,
+        star: video.star?.name ?? null,
+        ageInVideo: dateDiff(video.star?.birthdate, video.date),
+        website: video.website.name,
+        site: video.site?.name ?? null,
+        plays: video.plays.length,
+        categories: getUnique(bookmarks.map(({ category }) => category.name)),
+        attributes: video.attributes.map(({ attribute }) => attribute.name),
+        locations: video.locations.map(({ location }) => location.name)
+      })),
+      attributes,
+      locations,
+      categories
+    }
+  }
+}
+
+const VideoSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
+  videos,
+  attributes,
+  categories,
+  locations
+}) => {
   const [sort, setSort] = useState<VideoSort>({ type: 'date', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
     titleSearch: '',
@@ -37,11 +97,17 @@ const VideoSearchPage: NextPage = () => {
   return (
     <Grid container>
       <Grid item xs={2} id={styles.sidebar}>
-        <Sidebar setHidden={setHidden} setSort={setSort} />
+        <Sidebar
+          attributes={attributes}
+          categories={categories}
+          locations={locations}
+          setHidden={setHidden}
+          setSort={setSort}
+        />
       </Grid>
 
       <Grid item xs={10}>
-        <Videos hidden={hidden} sortMethod={getVideoSort(sort)} />
+        <Videos videos={videos} hidden={hidden} sortMethod={getVideoSort(sort)} />
       </Grid>
 
       <ScrollToTop smooth />
@@ -50,18 +116,15 @@ const VideoSearchPage: NextPage = () => {
 }
 
 type VideosProps = {
+  videos: VideoSearch[]
   hidden: Hidden
   sortMethod: SortMethodVideo
 }
-const Videos = ({ hidden, sortMethod }: VideosProps) => {
-  const { data: videos } = searchService.useVideos()
-
+const Videos = ({ videos, hidden, sortMethod }: VideosProps) => {
   const localWebsites = useReadLocalStorage<LocalWebsite[]>('websites')
   const [filtered, setFiltered] = useState<Video[]>([])
 
   useEffect(() => {
-    if (videos === undefined) return
-
     const map = new Map<string, number>()
     const allMap = new Map<string, number>()
 
@@ -72,6 +135,7 @@ const Videos = ({ hidden, sortMethod }: VideosProps) => {
 
     setFiltered(
       videos
+        .filter(v => !v.attributes.includes('video-unplayable')) //FIXME broken file/stream?
         .sort(getVideoSort({ type: 'date' }))
         .filter(v => {
           const website = initialData.find(wsite => wsite.label === v.website)
@@ -89,18 +153,12 @@ const Videos = ({ hidden, sortMethod }: VideosProps) => {
 
           // return v.categories.length > 0
         })
-        // TODO move this as a toggle to the settings-page
-        // also move the label/name to the settings page
-        // add dropdown from attributes? instead of input-field?
-        .filter(v => !v.attributes.includes('video-unplayable')) //FIXME broken file/stream?
     )
 
     console.clear()
     const selectedMap = [...(map.size > 0 ? map : allMap)]
     selectedMap.slice(0, 2).forEach(([key, value]) => console.log(key, printWithMax(value, 200)))
   }, [localWebsites, videos, hidden])
-
-  if (videos === undefined) return <Spinner />
 
   const visible = getVisible(filtered.sort(sortMethod), hidden)
 
@@ -146,14 +204,17 @@ const VideoCard = ({ video }: VideoCardProps) => {
 }
 
 type SidebarProps = {
+  attributes: General[]
+  categories: General[]
+  locations: General[]
   setHidden: SetState<Hidden>
   setSort: SetState<VideoSort>
 }
-const Sidebar = ({ setHidden, setSort }: SidebarProps) => (
+const Sidebar = ({ attributes, categories, locations, setHidden, setSort }: SidebarProps) => (
   <>
     <TitleSearch setHidden={setHidden} />
     <Sort setSort={setSort} />
-    <Filter setHidden={setHidden} />
+    <Filter attributes={attributes} categories={categories} locations={locations} setHidden={setHidden} />
   </>
 )
 
@@ -204,13 +265,12 @@ const Sort = ({ setSort }: SortProps) => {
 }
 
 type FilterProps = {
+  attributes: General[]
+  categories: General[]
+  locations: General[]
   setHidden: SetState<Hidden>
 }
-const Filter = ({ setHidden }: FilterProps) => {
-  const { data: attributes } = attributeService.useAttributes()
-  const { data: categories } = categoryService.useCategories()
-  const { data: locations } = locationService.useLocations()
-
+const Filter = ({ setHidden, attributes, categories, locations }: FilterProps) => {
   const category = (ref: RegularHandlerProps, target: General) => {
     const targetLower = target.name.toLowerCase()
 

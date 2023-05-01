@@ -5,7 +5,7 @@ import validate, { z } from '@utils/server/validation'
 import { dateDiff } from '@utils/server/helper'
 import { aliasExists, getAliasAsStar } from '@utils/server/helper.db'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   if (req.method === 'GET') {
     const { id } = req.query
 
@@ -16,7 +16,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       const star = await prisma.star.findFirst({
-        where: { videos: { some: { id: parseInt(id) } } }
+        where: { videos: { some: { id: parseInt(id) } } },
+        select: { id: true, name: true, image: true, birthdate: true }
       })
 
       if (star !== null) {
@@ -24,11 +25,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           where: { starID: star.id }
         })
 
+        const { birthdate, ...rest } = star
         res.json({
-          id: star.id,
-          name: star.name,
-          image: star.image,
-          ageInVideo: dateDiff(videos.find(v => v.id === parseInt(id))?.date, star.birthdate),
+          ...rest,
+          ageInVideo: dateDiff(videos.find(v => v.id === parseInt(id))?.date, birthdate),
           numVideos: videos.length
         })
       } else {
@@ -71,12 +71,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       })
 
+      const { birthdate, _count, ...rest } = star
       res.json({
-        id: star.id,
-        name: star.name,
-        image: star.image,
-        ageInVideo: video.starAge ?? dateDiff(star.birthdate, video.date),
-        numVideos: star._count.videos
+        ...rest,
+        ageInVideo: video.starAge ?? dateDiff(birthdate, video.date),
+        numVideos: _count.videos
       })
     }
   } else if (req.method === 'DELETE') {

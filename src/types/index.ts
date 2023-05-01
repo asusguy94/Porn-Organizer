@@ -1,3 +1,5 @@
+import { Website } from '@prisma/client'
+
 // Common types
 export type SetState<T> = React.Dispatch<React.SetStateAction<T>>
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
@@ -8,14 +10,15 @@ export type General = {
 }
 
 // Other Types
-export type Quality = 1080 | 720 | 480 | 360 | 0
-
 export type WebsiteWithSites = {
   id: number
   name: string
   sites: General[]
   videos: number
 }
+
+//TODO use prisma-types instead
+export type WebsiteWithCount = Website & { _count: { videos: number } }
 
 export type Bookmark = {
   id: number

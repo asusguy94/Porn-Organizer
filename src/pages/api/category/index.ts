@@ -2,8 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import prisma from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
+import { Category } from '@interfaces/api'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<Category[]>) {
   if (req.method === 'GET') {
     res.json(await prisma.category.findMany())
   } else if (req.method === 'POST') {

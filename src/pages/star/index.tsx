@@ -1,4 +1,4 @@
-import { NextPage } from 'next/types'
+import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next/types'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 
@@ -8,83 +8,71 @@ import { useSessionStorage } from 'usehooks-ts'
 
 import Link from '@components/link'
 import { ImageCard } from '@components/image'
-import Spinner from '@components/spinner'
 
 import { starService } from '@service'
 import { serverConfig } from '@config'
 import { getUnique } from '@utils/shared'
+import prisma from '@utils/server/prisma'
+import { generateStarName } from '@utils/server/generate'
 
-type Star = {
-  id: number
-  name: string
-  image: string | null
+export const getServerSideProps: GetServerSideProps<{
+  stars: {
+    id: number
+    name: string
+    image: string | null
+  }[]
+  missing: {
+    videoId: number
+    name: string
+  }[]
+}> = async () => {
+  const stars = await prisma.star.findMany({
+    select: { id: true, name: true, image: true },
+    where: {
+      OR: [
+        { image: null }, // without image
+        {
+          // without profile data
+          breast: null,
+          haircolor: null,
+          ethnicity: null,
+          birthdate: null,
+          height: null,
+          weight: null
+        },
+        { autoTaggerIgnore: true }, // disabled profile
+        { api: null } // missing profile
+      ]
+    }
+  })
+
+  // VideoStars Without STAR
+  const missing = (await prisma.video.findMany({ where: { star: null } })).map(v => ({
+    videoId: v.id,
+    name: generateStarName(v.path)
+  }))
+
+  return { props: { stars, missing } }
 }
 
-type Missing = {
-  videoID: number
-  name: string
-}
-
-type IndexChanger = {
-  total: Missing[]
-  index: number
-  setIndex: (index: number) => void
-}
-const IndexChanger = ({ total, index, setIndex }: IndexChanger) => (
-  <span className='mx-1' style={total.length ? {} : { display: 'none' }}>
-    <Button
-      variant='outlined'
-      onClick={() => setIndex(index - 1)}
-      disabled={index <= 0}
-      style={{ maxHeight: 30, minWidth: 30 }}
-    >
-      -
-    </Button>
-
-    <span className='d-inline-block mx-1' style={{ verticalAlign: 'middle' }}>
-      {index}
-    </span>
-
-    <Button
-      variant='outlined'
-      onClick={() => setIndex(index + 1)}
-      disabled={index >= total.length - 1}
-      style={{ maxHeight: 30, minWidth: 30 }}
-    >
-      +
-    </Button>
-  </span>
-)
-
-const Stars: NextPage = () => {
+const Stars: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ stars, missing: videoStars }) => {
   const router = useRouter()
 
   const [starInput, setStarInput] = useSessionStorage('starInput', '')
 
-  const { stars, missing: videoStars } = starService.useStarMissing<Star, Missing>().data ?? {}
-
-  const [missing, setMissing] = useState<Missing[]>([])
   const [input, setInput] = useState('')
   const [activeStar, setActiveStar] = useState<string>()
 
   const [index, setIndex] = useState(0)
 
-  useEffect(() => {
-    if (videoStars !== undefined && stars !== undefined) {
-      const filtered = getUnique(videoStars, 'name').filter(star => !stars.some(s => s.name === star.name))
-
-      setMissing(filtered)
-    }
-  }, [videoStars, stars])
+  const missing = getUnique(videoStars, 'name').filter(star => !stars.some(s => s.name === star.name))
 
   useEffect(() => {
     if (missing.length) setInput(missing[index].name)
   }, [missing, index])
 
   useEffect(() => {
-    if (stars !== undefined && starInput.length > 0) {
-      setActiveStar(stars.find(s => s.name === starInput)?.name)
-    }
+    setActiveStar(stars.find(s => s.name === starInput)?.name)
   }, [starInput, stars])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -103,8 +91,6 @@ const Stars: NextPage = () => {
       router.reload()
     })
   }
-
-  if (videoStars === undefined || stars === undefined) return <Spinner />
 
   return (
     <Grid container justifyContent='center'>
@@ -169,13 +155,13 @@ const Stars: NextPage = () => {
           .sort((a, b) => a.name.localeCompare(b.name))
           .slice(0, 500) // limit results to avoid crash
           .map(star => (
-            <Grid item key={star.videoID} lg={1} md={2} xs={3}>
+            <Grid item key={star.videoId} lg={1} md={2} xs={3}>
               <Card className='text-center'>
                 <CardContent>
                   <Typography>{star.name}</Typography>
 
                   <CardActionArea>
-                    <Link href={{ pathname: '/video/[id]', query: { id: star.videoID } }}>{star.videoID}</Link>
+                    <Link href={{ pathname: '/video/[id]', query: { id: star.videoId } }}>{star.videoId}</Link>
                   </CardActionArea>
                 </CardContent>
               </Card>
@@ -185,5 +171,36 @@ const Stars: NextPage = () => {
     </Grid>
   )
 }
+
+type IndexChanger = {
+  total: InferGetServerSidePropsType<typeof getServerSideProps>['missing']
+  index: number
+  setIndex: (index: number) => void
+}
+const IndexChanger = ({ total, index, setIndex }: IndexChanger) => (
+  <span className='mx-1' style={total.length ? {} : { display: 'none' }}>
+    <Button
+      variant='outlined'
+      onClick={() => setIndex(index - 1)}
+      disabled={index <= 0}
+      style={{ maxHeight: 30, minWidth: 30 }}
+    >
+      -
+    </Button>
+
+    <span className='d-inline-block mx-1' style={{ verticalAlign: 'middle' }}>
+      {index}
+    </span>
+
+    <Button
+      variant='outlined'
+      onClick={() => setIndex(index + 1)}
+      disabled={index >= total.length - 1}
+      style={{ maxHeight: 30, minWidth: 30 }}
+    >
+      +
+    </Button>
+  </span>
+)
 
 export default Stars

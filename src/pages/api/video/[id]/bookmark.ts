@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 import prisma from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   if (req.method === 'GET') {
     const { id } = req.query
 

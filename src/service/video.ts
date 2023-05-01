@@ -19,6 +19,16 @@ export default {
   addAttribute: (id: number, attributeID: number) => api.post<General>(`/${id}/attribute`, { attributeID }),
   fixDate: (id: number) => api.put(`/${id}/fix-date`),
   renameTitle: (id: number, title: string) => api.put(`/${id}`, { title }),
+  getSlugs: (id: number) =>
+    api.get<
+      {
+        id: string
+        title: string
+        image: string
+        site: string
+        date: string
+      }[]
+    >(`/${id}/meta`),
   setSlug: (id: number, slug: string) => api.put(`/${id}`, { slug }),
   addPlay: (id: number) => api.put(`/${id}`, { plays: 1 }),
   delete: (id: number) => api.delete(`/${id}`),
@@ -35,6 +45,5 @@ export default {
       performers: Performer[]
     }>(`/${id}/star/info`)
   },
-  useNewVideos: <T>() => useFetch<T>(baseURL, { method: 'post' }),
   addVideos: <T>(videos: T) => api.post('/add', { videos })
 }

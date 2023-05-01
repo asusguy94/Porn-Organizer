@@ -5,8 +5,9 @@ import fs from 'fs'
 import prisma from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 import { downloader, sendFile } from '@utils/server/helper'
+import { StarImage } from '@interfaces/api'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<StarImage>) {
   if (req.method === 'GET') {
     const { id } = req.query
 

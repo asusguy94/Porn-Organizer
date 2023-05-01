@@ -1,15 +1,16 @@
-import { NextApiRequest, NextApiResponse } from 'next/types'
+import { NextApiRequest } from 'next/types'
 
 import prisma from '@utils/server/prisma'
-import { fileExists, rebuildVideoFile, sleep } from '@utils/server/helper'
+import { fileExists, logger, rebuildVideoFile, sleep } from '@utils/server/helper'
 import { getDuration as videoDuration, getHeight as videoHeight, getWidth as videoWidth } from '@utils/server/ffmpeg'
 import { generateStarName } from '@utils/server/generate'
 import { aliasExists, aliasIsIgnored, getAliasAsStar, starExists, starIsIgnored } from '@utils/server/helper.db'
 import { findSceneSlug } from '@utils/server/metadata'
 
-import type { Video } from '@prisma/client'
+import { Video } from '@prisma/client'
+import { NextApiResponseWithSocket } from '@interfaces/socket'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponseWithSocket) {
   if (req.method === 'POST') {
     const checkStarRelation = async (video: Video) => {
       const star = generateStarName(video.path)
@@ -52,12 +53,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const addVideoStar = async (videoID: number, starID: number) => {
-      console.log('Adding VideoStar')
+      logger('Adding VideoStar')
 
       await prisma.video.update({ where: { id: videoID }, data: { star: { connect: { id: starID } } } })
     }
 
-    console.log('Updating DURATION & HEIGHT')
+    logger('Updating DURATION & HEIGHT')
     const fixVideos = await prisma.video.findMany({ where: { OR: [{ duration: 0 }, { height: 0 }, { width: 0 }] } })
     for await (const video of fixVideos) {
       const videoPath = `videos/${video.path}`
@@ -65,7 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (await fileExists(absoluteVideoPath)) {
         await rebuildVideoFile(absoluteVideoPath).then(async () => {
-          console.log(`Rebuild: ${video.id}`)
+          logger(`Rebuild: ${video.id}`)
 
           // TODO Remove stream-directory in videos/
           // TODO Remove VTT & JPG files in /vtt
@@ -74,7 +75,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const height = await videoHeight(absoluteVideoPath)
           const duration = await videoDuration(absoluteVideoPath)
 
-          console.log(`Refreshing: "${video.path}"`)
+          logger(`Refreshing: "${video.path}"`, 'meta', res.socket.server.io)
           await prisma.video.update({
             where: { id: video.id },
             data: { duration, height, width }
@@ -82,9 +83,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
       }
     }
-    console.log('Finished updating DURATION & HEIGHT')
+    logger('Finished updating DURATION & HEIGHT')
 
-    console.log('Updating VIDEO INFO')
+    logger('Updating VIDEO INFO')
     const infoVideos = await prisma.video.findMany({
       where: { api: null, ignoreMeta: false },
       include: { site: true, website: true }
@@ -100,13 +101,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           if (reason === 'too few slugs' || reason === 'too many slugs') {
             await prisma.video.update({ where: { id: video.id }, data: { ignoreMeta: true } })
           }
-          console.log('cannot generate slug for ' + video.name)
-          console.log(reason)
+          logger('cannot generate slug for ' + video.name)
+          logger(reason)
         })
     }
-    console.log('Finished updating VIDEO INFO')
+    logger('Finished updating VIDEO INFO')
 
-    console.log('Updating STARS')
+    logger('Updating STARS')
     const videos = await prisma.video.findMany({ where: { starID: null } })
     for await (const video of videos) {
       // Only check relation if the video has not been moved!
@@ -114,9 +115,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await checkStarRelation(video)
       }
     }
-    console.log('Finished updating STARS')
+    logger('Finished updating STARS')
 
-    console.log('FINISHED GENERATING METADATA')
+    logger('FINISHED GENERATING METADATA')
 
     res.end()
   }

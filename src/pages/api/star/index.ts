@@ -4,7 +4,10 @@ import prisma from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 import { getUnique } from '@utils/shared'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<{ breast: string[]; haircolor: string[]; ethnicity: string[]; websites: string[] }>
+) {
   if (req.method === 'GET') {
     res.json({
       breast: getUnique(

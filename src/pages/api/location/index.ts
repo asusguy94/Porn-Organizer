@@ -2,8 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import prisma from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
+import { Location } from '@interfaces/api'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<Location[]>) {
   if (req.method === 'GET') {
     res.json(await prisma.location.findMany())
   } else if (req.method === 'POST') {

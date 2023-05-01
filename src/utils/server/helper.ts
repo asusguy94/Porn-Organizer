@@ -5,6 +5,7 @@ import path from 'path'
 import fetch from 'node-fetch'
 import ffmpeg from 'fluent-ffmpeg'
 import crypto from 'crypto-js'
+import { Server } from 'socket.io'
 
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -13,6 +14,7 @@ dayjs.extend(utc)
 import prisma from './prisma'
 
 import { settingsConfig } from '@config'
+import { SimilarStar } from '@interfaces/api'
 
 export const dateDiff = (date1?: string | Date | null, date2: string | Date | null = new Date()): number => {
   if (date1 === null || date1 === undefined || date2 === null) return 0
@@ -202,12 +204,6 @@ export const formatBreastSize = (input: string): string => {
   return breast.trim()
 }
 
-type SimilarStar = {
-  id: number
-  name: string
-  image: string | null
-  match: number
-}
 export const getSimilarStars = async (starID: number, maxMaxLength = 9): Promise<SimilarStar[]> => {
   const currentStar = await prisma.star.findFirstOrThrow({ where: { id: starID } })
 
@@ -262,8 +258,16 @@ export const isNewDate = (dateStr1: string | Date, dateStr2: string | Date): boo
  */
 export const getResizedThumb = (id: number): string => `${id}-${settingsConfig.THUMB_RES}.jpg`
 
-const setCache = (res: NextApiResponse, ageInSeconds: number) => {
-  res.setHeader('Cache-Control', `public, max-age=${ageInSeconds}`)
+const setCache = (res: NextApiResponse, ageInSeconds: number, delay = 100) => {
+  const cacheArr = [
+    'public',
+    `max-age=${ageInSeconds}`,
+    `s-maxage=${ageInSeconds}`,
+    'must-revalidate',
+    `stale-while-revalidate=${delay}`
+  ]
+
+  res.setHeader('Cache-Control', cacheArr.join(', '))
 }
 
 export const sendFile = async (res: NextApiResponse, path: string) => {
@@ -389,4 +393,11 @@ export function getDividableWidth(width: number, limits = { min: 120, max: 240 }
     return getDividableWidth(width, limits)
   }
   throw new Error(`Could not find dividable width for ${width}`)
+}
+
+export function logger(message: string, event?: string, socket?: Server) {
+  if (socket && event) {
+    socket.emit(event, message)
+  }
+  console.log(message)
 }

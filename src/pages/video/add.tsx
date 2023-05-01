@@ -1,6 +1,8 @@
-import { NextPage } from 'next/types'
+import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next/types'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import fs from 'fs'
 
 import {
   Grid,
@@ -15,26 +17,68 @@ import {
   Paper
 } from '@mui/material'
 
-import Spinner from '@components/spinner'
-
 import { generateService, videoService } from '@service'
+import prisma from '@utils/server/prisma'
+import { dirOnly, extOnly } from '@utils/server/helper'
+import { generateDate, generateSite, generateTitle } from '@utils/server/generate'
 
 import styles from './add.module.scss'
 
-const AddVideoPage: NextPage = () => {
-  const router = useRouter()
+type VideoFile = {
+  path: string
+  website: string
+  site: string
+  title: string
+  date: string
+}
 
-  type VideoFile = {
-    path: string
-    website: string
-    site: string
-    title: string
-    date: string
+export const getServerSideProps: GetServerSideProps<{ files: VideoFile[]; pages: number }> = async () => {
+  const filesDB = await prisma.video.findMany()
+  const filesArr = filesDB.map(({ path }) => path)
+
+  // TODO skip this check if directory is missing?
+  const paths = await fs.promises.readdir('./media/videos')
+
+  const newFiles = []
+  for await (const path of paths) {
+    if (path.includes('_')) continue
+
+    const dirPath = `./media/videos/${path}`
+    if ((await fs.promises.lstat(dirPath)).isDirectory()) {
+      const files = await fs.promises.readdir(dirPath)
+
+      for await (const file of files) {
+        const filePath = `${dirPath}/${file}`
+        const dir = dirOnly(dirPath)
+        if (
+          !filesArr.includes(`${dir}/${file}`) &&
+          (await fs.promises.lstat(filePath)).isFile() &&
+          extOnly(filePath) === '.mp4' // Prevent random files from being imported!
+        ) {
+          newFiles.push({
+            path: `${dir}/${file}`,
+            website: dir,
+            date: generateDate(filePath),
+            site: generateSite(filePath),
+            title: generateTitle(filePath)
+          })
+        }
+      }
+    }
   }
 
-  const { files: videos, pages } = videoService.useNewVideos<{ files: VideoFile[]; pages: number }>().data ?? {}
+  const newFilesSliced = newFiles.slice(0, 33)
 
-  if (videos === undefined) return <Spinner />
+  return {
+    props: {
+      files: newFilesSliced,
+      pages: Math.ceil(newFiles.length / newFilesSliced.length) || 0
+    }
+  }
+}
+
+const AddVideoPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ files: videos, pages }) => {
+  const router = useRouter()
 
   return (
     <Grid className='text-center'>
@@ -74,7 +118,7 @@ const AddVideoPage: NextPage = () => {
 
           <div style={{ marginTop: 8 }}>
             <Action
-              label={`Add Videos (page 1 of ${pages ?? 0})`}
+              label={`Add Videos (page 1 of ${pages})`}
               callback={() =>
                 void videoService.addVideos(videos).then(() => {
                   router.reload()

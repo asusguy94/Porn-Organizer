@@ -1,3 +1,5 @@
+//TODO this page has a depenceny that breaks when using getServerSideProps
+
 import { NextPage } from 'next/types'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -7,7 +9,7 @@ import { Grid, Card, Typography, TextField } from '@mui/material'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 
 import { ImageCard } from '@components/image'
-import ModalComponent, { useModal, type ModalHandler, type Modal } from '@components/modal'
+import ModalComponent, { useModal, ModalHandler, Modal } from '@components/modal'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Badge from '@components/badge'
 import { Header, Player as VideoPlayer, Timeline } from '@components/video'
@@ -35,7 +37,7 @@ const VideoPage: NextPage = () => {
   const { data: starData } = videoService.useStar(videoID)
   const { data: bookmarksData } = videoService.useBookmarks<Bookmark[]>(videoID)
 
-  const [video, setVideo] = useState<Video>()
+  const [video, setVideo] = useState(videoData)
   const [star, setStar] = useState<VideoStar | null>()
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
 

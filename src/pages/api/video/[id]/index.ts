@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next/types'
+import { NextApiRequest } from 'next/types'
 
 import fs from 'fs'
 
@@ -12,6 +12,7 @@ import {
   generateHash,
   getDate,
   isNewDate,
+  logger,
   noExt,
   removeThumbnails,
   validateHash
@@ -21,8 +22,9 @@ import { resizeImage } from '@utils/server/ffmpeg'
 import { getSceneData, getSceneSlug } from '@utils/server/metadata'
 import { printError } from '@utils/shared'
 import { settingsConfig } from '@config'
+import { NextApiResponseWithSocket } from '@interfaces/socket'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponseWithSocket<any>) {
   if (req.method === 'GET') {
     const { id } = req.query
 
@@ -32,22 +34,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return
       }
 
-      const video = await prisma.video.findFirstOrThrow({
+      const { apiDateHash, ...video } = await prisma.video.findFirstOrThrow({
         where: { id: parseInt(id) },
-        include: {
-          star: true,
+        select: {
+          id: true,
+          name: true,
+          cover: true,
+          api: true,
+          path: true,
+          added: true,
+          date: true,
+          duration: true,
+          height: true,
           plays: true,
           website: true,
+          locations: { select: { location: true } },
+          attributes: { select: { attribute: true } },
           site: true,
-          locations: { include: { location: true } },
-          attributes: { include: { attribute: true } }
+          apiDateHash: true
         }
       })
 
       let invalid = false
       if (video.api !== null) {
         // check if date has been validated
-        if (!(video.apiDateHash !== null && validateHash(formatDate(video.date, true), video.apiDateHash))) {
+        if (!(apiDateHash !== null && validateHash(formatDate(video.date, true), apiDateHash))) {
           try {
             const apiDate = (await getSceneData(video.api)).date.trim()
 
@@ -67,28 +78,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
 
+      const { cover, api, path, added, site, ...rest } = video
       res.json({
-        id: video.id,
-        name: video.name,
-        image: video.cover,
-        slug: video.api,
+        ...rest,
+        image: cover,
+        slug: api,
         path: {
-          file: video.path,
-          stream: `${video.path.split('.').slice(0, -1).join('.')}/master.m3u8`
+          file: path,
+          stream: `${path.split('.').slice(0, -1).join('.')}/master.m3u8`
         },
         date: {
-          added: formatDate(video.added),
-          published: formatDate(video.date),
+          added: formatDate(added),
+          published: formatDate(rest.date),
           invalid
         },
-        duration: video.duration,
-        height: video.height,
-        plays: video.plays.length,
-        website: video.website.name,
-        star: generateStarName(video.path),
-        locations: video.locations.map(({ location }) => location),
-        attributes: video.attributes.map(({ attribute }) => attribute),
-        subsite: video.site?.name ?? null
+        plays: rest.plays.length,
+        website: rest.website.name,
+        star: generateStarName(path),
+        locations: rest.locations.map(({ location }) => location),
+        attributes: rest.attributes.map(({ attribute }) => attribute),
+        subsite: site?.name ?? null
       })
     }
   } else if (req.method === 'PUT') {
@@ -190,7 +199,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
               // download file (if missing)
               if (!(await fileExists(`./media/${imagePath}`))) {
-                console.log(`Generating HIGHRES ${video.id}`)
+                logger(`Generating HIGHRES ${video.id}`, 'thumb', res.socket.server.io)
                 await downloader(image, `media/${imagePath}`, 'URL')
 
                 // upscale image to w=1920
@@ -198,7 +207,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               }
 
               {
-                console.log(`Generating LOWRES ${video.id}`)
+                logger(`Generating LOWRES ${video.id}`, 'thumb', res.socket.server.io)
                 await downloader(`media/${imagePath}`, `media/${imagePath_low}`, 'FILE') // copy file
 
                 // downscale image to w=290

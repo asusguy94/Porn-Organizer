@@ -3,8 +3,9 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 import prisma from '@utils/server/prisma'
 import { dateDiff, getDate } from '@utils/server/helper'
 import { generateDate } from '@utils/server/generate'
+import { FixVideoDate } from '@interfaces/api'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<FixVideoDate>) {
   if (req.method === 'PUT') {
     const { id } = req.query
 

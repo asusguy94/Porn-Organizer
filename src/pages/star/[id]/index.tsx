@@ -1,3 +1,5 @@
+//TODO this page has a depenceny that breaks when using getServerSideProps
+
 import { NextPage } from 'next/types'
 import { useRouter } from 'next/router'
 import { useState, useRef, useEffect } from 'react'
@@ -23,7 +25,7 @@ import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 import Image, { ImageCard } from '@components/image'
 import Link from '@components/link'
-import ModalComponent, { type ModalHandler, useModal } from '@components/modal'
+import ModalComponent, { ModalHandler, useModal } from '@components/modal'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Dropbox from '@components/dropbox'
 import { IconWithText } from '@components/icon'

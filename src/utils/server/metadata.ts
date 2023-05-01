@@ -4,7 +4,8 @@ import { toCamelCase } from './helper'
 import { getUnique } from '../shared'
 
 import { settingsConfig } from '@config'
-import { Extra, Gender, Performer } from '@interfaces'
+import { Extra, Gender } from '@interfaces'
+import { SceneData } from '@interfaces/api'
 
 type BasicModel = {
   data: {
@@ -57,6 +58,36 @@ export const getSceneSlug = async (slug: string): Promise<string> => {
 
   // TODO find out if this ever throws?
   return Promise.resolve(result.data.id)
+}
+
+export async function findBroadSceneSlug(videoTitle: string, wsiteOrSite: string) {
+  type Scene = {
+    data: {
+      id: string
+      title: string
+      background: {
+        full: string
+      }
+      site: {
+        name: string
+      }
+      date: string
+    }[]
+  }
+
+  const url = getUrl('/scenes')
+  url.searchParams.set('title', videoTitle)
+  url.searchParams.set('q', wsiteOrSite)
+
+  const result = (await axios.get<Scene>(url.href, createConfig(true))).data
+
+  return result.data.map(s => ({
+    id: s.id,
+    title: s.title,
+    image: s.background.full,
+    site: s.site.name,
+    date: s.date
+  }))
 }
 
 //FIXME outdated?
@@ -117,25 +148,9 @@ export const getStarSlug = async (star: string): Promise<string> => {
 }
 
 export const getSceneData = async (slug: string, longTimeout = false) => {
-  type Scene = {
-    data: {
-      id: string
-      title: string
-      date: string
-      image: string
-      background: {
-        full: string
-        large: string
-        medium: string
-        small: string
-      }
-      performers: Performer[]
-    }
-  }
-
   try {
     const url = getUrl(`/scenes/${slug}`)
-    const result = (await axios.get<Scene>(url.href, createConfig(longTimeout))).data
+    const result = (await axios.get<{ data: SceneData }>(url.href, createConfig(longTimeout))).data
 
     return {
       id: result.data.id,

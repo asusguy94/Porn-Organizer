@@ -4,7 +4,7 @@ import prisma from '@utils/server/prisma'
 import { getSceneData } from '@utils/server/metadata'
 import { printError } from '@utils/shared'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   if (req.method === 'GET') {
     const { id } = req.query
 
