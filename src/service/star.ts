@@ -1,17 +1,11 @@
-import { useFetch } from 'usehooks-ts'
-
-import { Similar, StarVideo } from '@interfaces'
+import { Similar } from '@interfaces'
 
 import { createApi } from '@config'
-const { api, baseURL } = createApi('/star')
+const { api } = createApi('/star')
 
-const defaultNumber = 0
 export default {
-  useStarInfo: () => useFetch<{ breast: string[]; haircolor: string[]; ethnicity: string[] }>(baseURL),
   add: (star: string) => api.post('/', { name: star }),
-  useStar: <T>(id: number = defaultNumber) => useFetch<T>(`${baseURL}/${id}`),
   remove: (id: number) => api.delete(`/${id}`),
-  useStarVideos: (id: number = defaultNumber) => useFetch<StarVideo[]>(`${baseURL}/${id}/video`),
   renameStar: (id: number, name: string) => api.put(`/${id}`, { name }),
   setSlug: (id: number, slug: string) => api.put(`/${id}`, { slug }),
   ignoreStar: <T extends { id: number; ignored: boolean }>(star: T) => {

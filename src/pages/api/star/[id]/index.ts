@@ -3,51 +3,10 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 import prisma from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 import { formatBreastSize, formatDate, getDate, getSimilarStars } from '@utils/server/helper'
-import { PutStar, RawStar, Star } from '@interfaces/api'
+import { PutStar, RawStar } from '@interfaces/api'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<Star | PutStar | RawStar>) {
-  if (req.method === 'GET') {
-    const { id } = req.query
-
-    if (typeof id === 'string') {
-      if (id === '0') {
-        res.end()
-        return
-      }
-
-      const star = await prisma.star.findFirstOrThrow({
-        where: { id: parseInt(id) },
-        select: {
-          id: true,
-          name: true,
-          image: true,
-          autoTaggerIgnore: true,
-          breast: true,
-          haircolor: true,
-          ethnicity: true,
-          birthdate: true,
-          height: true,
-          weight: true
-        }
-      })
-
-      const { autoTaggerIgnore, breast, haircolor, ethnicity, birthdate, height, weight, ...rest } = star
-      res.json({
-        ...rest,
-        ignored: autoTaggerIgnore,
-        info: {
-          breast: breast ?? '',
-          haircolor: haircolor ?? '',
-          ethnicity: ethnicity ?? '',
-          // items without autocomplete
-          birthdate: birthdate ? formatDate(birthdate, true) : '',
-          height: height?.toString() ?? '',
-          weight: weight?.toString() ?? ''
-        },
-        similar: await getSimilarStars(star.id)
-      })
-    }
-  } else if (req.method === 'PUT') {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<PutStar | RawStar>) {
+  if (req.method === 'PUT') {
     const { id } = req.query
 
     if (typeof id === 'string') {

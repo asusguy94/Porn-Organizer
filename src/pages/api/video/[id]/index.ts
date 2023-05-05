@@ -9,15 +9,13 @@ import {
   downloader,
   fileExists,
   formatDate,
-  generateHash,
   getDate,
   isNewDate,
   logger,
   noExt,
-  removeThumbnails,
-  validateHash
+  removeThumbnails
 } from '@utils/server/helper'
-import { generateDate, generateStarName } from '@utils/server/generate'
+import { generateDate } from '@utils/server/generate'
 import { resizeImage } from '@utils/server/ffmpeg'
 import { getSceneData, getSceneSlug } from '@utils/server/metadata'
 import { printError } from '@utils/shared'
@@ -25,82 +23,7 @@ import { settingsConfig } from '@config'
 import { NextApiResponseWithSocket } from '@interfaces/socket'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponseWithSocket<any>) {
-  if (req.method === 'GET') {
-    const { id } = req.query
-
-    if (typeof id === 'string') {
-      if (id === '0') {
-        res.end()
-        return
-      }
-
-      const { apiDateHash, ...video } = await prisma.video.findFirstOrThrow({
-        where: { id: parseInt(id) },
-        select: {
-          id: true,
-          name: true,
-          cover: true,
-          api: true,
-          path: true,
-          added: true,
-          date: true,
-          duration: true,
-          height: true,
-          plays: true,
-          website: true,
-          locations: { select: { location: true } },
-          attributes: { select: { attribute: true } },
-          site: true,
-          apiDateHash: true
-        }
-      })
-
-      let invalid = false
-      if (video.api !== null) {
-        // check if date has been validated
-        if (!(apiDateHash !== null && validateHash(formatDate(video.date, true), apiDateHash))) {
-          try {
-            const apiDate = (await getSceneData(video.api)).date.trim()
-
-            // date don't match either
-            invalid = apiDate !== formatDate(video.date, true)
-
-            // ony update database with new hash if nessesary
-            await prisma.video.update({
-              where: { id: video.id },
-              data: {
-                apiDateHash: generateHash(apiDate)
-              }
-            })
-          } catch (error) {
-            console.error(error)
-          }
-        }
-      }
-
-      const { cover, api, path, added, site, ...rest } = video
-      res.json({
-        ...rest,
-        image: cover,
-        slug: api,
-        path: {
-          file: path,
-          stream: `${path.split('.').slice(0, -1).join('.')}/master.m3u8`
-        },
-        date: {
-          added: formatDate(added),
-          published: formatDate(rest.date),
-          invalid
-        },
-        plays: rest.plays.length,
-        website: rest.website.name,
-        star: generateStarName(path),
-        locations: rest.locations.map(({ location }) => location),
-        attributes: rest.attributes.map(({ attribute }) => attribute),
-        subsite: site?.name ?? null
-      })
-    }
-  } else if (req.method === 'PUT') {
+  if (req.method === 'PUT') {
     const { id } = req.query
 
     if (typeof id === 'string') {

@@ -2,25 +2,10 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import prisma from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
+import { Bookmark } from '@prisma/client'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
-  if (req.method === 'GET') {
-    const { id } = req.query
-
-    if (typeof id === 'string') {
-      res.json(
-        await prisma.bookmark.findMany({
-          select: {
-            id: true,
-            category: { select: { id: true, name: true } },
-            start: true
-          },
-          where: { videoID: parseInt(id) },
-          orderBy: { start: 'asc' }
-        })
-      )
-    }
-  } else if (req.method === 'POST') {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<Bookmark>) {
+  if (req.method === 'POST') {
     const { id } = req.query
 
     if (typeof id === 'string') {

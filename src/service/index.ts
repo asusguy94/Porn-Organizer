@@ -1,6 +1,5 @@
 export { default as attributeService } from './attribute'
 export { default as bookmarkService } from './bookmark'
-export { default as categoryService } from './category'
 export { default as generateService } from './generate'
 export { default as locationService } from './location'
 export { default as starService } from './star'

@@ -1,18 +1,12 @@
-import { useFetch } from 'usehooks-ts'
-
 import { Bookmark, General, Performer, VideoStar } from '@interfaces'
 
 import { createApi } from '@config'
-const { api, baseURL } = createApi('/video')
+const { api } = createApi('/video')
 
-const defaultNumber = 0
 export default {
-  useVideo: <T>(id: number = defaultNumber) => useFetch<T>(`${baseURL}/${id}`),
-  useBookmarks: <T>(id: number = defaultNumber) => useFetch<T>(`${baseURL}/${id}/bookmark`),
   addBookmark: (id: number, categoryID: number, time: number) => {
     return api.post<Bookmark>(`/${id}/bookmark`, { categoryID, time })
   },
-  useStar: (id: number = defaultNumber) => useFetch<VideoStar | null>(`${baseURL}/${id}/star`),
   addStar: (id: number, star: string) => api.post<VideoStar>(`/${id}/star`, { name: star }),
   removeStar: (id: number) => api.delete(`/${id}/star`),
   addLocation: (id: number, locationID: number) => api.post<General>(`/${id}/location`, { locationID }),

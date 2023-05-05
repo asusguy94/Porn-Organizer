@@ -1,6 +1,4 @@
-//TODO this page has a depenceny that breaks when using getServerSideProps
-
-import { NextPage } from 'next/types'
+import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next/types'
 import { useRouter } from 'next/router'
 import { useState, useRef, useEffect } from 'react'
 
@@ -29,16 +27,18 @@ import ModalComponent, { ModalHandler, useModal } from '@components/modal'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Dropbox from '@components/dropbox'
 import { IconWithText } from '@components/icon'
+import Spinner from '@components/spinner'
 
 import { daysToYears } from '@utils/client/date-time'
 import { getUnique } from '@utils/shared'
+import prisma from '@utils/server/prisma'
+import { dateDiff, formatDate, getSimilarStars } from '@utils/server/helper'
 
 import { starService } from '@service'
 import { SetState, Similar, StarVideo } from '@interfaces'
 import { serverConfig } from '@config'
 
 import styles from './star.module.scss'
-import Spinner from '@components/spinner'
 
 type Star = {
   id: number
@@ -50,8 +50,8 @@ type Star = {
     haircolor: string
     ethnicity: string
     birthdate: string
-    height: number
-    weight: number
+    height: string
+    weight: string
   }
   similar: Similar[]
 }
@@ -62,23 +62,106 @@ type StarData = Partial<{
   haircolor: string[]
 }>
 
-const StarPage: NextPage = () => {
-  const { query, isReady } = useRouter()
+export const getServerSideProps: GetServerSideProps<
+  {
+    breast: string[]
+    haircolor: string[]
+    ethnicity: string[]
+    websites: string[]
+    star: Star
+    videos: StarVideo[]
+  },
+  { id: string }
+> = async context => {
+  const id = context.params?.id
+  if (id === undefined) throw new Error("'id' is missing")
 
-  const { breast, haircolor, ethnicity } = starService.useStarInfo().data ?? {}
+  const breasts = await prisma.star.findMany({ where: { breast: { not: null } }, orderBy: { breast: 'asc' } })
+  const haircolors = await prisma.star.findMany({ where: { haircolor: { not: null } }, orderBy: { haircolor: 'asc' } })
+  const ethnicities = await prisma.star.findMany({ where: { ethnicity: { not: null } }, orderBy: { ethnicity: 'asc' } })
+  const websites = await prisma.website.findMany({ orderBy: { name: 'asc' } })
 
-  const starID = isReady && typeof query.id === 'string' ? parseInt(query.id) : undefined
-  const { data: starData } = starService.useStar<Star>(starID)
-  const { data: videos } = starService.useStarVideos(starID)
+  const videos = await prisma.video.findMany({
+    where: { starID: parseInt(id) },
+    select: {
+      id: true,
+      name: true,
+      date: true,
+      path: true,
+      starAge: true,
+      cover: true,
+      star: { select: { birthdate: true } },
+      website: { select: { name: true } },
+      site: { select: { name: true } }
+    },
+    orderBy: { date: 'asc' }
+  })
 
-  const [star, setStar] = useState<Star>()
+  const star = await prisma.star.findFirstOrThrow({
+    where: { id: parseInt(id) },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      autoTaggerIgnore: true,
+      breast: true,
+      haircolor: true,
+      ethnicity: true,
+      birthdate: true,
+      height: true,
+      weight: true
+    }
+  })
 
+  const { autoTaggerIgnore, breast, haircolor, ethnicity, birthdate, height, weight, ...rest } = star
+  return {
+    props: {
+      breast: getUnique(breasts.flatMap(({ breast }) => (breast !== null ? [breast] : []))),
+      haircolor: getUnique(haircolors.flatMap(({ haircolor }) => (haircolor !== null ? [haircolor] : []))),
+      ethnicity: getUnique(ethnicities.flatMap(({ ethnicity }) => (ethnicity !== null ? [ethnicity] : []))),
+      websites: websites.map(website => website.name),
+      star: {
+        ...rest,
+        ignored: autoTaggerIgnore,
+        info: {
+          breast: breast ?? '',
+          haircolor: haircolor ?? '',
+          ethnicity: ethnicity ?? '',
+          // items without autocomplete
+          birthdate: birthdate ? formatDate(birthdate, true) : '',
+          height: height?.toString() ?? '',
+          weight: weight?.toString() ?? ''
+        },
+        similar: await getSimilarStars(star.id)
+      },
+      videos: videos
+        .map(({ path, website, site, starAge, star, cover, ...video }) => ({
+          ...video,
+          date: formatDate(video.date),
+          fname: path,
+          website: website.name,
+          site: site?.name ?? null,
+          age: starAge ?? dateDiff(star?.birthdate, video.date),
+          image: cover ?? '',
+          hidden: false
+        }))
+        .sort((a, b) => a.age - b.age)
+    }
+  }
+}
+
+const StarPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
+  breast,
+  haircolor,
+  ethnicity,
+  videos,
+  star: starData
+}) => {
+  const [star, setStar] = useState<typeof starData>() //FIXME starData cannot be used directly
   const { modal, setModal } = useModal()
 
   useEffect(() => {
-    if (starData !== undefined) {
-      setStar(starData)
-    }
+    setStar(starData)
   }, [starData])
 
   if (star === undefined) return <Spinner />

@@ -128,7 +128,7 @@ type VideoPlayerProps = {
   plyrRef: React.MutableRefObject<PlyrWithMetadata | null>
   update: {
     video: SetState<Video | undefined>
-    star: SetState<VideoStar | null | undefined>
+    star: SetState<VideoStar | null>
     bookmarks: SetState<Bookmark[]>
   }
   onModal: ModalHandler

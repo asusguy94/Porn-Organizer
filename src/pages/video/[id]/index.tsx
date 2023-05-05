@@ -1,7 +1,4 @@
-//TODO this page has a depenceny that breaks when using getServerSideProps
-
-import { NextPage } from 'next/types'
-import { useRouter } from 'next/router'
+import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next/types'
 import { useEffect, useRef, useState } from 'react'
 
 import { Grid, Card, Typography, TextField } from '@mui/material'
@@ -19,45 +16,157 @@ import Spinner from '@components/spinner'
 import { PlyrWithMetadata } from '@components/plyr'
 
 import { Bookmark as VideoBookmark, Video, VideoStar, SetState, Bookmark, General } from '@interfaces'
-import { attributeService, categoryService, locationService, videoService } from '@service'
+import { videoService } from '@service'
 import { serverConfig } from '@config'
 import { daysToYears } from '@utils/client/date-time'
 
 import styles from './video.module.scss'
+import prisma from '@utils/server/prisma'
+import { Attribute, Category, Location } from '@prisma/client'
+import { dateDiff, formatDate, generateHash, validateHash } from '@utils/server/helper'
+import { getSceneData } from '@utils/server/metadata'
+import { generateStarName } from '@utils/server/generate'
 
-const VideoPage: NextPage = () => {
-  const { query, isReady } = useRouter()
+export const getServerSideProps: GetServerSideProps<
+  {
+    attributes: Attribute[]
+    categories: Category[]
+    locations: Location[]
+    video: Video
+    star: VideoStar | null
+    bookmarks: Bookmark[]
+  },
+  { id: string }
+> = async context => {
+  const id = context.params?.id
+  if (id === undefined) throw new Error("'id' is missing")
 
-  const { data: attributes } = attributeService.useAttributes()
-  const { data: categories } = categoryService.useCategories()
-  const { data: locations } = locationService.useLocations()
+  const attributes = await prisma.attribute.findMany()
+  const categories = await prisma.category.findMany()
+  const locations = await prisma.location.findMany()
 
-  const videoID = isReady && typeof query.id === 'string' ? parseInt(query.id) : undefined
-  const { data: videoData } = videoService.useVideo<Video>(videoID)
-  const { data: starData } = videoService.useStar(videoID)
-  const { data: bookmarksData } = videoService.useBookmarks<Bookmark[]>(videoID)
+  const bookmarks = await prisma.bookmark.findMany({
+    select: {
+      id: true,
+      category: { select: { id: true, name: true } },
+      start: true
+    },
+    where: { videoID: parseInt(id) },
+    orderBy: { start: 'asc' }
+  })
 
-  const [video, setVideo] = useState(videoData)
-  const [star, setStar] = useState<VideoStar | null>()
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
+  const star = await prisma.star.findFirst({
+    where: { videos: { some: { id: parseInt(id) } } },
+    select: { id: true, name: true, image: true, birthdate: true }
+  })
+
+  let starVal: VideoStar | null = null
+  if (star !== null) {
+    const videos = await prisma.video.findMany({
+      where: { starID: star.id }
+    })
+
+    const { birthdate, ...rest } = star
+    starVal = {
+      ...rest,
+      ageInVideo: dateDiff(videos.find(v => v.id === parseInt(id))?.date, birthdate),
+      numVideos: videos.length
+    }
+  }
+
+  const { apiDateHash, ...video } = await prisma.video.findFirstOrThrow({
+    where: { id: parseInt(id) },
+    select: {
+      id: true,
+      name: true,
+      cover: true,
+      api: true,
+      path: true,
+      added: true,
+      date: true,
+      duration: true,
+      height: true,
+      plays: true,
+      website: true,
+      locations: { select: { location: true } },
+      attributes: { select: { attribute: true } },
+      site: true,
+      apiDateHash: true
+    }
+  })
+
+  let invalid = false
+  if (video.api !== null) {
+    // check if date has been validated
+    if (!(apiDateHash !== null && validateHash(formatDate(video.date, true), apiDateHash))) {
+      try {
+        const apiDate = (await getSceneData(video.api)).date.trim()
+
+        // date don't match either
+        invalid = apiDate !== formatDate(video.date, true)
+
+        // ony update database with new hash if nessesary
+        await prisma.video.update({
+          where: { id: video.id },
+          data: {
+            apiDateHash: generateHash(apiDate)
+          }
+        })
+      } catch (error) {
+        console.error(error)
+      }
+    }
+  }
+
+  const { cover, api, path, added, site, ...rest } = video
+  return {
+    props: {
+      attributes,
+      categories,
+      locations,
+      video: {
+        ...rest,
+        image: cover,
+        slug: api,
+        path: {
+          file: path,
+          stream: `${path.split('.').slice(0, -1).join('.')}/master.m3u8`
+        },
+        date: {
+          added: formatDate(added),
+          published: formatDate(rest.date),
+          invalid
+        },
+        plays: rest.plays.length,
+        website: rest.website.name,
+        star: generateStarName(path),
+        locations: rest.locations.map(({ location }) => location),
+        attributes: rest.attributes.map(({ attribute }) => attribute),
+        subsite: site?.name ?? ''
+      },
+      star: starVal,
+      bookmarks
+    }
+  }
+}
+
+const VideoPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
+  attributes,
+  categories,
+  locations,
+  video: videoData,
+  star: starData,
+  bookmarks: bookmarksData
+}) => {
+  const [video, setVideo] = useState<typeof videoData>() //FIXME videoData cannot be used directly
+  const [star, setStar] = useState(starData)
+  const [bookmarks, setBookmarks] = useState(bookmarksData)
 
   const { modal, setModal } = useModal()
 
   useEffect(() => {
     setVideo(videoData)
   }, [videoData])
-
-  useEffect(() => {
-    if (starData !== undefined) {
-      setStar(starData)
-    }
-  }, [starData])
-
-  useEffect(() => {
-    if (bookmarksData !== undefined) {
-      setBookmarks(bookmarksData)
-    }
-  }, [bookmarksData])
 
   return (
     <Grid container>
@@ -75,16 +184,12 @@ const VideoPage: NextPage = () => {
 
       <Grid item xs={2} id={styles.sidebar} component='aside'>
         <div id={styles.stars}>
-          {star !== undefined ? (
-            video !== undefined && (
-              <>
-                {star !== null && <Star video={video} star={star} update={setStar} />}
+          {video !== undefined && (
+            <>
+              {star !== null && <Star video={video} star={star} update={setStar} />}
 
-                <StarInput video={video} disabled={star !== null} update={setStar} />
-              </>
-            )
-          ) : (
-            <Spinner />
+              <StarInput video={video} disabled={star !== null} update={setStar} />
+            </>
           )}
         </div>
       </Grid>
@@ -105,7 +210,7 @@ type SectionProps = {
   star?: VideoStar | null
   update: {
     video: SetState<Video | undefined>
-    star: SetState<VideoStar | null | undefined>
+    star: SetState<VideoStar | null>
     bookmarks: SetState<Bookmark[]>
   }
   onModal: ModalHandler
@@ -166,7 +271,7 @@ const Section = ({
 type StarProps = {
   star: VideoStar
   video: Video
-  update: SetState<VideoStar | null | undefined>
+  update: SetState<VideoStar | null>
 }
 const Star = ({ star, video, update }: StarProps) => {
   const removeStarHandler = () => {
@@ -211,7 +316,7 @@ const Star = ({ star, video, update }: StarProps) => {
 
 type StarInputProps = {
   video: Video
-  update: SetState<VideoStar | null | undefined>
+  update: SetState<VideoStar | null>
   disabled?: boolean
 }
 const StarInput = ({ video, update, disabled = false }: StarInputProps) => {
