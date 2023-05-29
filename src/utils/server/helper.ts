@@ -101,11 +101,6 @@ export const fileExists = async (path: string): Promise<boolean> => {
 }
 
 export const getDate = (dateStr: string) => dayjs.utc(dateStr).toDate()
-export const formatDate = (dateStr: string | Date, raw = false): string => {
-  const date = dayjs.utc(dateStr)
-
-  return raw ? date.format('YYYY-MM-DD') : date.format('D MMMM YYYY')
-}
 
 export const formatBreastSize = (input: string): string => {
   let breast = input.toUpperCase()

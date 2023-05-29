@@ -8,7 +8,6 @@ import {
   dateDiff,
   downloader,
   fileExists,
-  formatDate,
   getDate,
   isNewDate,
   logger,
@@ -18,7 +17,7 @@ import {
 import { generateDate } from '@utils/server/generate'
 import { resizeImage } from '@utils/server/ffmpeg'
 import { getSceneData, getSceneSlug } from '@utils/server/metadata'
-import { printError } from '@utils/shared'
+import { formatDate, printError } from '@utils/shared'
 import { settingsConfig } from '@config'
 import { NextApiResponseWithSocket } from '@interfaces/socket'
 
@@ -27,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
     const { id } = req.query
 
     if (typeof id === 'string') {
-      const { title, starAge, plays, slug, path, date, cover } = validate(
+      const { title, starAge, plays, slug, path, date, cover, validated } = validate(
         z.object({
           title: z.string().optional(),
           starAge: z.number().int().min(18).max(99).nullable().optional(),
@@ -36,6 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
           path: z.string().optional(),
           date: z.boolean().optional(),
           cover: z.boolean().or(z.string().url()).optional(),
+          validated: z.literal(true).optional()
         }),
         req.body
       )
@@ -49,6 +49,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
         await prisma.video.update({
           where: { id: parseInt(id) },
           data: { starAge: starAge }
+        })
+      } else if (validated !== undefined) {
+        await prisma.video.update({
+          where: { id: parseInt(id) },
+          data: { validated: validated }
         })
       } else if (plays !== undefined) {
         if (!plays) {

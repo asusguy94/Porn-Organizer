@@ -30,9 +30,9 @@ import { IconWithText } from '@components/icon'
 import Spinner from '@components/spinner'
 
 import { daysToYears } from '@utils/client/date-time'
-import { getUnique } from '@utils/shared'
+import { formatDate, getUnique } from '@utils/shared'
 import prisma from '@utils/server/prisma'
-import { dateDiff, formatDate, getSimilarStars } from '@utils/server/helper'
+import { dateDiff, getSimilarStars } from '@utils/server/helper'
 
 import { starService } from '@service'
 import { SetState, Similar, StarVideo } from '@interfaces'
@@ -47,7 +47,7 @@ type Star = {
   ignored: boolean
   info: {
     breast: string
-    haircolor: string
+    haircolor: string[]
     ethnicity: string
     birthdate: string
     height: string

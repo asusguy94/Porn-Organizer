@@ -8,6 +8,13 @@ $spacing: 5px;
       color: black;
     }
 
+    &.location,
+    &.attribute {
+      &:hover {
+        text-decoration: line-through;
+      }
+    }
+
     margin-left: 15px;
 
     svg {

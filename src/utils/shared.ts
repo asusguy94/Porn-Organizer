@@ -1,3 +1,7 @@
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
+
 export const getUnique = <T>(arr: T[], prop?: keyof T): T[] => {
   if (prop !== undefined) {
     return arr.filter((obj, idx) => arr.findIndex(item => item[prop] === obj[prop]) === idx)
@@ -25,4 +29,10 @@ export const printError = (error: unknown) => {
   if (error instanceof Error) {
     console.error(`Error: ${error.message}`)
   }
+}
+
+export const formatDate = (dateStr: string | Date, raw = false, addDays = 0): string => {
+  const date = dayjs.utc(dateStr).add(addDays, 'days')
+
+  return raw ? date.format('YYYY-MM-DD') : date.format('D MMMM YYYY')
 }

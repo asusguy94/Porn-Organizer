@@ -31,12 +31,13 @@ export default {
   removePlays: (id: number) => api.put(`/${id}`, { plays: 0 }),
   rename: (id: number, path: string) => api.put(`/${id}`, { path }),
   setThumbnail: (id: number) => api.put(`/${id}`, { cover: true }),
-  getStarInfo: (id: number) => {
+  validateTitle: (id: number) => api.put(`/${id}`, { validated: true }),
+  getVideoInfo: (id: number) => {
     return api.get<{
       id: string
       title: string
       date: string
-      performers: Performer[]
+      image: string
     }>(`/${id}/star/info`)
   },
   addVideos: <T>(videos: T) => api.post('/add', { videos })

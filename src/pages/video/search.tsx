@@ -19,9 +19,9 @@ import Link from '@components/link'
 import { daysToYears } from '@utils/client/date-time'
 import { SetState, General, LocalWebsite } from '@interfaces'
 import { serverConfig } from '@config'
-import { getUnique, printWithMax } from '@utils/shared'
+import { formatDate, getUnique, printWithMax } from '@utils/shared'
 import prisma from '@utils/server/prisma'
-import { dateDiff, formatDate } from '@utils/server/helper'
+import { dateDiff } from '@utils/server/helper'
 
 import styles from './search.module.scss'
 

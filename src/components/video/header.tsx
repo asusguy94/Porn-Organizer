@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
 
 import { Button, Grid, ImageList, ImageListItem, TextField, Typography } from '@mui/material'
 
@@ -14,9 +14,9 @@ import Spinner from '../spinner'
 import { attributeService, locationService, videoService } from '@service'
 import { General, SetState, Video } from '@interfaces'
 import { settingsConfig } from '@config'
+import { formatDate } from '@utils/shared'
 
 import styles from './header.module.scss'
-import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 type HeaderProps = {
   video: Video
@@ -32,6 +32,7 @@ const Header = ({ video, attributes, locations, update, onModal }: HeaderProps) 
 
       <HeaderSlug video={video} hidden={video.slug !== null} onModal={onModal} />
       <HeaderCover video={video} hidden={video.image !== null || video.slug === null} />
+      <ValidateTitle video={video} hidden={video.validated || video.slug === null} onModal={onModal} />
 
       <HeaderDate video={video} />
 
@@ -149,6 +150,58 @@ const HeaderCover = ({ video, hidden = false }: HeaderCoverProps) => {
   )
 }
 
+type ValidateTitleProps = {
+  video: Video
+  hidden: boolean
+  onModal: ModalHandler
+}
+const ValidateTitle = ({ video, hidden, onModal }: ValidateTitleProps) => {
+  const [disabled, setDisabled] = useState(hidden)
+  const [value, setValue] = useState('Validate Title')
+
+  const handleClick = () => {
+    setValue('Loading...')
+    videoService.getVideoInfo(video.id).then(({ data }) => {
+      if (data.title.toLowerCase().trim() === video.name.toLowerCase().trim()) {
+        setValue('Updating...')
+        videoService.validateTitle(video.id).then(() => {
+          setDisabled(true)
+        })
+      } else {
+        setValue('Validate Title')
+        onModal(
+          'Validate Title',
+          <>
+            <pre>{video.name}</pre> does not match <pre>{data.title}</pre>
+            <Button
+              size='small'
+              variant='contained'
+              color='warning'
+              onClick={() => {
+                onModal()
+                setValue('Updating...')
+                videoService.validateTitle(video.id).then(() => {
+                  setDisabled(true)
+                })
+              }}
+            >
+              Override?
+            </Button>
+          </>
+        )
+      }
+    })
+  }
+
+  if (disabled) return null
+
+  return (
+    <Button size='small' variant='outlined' onClick={handleClick}>
+      {value}
+    </Button>
+  )
+}
+
 type HeaderLocationsProps = {
   video: Video
   update: SetState<Video | undefined>
@@ -164,19 +217,18 @@ const HeaderLocations = ({ video, update }: HeaderLocationsProps) => {
     <>
       {video.locations
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map(item => (
-          <Fragment key={item.id}>
-            <ContextMenuTrigger id={`location-${item.id}`} className='d-inline-block'>
-              <Button size='small' variant='outlined' color='secondary'>
+        .map(location => (
+          <Button
+            key={location.id}
+            size='small'
+            variant='outlined'
+            color='secondary'
+            className={styles.location}
+            onClick={() => removeLocation(location)}
+          >
                 <Icon code='map' />
-                {item.name}
+            {location.name}
               </Button>
-            </ContextMenuTrigger>
-
-            <ContextMenu id={`location-${item.id}`}>
-              <IconWithText component={MenuItem} icon='delete' text='Remove' onClick={() => removeLocation(item)} />
-            </ContextMenu>
-          </Fragment>
         ))}
     </>
   )
@@ -197,19 +249,18 @@ const HeaderAttributes = ({ video, update }: HeaderAttributesProps) => {
     <>
       {video.attributes
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map(item => (
-          <Fragment key={item.id}>
-            <ContextMenuTrigger id={`attribute-${item.id}`} className='d-inline-block'>
-              <Button size='small' variant='outlined' color='primary'>
+        .map(attribute => (
+          <Button
+            key={attribute.id}
+            size='small'
+            variant='outlined'
+            color='primary'
+            className={styles.attribute}
+            onClick={() => removeAttribute(attribute)}
+          >
                 <Icon code='tag' />
-                {item.name}
+            {attribute.name}
               </Button>
-            </ContextMenuTrigger>
-
-            <ContextMenu id={`attribute-${item.id}`}>
-              <IconWithText component={MenuItem} icon='delete' text='Remove' onClick={() => removeAttribute(item)} />
-            </ContextMenu>
-          </Fragment>
         ))}
     </>
   )
@@ -227,17 +278,19 @@ const HeaderDate = ({ video }: HeaderDateProps) => {
     })
   }
 
+  const isInvalid = video.slug !== null && video.date.apiDate !== video.date.published
+
   return (
     <>
       <ContextMenuTrigger id='menu__date' className='d-inline-block'>
-        <Button size='small' variant='outlined'>
+        <Button size='small' variant='outlined' color={isInvalid ? 'error' : undefined}>
           <Icon code='calendar' />
-          {video.date.invalid ? 'INVALID_DATE' : video.date.published}
+          {isInvalid ? 'INVALID_DATE' : video.date.published}
         </Button>
       </ContextMenuTrigger>
 
       <ContextMenu id='menu__date'>
-        <IconWithText component={MenuItem} icon='sync' text='Refresh Date' onClick={() => fixDate()} />
+        <IconWithText component={MenuItem} icon='sync' text='Refresh Date' onClick={fixDate} />
       </ContextMenu>
     </>
   )

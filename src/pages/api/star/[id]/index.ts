@@ -2,7 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import prisma from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
-import { formatBreastSize, formatDate, getDate, getSimilarStars } from '@utils/server/helper'
+import { formatBreastSize, getDate, getSimilarStars } from '@utils/server/helper'
+import { formatDate } from '@utils/shared'
 import { PutStar, RawStar } from '@interfaces/api'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<PutStar | RawStar>) {
