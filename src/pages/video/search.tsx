@@ -37,7 +37,6 @@ export const getServerSideProps: GetServerSideProps<{
       height: true,
       date: true,
       api: true,
-      apiDateHash: true,
       cover: true,
       name: true,
       star: { select: { name: true, birthdate: true } },
@@ -57,11 +56,10 @@ export const getServerSideProps: GetServerSideProps<{
 
   return {
     props: {
-      videos: videos.map(({ height, cover, bookmarks, apiDateHash, ...video }) => ({
+      videos: videos.map(({ height, cover, bookmarks, ...video }) => ({
         ...video,
         quality: height,
         date: formatDate(video.date),
-        invalidDate: apiDateHash === null || (video.api !== null && cover === null),
         image: cover,
         star: video.star?.name ?? null,
         ageInVideo: dateDiff(video.star?.birthdate, video.date),

@@ -74,7 +74,7 @@ export const getServerSideProps: GetServerSideProps<
     }
   }
 
-  const { apiDateHash, ...video } = await prisma.video.findFirstOrThrow({
+  const video = await prisma.video.findFirstOrThrow({
     where: { id: parseInt(id) },
     select: {
       id: true,

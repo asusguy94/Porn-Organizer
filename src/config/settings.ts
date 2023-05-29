@@ -13,7 +13,6 @@ export default {
     spacing: parseFloat(getValue('NEXT_PUBLIC_TIMELINE_SPACING', '0'))
   },
   player: {
-    maxDurationDiff: parseInt(getValue('NEXT_PUBLIC_PLAYER_DURATIONDIFF', '1')),
     thumbnails: getValue('NEXT_PUBLIC_PLAYER_THUMBNAILS', 'false') === 'true'
   },
   THUMB_RES: parseInt(process.env.THUMBNAIL_RES ?? '290'),

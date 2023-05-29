@@ -35,7 +35,6 @@ export type VideoSearch = {
   attributes: string[]
   categories: string[]
   date: string
-  invalidDate: boolean
   image: string | null
   locations: string[]
   plays: number

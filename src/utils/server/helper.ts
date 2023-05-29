@@ -4,7 +4,6 @@ import fs from 'fs'
 import path from 'path'
 import fetch from 'node-fetch'
 import ffmpeg from 'fluent-ffmpeg'
-import crypto from 'crypto-js'
 import { Server } from 'socket.io'
 
 import dayjs from 'dayjs'
@@ -312,10 +311,6 @@ export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, pat
 export const sleep = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
-
-// Indetity Hashing
-export const generateHash = (str: string) => crypto.MD5(str).toString()
-export const validateHash = (str: string, hash: string) => generateHash(str) === hash
 
 export const toCamelCase = (str: string) => str.replace(/([a-z])([A-Z])/g, '$1 $2')
 
