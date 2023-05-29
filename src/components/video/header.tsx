@@ -242,9 +242,9 @@ const HeaderLocations = ({ video, update }: HeaderLocationsProps) => {
             className={styles.location}
             onClick={() => removeLocation(location)}
           >
-                <Icon code='map' />
+            <Icon code='map' />
             {location.name}
-              </Button>
+          </Button>
         ))}
     </>
   )
@@ -274,9 +274,9 @@ const HeaderAttributes = ({ video, update }: HeaderAttributesProps) => {
             className={styles.attribute}
             onClick={() => removeAttribute(attribute)}
           >
-                <Icon code='tag' />
+            <Icon code='tag' />
             {attribute.name}
-              </Button>
+          </Button>
         ))}
     </>
   )
@@ -294,6 +294,15 @@ const HeaderDate = ({ video }: HeaderDateProps) => {
     })
   }
 
+  const autoRename = () => {
+    if (video.date.apiDate !== null) {
+      const newDate = formatDate(video.date.apiDate, true, 1)
+
+      const newFileName = video.path.file.replace(/\{.*?\}/, `{${newDate}}`)
+      videoService.rename(video.id, newFileName).then(() => fixDate())
+    }
+  }
+
   const isInvalid = video.slug !== null && video.date.apiDate !== video.date.published
 
   return (
@@ -307,6 +316,13 @@ const HeaderDate = ({ video }: HeaderDateProps) => {
 
       <ContextMenu id='menu__date'>
         <IconWithText component={MenuItem} icon='sync' text='Refresh Date' onClick={fixDate} />
+        <IconWithText
+          component={MenuItem}
+          icon='edit'
+          text='Auto Rename (EXPERIMENTAL)'
+          onClick={autoRename}
+          disabled={!isInvalid}
+        />
       </ContextMenu>
     </>
   )
