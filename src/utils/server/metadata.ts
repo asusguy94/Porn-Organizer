@@ -60,7 +60,7 @@ export const getSceneSlug = async (slug: string): Promise<string> => {
   return Promise.resolve(result.data.id)
 }
 
-export async function findBroadSceneSlug(videoTitle: string, wsiteOrSite: string) {
+export async function findBroadSceneSlug(videoTitle: string, wsiteOrSite?: string) {
   type Scene = {
     data: {
       id: string
@@ -77,7 +77,9 @@ export async function findBroadSceneSlug(videoTitle: string, wsiteOrSite: string
 
   const url = getUrl('/scenes')
   url.searchParams.set('title', videoTitle)
-  url.searchParams.set('q', wsiteOrSite)
+  if (wsiteOrSite !== undefined) {
+    url.searchParams.set('q', wsiteOrSite)
+  }
 
   const result = (await axios.get<Scene>(url.href, createConfig(true))).data
 

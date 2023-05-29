@@ -75,6 +75,22 @@ const HeaderSlug = ({ video, hidden = false, onModal }: HeaderSlugProps) => {
     const calcRows = (images: unknown[]) => Math.min(images.length, MAX_ROWS)
 
     videoService.getSlugs(video.id).then(({ data }) => {
+      data.sort((a, b) => {
+        const matchesA = [
+          a.title === video.name,
+          [video.website, video.subsite].includes(a.site),
+          a.date === formatDate(video.date.published, true)
+        ].filter(Boolean).length
+
+        const matchesB = [
+          b.title === video.name,
+          [video.website, video.subsite].includes(b.site),
+          b.date === formatDate(video.date.published, true)
+        ].filter(Boolean).length
+
+        return matchesB - matchesA
+      })
+
       onModal(
         'Select Slug',
         <ImageList cols={calcCols(data)} sx={{ margin: 0, height: (275 + GAP) * calcRows(data) }}>

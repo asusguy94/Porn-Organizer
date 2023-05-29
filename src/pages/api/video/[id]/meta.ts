@@ -20,6 +20,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       if (video.site !== null) {
         result = [...result, ...(await findBroadSceneSlug(video.name, video.site.name))]
       }
+      if (result.length === 0) {
+        result = await findBroadSceneSlug(video.name)
+      }
 
       res.json(getUnique(result, 'id'))
 
