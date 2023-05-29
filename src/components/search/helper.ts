@@ -21,7 +21,7 @@ export type StarSearch = {
   age: number
   breast: string | null
   ethnicity: string | null
-  haircolor: string | null
+  haircolor: string[]
   score: number
   websites: string[]
   sites: string[]
@@ -72,11 +72,8 @@ const isHaircolorVisible = (star: StarSearch, hidden: HiddenStar) => {
   // hidden is empty
   if (hidden.haircolor.length === 0) return true
 
-  // star has no haircolor
-  if (star.haircolor === null) return false
-
   // hidden is not empty
-  return hidden.haircolor.toLowerCase() === star.haircolor.toLowerCase()
+  return star.haircolor.some(haircolor => haircolor.toLowerCase() === hidden.haircolor.toLowerCase())
 }
 
 const isEthnicityVisible = (star: StarSearch, hidden: HiddenStar) => {

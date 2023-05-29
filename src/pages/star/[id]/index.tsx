@@ -1,6 +1,6 @@
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next/types'
 import { useRouter } from 'next/router'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, Fragment } from 'react'
 
 import {
   Button,
@@ -77,7 +77,7 @@ export const getServerSideProps: GetServerSideProps<
   if (id === undefined) throw new Error("'id' is missing")
 
   const breasts = await prisma.star.findMany({ where: { breast: { not: null } }, orderBy: { breast: 'asc' } })
-  const haircolors = await prisma.star.findMany({ where: { haircolor: { not: null } }, orderBy: { haircolor: 'asc' } })
+  const haircolors = await prisma.haircolor.findMany({ orderBy: { name: 'asc' } })
   const ethnicities = await prisma.star.findMany({ where: { ethnicity: { not: null } }, orderBy: { ethnicity: 'asc' } })
   const websites = await prisma.website.findMany({ orderBy: { name: 'asc' } })
 
@@ -97,7 +97,7 @@ export const getServerSideProps: GetServerSideProps<
     orderBy: { date: 'asc' }
   })
 
-  const star = await prisma.star.findFirstOrThrow({
+  const { haircolors: starHaircolors, ...star } = await prisma.star.findFirstOrThrow({
     where: { id: parseInt(id) },
     select: {
       id: true,
@@ -105,7 +105,7 @@ export const getServerSideProps: GetServerSideProps<
       image: true,
       autoTaggerIgnore: true,
       breast: true,
-      haircolor: true,
+      haircolors: true,
       ethnicity: true,
       birthdate: true,
       height: true,
@@ -113,11 +113,11 @@ export const getServerSideProps: GetServerSideProps<
     }
   })
 
-  const { autoTaggerIgnore, breast, haircolor, ethnicity, birthdate, height, weight, ...rest } = star
+  const { autoTaggerIgnore, breast, ethnicity, birthdate, height, weight, ...rest } = star
   return {
     props: {
       breast: getUnique(breasts.flatMap(({ breast }) => (breast !== null ? [breast] : []))),
-      haircolor: getUnique(haircolors.flatMap(({ haircolor }) => (haircolor !== null ? [haircolor] : []))),
+      haircolor: haircolors.map(haircolor => haircolor.name),
       ethnicity: getUnique(ethnicities.flatMap(({ ethnicity }) => (ethnicity !== null ? [ethnicity] : []))),
       websites: websites.map(website => website.name),
       star: {
@@ -125,7 +125,7 @@ export const getServerSideProps: GetServerSideProps<
         ignored: autoTaggerIgnore,
         info: {
           breast: breast ?? '',
-          haircolor: haircolor ?? '',
+          haircolor: starHaircolors.map(({ hair: haircolor }) => haircolor),
           ethnicity: ethnicity ?? '',
           // items without autocomplete
           birthdate: birthdate ? formatDate(birthdate, true) : '',
@@ -169,7 +169,7 @@ const StarPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
   return (
     <Grid container>
       <Grid item xs={7}>
-        <div id={styles.star} style={{ maxWidth: '32%' }}>
+        <div id={styles.star}>
           <StarImageDropbox star={star} update={setStar} onModal={setModal} />
 
           <StarTitle star={star} update={setStar} onModal={setModal} />
@@ -431,6 +431,24 @@ type StarFormProps = {
 const StarForm = ({ star, starData, update }: StarFormProps) => {
   const router = useRouter()
 
+  const addHaircolor = (name: string) => {
+    starService.addHaircolor(star.id, name).then(() => {
+      update({ ...star, info: { ...star.info, haircolor: [...star.info.haircolor, name] } })
+    })
+  }
+
+  const removeHaircolor = (name: string) => {
+    starService.removeHaircolor(star.id, name).then(() => {
+      update({
+        ...star,
+        info: {
+          ...star.info,
+          haircolor: star.info.haircolor.filter(haircolor => haircolor.toLowerCase() !== name.toLowerCase())
+        }
+      })
+    })
+  }
+
   const updateInfo = (value: string, label: string) => {
     starService.updateInfo(star.id, label, value).then(({ data }) => {
       if (data.reload) {
@@ -468,11 +486,48 @@ const StarForm = ({ star, starData, update }: StarFormProps) => {
       </div>
 
       <StarInputForm update={updateInfo} name='Breast' value={star.info.breast} list={starData.breast} capitalize />
-      <StarInputForm update={updateInfo} name='HairColor' value={star.info.haircolor} list={starData.haircolor} />
+
+      <StarInputForm
+        update={addHaircolor}
+        name='Haircolor'
+        emptyByDefault
+        value={star.info.haircolor}
+        list={starData.haircolor}
+      >
+        <InputFormData label='haircolor' data={star.info.haircolor} remove={removeHaircolor} />
+      </StarInputForm>
+
       <StarInputForm update={updateInfo} name='Ethnicity' value={star.info.ethnicity} list={starData.ethnicity} />
       <StarInputForm update={updateInfo} name='Birthdate' value={star.info.birthdate} noDropdown />
       <StarInputForm update={updateInfo} name='Height' value={star.info.height.toString()} noDropdown />
       <StarInputForm update={updateInfo} name='Weight' value={star.info.weight.toString()} noDropdown />
+    </>
+  )
+}
+
+type InputFormDataProps = {
+  data: string[]
+  remove: (name: string) => void
+  label: string
+}
+const InputFormData = ({ label, data, remove }: InputFormDataProps) => {
+  return (
+    <>
+      {data.map(item => (
+        <Fragment key={item}>
+          <ContextMenuTrigger id={`${label}-${item}`} className='d-inline-block'>
+            <span className={styles.data}>
+              <Button size='small' variant='outlined' color='primary'>
+                {item}
+              </Button>
+            </span>
+          </ContextMenuTrigger>
+
+          <ContextMenu id={`${label}-${item}`}>
+            <IconWithText component={MenuItem} icon='delete' text='Remove' onClick={() => remove(item)} />
+          </ContextMenu>
+        </Fragment>
+      ))}
     </>
   )
 }
@@ -552,12 +607,13 @@ const StarVideos = ({ videos }: StarVideosProps) => {
 
 type StarInputFormProps = {
   update: (value: string, label: string) => void
-  value: string
+  value: string | string[]
   name: string
   list?: string[]
   capitalize?: boolean
   children?: React.ReactNode
   noDropdown?: boolean
+  emptyByDefault?: boolean
 }
 const StarInputForm = ({
   update,
@@ -566,7 +622,8 @@ const StarInputForm = ({
   list,
   children,
   capitalize = false,
-  noDropdown = false
+  noDropdown = false,
+  emptyByDefault = false
 }: StarInputFormProps) => {
   const hasDropdown = !noDropdown
 
@@ -582,25 +639,29 @@ const StarInputForm = ({
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (!open && e.key === 'Enter') {
       update(inputValue, name.toLowerCase())
+
+      if (emptyByDefault) setInputValue('')
     }
   }
 
-  const isChanged = inputValue.toLowerCase() !== value.toLowerCase()
-  const shouldShrink = isChanged || value.length > 0
+  const isChanged =
+    inputValue.toLowerCase() !== (typeof value === 'string' && !emptyByDefault ? value : '').toLowerCase()
+  const shouldShrink = isChanged || (typeof value === 'string' && value.length > 0)
 
   useEffect(() => {
-    if (value) {
+    if (!emptyByDefault && typeof value === 'string') {
       setInputValue(value)
     }
 
     return () => setInputValue('')
-  }, [value])
+  }, [emptyByDefault, value])
 
   if (hasDropdown && list === undefined) return <Spinner />
 
+  // FIXME excluding an item from dropdown causes a warning
   return (
     <Grid container style={{ marginBottom: 4 }}>
-      <Grid item xs={10}>
+      <Grid item xs={3}>
         <Autocomplete
           inputValue={inputValue}
           //
@@ -613,7 +674,7 @@ const StarInputForm = ({
           onKeyPress={handleKeyPress}
           //
           // OPTIONS
-          options={list ?? []}
+          options={list?.filter(item => !(emptyByDefault && value.includes(item))) ?? []}
           renderInput={params => (
             <TextField
               {...params}
@@ -637,7 +698,7 @@ const StarInputForm = ({
         />
       </Grid>
 
-      <Grid item style={{ marginTop: 18, marginLeft: 2 }}>
+      <Grid item style={{ marginTop: 14, marginLeft: 8 }}>
         {children}
       </Grid>
     </Grid>

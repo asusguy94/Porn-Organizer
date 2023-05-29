@@ -58,10 +58,9 @@ export const getServerSideProps: GetServerSideProps<{
     orderBy: { ethnicity: 'asc' }
   })
 
-  const haircolor = await prisma.star.findMany({
-    select: { haircolor: true },
-    where: { haircolor: { not: null } },
-    orderBy: { haircolor: 'asc' }
+  const haircolor = await prisma.haircolor.findMany({
+    select: { name: true },
+    orderBy: { name: 'asc' }
   })
 
   /**
@@ -86,7 +85,7 @@ export const getServerSideProps: GetServerSideProps<{
 
   const stars = await prisma.star.findMany({
     orderBy: { name: 'asc' },
-    include: { videos: { include: { website: { include: { sites: true } }, site: true } } }
+    include: { videos: { include: { website: { include: { sites: true } }, site: true } }, haircolors: true }
   })
 
   return {
@@ -95,7 +94,7 @@ export const getServerSideProps: GetServerSideProps<{
       starInfo: {
         breast: getUnique(breast.flatMap(({ breast }) => (breast !== null ? [breast] : []))),
         ethnicity: getUnique(ethnicity.flatMap(({ ethnicity }) => (ethnicity !== null ? [ethnicity] : []))),
-        haircolor: getUnique(haircolor.flatMap(({ haircolor }) => (haircolor !== null ? [haircolor] : [])))
+        haircolor: haircolor.map(haircolor => haircolor.name)
       },
       stars: stars.map(star => {
         const websites = getUnique(
@@ -112,7 +111,7 @@ export const getServerSideProps: GetServerSideProps<{
           name: star.name,
           image: star.image,
           breast: star.breast,
-          haircolor: star.haircolor,
+          haircolor: star.haircolors.map(haircolor => haircolor.hair),
           ethnicity: star.ethnicity,
           age: dateDiff(star.birthdate),
           videoCount: star.videos.length,

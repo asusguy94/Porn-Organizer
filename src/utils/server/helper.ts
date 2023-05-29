@@ -204,18 +204,20 @@ export const formatBreastSize = (input: string): string => {
 }
 
 export const getSimilarStars = async (starID: number, maxMaxLength = 9): Promise<SimilarStar[]> => {
-  const currentStar = await prisma.star.findFirstOrThrow({ where: { id: starID } })
+  const currentStar = await prisma.star.findFirstOrThrow({ where: { id: starID }, include: { haircolors: true } })
 
   const match_default = 2
   const match_important = 5
   const decimals = 0
 
-  const otherStars = (await prisma.star.findMany({ where: { id: { not: starID } } }))
+  const otherStars = (await prisma.star.findMany({ where: { id: { not: starID } }, include: { haircolors: true } }))
     .map(otherStar => {
       let match = 100
 
+      //TODO add better comparison of haircolors
       if (currentStar.breast !== null && otherStar.breast !== currentStar.breast) match -= match_important
-      if (currentStar.haircolor !== null && otherStar.haircolor !== currentStar.haircolor) match -= match_important
+      if (currentStar.haircolors.length !== 0 && otherStar.haircolors !== currentStar.haircolors)
+        match -= match_important
       if (currentStar.ethnicity !== null && otherStar.ethnicity !== currentStar.ethnicity) match -= match_important
       if (currentStar.height !== null && otherStar.height !== currentStar.height) match -= match_default
       if (currentStar.weight !== null && otherStar.weight !== currentStar.weight) match -= match_default

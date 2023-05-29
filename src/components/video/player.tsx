@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
-import { Button, Card, List, ListItem, TextField } from '@mui/material'
+import { Button, TextField } from '@mui/material'
 
 import Hls, { HlsConfig, HlsListeners } from 'hls.js'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
@@ -224,32 +224,6 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
     })
   }
 
-  const getStarInfo = () => {
-    videoService.getStarInfo(video.id).then(({ data }) => {
-      onModal(
-        'Star Details',
-        <List dense>
-          <ListItem>videoID: {data.id}</ListItem>
-          <ListItem>videoTitle: {data.title}</ListItem>
-          <ListItem>videoDate: {data.date}</ListItem>
-          {data.performers.map(performer => (
-            <List component={Card} key={performer.id} dense>
-              <ListItem>id: {performer.id}</ListItem>
-              <ListItem>name: {performer.name}</ListItem>
-              <ListItem>birthday: {performer.extra.birthday}</ListItem>
-              <ListItem>ethnicity: {performer.extra.ethnicity}</ListItem>
-              <ListItem>nationality: {performer.extra.nationality}</ListItem>
-              <ListItem>haircolor: {performer.extra.haircolor}</ListItem>
-              <ListItem>height: {performer.extra.height}</ListItem>
-              <ListItem>weight: {performer.extra.weight}</ListItem>
-              <ListItem>cupsize: {performer.extra.cupsize}</ListItem>
-            </List>
-          ))}
-        </List>
-      )
-    })
-  }
-
   if (categories === undefined) return <Spinner />
 
   return (
@@ -314,14 +288,6 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
               />
             )
           }}
-        />
-
-        <IconWithText
-          component={MenuItem}
-          icon='add'
-          text='Get Star Info'
-          onClick={getStarInfo}
-          disabled={video.slug === null}
         />
 
         <hr />

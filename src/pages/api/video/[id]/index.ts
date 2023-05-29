@@ -35,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
           slug: z.string().optional(),
           path: z.string().optional(),
           date: z.boolean().optional(),
-          cover: z.boolean().optional()
+          cover: z.boolean().or(z.string().url()).optional(),
         }),
         req.body
       )
@@ -65,14 +65,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
           // Reset SLUG
           await prisma.video.update({
             where: { id: parseInt(id) },
-            data: { api: null, apiDateHash: null }
+            data: { api: null, apiDate: null }
           })
         } else {
           // Add Slug
           await getSceneSlug(slug).then(async data => {
             await prisma.video.update({
               where: { id: parseInt(id) },
-              data: { api: data, apiDateHash: null }
+              data: { api: data, apiDate: null }
             })
           })
         }
@@ -115,7 +115,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
         })
         if (video.api) {
           try {
-            const { image } = await getSceneData(video.api, true)
+            const image = typeof cover === 'string' ? cover : (await getSceneData(video.api, true)).image
             if (image) {
               const imagePath = `images/videos/${video.id}.jpg`
               const imagePath_low = `images/videos/${video.id}-${settingsConfig.THUMB_RES}.jpg`

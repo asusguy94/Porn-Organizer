@@ -91,26 +91,21 @@ export const getServerSideProps: GetServerSideProps<
       locations: { select: { location: true } },
       attributes: { select: { attribute: true } },
       site: true,
-      apiDateHash: true
+      apiDate: true,
+      validated: true
     }
   })
 
-  let invalid = false
   if (video.api !== null) {
     // check if date has been validated
-    if (!(apiDateHash !== null && validateHash(formatDate(video.date, true), apiDateHash))) {
+    if (!(video.apiDate !== null && formatDate(video.date, true) === video.apiDate)) {
       try {
-        const apiDate = (await getSceneData(video.api)).date.trim()
+        video.apiDate = (await getSceneData(video.api)).date.trim()
 
-        // date don't match either
-        invalid = apiDate !== formatDate(video.date, true)
-
-        // ony update database with new hash if nessesary
+        // ony update database with new apiDate if nessesary
         await prisma.video.update({
           where: { id: video.id },
-          data: {
-            apiDateHash: generateHash(apiDate)
-          }
+          data: { apiDate: video.apiDate }
         })
       } catch (error) {
         console.error(error)
@@ -118,7 +113,7 @@ export const getServerSideProps: GetServerSideProps<
     }
   }
 
-  const { cover, api, path, added, site, ...rest } = video
+  const { cover, api, path, added, site, apiDate, ...rest } = video
   return {
     props: {
       attributes,
@@ -135,7 +130,7 @@ export const getServerSideProps: GetServerSideProps<
         date: {
           added: formatDate(added),
           published: formatDate(rest.date),
-          invalid
+          apiDate: apiDate !== null ? formatDate(apiDate) : null
         },
         plays: rest.plays.length,
         website: rest.website.name,

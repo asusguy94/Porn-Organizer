@@ -5,6 +5,7 @@ import { Button, Grid, ImageList, ImageListItem, TextField, Typography } from '@
 
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import { useCopyToClipboard } from 'usehooks-ts'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 import Icon, { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'

@@ -39,6 +39,7 @@ export type Similar = {
 export type Video = {
   id: number
   name: string
+  validated: boolean
   image: string | null
   slug: string | null
   duration: number
@@ -49,7 +50,7 @@ export type Video = {
   subsite: string
   locations: General[]
   attributes: General[]
-  date: { added: string; published?: string; invalid: boolean }
+  date: { added: string; published: string; apiDate: string | null }
   path: { file: string; stream: string }
 }
 

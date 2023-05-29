@@ -81,11 +81,29 @@ model StarAlias {
   @@map("staralias")
 }
 
+model Haircolor {
+  name String @id
+
+  stars StarHaircolors[]
+
+  @@map("haircolor")
+}
+
+model StarHaircolors {
+  hair   String
+  starId Int
+
+  haircolor Haircolor @relation(fields: [hair], references: [name], onDelete: Restrict, onUpdate: Cascade)
+  star      Star      @relation(fields: [starId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([starId, hair])
+  @@map("starhaircolors")
+}
+
 model Star {
   id               Int       @id @default(autoincrement())
   name             String    @unique
   image            String?   @unique
-  haircolor        String?
   breast           String?
   ethnicity        String?
   birthdate        DateTime? @db.Date
@@ -94,8 +112,9 @@ model Star {
   autoTaggerIgnore Boolean   @default(false)
   api              String?   @unique @db.VarChar(36)
 
-  alias  StarAlias[]
-  videos Video[]
+  haircolors StarHaircolors[]
+  alias      StarAlias[]
+  videos     Video[]
 
   @@map("star")
 }

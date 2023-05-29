@@ -6,9 +6,8 @@ import prisma from '@utils/server/prisma'
 import { formatBreastSize, getDate } from '@utils/server/helper'
 import { getStarData, getStarSlug } from '@utils/server/metadata'
 import { printError } from '@utils/shared'
-import { RawStar } from '@interfaces/api'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<RawStar>) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   if (req.method === 'POST') {
     const { id } = req.query
 
@@ -41,11 +40,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             update = true
           }
 
-          if (!star.haircolor && starData.haircolor) {
-            star.haircolor = capitalize(starData.haircolor)
-            update = true
-          }
-
           if (!star.height && starData.height) {
             star.height = starData.height
             update = true
@@ -70,10 +64,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const { id } = req.query
 
     if (typeof id === 'string') {
+      await prisma.starHaircolors.deleteMany({ where: { starId: parseInt(id) } })
+
       await prisma.star.update({
         where: { id: parseInt(id) },
         data: {
-          haircolor: null,
           breast: null,
           ethnicity: null,
           birthdate: null,

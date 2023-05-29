@@ -15,6 +15,8 @@ export default {
   removeImage: (id: number) => api.delete(`/${id}/image`),
   addImage: (id: number, url: string) => api.post<{ image: string }>(`/${id}/image`, { url }),
   getImages: (id: number) => api.post<{ images: string[] }>(`/${id}/api/image`),
+  addHaircolor: (id: number, name: string) => api.put(`/${id}/haircolor`, { name }),
+  removeHaircolor: (id: number, name: string) => api.put(`/${id}/haircolor`, { name, remove: true }),
   updateInfo: (id: number, label: string, value: string) =>
     api.put<{ reload: boolean; content: string | Date | number | null; similar: Similar[] }>(`/${id}`, {
       label,

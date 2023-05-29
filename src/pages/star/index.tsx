@@ -34,7 +34,7 @@ export const getServerSideProps: GetServerSideProps<{
         {
           // without profile data
           breast: null,
-          haircolor: null,
+          haircolors: { none: {} },
           ethnicity: null,
           birthdate: null,
           height: null,
