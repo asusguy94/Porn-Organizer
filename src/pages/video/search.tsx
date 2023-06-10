@@ -1,7 +1,18 @@
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next/types'
 import { useState, useEffect } from 'react'
 
-import { Card, CardActionArea, FormControl, Grid, RadioGroup, TextField, Typography } from '@mui/material'
+import {
+  Card,
+  CardActionArea,
+  FormControl,
+  Grid,
+  MenuItem,
+  RadioGroup,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Typography
+} from '@mui/material'
 
 import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
@@ -9,7 +20,7 @@ import { useReadLocalStorage } from 'usehooks-ts'
 
 import { ImageCard } from '@components/image'
 import { RegularHandlerProps, RegularItem } from '@components/indeterminate'
-import { getVisible, HiddenVideo as Hidden, VideoSearch as Video, VideoSearch } from '@components/search/helper'
+import { getVisible, HiddenVideo as Hidden, VideoSearch as Video } from '@components/search/helper'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import VGrid from '@components/virtualized/virtuoso'
 import Spinner from '@components/spinner'
@@ -19,69 +30,39 @@ import Link from '@components/link'
 import { daysToYears } from '@utils/client/date-time'
 import { SetState, General, LocalWebsite } from '@interfaces'
 import { serverConfig } from '@config'
-import { formatDate, getUnique, printWithMax } from '@utils/shared'
+import { printWithMax } from '@utils/shared'
 import prisma from '@utils/server/prisma'
-import { dateDiff } from '@utils/server/helper'
+
+import { searchService } from '@service'
 
 import styles from './search.module.scss'
 
 export const getServerSideProps: GetServerSideProps<{
-  videos: VideoSearch[]
   attributes: General[]
   categories: General[]
   locations: General[]
+  websites: General[]
 }> = async () => {
-  const videos = await prisma.video.findMany({
-    select: {
-      id: true,
-      height: true,
-      date: true,
-      api: true,
-      cover: true,
-      name: true,
-      star: { select: { name: true, birthdate: true } },
-      website: { select: { name: true } },
-      site: { select: { name: true } },
-      plays: { select: { video: true } },
-      bookmarks: { select: { category: { select: { name: true } } } },
-      attributes: { select: { attribute: { select: { name: true } } } },
-      locations: { select: { location: { select: { name: true } } } }
-    },
-    orderBy: { name: 'asc' }
-  })
-
   const attributes = await prisma.attribute.findMany()
   const locations = await prisma.location.findMany()
   const categories = await prisma.category.findMany()
+  const websites = await prisma.website.findMany()
 
   return {
     props: {
-      videos: videos.map(({ height, cover, bookmarks, ...video }) => ({
-        ...video,
-        quality: height,
-        date: formatDate(video.date),
-        image: cover,
-        star: video.star?.name ?? null,
-        ageInVideo: dateDiff(video.star?.birthdate, video.date),
-        website: video.website.name,
-        site: video.site?.name ?? null,
-        plays: video.plays.length,
-        categories: getUnique(bookmarks.map(({ category }) => category.name)),
-        attributes: video.attributes.map(({ attribute }) => attribute.name),
-        locations: video.locations.map(({ location }) => location.name)
-      })),
       attributes,
       locations,
-      categories
+      categories,
+      websites
     }
   }
 }
 
 const VideoSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
-  videos,
   attributes,
   categories,
-  locations
+  locations,
+  websites
 }) => {
   const [sort, setSort] = useState<VideoSort>({ type: 'date', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
@@ -99,13 +80,14 @@ const VideoSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSide
           attributes={attributes}
           categories={categories}
           locations={locations}
+          websites={websites}
           setHidden={setHidden}
           setSort={setSort}
         />
       </Grid>
 
       <Grid item xs={10}>
-        <Videos videos={videos} hidden={hidden} sortMethod={getVideoSort(sort)} />
+        <Videos hidden={hidden} sortMethod={getVideoSort(sort)} />
       </Grid>
 
       <ScrollToTop smooth />
@@ -114,15 +96,18 @@ const VideoSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSide
 }
 
 type VideosProps = {
-  videos: VideoSearch[]
   hidden: Hidden
   sortMethod: SortMethodVideo
 }
-const Videos = ({ videos, hidden, sortMethod }: VideosProps) => {
+const Videos = ({ hidden, sortMethod }: VideosProps) => {
   const localWebsites = useReadLocalStorage<LocalWebsite[]>('websites')
   const [filtered, setFiltered] = useState<Video[]>([])
 
+  const { data: videos } = searchService.useVideos()
+
   useEffect(() => {
+    if (videos === undefined) return
+
     const map = new Map<string, number>()
     const allMap = new Map<string, number>()
 
@@ -157,6 +142,8 @@ const Videos = ({ videos, hidden, sortMethod }: VideosProps) => {
     const selectedMap = [...(map.size > 0 ? map : allMap)]
     selectedMap.slice(0, 2).forEach(([key, value]) => console.log(key, printWithMax(value, 200)))
   }, [localWebsites, videos, hidden])
+
+  if (videos === undefined) return <Spinner />
 
   const visible = getVisible(filtered.sort(sortMethod), hidden)
 
@@ -205,14 +192,21 @@ type SidebarProps = {
   attributes: General[]
   categories: General[]
   locations: General[]
+  websites: General[]
   setHidden: SetState<Hidden>
   setSort: SetState<VideoSort>
 }
-const Sidebar = ({ attributes, categories, locations, setHidden, setSort }: SidebarProps) => (
+const Sidebar = ({ attributes, categories, locations, websites, setHidden, setSort }: SidebarProps) => (
   <>
     <TitleSearch setHidden={setHidden} />
     <Sort setSort={setSort} />
-    <Filter attributes={attributes} categories={categories} locations={locations} setHidden={setHidden} />
+    <Filter
+      attributes={attributes}
+      categories={categories}
+      locations={locations}
+      websites={websites}
+      setHidden={setHidden}
+    />
   </>
 )
 
@@ -266,9 +260,10 @@ type FilterProps = {
   attributes: General[]
   categories: General[]
   locations: General[]
+  websites: General[]
   setHidden: SetState<Hidden>
 }
-const Filter = ({ setHidden, attributes, categories, locations }: FilterProps) => {
+const Filter = ({ setHidden, attributes, categories, locations, websites }: FilterProps) => {
   const category = (ref: RegularHandlerProps, target: General) => {
     const targetLower = target.name.toLowerCase()
 
@@ -299,6 +294,16 @@ const Filter = ({ setHidden, attributes, categories, locations }: FilterProps) =
     }
   }
 
+  const website_DROP = (e: SelectChangeEvent) => {
+    const targetLower = e.target.value.toLowerCase()
+
+    if (targetLower === 'all') {
+      setHidden(prev => ({ ...prev, website: '' }))
+    } else {
+      setHidden(prev => ({ ...prev, website: targetLower }))
+    }
+  }
+
   const category_NULL = (ref: RegularHandlerProps) => {
     if (!ref.checked) {
       setHidden(prev => ({ ...prev, category: prev.category.filter(category => category !== null) }))
@@ -309,12 +314,38 @@ const Filter = ({ setHidden, attributes, categories, locations }: FilterProps) =
 
   return (
     <>
-      {/* <WebsiteDropdown websites={videoData.websites} label='website' callback={website} /> */}
+      <FilterDropdown data={websites} label='website' callback={website_DROP} />
 
       <FilterObj data={categories} label='category' callback={category} nullCallback={category_NULL} defaultNull />
 
       <FilterObj data={attributes} label='attribute' callback={attribute} />
       <FilterObj data={locations} label='location' callback={location} />
+    </>
+  )
+}
+
+type FilterDropdownProps<T extends General> = {
+  data?: T[]
+  label: string
+  callback: (e: SelectChangeEvent) => void
+}
+function FilterDropdown<T extends General>({ data, label, callback }: FilterDropdownProps<T>) {
+  if (data === undefined) return <Spinner />
+
+  return (
+    <>
+      <h2>{capitalize(label, true)}</h2>
+
+      <FormControl>
+        <Select variant='standard' id={label} defaultValue='ALL' onChange={callback}>
+          <MenuItem value='ALL'>All</MenuItem>
+          {data.map(item => (
+            <MenuItem key={item.id} value={item.name}>
+              {item.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
     </>
   )
 }

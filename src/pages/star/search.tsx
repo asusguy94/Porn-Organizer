@@ -22,7 +22,7 @@ import capitalize from 'capitalize'
 import { daysToYears } from '@utils/client/date-time'
 
 import { ImageCard } from '@components/image'
-import { getVisible, HiddenStar as Hidden, StarSearch as Star, StarSearch } from '@components/search/helper'
+import { getVisible, HiddenStar as Hidden, StarSearch as Star } from '@components/search/helper'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Badge from '@components/badge'
 import Spinner from '@components/spinner'
@@ -32,17 +32,16 @@ import SortObj, { getStarSort, SortMethodStar, SortTypeStar as StarSort } from '
 
 import { General, SetState } from '@interfaces'
 import { serverConfig } from '@config'
-import { Site, Website } from '@prisma/client'
+import { Website } from '@prisma/client'
 import prisma from '@utils/server/prisma'
 import { getUnique } from '@utils/shared'
-import { dateDiff } from '@utils/server/helper'
+import { searchService } from '@service'
 
 import styles from './search.module.scss'
 
 export const getServerSideProps: GetServerSideProps<{
   websites: Website[]
   starInfo: { breast: string[]; haircolor: string[]; ethnicity: string[] }
-  stars: StarSearch[]
 }> = async () => {
   const websites = await prisma.website.findMany({ orderBy: { name: 'asc' } })
 
@@ -63,31 +62,6 @@ export const getServerSideProps: GetServerSideProps<{
     orderBy: { name: 'asc' }
   })
 
-  /**
-   * Returns a site-activity percentage as a decimal
-   * @param website the website to compare with
-   * @param sites the sites to check
-   * @returns a number between 0 and 1
-   */
-  const calculateSiteScore = (website: Website & { sites: Site[] }, sites: Site[]): number => {
-    return sites.filter(s => s.websiteID === website.id).length / website.sites.length
-  }
-
-  // highest siteScore is currently 2.6, or 26 when *10
-  const calculateScore = (websitesWithSites: (Website & { sites: Site[] })[], sites: Site[]) => {
-    const siteScore = websitesWithSites
-      .map(website => calculateSiteScore(website, sites) * 10)
-      .filter(score => !isNaN(score))
-      .reduce((sum, score) => sum + score, 0)
-
-    return siteScore
-  }
-
-  const stars = await prisma.star.findMany({
-    orderBy: { name: 'asc' },
-    include: { videos: { include: { website: { include: { sites: true } }, site: true } }, haircolors: true }
-  })
-
   return {
     props: {
       websites,
@@ -95,40 +69,12 @@ export const getServerSideProps: GetServerSideProps<{
         breast: getUnique(breast.flatMap(({ breast }) => (breast !== null ? [breast] : []))),
         ethnicity: getUnique(ethnicity.flatMap(({ ethnicity }) => (ethnicity !== null ? [ethnicity] : []))),
         haircolor: haircolor.map(haircolor => haircolor.name)
-      },
-      stars: stars.map(star => {
-        const websites = getUnique(
-          star.videos.map(({ website }) => website),
-          'id'
-        )
-        const sites = getUnique(
-          star.videos.flatMap(({ site }) => (site !== null ? [site] : [])),
-          'id'
-        )
-
-        return {
-          id: star.id,
-          name: star.name,
-          image: star.image,
-          breast: star.breast,
-          haircolor: star.haircolors.map(haircolor => haircolor.hair),
-          ethnicity: star.ethnicity,
-          age: dateDiff(star.birthdate),
-          videoCount: star.videos.length,
-          score: calculateScore(websites, sites),
-          websites: websites.map(w => w.name),
-          sites: sites.map(s => s.name)
-        }
-      })
+      }
     }
   }
 }
 
-const StarSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
-  websites,
-  starInfo,
-  stars
-}) => {
+const StarSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ websites, starInfo }) => {
   const [sort, setSort] = useState<StarSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
     titleSearch: '',
@@ -145,7 +91,7 @@ const StarSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSideP
       </Grid>
 
       <Grid item xs={10}>
-        <Stars stars={stars} hidden={hidden} sortMethod={getStarSort(sort)} />
+        <Stars hidden={hidden} sortMethod={getStarSort(sort)} />
       </Grid>
 
       <ScrollToTop smooth />
@@ -154,11 +100,14 @@ const StarSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSideP
 }
 
 type StarsProps = {
-  stars: StarSearch[]
   hidden: Hidden
   sortMethod: SortMethodStar
 }
-const Stars = ({ stars, hidden, sortMethod }: StarsProps) => {
+const Stars = ({ hidden, sortMethod }: StarsProps) => {
+  const { data: stars } = searchService.useStars()
+
+  if (stars === undefined) return <Spinner />
+
   const visible = getVisible(stars.sort(sortMethod), hidden)
 
   return (
@@ -400,7 +349,7 @@ const FilterDropdown = ({ data, label, callback }: FilterDropdownProps) => {
         <Select variant='standard' id={label} defaultValue='ALL' onChange={callback}>
           <MenuItem value='ALL'>All</MenuItem>
           {data.map(item => (
-            <MenuItem key={item.name} value={item.name}>
+            <MenuItem key={item.id} value={item.name}>
               {item.name}
             </MenuItem>
           ))}

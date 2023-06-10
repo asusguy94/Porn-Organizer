@@ -45,12 +45,15 @@ export type VideoSearch = {
   api: string | null
 }
 
-const isHiddenVideo = (hidden: HiddenVideo | HiddenStar): hidden is HiddenVideo => 'category' in hidden
-const isHiddenStar = (hidden: HiddenVideo | HiddenStar): hidden is HiddenStar => 'breast' in hidden
-const isVideo = (obj: StarSearch | VideoSearch): obj is VideoSearch => 'ageInVideo' in obj
-const isStar = (obj: StarSearch | VideoSearch): obj is StarSearch => 'videoCount' in obj
+type HiddenType = HiddenStar | HiddenVideo
+type ObjectType = StarSearch | VideoSearch
 
-const isTitleVisible = (obj: StarSearch | VideoSearch, hidden: HiddenStar | HiddenVideo) => {
+const isHiddenVideo = (hidden: HiddenType): hidden is HiddenVideo => 'category' in hidden
+const isHiddenStar = (hidden: HiddenType): hidden is HiddenStar => 'breast' in hidden
+const isVideo = (obj: ObjectType): obj is VideoSearch => 'ageInVideo' in obj
+const isStar = (obj: ObjectType): obj is StarSearch => 'videoCount' in obj
+
+const isTitleVisible = (obj: ObjectType, hidden: HiddenType) => {
   return obj.name.toLowerCase().includes(hidden.titleSearch.toLowerCase())
 }
 
@@ -89,7 +92,7 @@ const isEthnicityVisible = (star: StarSearch, hidden: HiddenStar) => {
 
 function isWebsiteVisible(video: VideoSearch, hidden: HiddenVideo): boolean
 function isWebsiteVisible(star: StarSearch, hidden: HiddenStar): boolean
-function isWebsiteVisible(obj: StarSearch | VideoSearch, hidden: HiddenStar | HiddenVideo) {
+function isWebsiteVisible(obj: ObjectType, hidden: HiddenType): boolean {
   // hidden is empty
   if (hidden.website.length === 0) return true
 
@@ -99,6 +102,8 @@ function isWebsiteVisible(obj: StarSearch | VideoSearch, hidden: HiddenStar | Hi
   } else if (isHiddenStar(hidden) && isStar(obj)) {
     return obj.websites.some(ws => ws.toLowerCase() === hidden.website.toLowerCase())
   }
+
+  return false
 }
 
 const isCategoryVisible = (video: VideoSearch, hidden: HiddenVideo) => {
@@ -166,13 +171,14 @@ const isVideoHidden = (video: VideoSearch, hidden: HiddenVideo) => {
     isTitleVisible(video, hidden) &&
     isCategoryVisible(video, hidden) &&
     isAttributeVisible(video, hidden) &&
-    isLocationVisible(video, hidden)
+    isLocationVisible(video, hidden) &&
+    isWebsiteVisible(video, hidden)
   )
 }
 
 export function isHidden(video: VideoSearch, hidden: HiddenVideo): boolean
 export function isHidden(star: StarSearch, hidden: HiddenStar): boolean
-export function isHidden(obj: StarSearch | VideoSearch, hidden: HiddenStar | HiddenVideo): boolean {
+export function isHidden(obj: ObjectType, hidden: HiddenType): boolean {
   if (isHiddenVideo(hidden)) {
     return isVideoHidden(obj as VideoSearch, hidden)
   }
@@ -189,10 +195,7 @@ const getVisibleVideos = (videos: VideoSearch[], hidden: HiddenVideo) => {
 
 export function getVisible(videos: VideoSearch[], hidden: HiddenVideo): VideoSearch[]
 export function getVisible(stars: StarSearch[], hidden: HiddenStar): StarSearch[]
-export function getVisible(
-  arr: StarSearch[] | VideoSearch[],
-  hidden: HiddenStar | HiddenVideo
-): VideoSearch[] | StarSearch[] {
+export function getVisible(arr: ObjectType[], hidden: HiddenType): ObjectType[] {
   if (isHiddenVideo(hidden)) {
     return getVisibleVideos(arr as VideoSearch[], hidden)
   }

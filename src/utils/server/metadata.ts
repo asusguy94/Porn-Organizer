@@ -203,6 +203,9 @@ export const getStarData = async (slug: string) => {
         name: string
         site: {
           id: number
+          parent_id: number
+          network_id: number
+          network: string
           name: string
           short_name: string
           url: string
@@ -225,7 +228,14 @@ export const getStarData = async (slug: string) => {
       height: result.data.extras.height ? parseInt(result.data.extras.height.match(/^\d+/)?.[0] ?? '0') : null,
       weight: result.data.extras.weight ? parseInt(result.data.extras.weight.match(/^\d+/)?.[0] ?? '0') : null,
       posters: result.data.posters.map(poster => poster.url),
-      videos: result.data.site_performers.map(v => ({ id: v.id, name: v.name })),
+      videos: result.data.site_performers.map(v => ({
+        ...v,
+        site: {
+          id: v.id,
+          name: v.name,
+          site: { ...v.site }
+        }
+      })),
       sites: getUnique(
         result.data.site_performers.map(v => ({
           id: v.id,
@@ -237,6 +247,17 @@ export const getStarData = async (slug: string) => {
         'id'
       )
     }
+  } catch (error) {
+    throw new Error(SERVER_ERROR)
+  }
+}
+
+export const getStarData2 = async (slug: string) => {
+  try {
+    const url = getUrl(`/performers/${slug}`)
+    const result = (await axios.get(url.href, createConfig())).data
+
+    return result
   } catch (error) {
     throw new Error(SERVER_ERROR)
   }

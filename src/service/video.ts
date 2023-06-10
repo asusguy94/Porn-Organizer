@@ -26,7 +26,6 @@ export default {
   setSlug: (id: number, slug: string) => api.put(`/${id}`, { slug }),
   addPlay: (id: number) => api.put(`/${id}`, { plays: 1 }),
   delete: (id: number) => api.delete(`/${id}`),
-  setStarAge: (id: number, age: number) => api.put(`/${id}`, { starAge: !isNaN(age) ? age : null }),
   removeBookmark: (id: number) => api.delete(`/${id}/bookmark`),
   removePlays: (id: number) => api.put(`/${id}`, { plays: 0 }),
   rename: (id: number, path: string) => api.put(`/${id}`, { path }),
