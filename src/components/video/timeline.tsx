@@ -15,6 +15,8 @@ import { settingsConfig } from '@config'
 
 import styles from './timeline.module.scss'
 
+const spacing = { top: 3, bookmarks: 36 }
+
 type TimelineProps = {
   video: Video
   bookmarks: Bookmark[]
@@ -25,6 +27,8 @@ type TimelineProps = {
 }
 const Timeline = ({ bookmarks, video, playVideo, categories, update, onModal }: TimelineProps) => {
   const windowSize = useWindowSize()
+  const bookmarksRef = useRef<HTMLButtonElement[]>([])
+  const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
 
   const setTime = (bookmark: Bookmark) => {
     const player = document.getElementsByTagName('video')[0]
@@ -62,55 +66,63 @@ const Timeline = ({ bookmarks, video, playVideo, categories, update, onModal }: 
     })
   }
 
-  const collisionCheck = (a: HTMLElement, b: HTMLElement) => {
+  const collisionCheck = (a: HTMLElement | null, b: HTMLElement | null) => {
+    if (a === null || b === null) return false
+
     const aRect = a.getBoundingClientRect()
     const bRect = b.getBoundingClientRect()
 
-    return !(
-      aRect.x + aRect.width < bRect.x - settingsConfig.timeline.spacing ||
-      bRect.x + settingsConfig.timeline.spacing > bRect.x + bRect.width
+    return (
+      aRect.x + aRect.width >= bRect.x - settingsConfig.timeline.spacing &&
+      aRect.x - settingsConfig.timeline.spacing <= bRect.x + bRect.width
     )
   }
 
-  const setDataLevel = (item: HTMLElement, level: number) => {
-    if (level > 0) {
-      item.setAttribute('data-level', level.toString())
+  useEffect(() => {
+    const bookmarksArr = bookmarks.length > 0 ? bookmarksRef.current : []
+    const levels: number[] = new Array(bookmarks.length).fill(0)
+    let maxLevel = 0
+
+    for (let i = 0; i < bookmarksArr.length; i++) {
+      let level = 1
+      for (let j = 0; j < i; j++) {
+        if (levels[j] === level && collisionCheck(bookmarksArr[j], bookmarksArr[i])) {
+          level++
+          j = -1
     }
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const bookmarksArr: HTMLElement[] = []
-  useEffect(() => {
-    const LEVEL_MIN = 1
+      levels[i] = level
+      if (level > maxLevel) maxLevel = level
+    }
 
-    let level = LEVEL_MIN
-    bookmarksArr.forEach((item, idx, arr) => {
-      if (idx > 0) {
-        const collision = arr.some((other, i) => i < idx && collisionCheck(other, item))
+    setBookmarkLevels(levels)
 
-        level = collision ? level + 1 : LEVEL_MIN
+    const videoPlayer = document.querySelector<HTMLElement>('.plyr')
+    if (videoPlayer) {
+      const videoTop = videoPlayer.getBoundingClientRect().top
+      videoPlayer.style.maxHeight = `calc(100vh - (${spacing.bookmarks}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
       }
-
-      setDataLevel(item, level)
-    })
-  }, [bookmarksArr, windowSize.width])
+  }, [bookmarks, windowSize.width])
 
   if (categories === undefined) return <Spinner />
 
   return (
-    <Grid id={styles.timeline}>
+    <Grid id={styles.timeline} style={bookmarks.length > 0 ? { marginTop: spacing.top } : {}}>
       {bookmarks.map((bookmark, idx) => (
         <Fragment key={bookmark.start}>
           <ContextMenuTrigger id={`bookmark-${bookmark.start}`}>
             <Button
-              className={styles.bookmark}
               size='small'
               variant='outlined'
               color='primary'
-              style={{ left: `${((bookmark.start * 100) / video.duration) * settingsConfig.timeline.offset}%` }}
+              className={styles.bookmark}
+              style={{
+                left: `${(bookmark.start / video.duration) * 100}%`,
+                top: `${(bookmarkLevels[idx] - 1) * spacing.bookmarks}px`
+              }}
               onClick={() => playVideo(bookmark.start)}
-              ref={(bookmark: HTMLButtonElement) => (bookmarksArr[idx] = bookmark)}
-              data-level={1}
+              ref={(bookmark: HTMLButtonElement) => (bookmarksRef.current[idx] = bookmark)}
             >
               {bookmark.category.name}
             </Button>

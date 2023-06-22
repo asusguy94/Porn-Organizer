@@ -20,13 +20,14 @@ import { videoService } from '@service'
 import { serverConfig } from '@config'
 import { daysToYears } from '@utils/client/date-time'
 
-import styles from './video.module.scss'
 import prisma from '@utils/server/prisma'
 import { Attribute, Category, Location } from '@prisma/client'
 import { dateDiff } from '@utils/server/helper'
 import { formatDate } from '@utils/shared'
 import { getSceneData } from '@utils/server/metadata'
 import { generateStarName } from '@utils/server/generate'
+
+import styles from './video.module.scss'
 
 export const getServerSideProps: GetServerSideProps<
   {

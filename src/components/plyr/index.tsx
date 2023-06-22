@@ -17,7 +17,7 @@ const PlyrComponent = ({ plyrRef, source, poster, thumbnail }: PlyrProps) => {
       settings: ['speed'],
       speed: { selected: 1, options: [0.75, 1, 1.25] },
       hideControls: false,
-      ratio: '21:9',
+      ratio: '16:9',
       keyboard: { focused: false },
       fullscreen: { enabled: false },
       previewThumbnails: {

@@ -1,24 +1,10 @@
-@import '@styles/variables';
-
 #timeline {
   position: relative;
-  left: 95px;
-  margin-top: 5px;
+  margin-left: 95px;
+  margin-right: 95px;
 
   .bookmark {
     position: absolute;
     white-space: nowrap;
-
-    $levelSelector: 1;
-    @for $i from 1 through ($bookmarkRows * $bookmarkCols) {
-      $modLevelSelector: (($levelSelector - 1) % $bookmarkCols);
-      $margin: $modLevelSelector * $bookmarkSpacing;
-
-      &[data-level='#{$i}'] {
-        margin-top: $margin;
-      }
-
-      $levelSelector: $levelSelector + 1;
-    }
   }
 }
