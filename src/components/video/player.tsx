@@ -15,7 +15,7 @@ import Spinner from '../spinner'
 
 import { videoService } from '@service'
 import { Bookmark, General, SetState, Video, VideoStar } from '@interfaces'
-import { serverConfig } from '@config'
+import { serverConfig, settingsConfig } from '@config'
 
 const useHls = (
   video: Video,
@@ -89,11 +89,19 @@ const useHls = (
         hls.attachMedia(player.media)
 
         const onLoad: HlsListeners[typeof Hls.Events.MANIFEST_PARSED] = (e, data) => {
-          hls.autoLevelCapping = data.levels.filter(l => l.height >= 1080).length
+          if (settingsConfig.debug) {
+            console.log(e, data)
+          }
+
+          hls.autoLevelCapping = data.levels.filter(level => level.height <= settingsConfig.player.quality).length
           hls.startLoad(localBookmark)
         }
 
         const onError: HlsListeners[typeof Hls.Events.ERROR] = (e, data) => {
+          if (settingsConfig.debug) {
+            console.log(e, data)
+          }
+
           if (data.fatal) {
             hls.off(Hls.Events.ERROR, onError)
             hls.off(Hls.Events.MANIFEST_PARSED, onLoad)

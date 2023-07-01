@@ -15,6 +15,7 @@ export default {
   },
   player: {
     thumbnails: getValue('PLAYER_THUMBNAILS', 'false') === 'true',
+    quality: parseInt(getValue('PLAYER_QUALITY', '1080'))
   },
   THUMB_RES: parseInt(process.env.THUMBNAIL_RES ?? '290'),
   IMAGE_RES: parseInt(process.env.IMAGE_RES ?? '1920'),
@@ -24,5 +25,6 @@ export default {
       close: getValue('USER_THUMB', 'reload') === 'close',
       reload: getValue('USER_THUMB', 'reload') === 'reload'
     }
-  }
+  },
+  debug: getValue('DEBUG', 'false') === 'true'
 }
