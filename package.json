@@ -10,13 +10,17 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "docker:build": "docker build -t asusguy94/pornts .",
-    "docker:build-dev": "docker build -t asusguy94/pornts:dev .",
+    "docker:build-beta": "docker build -t asusguy94/pornts:beta .",
+    "docker:build-alpha": "docker build -t asusguy94/pornts:alpha .",
     "docker:push": "docker push asusguy94/pornts",
-    "docker:push-dev": "docker push asusguy94/pornts:dev",
+    "docker:push-beta": "docker push asusguy94/pornts:beta",
+    "docker:push-alpha": "docker push asusguy94/pornts:alpha",
     "docker:remove": "docker image prune -f",
     "docker": "yarn docker:build && yarn docker:push && yarn docker:remove",
-    "docker-dev": "yarn docker:build-dev && yarn docker:push-dev && yarn docker:remove",
-    "docker:watch-dev": "nodemon --exec \"yarn docker-dev\""
+    "docker-beta": "yarn docker:build-beta && yarn docker:push-beta && yarn docker:remove",
+    "docker-alpha": "yarn docker:build-alpha && yarn docker:push-alpha && yarn docker:remove",
+    "docker:watch-beta": "nodemon --exec \"yarn docker-beta\"",
+    "docker:watch-alpha": "nodemon --exec \"yarn docker-alpha\""
   },
   "dependencies": {
     "@emotion/react": "^11.10.6",
