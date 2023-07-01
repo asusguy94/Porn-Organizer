@@ -1,13 +1,14 @@
 # Porn NextJS
 
-## :warning: Important
+## Note about thumbnails
 
-The image server is currently broken, I recommend not generating cover-images, deleting all files in `images/videos`, and running `UPDATE VIDEO SET COVER = NULL` on the database to prevent issues. I have disabled the generation logic from the browser, but if you still want to do it, you can clone this repo and revert the last change.
+The image server is currently broken, ~~I recommend not generating cover-images, deleting all files in `images/videos`, and running `UPDATE VIDEO SET COVER = NULL` on the database to prevent issues. I have disabled the generation logic from the browser, but if you still want to do it, you can clone this repo and revert the last change.~~ I've created a simple upscaling algorithm, so cover-images should now work, and I re-enabled the genaration logic. Tiny images will hovever not look quite as good as before, and if the server ever is updated fully, I will change it back.
 
 ## Requirements
 
 1. Modern Web Browser
-2. Browser resolution set to 1920x1080 (not a hard requirement, but some stuff might be visually bugged otherwise)
+2. Browser resolution set to 1920x1080 (sotf-requirement)
+   - This should not be an issue any more
 3. Yarn package manger
 4. Database (preferable mariaDB)
    - host
@@ -22,19 +23,16 @@ Any setting ending with `*` is required
 
 ### List of settings
 
-| Keyword                         | Description                                                                                        |
-| ------------------------------- | -------------------------------------------------------------------------------------------------- |
-| DATABASE_URL\*                  | The database URL for your chosen database                                                          |
-| NEXT_PUBLIC_DB_ADMIN            | The url for the DB-link in the navbar _(default=`/db`)_                                            |
-| NEXT_PUBLIC_TIMELINE_OFFSET     | The left offset of the timeline (default=`1`)                                                      |
-| NEXT_PUBLIC_TIMELINE_SPACING    | The max allowed horizontal spacing between bookmarks (default=`0`)                                 |
-| NEXT_PUBLIC_PLAYER_DURATIONDIFF | The max allowed difference of a video's duration and the reported duration (default=`1`)           |
-| NEXT_PUBLIC_THUMBNAILS          | Weather generated thumbnails should be used (default=`false`)                                      |
-| NEXT_PUBLIC_USER_THUMB          | Weather window should be closed after a thumbnail has been created (default=`false`)               |
-| THUMBNAIL_RES                   | The height used for thumbnails (default=`290`)                                                     |
-| THEPORNDB_API                   | The API-KEY used, for getting data                                                                 |
-| PORT\*                          | _Only required for docker._ The port used for the application (default=`3000`)                     |
-| PATH\*                          | _Only docker._ The path to map to `app/media` (this directory should contain a `videos`-directory) |
+| Keyword                | Description                                                                                        |
+| ---------------------- | -------------------------------------------------------------------------------------------------- |
+| DATABASE_URL\*         | The database URL for your chosen database                                                          |
+| NEXT_PUBLIC_DB_ADMIN   | The url for the DB-link in the navbar _(default=`/db`)_                                            |
+| NEXT_PUBLIC_THUMBNAILS | Weather generated thumbnails should be used (default=`false`)                                      |
+| NEXT_PUBLIC_USER_THUMB | Weather window should be closed after a thumbnail has been created (default=`false`)               |
+| THUMBNAIL_RES          | The height used for thumbnails (default=`290`)                                                     |
+| THEPORNDB_API          | The API-KEY used, for getting data                                                                 |
+| PORT\*                 | _Only required for docker._ The port used for the application (default=`3000`)                     |
+| PATH\*                 | _Only docker._ The path to map to `app/media` (this directory should contain a `videos`-directory) |
 
 ### With Docker
 
