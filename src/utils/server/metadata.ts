@@ -1,7 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios'
 
 import { toCamelCase } from './helper'
-import { getUnique } from '../shared'
 
 import { settingsConfig } from '@config'
 import { Extra, Gender } from '@interfaces'
@@ -20,7 +19,7 @@ type BasicModel = {
     }
     image: string
     thumbnail: string
-    posters: {
+    posters?: {
       id: number
       url: string
     }[]
@@ -142,9 +141,17 @@ export const getStarSlug = async (star: string): Promise<string> => {
 
   const result = (await axios.get<BasicModel>(url.href, createConfig())).data
 
-  let data = result.data.filter(s => s.extras.gender === 'Female')
-  if (data.length > 1) data = data.filter(s => s.posters.length > 0)
+  let prevData = result.data
+  let data = prevData.filter(s => s.extras.gender === 'Female')
+  if (data.length === 0) data = prevData
+
+  prevData = data
+  if (data.length > 1) data = data.filter(s => s.posters !== undefined && s.posters.length > 0)
+  if (data.length === 0) data = prevData
+
+  prevData = data
   if (data.length > 1) data = data.filter(s => s.name === star)
+  if (data.length === 0) data = prevData
 
   return data[0].id
 }
@@ -198,21 +205,6 @@ export const getStarData = async (slug: string) => {
         id: number
         url: string
       }[]
-      site_performers: {
-        id: string
-        name: string
-        site: {
-          id: number
-          parent_id: number
-          network_id: number
-          network: string
-          name: string
-          short_name: string
-          url: string
-          logo: string
-          poster: string
-        }
-      }[]
     }
   }
 
@@ -227,37 +219,92 @@ export const getStarData = async (slug: string) => {
       birthdate: result.data.extras.birthday,
       height: result.data.extras.height ? parseInt(result.data.extras.height.match(/^\d+/)?.[0] ?? '0') : null,
       weight: result.data.extras.weight ? parseInt(result.data.extras.weight.match(/^\d+/)?.[0] ?? '0') : null,
-      posters: result.data.posters.map(poster => poster.url),
-      videos: result.data.site_performers.map(v => ({
-        ...v,
-        site: {
-          id: v.id,
-          name: v.name,
-          site: { ...v.site }
-        }
-      })),
-      sites: getUnique(
-        result.data.site_performers.map(v => ({
-          id: v.id,
-          name: v.site.name,
-          label: v.site.short_name,
-          logo: v.site.logo,
-          poster: v.site.logo
-        })),
-        'id'
-      )
+      posters: result.data.posters.map(poster => poster.url)
     }
   } catch (error) {
     throw new Error(SERVER_ERROR)
   }
 }
 
-export const getStarData2 = async (slug: string) => {
-  try {
-    const url = getUrl(`/performers/${slug}`)
-    const result = (await axios.get(url.href, createConfig())).data
+export const getStarScenes = async (slug: string) => {
+  type Data = {
+    data: {
+      id: string
+      title: string
+      type: string
+      slug: string
+      date: string
+      site: {
+        name: string
+        short_name: string
+        network?: {
+          name: string
+          short_name: string
+        }
+      }
+    }[]
+    links: {
+      first: string
+      last: string
+      prev: null
+      next: string
+    }
+    meta: {
+      current_page: number
+      from: number
+      last_page: number
+      per_page: number
+      to: number
+      total: number
+    }
+  }
 
-    return result
+  const getData = async (url: URL, page = 1) => {
+    url.searchParams.set('page', page.toString())
+    const result = (await axios.get<Data>(url.href, createConfig())).data
+
+    const data = result.data.map(item => ({
+      id: item.id,
+      date: item.date,
+      site: { name: item.site.name, network: item.site.network }
+    }))
+
+    return { data, meta: result.meta }
+  }
+
+  const formatData = (arr: Awaited<ReturnType<typeof getData>>['data']) => {
+    const data: { name: string; videos: { id: string; date: string }[] }[] = []
+
+    arr.forEach(item => {
+      const { id, date, site } = item
+
+      const existingIndex = data.findIndex(item => item.name === site.name)
+
+      if (existingIndex >= 0) {
+        data[existingIndex].videos.push({ id, date })
+      } else {
+        data.push({ name: site.name, videos: [{ id, date }] })
+      }
+    })
+
+    return data
+  }
+
+  try {
+    const url = getUrl(`/performers/${slug}/scenes`)
+
+    const initialResult = await getData(url)
+    const data = [...initialResult.data]
+    for (let page = initialResult.meta.current_page + 1; page <= initialResult.meta.last_page; page++) {
+      const next = await getData(url, page)
+
+      data.push(...next.data)
+    }
+
+    return {
+      original_data: data,
+      formatted: formatData(data)
+    }
   } catch (error) {
     throw new Error(SERVER_ERROR)
   }
