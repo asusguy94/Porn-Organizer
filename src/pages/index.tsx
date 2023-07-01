@@ -32,18 +32,18 @@ export const Column = ({ label, rows = 1, limit = -1, colSize = 10 }: ColumnProp
   if (limit === -1) {
     limit = rows * colSize
   }
-  const { data } = useFetch<Video[]>(`${serverConfig.api}/home/${label}/${limit}`)
+  const { data: videos } = useFetch<Video[]>(`${serverConfig.api}/home/${label}/${limit}`)
 
-  if (data === undefined) return <Spinner />
+  if (videos === undefined) return <Spinner />
 
   return (
     <Grid container component='section' style={{ marginBottom: '0.5em' }}>
       <h2 style={{ marginTop: 0, marginBottom: 0 }}>
-        {capitalize(label)} (<span style={{ color: 'green' }}>{data.length}</span>)
+        {capitalize(label)} (<span style={{ color: 'green' }}>{videos.length}</span>)
       </h2>
 
       <Grid container spacing={2} columns={colSize}>
-        {data.map((video, idx) => {
+        {videos.map((video, idx) => {
           const isMissing = video.image === null
 
           return (

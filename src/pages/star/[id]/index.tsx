@@ -44,6 +44,7 @@ type Star = {
   id: number
   name: string
   image: string | null
+  slug: string | null
   ignored: boolean
   info: {
     breast: string
@@ -109,11 +110,12 @@ export const getServerSideProps: GetServerSideProps<
       ethnicity: true,
       birthdate: true,
       height: true,
-      weight: true
+      weight: true,
+      api: true
     }
   })
 
-  const { autoTaggerIgnore, breast, ethnicity, birthdate, height, weight, ...rest } = star
+  const { autoTaggerIgnore, breast, ethnicity, birthdate, height, weight, api, ...rest } = star
   return {
     props: {
       breast: getUnique(breasts.flatMap(({ breast }) => (breast !== null ? [breast] : []))),
@@ -122,6 +124,7 @@ export const getServerSideProps: GetServerSideProps<
       websites: websites.map(website => website.name),
       star: {
         ...rest,
+        slug: api,
         ignored: autoTaggerIgnore,
         info: {
           breast: breast ?? '',
@@ -174,7 +177,7 @@ const StarPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
 
           <StarTitle star={star} update={setStar} onModal={setModal} />
 
-          <StarForm starData={{ breast, ethnicity, haircolor }} star={star} update={setStar} />
+          <StarForm starData={{ breast, ethnicity, haircolor }} star={star} update={setStar} onModal={setModal} />
         </div>
 
         <Grid item xs={12}>
@@ -306,26 +309,22 @@ const Sidebar = ({ similar }: SidebarProps) => (
 
     <CardContent>
       <Grid id={styles.similar}>
-        {similar.map((similarStar, idx) => (
-          <Link
-            key={similarStar.id}
-            href={{ pathname: '/star/[id]', query: { id: similarStar.id } }}
-            className={styles.star}
-          >
+        {similar.map((star, idx) => (
+          <Link key={star.id} href={{ pathname: '/star/[id]', query: { id: star.id } }} className={styles.star}>
             <RibbonContainer component={Card}>
               <ImageCard
-                src={`${serverConfig.api}/star/${similarStar.id}/image`}
+                src={`${serverConfig.api}/star/${star.id}/image`}
                 width={200}
                 height={275}
-                missing={similarStar.image === null}
+                missing={star.image === null}
                 scale={5}
                 alt='star'
                 priority={idx === 0}
               />
 
-              <Typography>{similarStar.name}</Typography>
+              <Typography>{star.name}</Typography>
 
-              <Ribbon label={`${similarStar.match}%`} />
+              <Ribbon label={`${star.match}%`} />
             </RibbonContainer>
           </Link>
         ))}
@@ -368,11 +367,11 @@ const StarImageDropbox = ({ star, update, onModal }: StarImageDropboxProps) => {
     const calcCols = (images: string[]) => Math.min(Math.ceil(images.length / Math.floor(MAX_ROWS)), MAX_COLS)
     const calcRows = (images: string[]) => Math.min(images.length, MAX_ROWS)
 
-    starService.getImages(star.id).then(({ data }) => {
+    starService.getImages(star.id).then(({ data: { images } }) => {
       onModal(
         'Change Image',
-        <ImageList cols={calcCols(data.images)} sx={{ margin: 0, height: (275 + GAP) * calcRows(data.images) }}>
-          {data.images.map(image => (
+        <ImageList cols={calcCols(images)} sx={{ margin: 0, height: (275 + GAP) * calcRows(images) }}>
+          {images.map(image => (
             <ImageListItem
               key={image}
               onClick={() => {
@@ -427,9 +426,12 @@ type StarFormProps = {
   star: Star
   starData: StarData
   update: SetState<Star | undefined>
+  onModal: ModalHandler
 }
-const StarForm = ({ star, starData, update }: StarFormProps) => {
+const StarForm = ({ star, starData, update, onModal }: StarFormProps) => {
   const router = useRouter()
+
+  const [hasMissing, setMissing] = useState(false) //FIXME disabled for now, as the required api is not working
 
   const addHaircolor = (name: string) => {
     starService.addHaircolor(star.id, name).then(() => {
@@ -556,8 +558,8 @@ const StarVideos = ({ videos }: StarVideosProps) => {
     if (videos !== undefined) {
       setFocus([])
 
-      setWebsites(getUnique(videos.map(v => v.website)))
-      setSites(getUnique(videos.flatMap(v => (v.site !== null ? [v.site] : []))))
+      setWebsites(getUnique(videos.map(video => video.website)))
+      setSites(getUnique(videos.flatMap(video => (video.site !== null ? [video.site] : []))))
     }
   }, [videos])
 
@@ -596,7 +598,7 @@ const StarVideos = ({ videos }: StarVideosProps) => {
           : null}
       </Typography>
 
-      <Flipper flipKey={videos.map(v => v.id)}>
+      <Flipper flipKey={videos.map(video => video.id)}>
         <Grid container style={{ marginTop: 8 }}>
           {videos
             .map(video => {
@@ -612,17 +614,17 @@ const StarVideos = ({ videos }: StarVideosProps) => {
             })
             .sort((a, b) => a.age - b.age)
             .sort((a, b) => Number(a.hidden) - Number(b.hidden))
-            .map((v, idx) => (
-              <Flipped key={v.id} flipId={v.id}>
+            .map((video, idx) => (
+              <Flipped key={video.id} flipId={video.id}>
                 <Link
-                  className={`${styles.video} ${v.hidden ? styles.hidden : ''}`}
-                  href={{ pathname: '/video/[id]', query: { id: v.id } }}
+                  className={`${styles.video} ${video.hidden ? styles.hidden : ''}`}
+                  href={{ pathname: '/video/[id]', query: { id: video.id } }}
                 >
                   <StarVideo
-                    video={v}
+                    video={video}
                     isFirst={videos.length > 1 && idx === 0}
                     isLast={videos.length > 1 && idx === videos.length - 1}
-                    isHidden={v.hidden}
+                    isHidden={video.hidden}
                   />
                 </Link>
               </Flipped>

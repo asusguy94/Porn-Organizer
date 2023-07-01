@@ -15,10 +15,16 @@ import prisma from './prisma'
 import { settingsConfig } from '@config'
 import { SimilarStar } from '@interfaces/api'
 
-export const dateDiff = (date1?: string | Date | null, date2: string | Date | null = new Date()): number => {
+export const dateDiff = (
+  date1?: string | Date | null,
+  date2: string | Date | null = new Date(),
+  relative = true
+): number => {
   if (date1 === null || date1 === undefined || date2 === null) return 0
 
-  return Math.abs(dayjs(date1).diff(dayjs(date2), 'days'))
+  const diff = dayjs(date1).diff(dayjs(date2), 'days')
+
+  return relative ? Math.abs(diff) : diff
 }
 
 const getClosest = (search: number, arr: number[]): number => {
@@ -103,99 +109,14 @@ export const fileExists = async (path: string): Promise<boolean> => {
 export const getDate = (dateStr: string) => dayjs.utc(dateStr).toDate()
 
 export const formatBreastSize = (input: string): string => {
-  let breast = input.toUpperCase()
+  input = input.toUpperCase().trim()
 
-  switch (breast) {
-    case 'DD':
-      breast = 'E'
-      break
-    case 'DDD':
-    case 'EE':
-      breast = 'F'
-      break
-    case 'EEE':
-    case 'FF':
-      breast = 'G'
-      break
-    case 'FFF':
-    case 'GG':
-      breast = 'H'
-      break
-    case 'GGG':
-    case 'HH':
-      breast = 'I'
-      break
-    case 'HHH':
-    case 'II':
-      breast = 'J'
-      break
-    case 'III':
-    case 'JJ':
-      breast = 'K'
-      break
-    case 'JJJ':
-    case 'KK':
-      breast = 'L'
-      break
-    case 'KKK':
-    case 'LL':
-      breast = 'M'
-      break
-    case 'LLL':
-    case 'MM':
-      breast = 'N'
-      break
-    case 'MMM':
-    case 'NN':
-      breast = 'O'
-      break
-    case 'NNN':
-    case 'OO':
-      breast = 'P'
-      break
-    case 'OOO':
-    case 'PP':
-      breast = 'Q'
-      break
-    case 'PPP':
-    case 'QQ':
-      breast = 'R'
-      break
-    case 'QQQ':
-    case 'RR':
-      breast = 'S'
-      break
-    case 'RRR':
-    case 'SS':
-      breast = 'T'
-      break
-    case 'SSS':
-    case 'TT':
-      breast = 'U'
-      break
-    case 'TTT':
-    case 'UU':
-      breast = 'V'
-      break
-    case 'UUU':
-    case 'VV':
-      breast = 'W'
-      break
-    case 'VVV':
-    case 'WW':
-      breast = 'X'
-      break
-    case 'WWW':
-    case 'XX':
-      breast = 'Y'
-      break
-    case 'XXX':
-    case 'YY':
-      breast = 'Z'
-      break
+  if (input.length > 1) {
+    const charCode = input.charCodeAt(0) + input.length - 1
+    return String.fromCharCode(((charCode - 65) % 26) + 65)
   }
 
-  return breast.trim()
+  return input
 }
 
 export const getSimilarStars = async (starID: number, maxMaxLength = 9): Promise<SimilarStar[]> => {

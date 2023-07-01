@@ -7,7 +7,7 @@ import { fileExists } from '@utils/server/helper'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-    const websites = (await prisma.website.findMany()).map(({ name }) => name)
+    const websites = (await prisma.website.findMany()).map(website => website.name)
     const videos = await prisma.video.findMany()
 
     // checks for unused video-files
@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (pattern !== null) {
         const id = parseInt(pattern[0])
 
-        if (videos.find(v => v.id === id) === undefined) {
+        if (videos.some(v => v.id !== id)) {
           console.log({ image })
         }
       }
@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (pattern !== null) {
         const id = parseInt(pattern[0])
 
-        if (videos.find(v => v.id === id) === undefined) {
+        if (videos.some(v => v.id !== id)) {
           console.log({ thumb })
         }
       }

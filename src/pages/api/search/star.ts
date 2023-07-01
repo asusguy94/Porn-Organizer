@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
      * @returns a number between 0 and 1
      */
     const calculateSiteScore = (website: Website & { sites: Site[] }, sites: Site[]): number => {
-      return sites.filter(s => s.websiteID === website.id).length / website.sites.length
+      return sites.filter(site => site.websiteID === website.id).length / website.sites.length
     }
 
     // highest siteScore is currently 2.6, or 26 when *10
@@ -53,8 +53,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           age: dateDiff(star.birthdate),
           videoCount: star.videos.length,
           score: calculateScore(websites, sites),
-          websites: websites.map(w => w.name),
-          sites: sites.map(s => s.name)
+          websites: websites.map(website => website.name),
+          sites: sites.map(site => site.name)
         }
       })
     )

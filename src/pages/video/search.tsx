@@ -30,7 +30,6 @@ import Link from '@components/link'
 import { daysToYears } from '@utils/client/date-time'
 import { SetState, General, LocalWebsite } from '@interfaces'
 import { serverConfig } from '@config'
-import { printWithMax } from '@utils/shared'
 import prisma from '@utils/server/prisma'
 
 import { searchService } from '@service'
@@ -102,6 +101,7 @@ type VideosProps = {
 const Videos = ({ hidden, sortMethod }: VideosProps) => {
   const localWebsites = useReadLocalStorage<LocalWebsite[]>('websites')
   const [filtered, setFiltered] = useState<Video[]>([])
+  const [data, setData] = useState<{ label: string; count: number }[]>([])
 
   const { data: videos } = searchService.useVideos()
 
@@ -109,38 +109,43 @@ const Videos = ({ hidden, sortMethod }: VideosProps) => {
     if (videos === undefined) return
 
     const map = new Map<string, number>()
-    const allMap = new Map<string, number>()
 
     const initialData = (localWebsites !== null ? [...localWebsites] : []).map(wsite => ({
       ...wsite,
       count: wsite.finished ? wsite.count + 1 : wsite.count
     }))
 
+    let stop = false
     setFiltered(
       videos
-        .filter(v => !v.attributes.includes('video-unplayable')) //FIXME broken file/stream?
+        .filter(video => !video.attributes.includes('video-unplayable')) //FIXME broken file/stream?
         .sort(getVideoSort({ type: 'date' }))
-        .filter(v => {
-          const website = initialData.find(wsite => wsite.label === v.website)
+        .filter(video => {
+          const website = initialData.find(wsite => wsite.label === video.website)
 
-          if (website !== undefined && website.count-- > (website.finished ? 0 : 1)) {
+          if (website !== undefined && website.count-- > 1) {
             return true
           }
 
-          if (v.categories.length === 0) {
-            map.set(v.website, (map.get(v.website) ?? 0) + 1)
+          if (video.categories.length === 0 && !stop) {
+            const isNewWebsite = map.get(video.website) === undefined
+
+            if (isNewWebsite && map.size >= 3) {
+              // 3rd website found
+              stop = true
+            }
+
+            if (!stop || !isNewWebsite) {
+              // add or increment website
+              map.set(video.website, (map.get(video.website) ?? 0) + 1)
+            }
           }
-          allMap.set(v.website, (allMap.get(v.website) ?? 0) + 1)
 
           return false
-
-          // return v.categories.length > 0
         })
     )
 
-    console.clear()
-    const selectedMap = [...(map.size > 0 ? map : allMap)]
-    selectedMap.slice(0, 2).forEach(([key, value]) => console.log(key, printWithMax(value, 200)))
+    setData([...map].map(([key, value]) => ({ label: key, count: value })))
   }, [localWebsites, videos, hidden])
 
   if (videos === undefined) return <Spinner />
@@ -149,9 +154,20 @@ const Videos = ({ hidden, sortMethod }: VideosProps) => {
 
   return (
     <div id={styles.videos}>
-      <Typography variant='h6' className='text-center'>
+      <Typography variant='h5' className='text-center'>
         <span id={styles.count}>{visible.length}</span> Videos
       </Typography>
+
+      {data.length > 0 && (
+        <Typography variant='h6' className='text-center'>
+          {data.map((item, idx) => (
+            <span key={item.label}>
+              {idx > 0 && ' - '}
+              {item.label}: {item.count}
+            </span>
+          ))}
+        </Typography>
+      )}
 
       <VGrid itemHeight={300} total={visible.length} renderData={idx => <VideoCard video={visible[idx]} />} />
     </div>
@@ -339,6 +355,7 @@ function FilterDropdown<T extends General>({ data, label, callback }: FilterDrop
       <FormControl>
         <Select variant='standard' id={label} defaultValue='ALL' onChange={callback}>
           <MenuItem value='ALL'>All</MenuItem>
+
           {data.map(item => (
             <MenuItem key={item.id} value={item.name}>
               {item.name}

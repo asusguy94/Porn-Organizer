@@ -47,9 +47,9 @@ export const getServerSideProps: GetServerSideProps<{
   })
 
   // VideoStars Without STAR
-  const missing = (await prisma.video.findMany({ where: { star: null } })).map(v => ({
-    videoId: v.id,
-    name: generateStarName(v.path)
+  const missing = (await prisma.video.findMany({ where: { star: null } })).map(video => ({
+    videoId: video.id,
+    name: generateStarName(video.path)
   }))
 
   return { props: { stars, missing } }
@@ -65,7 +65,7 @@ const Stars: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = 
 
   const [index, setIndex] = useState(0)
 
-  const missing = getUnique(videoStars, 'name').filter(star => !stars.some(s => s.name === star.name))
+  const missing = getUnique(videoStars, 'name').filter(star => stars.every(s => s.name !== star.name))
 
   useEffect(() => {
     if (missing.length) setInput(missing[index].name)
@@ -87,7 +87,7 @@ const Stars: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = 
   }
 
   const handleSubmitAll = () => {
-    Promise.allSettled(missing.map(m => starService.add(m.name))).finally(() => {
+    Promise.allSettled(missing.map(missing => starService.add(missing.name))).finally(() => {
       router.reload()
     })
   }
@@ -121,8 +121,8 @@ const Stars: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = 
 
       <Grid container justifyContent='center' spacing={3} style={{ marginTop: 0 }}>
         {stars
-          .filter(s => s.image === null)
-          .filter(s => s.name.includes(' '))
+          .filter(star => star.image === null)
+          .filter(star => star.name.includes(' '))
           .sort((a, b) => a.name.localeCompare(b.name))
           .slice(0, 12 * 12) // limit results to avoid crash
           .map(star => (

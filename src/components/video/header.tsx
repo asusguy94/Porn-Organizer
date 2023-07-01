@@ -404,18 +404,18 @@ const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTi
             onModal(
               'Add Attribute',
               attributes
-                .filter(item => !video.attributes.some(videoAttribute => videoAttribute.name === item.name))
-                .map(item => (
+                .filter(attribute => video.attributes.every(attr => attr.name !== attribute.name))
+                .map(attribute => (
                   <Button
                     variant='outlined'
                     color='primary'
-                    key={item.id}
+                    key={attribute.id}
                     onClick={() => {
                       onModal()
-                      addAttribute(item)
+                      addAttribute(attribute)
                     }}
                   >
-                    {item.name}
+                    {attribute.name}
                   </Button>
                 )),
               true
@@ -431,23 +431,18 @@ const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTi
             onModal(
               'Add Location',
               locations
-                .filter(item => {
-                  const match = video.locations.some(videoLocation => videoLocation.name === item.name)
-
-                  if (!match) return item
-                  return null
-                })
-                .map(item => (
+                .filter(location => video.locations.every(loc => loc.name !== location.name))
+                .map(location => (
                   <Button
                     variant='outlined'
                     color='primary'
-                    key={item.id}
+                    key={location.id}
                     onClick={() => {
                       onModal()
-                      addLocationHandler(item)
+                      addLocationHandler(location)
                     }}
                   >
-                    {item.name}
+                    {location.name}
                   </Button>
                 )),
               true

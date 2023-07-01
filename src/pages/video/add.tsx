@@ -34,7 +34,7 @@ type VideoFile = {
 
 export const getServerSideProps: GetServerSideProps<{ files: VideoFile[]; pages: number }> = async () => {
   const filesDB = await prisma.video.findMany()
-  const filesArr = filesDB.map(({ path }) => path)
+  const filesArr = filesDB.map(video => video.path)
 
   // TODO skip this check if directory is missing?
   const paths = await fs.promises.readdir('./media/videos')
@@ -102,16 +102,14 @@ const AddVideoPage: NextPage<InferGetServerSidePropsType<typeof getServerSidePro
               </TableHead>
 
               <TableBody>
-                {videos.map(video => {
-                  return (
-                    <TableRow key={video.path}>
-                      <TableCell>{video.website}</TableCell>
-                      <TableCell>{video.site}</TableCell>
-                      <TableCell>{video.path}</TableCell>
-                      <TableCell>{video.title}</TableCell>
-                    </TableRow>
-                  )
-                })}
+                {videos.map(video => (
+                  <TableRow key={video.path}>
+                    <TableCell>{video.website}</TableCell>
+                    <TableCell>{video.site}</TableCell>
+                    <TableCell>{video.path}</TableCell>
+                    <TableCell>{video.title}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>

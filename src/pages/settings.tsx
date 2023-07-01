@@ -54,7 +54,7 @@ const SettingsPage: NextPage<InferGetServerSidePropsType<typeof getServerSidePro
       <Grid container justifyContent='center'>
         <Grid item xs={2}>
           <WebsiteList
-            websites={websites.filter(w => !localWebsites.some(wsite => wsite.label === w.name))}
+            websites={websites.filter(website => localWebsites.every(wsite => wsite.label !== website.name))}
             addWebsite={handleAddWebsite}
           />
         </Grid>
@@ -133,7 +133,7 @@ const Input = ({ website, update, localWebsites, max = 0, onChange }: InputProps
     update(
       localWebsites.map(wsite => {
         if (wsite.label === website.label) {
-          wsite.count = value
+          return { ...wsite, count: value }
         }
 
         return wsite
@@ -150,7 +150,7 @@ const Input = ({ website, update, localWebsites, max = 0, onChange }: InputProps
     update(
       localWebsites.map(wsite => {
         if (wsite.label === website.label) {
-          wsite.finished = checked
+          return { ...wsite, finished: checked }
         }
 
         return wsite

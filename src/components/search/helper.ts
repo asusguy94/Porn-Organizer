@@ -100,14 +100,14 @@ function isWebsiteVisible(obj: ObjectType, hidden: HiddenType): boolean {
   if (isHiddenVideo(hidden) && isVideo(obj)) {
     return obj.website.toLowerCase() === hidden.website.toLowerCase()
   } else if (isHiddenStar(hidden) && isStar(obj)) {
-    return obj.websites.some(ws => ws.toLowerCase() === hidden.website.toLowerCase())
+    return obj.websites.some(website => website.toLowerCase() === hidden.website.toLowerCase())
   }
 
   return false
 }
 
 const isCategoryVisible = (video: VideoSearch, hidden: HiddenVideo) => {
-  const categories = video.categories.map(cat => cat.toLowerCase())
+  const categories = video.categories.map(category => category.toLowerCase())
 
   // hidden is empty
   if (hidden.category.length === 0) return true
@@ -127,11 +127,11 @@ const isCategoryVisible = (video: VideoSearch, hidden: HiddenVideo) => {
   if (video.categories.length === 0) return false
 
   // hidden is not empty
-  return hidden.category.every(cat => cat !== null && categories.includes(cat.toLowerCase()))
+  return hidden.category.every(category => category !== null && categories.includes(category.toLowerCase()))
 }
 
 const isAttributeVisible = (video: VideoSearch, hidden: HiddenVideo) => {
-  const attributes = video.attributes.map(attr => attr.toLowerCase())
+  const attributes = video.attributes.map(attribute => attribute.toLowerCase())
 
   // hidden is empty
   if (hidden.attribute.length === 0) return true
@@ -140,7 +140,7 @@ const isAttributeVisible = (video: VideoSearch, hidden: HiddenVideo) => {
   if (video.attributes.length === 0) return false
 
   // hidden is not empty
-  return hidden.attribute.every(attr => attributes.includes(attr.toLowerCase()))
+  return hidden.attribute.every(attribute => attributes.includes(attribute.toLowerCase()))
 }
 
 const isLocationVisible = (video: VideoSearch, hidden: HiddenVideo) => {

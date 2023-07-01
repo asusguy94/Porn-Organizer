@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 
 import { Button, Grid } from '@mui/material'
 
@@ -39,8 +39,9 @@ const Timeline = ({ bookmarks, video, playVideo, categories, update, onModal }: 
         [...bookmarks]
           .map(bookmarkItem => {
             if (bookmarkItem.id === bookmark.id) {
-              bookmarkItem.start = time
+              return { ...bookmarkItem, start: time }
             }
+
             return bookmarkItem
           })
           .sort((a, b) => a.start - b.start)
@@ -58,7 +59,9 @@ const Timeline = ({ bookmarks, video, playVideo, categories, update, onModal }: 
     bookmarkService.setCategory(bookmark.id, category.id).then(() => {
       update(
         bookmarks.map(bookmarkItem => {
-          if (bookmarkItem.start === bookmark.start) bookmarkItem.category = category
+          if (bookmarkItem.start === bookmark.start) {
+            return { ...bookmarkItem, category }
+          }
 
           return bookmarkItem
         })
@@ -89,8 +92,8 @@ const Timeline = ({ bookmarks, video, playVideo, categories, update, onModal }: 
         if (levels[j] === level && collisionCheck(bookmarksArr[j], bookmarksArr[i])) {
           level++
           j = -1
-    }
-  }
+        }
+      }
 
       levels[i] = level
       if (level > maxLevel) maxLevel = level
@@ -102,7 +105,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, update, onModal }: 
     if (videoPlayer) {
       const videoTop = videoPlayer.getBoundingClientRect().top
       videoPlayer.style.maxHeight = `calc(100vh - (${spacing.bookmarks}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
-      }
+    }
   }, [bookmarks, windowSize.width])
 
   if (categories === undefined) return <Spinner />

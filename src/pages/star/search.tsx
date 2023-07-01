@@ -348,6 +348,7 @@ const FilterDropdown = ({ data, label, callback }: FilterDropdownProps) => {
       <FormControl>
         <Select variant='standard' id={label} defaultValue='ALL' onChange={callback}>
           <MenuItem value='ALL'>All</MenuItem>
+
           {data.map(item => (
             <MenuItem key={item.id} value={item.name}>
               {item.name}
