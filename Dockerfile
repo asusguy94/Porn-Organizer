@@ -1,5 +1,5 @@
 # Define the base image
-FROM node:alpine3.16 AS custom_node
+FROM node:alpine3.18 AS custom_node
 
 # Install dependencies only when needed
 FROM custom_node AS deps
