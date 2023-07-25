@@ -1,8 +1,7 @@
 {
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:@typescript-eslint/strict",
     "plugin:react/recommended",
     "next/core-web-vitals",
@@ -11,7 +10,7 @@
   "plugins": ["@typescript-eslint", "react"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./tsconfig.json"
+    "project": true
   },
   "rules": {
     "import/no-anonymous-default-export": "off",
@@ -20,7 +19,7 @@
     "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-member-access": "off",
     "@typescript-eslint/no-unsafe-call": "off",
-    "@typescript-eslint/no-misused-promises": "off",
+    "@typescript-eslint/no-misused-promises": "off", // required for server-actions
     "@typescript-eslint/no-floating-promises": "off",
     "@typescript-eslint/consistent-type-definitions": ["warn", "type"]
   }
