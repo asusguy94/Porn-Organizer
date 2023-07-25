@@ -43,7 +43,6 @@ const Videos = ({ hidden, sortMethod }: VideosProps) => {
     let stop = false
     setFiltered(
       videos
-        // .filter(video => !video.attributes.includes(excludedAttribute)) //FIXME broken file/stream?
         .sort(getVideoSort({ type: 'date' }))
         .filter(video => {
           const website = initialData.find(wsite => wsite.label === video.website)
