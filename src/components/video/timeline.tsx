@@ -9,9 +9,9 @@ import { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'
 import Spinner from '../spinner'
 
+import { settingsConfig } from '@config'
 import { Bookmark, General, SetState, Video } from '@interfaces'
 import { bookmarkService } from '@service'
-import { settingsConfig } from '@config'
 
 import styles from './timeline.module.scss'
 
@@ -22,10 +22,11 @@ type TimelineProps = {
   bookmarks: Bookmark[]
   categories?: General[]
   playVideo: (time: number) => void
+  playerRef: React.RefObject<HTMLVideoElement>
   update: SetState<Bookmark[]>
   onModal: ModalHandler
 }
-const Timeline = ({ bookmarks, video, playVideo, categories, update, onModal }: TimelineProps) => {
+const Timeline = ({ bookmarks, video, playVideo, categories, playerRef, update, onModal }: TimelineProps) => {
   const windowSize = useWindowSize()
   const bookmarksRef = useRef<HTMLButtonElement[]>([])
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
@@ -69,19 +70,19 @@ const Timeline = ({ bookmarks, video, playVideo, categories, update, onModal }: 
     })
   }
 
-  const collisionCheck = (a: HTMLElement | null, b: HTMLElement | null) => {
-    if (a === null || b === null) return false
-
-    const aRect = a.getBoundingClientRect()
-    const bRect = b.getBoundingClientRect()
-
-    return (
-      aRect.x + aRect.width >= bRect.x - settingsConfig.timeline.spacing &&
-      aRect.x - settingsConfig.timeline.spacing <= bRect.x + bRect.width
-    )
-  }
-
   useEffect(() => {
+    const collisionCheck = (a: HTMLElement | null, b: HTMLElement | null) => {
+      if (a === null || b === null) return false
+
+      const aRect = a.getBoundingClientRect()
+      const bRect = b.getBoundingClientRect()
+
+      return (
+        aRect.x + aRect.width >= bRect.x - settingsConfig.timeline.spacing &&
+        aRect.x - settingsConfig.timeline.spacing <= bRect.x + bRect.width
+      )
+    }
+
     const bookmarksArr = bookmarks.length > 0 ? bookmarksRef.current : []
     const levels: number[] = new Array(bookmarks.length).fill(0)
     let maxLevel = 0
@@ -101,12 +102,12 @@ const Timeline = ({ bookmarks, video, playVideo, categories, update, onModal }: 
 
     setBookmarkLevels(levels)
 
-    const videoPlayer = document.querySelector<HTMLElement>('.plyr')
-    if (videoPlayer) {
-      const videoTop = videoPlayer.getBoundingClientRect().top
-      videoPlayer.style.maxHeight = `calc(100vh - (${spacing.bookmarks}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
+    const videoElement = playerRef.current
+    if (videoElement) {
+      const videoTop = videoElement.getBoundingClientRect().top
+      videoElement.style.maxHeight = `calc(100vh - (${spacing.bookmarks}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
     }
-  }, [bookmarks, windowSize.width])
+  }, [bookmarks, playerRef, windowSize.width])
 
   if (categories === undefined) return <Spinner />
 

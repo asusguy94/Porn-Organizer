@@ -1,21 +1,21 @@
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
 import { Button, TextField } from '@mui/material'
 
 import Hls, { HlsConfig, HlsListeners } from 'hls.js'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
-import { useSessionStorage } from 'usehooks-ts'
 import { useKey } from 'react-use'
+import { useSessionStorage } from 'usehooks-ts'
 
-import Plyr, { PlyrWithMetadata } from '../plyr'
 import { IconWithText } from '../icon'
 import { ModalHandler, Modal } from '../modal'
+import Plyr, { PlyrWithMetadata } from '../plyr'
 import Spinner from '../spinner'
 
-import { videoService } from '@service'
-import { Bookmark, General, SetState, Video, VideoStar } from '@interfaces'
 import { serverConfig, settingsConfig } from '@config'
+import { Bookmark, General, SetState, Video, VideoStar } from '@interfaces'
+import { videoService } from '@service'
 
 const useHls = (
   video: Video,
@@ -134,6 +134,7 @@ type VideoPlayerProps = {
   bookmarks: Bookmark[]
   star: VideoStar | null
   plyrRef: React.MutableRefObject<PlyrWithMetadata | null>
+  playerRef: React.RefObject<HTMLVideoElement>
   update: {
     video: SetState<Video | undefined>
     star: SetState<VideoStar | null>
@@ -143,7 +144,17 @@ type VideoPlayerProps = {
   modalData: Modal
 }
 
-const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onModal, modalData }: VideoPlayerProps) => {
+const VideoPlayer = ({
+  video,
+  categories,
+  bookmarks,
+  star,
+  plyrRef,
+  playerRef,
+  update,
+  onModal,
+  modalData
+}: VideoPlayerProps) => {
   const router = useRouter()
 
   useHls(video, plyrRef, { maxBufferLength: Infinity, autoStartLoad: false })
@@ -228,7 +239,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
 
   const renameVideo = (path: string) => {
     videoService.rename(video.id, path).then(() => {
-      router.reload()
+      router.refresh()
     })
   }
 
@@ -238,6 +249,7 @@ const VideoPlayer = ({ video, categories, bookmarks, star, plyrRef, update, onMo
     <div onWheel={handleWheel}>
       <ContextMenuTrigger id='video'>
         <Plyr
+          playerRef={playerRef}
           plyrRef={plyrRef}
           source={`${serverConfig.api}/video/${video.id}/file`}
           poster={`${serverConfig.api}/video/${video.id}/image`}

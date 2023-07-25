@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+
 dayjs.extend(utc)
 
 export const getUnique = <T>(arr: T[], prop?: keyof T): T[] => {
@@ -22,8 +23,6 @@ export function clamp(value: number, minOrMax: number, max?: number): number {
   // min was supplied, use regular clamp
   return Math.min(Math.max(value, minOrMax), max)
 }
-
-export const printWithMax = (value: number, max: number): string => `${value < max ? value : `${max - 1}+`}`
 
 export const printError = (error: unknown) => {
   if (error instanceof Error) {

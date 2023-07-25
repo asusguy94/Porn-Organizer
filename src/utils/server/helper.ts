@@ -1,19 +1,16 @@
-import { NextApiRequest, NextApiResponse } from 'next/types'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import fetch from 'node-fetch'
 
 import fs from 'fs'
 import path from 'path'
-import fetch from 'node-fetch'
-import ffmpeg from 'fluent-ffmpeg'
-import { Server } from 'socket.io'
-
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-dayjs.extend(utc)
 
 import prisma from './prisma'
 
 import { settingsConfig } from '@config'
 import { SimilarStar } from '@interfaces/api'
+
+dayjs.extend(utc)
 
 export const dateDiff = (
   date1?: string | Date | null,
@@ -70,23 +67,6 @@ export const removeThumbnails = async (videoID: number) => {
     fs.promises.unlink(`./media/vtt/${videoID}.vtt`),
     fs.promises.unlink(`./media/vtt/${videoID}.jpg`)
   ])
-}
-
-// This requires a specific pipeline, as such it is using callbacks
-export const rebuildVideoFile = async (src: string): Promise<boolean> => {
-  const { dir, ext, name } = path.parse(src)
-  const newSrc = `${dir}/${name}_${ext}`
-
-  await fs.promises.rename(src, newSrc)
-  return new Promise<boolean>((resolve, reject) => {
-    ffmpeg(newSrc)
-      .videoCodec('copy')
-      .audioCodec('copy')
-      .output(src)
-      .on('end', () => fs.unlink(newSrc, err => resolve(err !== null)))
-      .on('error', err => reject(err))
-      .run()
-  })
 }
 
 export const getClosestQ = (quality: number): number => {
@@ -175,7 +155,7 @@ export const isNewDate = (dateStr1: string | Date, dateStr2: string | Date): boo
  */
 export const getResizedThumb = (id: number): string => `${id}-${settingsConfig.THUMB_RES}.jpg`
 
-const setCache = (res: NextApiResponse, ageInSeconds: number, delay = 100) => {
+const setCache = (ageInSeconds: number, delay = 100) => {
   const cacheArr = [
     'public',
     `max-age=${ageInSeconds}`,
@@ -184,45 +164,58 @@ const setCache = (res: NextApiResponse, ageInSeconds: number, delay = 100) => {
     `stale-while-revalidate=${delay}`
   ]
 
-  res.setHeader('Cache-Control', cacheArr.join(', '))
+  return { 'Cache-Control': cacheArr.join(',') }
 }
 
-export const sendFile = async (res: NextApiResponse, path: string) => {
+const errorResponse = new Response(null, { status: 404 })
+
+export const sendFile = async (path: string) => {
   if (!(await fileExists(path))) {
-    res.status(404).end()
-    return
+    return errorResponse
   }
 
-  setCache(res, 1)
-  res.writeHead(200)
-  fs.createReadStream(path).pipe(res)
+  return new Response(await fs.promises.readFile(path), {
+    headers: { ...setCache(60 * 60) }
+  })
 }
 
-export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, path: string, mb = 2) => {
+export const sendPartial = async (req: Request, path: string, mb = 2) => {
   const chunkSize = 1024 * 1024 * mb
 
   if (!(await fileExists(path))) {
-    res.status(404).end()
-    return
+    return errorResponse
   }
 
-  fs.stat(path, (err, data) => {
-    if (err) {
-      throw err
-    }
+  return new Promise<Response>((resolve, reject) => {
+    fs.stat(path, (err, data) => {
+      if (err) throw err
 
-    // extract start and end / empty
-    const ranges = req.headers.range?.match(/^bytes=(\d+)-/)?.slice(1)
-    const start = parseInt(ranges?.[0] ?? '0')
-    const end = Math.min(start + chunkSize, data.size - 1)
+      // extract start and end / empty
+      const ranges = req.headers
+        .get('range')
+        ?.match(/^bytes=(\d+)-/)
+        ?.slice(1)
+      const start = parseInt(ranges?.[0] ?? '0')
+      const end = Math.min(start + chunkSize, data.size - 1)
 
-    res.writeHead(206, {
-      'Accept-Ranges': 'bytes',
-      'Content-Range': `bytes ${start}-${end}/${data.size}`,
-      'Content-Length': end - start + 1
+      const stream = fs.createReadStream(path, { start, end })
+      const buffer: Buffer[] = []
+
+      stream.on('data', (chunk: Buffer) => buffer.push(chunk))
+      stream.on('end', () => {
+        resolve(
+          new Response(Buffer.concat(buffer), {
+            status: 206,
+            headers: {
+              'Accept-Ranges': 'bytes',
+              'Content-Range': `bytes ${start}-${end}/${data.size}`,
+              'Content-Length': `${end - start + 1}`
+            }
+          })
+        )
+      })
+      stream.on('error', error => reject(error.cause))
     })
-
-    fs.createReadStream(path, { start, end }).pipe(res)
   })
 }
 
@@ -308,9 +301,6 @@ export function getDividableWidth(width: number, limits = { min: 120, max: 240 }
   throw new Error(`Could not find dividable width for ${width}`)
 }
 
-export function logger(message: string, event?: string, socket?: Server) {
-  if (socket && event) {
-    socket.emit(event, message)
-  }
+export function logger(message: string) {
   console.log(message)
 }

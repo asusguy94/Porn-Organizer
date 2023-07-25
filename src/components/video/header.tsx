@@ -1,19 +1,19 @@
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { Button, Grid, ImageList, ImageListItem, TextField, Typography } from '@mui/material'
 
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
-import { useCopyToClipboard } from 'usehooks-ts'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
+import { useCopyToClipboard } from 'usehooks-ts'
 
 import Icon, { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'
 import Spinner from '../spinner'
 
-import { attributeService, locationService, videoService } from '@service'
-import { General, SetState, Video } from '@interfaces'
 import { settingsConfig } from '@config'
+import { General, SetState, Video } from '@interfaces'
+import { attributeService, locationService, videoService } from '@service'
 import { formatDate } from '@utils/shared'
 
 import styles from './header.module.scss'
@@ -64,8 +64,6 @@ type HeaderSlugProps = {
   onModal: ModalHandler
 }
 const HeaderSlug = ({ video, hidden = false, onModal }: HeaderSlugProps) => {
-  const router = useRouter()
-
   const viewSlugs = () => {
     const GAP = 4
     const MAX_ROWS = 4
@@ -123,7 +121,7 @@ const HeaderSlug = ({ video, hidden = false, onModal }: HeaderSlugProps) => {
 
   const setSlug = (slug: string) => {
     videoService.setSlug(video.id, slug).then(() => {
-      router.reload()
+      location.reload()
     })
   }
 
@@ -150,7 +148,7 @@ const HeaderCover = ({ video, hidden = false }: HeaderCoverProps) => {
 
     videoService.setThumbnail(video.id).then(() => {
       if (settingsConfig.userAction.thumbnail.reload) {
-        router.reload()
+        router.refresh()
       } else if (settingsConfig.userAction.thumbnail.close) {
         window.close()
       }
@@ -176,9 +174,11 @@ const ValidateTitle = ({ video, hidden, onModal }: ValidateTitleProps) => {
   const [value, setValue] = useState('Validate Title')
 
   const handleClick = () => {
+    const format = (input: string) => input.toLowerCase().replace(/\s+/, '').trim()
+
     setValue('Loading...')
     videoService.getVideoInfo(video.id).then(({ data }) => {
-      if (data.title.toLowerCase().trim() === video.name.toLowerCase().trim()) {
+      if (format(data.title) === format(video.name)) {
         setValue('Updating...')
         videoService.validateTitle(video.id).then(() => {
           setDisabled(true)
@@ -290,7 +290,7 @@ const HeaderDate = ({ video }: HeaderDateProps) => {
 
   const fixDate = () => {
     videoService.fixDate(video.id).then(() => {
-      router.reload()
+      router.refresh()
     })
   }
 
@@ -452,8 +452,8 @@ const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTi
 
         <hr />
 
-        <IconWithText component={MenuItem} icon='copy' text='Copy Title' onClick={() => void copyTitle()} />
-        <IconWithText component={MenuItem} icon='person' text='Copy Star' onClick={() => void copyStar()} />
+        <IconWithText component={MenuItem} icon='copy' text='Copy Title' onClick={copyTitle} />
+        <IconWithText component={MenuItem} icon='person' text='Copy Star' onClick={copyStar} />
       </ContextMenu>
     </Typography>
   )

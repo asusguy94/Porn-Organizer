@@ -7,14 +7,15 @@ type GridProps = {
   total: number
   itemHeight: number
   itemRows?: number
+  listClassName?: string
 }
-const Grid = ({ renderData, total, itemHeight, itemRows = 1 }: GridProps) => (
+const Grid = ({ renderData, total, itemHeight, itemRows = 1, listClassName = '' }: GridProps) => (
   <VirtuosoGrid
     useWindowScroll
     overscan={itemHeight * itemRows}
     totalCount={total}
     itemContent={renderData}
-    listClassName={styles['grid-list']}
+    listClassName={`${styles['grid-list']} ${listClassName}`}
   />
 )
 

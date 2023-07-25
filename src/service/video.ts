@@ -1,6 +1,6 @@
+import { createApi } from '@config'
 import { Bookmark, General, VideoStar } from '@interfaces'
 
-import { createApi } from '@config'
 const { api } = createApi('/video')
 
 export default {
@@ -13,8 +13,8 @@ export default {
   addAttribute: (id: number, attributeID: number) => api.post<General>(`/${id}/attribute`, { attributeID }),
   fixDate: (id: number) => api.put(`/${id}/fix-date`),
   renameTitle: (id: number, title: string) => api.put(`/${id}`, { title }),
-  getSlugs: (id: number) =>
-    api.get<
+  getSlugs: (id: number) => {
+    return api.get<
       {
         id: string
         title: string
@@ -22,7 +22,8 @@ export default {
         site: string
         date: string
       }[]
-    >(`/${id}/meta`),
+    >(`/${id}/meta`)
+  },
   setSlug: (id: number, slug: string) => api.put(`/${id}`, { slug }),
   addPlay: (id: number) => api.put(`/${id}`, { plays: 1 }),
   delete: (id: number) => api.delete(`/${id}`),

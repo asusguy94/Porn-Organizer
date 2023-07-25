@@ -1,6 +1,6 @@
+import { createApi } from '@config'
 import { Similar } from '@interfaces'
 
-import { createApi } from '@config'
 const { api } = createApi('/star')
 
 export default {
@@ -11,7 +11,6 @@ export default {
   ignoreStar: <T extends { id: number; ignored: boolean }>(star: T) => {
     return api.put<T & { autoTaggerIgnore: boolean }>(`/${star.id}`, { ignore: !star.ignored })
   },
-  addAlias: (id: number, alias: string) => api.post(`/${id}/alias`, { alias }),
   removeImage: (id: number) => api.delete(`/${id}/image`),
   addImage: (id: number, url: string) => api.post<{ image: string }>(`/${id}/image`, { url }),
   getImages: (id: number) => api.post<{ images: string[] }>(`/${id}/api/image`),

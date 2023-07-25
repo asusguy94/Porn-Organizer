@@ -6,18 +6,18 @@ import { settingsConfig } from '@config'
 
 type PlyrProps = {
   plyrRef: React.MutableRefObject<Plyr | null>
+  playerRef: React.RefObject<HTMLVideoElement>
   source: string
   poster: string
   thumbnail: string
 }
-const PlyrComponent = ({ plyrRef, source, poster, thumbnail }: PlyrProps) => {
+const PlyrComponent = ({ plyrRef, playerRef, source, poster, thumbnail }: PlyrProps) => {
   useEffect(() => {
     const player = new Plyr('.plyr-js', {
       controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'settings'],
       settings: ['speed'],
       speed: { selected: 1, options: [0.75, 1, 1.25] },
       hideControls: false,
-      ratio: '16:9',
       keyboard: { focused: false },
       fullscreen: { enabled: false },
       previewThumbnails: {
@@ -36,7 +36,7 @@ const PlyrComponent = ({ plyrRef, source, poster, thumbnail }: PlyrProps) => {
     }
   }, [plyrRef, poster, thumbnail])
 
-  return <video className='plyr-js' src={source} />
+  return <video className='plyr-js' src={source} ref={playerRef} />
 }
 
 export type PlyrWithMetadata = Plyr & { media: HTMLVideoElement }

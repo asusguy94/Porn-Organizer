@@ -1,4 +1,5 @@
 import prisma from './prisma'
+
 import { Star } from '@prisma/client'
 
 export const getAliasAsStar = async (alias: string): Promise<Star> => {

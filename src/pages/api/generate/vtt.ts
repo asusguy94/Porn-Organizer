@@ -1,11 +1,11 @@
-import { NextApiRequest } from 'next/types'
+import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import prisma from '@utils/server/prisma'
-import { fileExists, logger } from '@utils/server/helper'
 import { extractVtt } from '@utils/server/ffmpeg'
-import { NextApiResponseWithSocket } from '@interfaces/socket'
+import { fileExists, logger } from '@utils/server/helper'
+import prisma from '@utils/server/prisma'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponseWithSocket) {
+//NEXT /video/add
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const videos = await prisma.video.findMany({ where: { duration: { gt: 0 }, height: { gt: 0 }, width: { gt: 0 } } })
 
@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
         (await fileExists(absoluteVideoPath)) &&
         (!(await fileExists(absoluteVttPath)) || !(await fileExists(absoluteImagePath)))
       ) {
-        logger(`Generating VTT: ${video.id}`, 'vtt', res.socket.server.io)
+        logger(`Generating VTT: ${video.id}`)
 
         // validate if video has invalid width
         try {

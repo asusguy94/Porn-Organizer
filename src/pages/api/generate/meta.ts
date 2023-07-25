@@ -1,16 +1,20 @@
-import { NextApiRequest } from 'next/types'
-
-import prisma from '@utils/server/prisma'
-import { fileExists, logger, rebuildVideoFile, sleep } from '@utils/server/helper'
-import { getDuration as videoDuration, getHeight as videoHeight, getWidth as videoWidth } from '@utils/server/ffmpeg'
-import { generateStarName } from '@utils/server/generate'
-import { aliasExists, aliasIsIgnored, getAliasAsStar, starExists, starIsIgnored } from '@utils/server/helper.db'
-import { findSceneSlug } from '@utils/server/metadata'
+import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import { Video } from '@prisma/client'
-import { NextApiResponseWithSocket } from '@interfaces/socket'
+import {
+  rebuildVideoFile,
+  getDuration as videoDuration,
+  getHeight as videoHeight,
+  getWidth as videoWidth
+} from '@utils/server/ffmpeg'
+import { generateStarName } from '@utils/server/generate'
+import { fileExists, logger, sleep } from '@utils/server/helper'
+import { aliasExists, aliasIsIgnored, getAliasAsStar, starExists, starIsIgnored } from '@utils/server/helper.db'
+import { findSceneSlug } from '@utils/server/metadata'
+import prisma from '@utils/server/prisma'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponseWithSocket) {
+//NEXT /video/add
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const checkStarRelation = async (video: Video) => {
       const star = generateStarName(video.path)
@@ -75,7 +79,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
           const height = await videoHeight(absoluteVideoPath)
           const duration = await videoDuration(absoluteVideoPath)
 
-          logger(`Refreshing: "${video.path}"`, 'meta', res.socket.server.io)
+          logger(`Refreshing: "${video.path}"`)
           await prisma.video.update({
             where: { id: video.id },
             data: { duration, height, width }
@@ -97,7 +101,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
         .then(async slug => {
           await prisma.video.update({ where: { id: video.id }, data: { api: slug, ignoreMeta: true } })
         })
-        .catch(async reason => {
+        .catch(async (reason: string) => {
           if (reason === 'too few slugs' || reason === 'too many slugs') {
             await prisma.video.update({ where: { id: video.id }, data: { ignoreMeta: true } })
           }

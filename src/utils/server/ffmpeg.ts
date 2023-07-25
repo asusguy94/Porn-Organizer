@@ -1,9 +1,14 @@
-import sharp from 'sharp'
 import generatePreview from 'ffmpeg-generate-video-preview'
-import getDimensions from 'get-video-dimensions'
 import ffmpeg from 'fluent-ffmpeg'
+import getDimensions from 'get-video-dimensions'
+import sharp from 'sharp'
+
+import fs from 'fs'
+import path from 'path'
 
 import { generateVTTData, getDividableWidth } from './helper'
+
+//FIXME ffmpeg cannot be used inside /app
 
 const getRawHeight = async (file: string) => (await getDimensions(file)).height
 const getRawWidth = async (file: string) => (await getDimensions(file)).width
@@ -71,4 +76,21 @@ export const extractVtt = async (src: string, dest: string, videoID: number) => 
       height: calcHeight
     }
   )
+}
+
+// This requires a specific pipeline, as such it is using callbacks
+export const rebuildVideoFile = async (src: string): Promise<boolean> => {
+  const { dir, ext, name } = path.parse(src)
+  const newSrc = `${dir}/${name}_${ext}`
+
+  await fs.promises.rename(src, newSrc)
+  return new Promise<boolean>((resolve, reject) => {
+    ffmpeg(newSrc)
+      .videoCodec('copy')
+      .audioCodec('copy')
+      .output(src)
+      .on('end', () => fs.unlink(newSrc, err => resolve(err !== null)))
+      .on('error', err => reject(err))
+      .run()
+  })
 }
