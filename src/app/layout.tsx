@@ -2,7 +2,7 @@ import NextTopLoader from 'nextjs-toploader'
 
 import ClientLayout from './client-layout'
 
-function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en'>
       <head>
@@ -16,5 +16,3 @@ function RootLayout({ children }: { children: React.ReactNode }) {
     </html>
   )
 }
-
-export default RootLayout

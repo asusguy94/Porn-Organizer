@@ -28,7 +28,7 @@ type BasicModel = {
 
 //TODO Check if title.toLowerCase() matches videodata.title.toLowercase()
 
-const createConfig = (longTimeout = false): AxiosRequestConfig => {
+function createConfig(longTimeout = false): AxiosRequestConfig {
   const TIMEOUT_DEFAULT = 5
   const TIMEOUT_LONG = 20
 
@@ -46,7 +46,7 @@ const getCupSize = (input: string) => input.match(/[A-Z]+$/i)?.[0] ?? null
 
 const getUrl = (path = '') => new URL(`https://api.metadataapi.net${path}`)
 
-export const getSceneSlug = async (slug: string): Promise<string> => {
+export async function getSceneSlug(slug: string): Promise<string> {
   type Scene = {
     data: { id: string }
   }
@@ -59,7 +59,7 @@ export const getSceneSlug = async (slug: string): Promise<string> => {
   return Promise.resolve(result.data.id)
 }
 
-export async function findBroadSceneSlug(videoTitle: string, wsiteOrSite?: string) {
+export default async function findBroadSceneSlug(videoTitle: string, wsiteOrSite?: string) {
   type Scene = {
     data: {
       id: string
@@ -135,7 +135,7 @@ export async function findSceneSlug(videoStar: string, videoTitle: string, siteO
   })
 }
 
-export const getStarSlug = async (star: string): Promise<string> => {
+export async function getStarSlug(star: string): Promise<string> {
   const url = getUrl('/performers')
   url.searchParams.set('q', star)
 
@@ -156,7 +156,7 @@ export const getStarSlug = async (star: string): Promise<string> => {
   return data[0].id
 }
 
-export const getSceneData = async (slug: string, longTimeout = false) => {
+export async function getSceneData(slug: string, longTimeout = false) {
   try {
     const url = getUrl(`/scenes/${slug}`)
     const result = (await axios.get<{ data: SceneData }>(url.href, createConfig(longTimeout))).data
@@ -165,7 +165,7 @@ export const getSceneData = async (slug: string, longTimeout = false) => {
       id: result.data.id,
       title: result.data.title,
       date: result.data.date,
-      image: result.data.background.full, // large is larger, but currently generates white background
+      image: result.data.background.full,
       performers: result.data.performers
         .filter(({ extra: { gender } }) => gender === 'Female')
         .map(performer => ({
@@ -187,7 +187,7 @@ export const getSceneData = async (slug: string, longTimeout = false) => {
   }
 }
 
-export const getStarData = async (slug: string) => {
+export async function getStarData(slug: string) {
   type Data = {
     data: {
       id: string
@@ -226,7 +226,7 @@ export const getStarData = async (slug: string) => {
   }
 }
 
-export const getStarScenes = async (slug: string) => {
+export async function getStarScenes(slug: string) {
   type Data = {
     data: {
       id: string

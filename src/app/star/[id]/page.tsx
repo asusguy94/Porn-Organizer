@@ -5,7 +5,7 @@ import { dateDiff, getSimilarStars } from '@utils/server/helper'
 import prisma from '@utils/server/prisma'
 import { formatDate, getUnique } from '@utils/shared'
 
-const StarPage = async ({ params }: Params<'id'>) => {
+export default async function StarPage({ params }: Params<'id'>) {
   const id = parseInt(params.id)
 
   const breasts = await prisma.star.findMany({ where: { breast: { not: null } }, orderBy: { breast: 'asc' } })
@@ -83,5 +83,3 @@ const StarPage = async ({ params }: Params<'id'>) => {
     />
   )
 }
-
-export default StarPage

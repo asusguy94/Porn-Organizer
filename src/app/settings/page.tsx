@@ -4,7 +4,7 @@ import prisma from '@utils/server/prisma'
 
 export const dynamic = 'force-dynamic'
 
-const SettingsPage = async () => {
+export default async function SettingsPage() {
   const websites = await prisma.website.findMany({
     include: { _count: { select: { videos: true } } },
     orderBy: { name: 'asc' }
@@ -12,5 +12,3 @@ const SettingsPage = async () => {
 
   return <Client websites={websites} />
 }
-
-export default SettingsPage

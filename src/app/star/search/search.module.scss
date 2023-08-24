@@ -1,5 +1,3 @@
-@import '@styles/variables';
-
 #sidebar {
   h2 {
     margin-bottom: 0;
@@ -18,9 +16,9 @@
   .star {
     margin: 5px;
 
-    width: $starWidth;
+    width: var(--star-width);
     img {
-      height: $starHeight;
+      height: var(--star-height);
     }
   }
 }

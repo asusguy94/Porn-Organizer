@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { NextPage } from 'next/types'
 import { useState } from 'react'
 
 import {
@@ -19,18 +18,22 @@ import {
 
 import { generateService, videoService } from '@service'
 
-import styles from './add.module.scss'
+import styles from './add.module.css'
 
-const AddVideoPage: NextPage<{
-  files: {
-    path: string
-    website: string
-    site: string
-    title: string
-    date: string
-  }[]
+export type File = {
+  path: string
+  website: string
+  site: string
+  title: string
+  date: string
+}
+
+type AddVideoPageProps = {
+  files: File[]
   pages: number
-}> = ({ files: videos, pages }) => {
+}
+
+export default function AddVideoPage({ files: videos, pages }: AddVideoPageProps) {
   const router = useRouter()
 
   return (
@@ -88,7 +91,7 @@ type ActionProps = {
   callback?: () => void
   disabled?: boolean
 }
-const Action = ({ label, callback = undefined, disabled = false }: ActionProps) => {
+function Action({ label, callback = undefined, disabled = false }: ActionProps) {
   const [isDisabled, setIsDisabled] = useState(disabled)
 
   const clickHandler = () => {
@@ -114,5 +117,3 @@ const Action = ({ label, callback = undefined, disabled = false }: ActionProps) 
     </Button>
   )
 }
-
-export default AddVideoPage

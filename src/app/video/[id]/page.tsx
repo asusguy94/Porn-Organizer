@@ -1,7 +1,6 @@
 import Client from './client'
 
-import { VideoStar } from '@interfaces'
-import { Params } from '@interfaces'
+import { Params, VideoStar } from '@interfaces'
 import { generateStarName } from '@utils/server/generate'
 import { dateDiff } from '@utils/server/helper'
 import { getSceneData } from '@utils/server/metadata'

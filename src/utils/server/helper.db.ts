@@ -2,15 +2,15 @@ import prisma from './prisma'
 
 import { Star } from '@prisma/client'
 
-export const getAliasAsStar = async (alias: string): Promise<Star> => {
+export async function getAliasAsStar(alias: string): Promise<Star> {
   return (await prisma.starAlias.findFirstOrThrow({ where: { name: alias }, include: { star: true } })).star
 }
 
-export const starIsIgnored = async (star: string): Promise<boolean> => {
+export async function starIsIgnored(star: string): Promise<boolean> {
   return (await prisma.star.count({ where: { name: star, autoTaggerIgnore: true } })) > 0
 }
 
-export const aliasIsIgnored = async (alias: string): Promise<boolean> => {
+export async function aliasIsIgnored(alias: string): Promise<boolean> {
   return (
     await prisma.starAlias.findFirstOrThrow({
       where: { name: alias },
@@ -19,10 +19,10 @@ export const aliasIsIgnored = async (alias: string): Promise<boolean> => {
   ).star.autoTaggerIgnore
 }
 
-export const starExists = async (star: string): Promise<boolean> => {
+export async function starExists(star: string): Promise<boolean> {
   return (await prisma.star.count({ where: { name: star } })) > 0
 }
 
-export const aliasExists = async (alias: string): Promise<boolean> => {
+export async function aliasExists(alias: string): Promise<boolean> {
   return (await prisma.starAlias.count({ where: { name: alias } })) > 0
 }

@@ -13,7 +13,7 @@ import { generateVTTData, getDividableWidth } from './helper'
 const getRawHeight = async (file: string) => (await getDimensions(file)).height
 const getRawWidth = async (file: string) => (await getDimensions(file)).width
 
-const getRawDuration = async (file: string) => {
+async function getRawDuration(file: string) {
   return new Promise<number>((resolve, reject) => {
     ffmpeg.ffprobe(file, (err, data) => {
       if (err) {
@@ -43,7 +43,7 @@ export const getDuration = async (file: string) => Math.round(await getRawDurati
 export const getHeight = async (file: string) => await getRawHeight(file)
 export const getWidth = async (file: string) => await getRawWidth(file)
 
-export const extractVtt = async (src: string, dest: string, videoID: number) => {
+export async function extractVtt(src: string, dest: string, videoID: number) {
   const duration = await getRawDuration(src) // in seconds
 
   const cols = 8 // images per row
@@ -61,7 +61,7 @@ export const extractVtt = async (src: string, dest: string, videoID: number) => 
     input: src,
     output: dest,
     width: getDividableWidth(await getRawWidth(src)),
-    quality: 3, // 3>> less than 4MB
+    quality: 3,
     rows: rows,
     cols: cols
   })
@@ -79,7 +79,7 @@ export const extractVtt = async (src: string, dest: string, videoID: number) => 
 }
 
 // This requires a specific pipeline, as such it is using callbacks
-export const rebuildVideoFile = async (src: string): Promise<boolean> => {
+export async function rebuildVideoFile(src: string): Promise<boolean> {
   const { dir, ext, name } = path.parse(src)
   const newSrc = `${dir}/${name}_${ext}`
 

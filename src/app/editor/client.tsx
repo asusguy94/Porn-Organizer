@@ -1,6 +1,5 @@
 'use client'
 
-import { NextPage } from 'next/types'
 import { useRef, useState } from 'react'
 
 import {
@@ -20,19 +19,21 @@ import capitalize from 'capitalize'
 
 import { General, ServerAction } from '@interfaces'
 
-import styles from './editor.module.scss'
+import styles from './editor.module.css'
 
 export type EditorPageProps = {
   data: { name: string; data: General[]; add: ServerAction; update: ServerAction }[]
 }
 
-const EditorPage: NextPage<EditorPageProps> = ({ data }) => (
-  <Grid container>
-    {data.map(item => (
-      <Table key={item.name} {...item} />
-    ))}
-  </Grid>
-)
+export default function EditorPage({ data }: EditorPageProps) {
+  return (
+    <Grid container>
+      {data.map(item => (
+        <Table key={item.name} {...item} />
+      ))}
+    </Grid>
+  )
+}
 
 type TableProps = {
   name: string
@@ -40,7 +41,7 @@ type TableProps = {
   add: ServerAction
   update: ServerAction
 }
-const Table = ({ name, data, add, update }: TableProps) => {
+function Table({ name, data, add, update }: TableProps) {
   const [value, setValue] = useState('')
 
   return (
@@ -86,7 +87,7 @@ type TableRowProps = {
   update: ServerAction
   data: General
 }
-const TableRow = ({ update, data }: TableRowProps) => {
+function TableRow({ update, data }: TableRowProps) {
   const ref = useRef<HTMLFormElement>(null)
   const [edit, setEdit] = useState(false)
 
@@ -112,5 +113,3 @@ const TableRow = ({ update, data }: TableRowProps) => {
     </MuiTableRow>
   )
 }
-
-export default EditorPage

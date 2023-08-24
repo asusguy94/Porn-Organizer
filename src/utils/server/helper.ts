@@ -12,11 +12,11 @@ import { SimilarStar } from '@interfaces/api'
 
 dayjs.extend(utc)
 
-export const dateDiff = (
+export function dateDiff(
   date1?: string | Date | null,
   date2: string | Date | null = new Date(),
   relative = true
-): number => {
+): number {
   if (date1 === null || date1 === undefined || date2 === null) return 0
 
   const diff = dayjs(date1).diff(dayjs(date2), 'days')
@@ -24,7 +24,7 @@ export const dateDiff = (
   return relative ? Math.abs(diff) : diff
 }
 
-const getClosest = (search: number, arr: number[]): number => {
+function getClosest(search: number, arr: number[]): number {
   return arr.reduce((a, b) => {
     const aDiff = Math.abs(a - search)
     const bDiff = Math.abs(b - search)
@@ -37,7 +37,7 @@ const getClosest = (search: number, arr: number[]): number => {
   })
 }
 
-export const downloader = async (url: string, dest: string, type: 'URL' | 'FILE'): Promise<void> => {
+export async function downloader(url: string, dest: string, type: 'URL' | 'FILE'): Promise<void> {
   let buffer: Uint8Array
   if (type === 'URL') {
     const response = await fetch(url)
@@ -49,15 +49,25 @@ export const downloader = async (url: string, dest: string, type: 'URL' | 'FILE'
   await fs.promises.writeFile(dest, buffer)
 }
 
-export const dirOnly = (dir: string, root = false): string => (root ? path.parse(dir).dir : path.parse(dir).name)
 export const extOnly = (dir: string): string => path.parse(dir).ext
-export const noExt = (dir: string): string => {
+export function dirOnly(dir: string, root = false): string {
+  if (root) {
+    return path.parse(dir).dir
+  }
+
+  return path.parse(dir).name
+}
+export function noExt(dir: string): string {
   const parsed = path.parse(dir)
 
-  return parsed.dir ? `${parsed.dir}/${parsed.name}` : parsed.name
+  if (parsed.dir) {
+    return `${parsed.dir}/${parsed.name}`
+  }
+
+  return parsed.name
 }
 
-export const removeThumbnails = async (videoID: number) => {
+export async function removeThumbnails(videoID: number) {
   await Promise.allSettled([
     // Remove Images
     fs.promises.unlink(`./media/images/videos/${videoID}.jpg`),
@@ -69,7 +79,7 @@ export const removeThumbnails = async (videoID: number) => {
   ])
 }
 
-export const getClosestQ = (quality: number): number => {
+export function getClosestQ(quality: number): number {
   if (quality === 396) {
     return 480
   }
@@ -82,13 +92,13 @@ export const getClosestQ = (quality: number): number => {
  * @param {string} path Path to check
  * @return {Promise<boolean>} Returns true if the file exists
  */
-export const fileExists = async (path: string): Promise<boolean> => {
+export async function fileExists(path: string): Promise<boolean> {
   return new Promise<boolean>(resolve => fs.access(path, fs.constants.F_OK, err => resolve(!err)))
 }
 
 export const getDate = (dateStr: string) => dayjs.utc(dateStr).toDate()
 
-export const formatBreastSize = (input: string): string => {
+export function formatBreastSize(input: string): string {
   input = input.toUpperCase().trim()
 
   if (input.length > 1) {
@@ -99,7 +109,7 @@ export const formatBreastSize = (input: string): string => {
   return input
 }
 
-export const getSimilarStars = async (starID: number, maxMaxLength = 9): Promise<SimilarStar[]> => {
+export async function getSimilarStars(starID: number, maxMaxLength = 9): Promise<SimilarStar[]> {
   const currentStar = await prisma.star.findFirstOrThrow({ where: { id: starID }, include: { haircolors: true } })
 
   const match_default = 2
@@ -142,7 +152,7 @@ export const getSimilarStars = async (starID: number, maxMaxLength = 9): Promise
  * @param {string|Date} dateStr2 Second date
  * @return {boolean} Returns false if dates are identical
  */
-export const isNewDate = (dateStr1: string | Date, dateStr2: string | Date): boolean => {
+export function isNewDate(dateStr1: string | Date, dateStr2: string | Date): boolean {
   const date1 = dayjs(dateStr1)
   const date2 = dayjs(dateStr2)
 
@@ -155,7 +165,7 @@ export const isNewDate = (dateStr1: string | Date, dateStr2: string | Date): boo
  */
 export const getResizedThumb = (id: number): string => `${id}-${settingsConfig.THUMB_RES}.jpg`
 
-const setCache = (ageInSeconds: number, delay = 100) => {
+function setCache(ageInSeconds: number, delay = 100) {
   const cacheArr = [
     'public',
     `max-age=${ageInSeconds}`,
@@ -169,7 +179,7 @@ const setCache = (ageInSeconds: number, delay = 100) => {
 
 const errorResponse = new Response(null, { status: 404 })
 
-export const sendFile = async (path: string) => {
+export async function sendFile(path: string) {
   if (!(await fileExists(path))) {
     return errorResponse
   }
@@ -179,7 +189,7 @@ export const sendFile = async (path: string) => {
   })
 }
 
-export const sendPartial = async (req: Request, path: string, mb = 2) => {
+export async function sendPartial(req: Request, path: string, mb = 2) {
   const chunkSize = 1024 * 1024 * mb
 
   if (!(await fileExists(path))) {
@@ -219,7 +229,7 @@ export const sendPartial = async (req: Request, path: string, mb = 2) => {
   })
 }
 
-export const sleep = (ms: number): Promise<void> => {
+export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
@@ -232,17 +242,18 @@ export const toCamelCase = (str: string) => str.replace(/([a-z])([A-Z])/g, '$1 $
  */
 const writeToFile = async (path: string, content: string) => fs.promises.appendFile(path, content)
 
-const calculateTime = (secs: number) =>
-  dayjs(0)
+function calculateTime(secs: number) {
+  return dayjs(0)
     .hour(0)
     .millisecond(secs * 1000)
+}
 
-export const generateVTTData = async (
+export async function generateVTTData(
   videoID: number,
   frameDelay: number,
   tiles: { rows: number; cols: number },
   dimension: { height: number; width: number }
-) => {
+) {
   const vtt = `./media/vtt/${videoID}.vtt`
 
   let nextTimeCode = 0

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const validate = <T>(schema: z.ZodType<T>, body: unknown) => {
+export default function validate<T>(schema: z.ZodType<T>, body: unknown) {
   if (body === undefined) throw new Error('Request-body is undefined')
 
   let parsedData = body
@@ -14,9 +14,8 @@ const validate = <T>(schema: z.ZodType<T>, body: unknown) => {
   return result.data
 }
 
-const formDataToObject = (data: FormData): Record<string, unknown> => {
+function formDataToObject(data: FormData): Record<string, unknown> {
   return Object.fromEntries([...data.entries()])
 }
 
 export { z }
-export default validate

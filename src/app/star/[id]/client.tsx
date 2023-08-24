@@ -1,12 +1,11 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { NextPage } from 'next/types'
 import React, { useState, useEffect } from 'react'
 
 import { Button, TextField, Grid, Card, CardContent, Typography, ImageList, ImageListItem } from '@mui/material'
 
-import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
+import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { useCopyToClipboard } from 'usehooks-ts'
 
@@ -44,14 +43,16 @@ type Star = {
   similar: Similar[]
 }
 
-const StarPage: NextPage<{
+type StarPageProps = {
   breast: string[]
   haircolor: string[]
   ethnicity: string[]
   websites: string[]
   star: Star
   videos: StarVideo[]
-}> = ({ breast, haircolor, ethnicity, videos, star: starData }) => {
+}
+
+export default function StarPage({ breast, haircolor, ethnicity, videos, star: starData }: StarPageProps) {
   const [star, setStar] = useState<typeof starData>() //FIXME starData cannot be used directly
   const { modal, setModal } = useModal()
 
@@ -93,7 +94,7 @@ type StarTitleProps = {
   update: SetState<Star | undefined>
   onModal: ModalHandler
 }
-const StarTitle = ({ star, update, onModal }: StarTitleProps) => {
+function StarTitle({ star, update, onModal }: StarTitleProps) {
   const router = useRouter()
 
   const [, setClipboard] = useCopyToClipboard()
@@ -128,7 +129,7 @@ const StarTitle = ({ star, update, onModal }: StarTitleProps) => {
 
       <ContextMenu id='title'>
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='edit'
           text='Rename'
           onClick={() => {
@@ -152,7 +153,7 @@ const StarTitle = ({ star, update, onModal }: StarTitleProps) => {
         />
 
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='edit'
           text='Set Slug'
           onClick={() => {
@@ -175,7 +176,7 @@ const StarTitle = ({ star, update, onModal }: StarTitleProps) => {
         />
 
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon={star.ignored ? 'toggle-yes' : 'toggle-no'}
           text={star.ignored ? 'Enable Star' : 'Ignore Star'}
           onClick={ignoreStar}
@@ -183,7 +184,7 @@ const StarTitle = ({ star, update, onModal }: StarTitleProps) => {
 
         <hr />
 
-        <IconWithText component={MenuItem} icon='copy' text='Copy Star' onClick={copy} />
+        <IconWithText component={ContextMenuItem} icon='copy' text='Copy Star' onClick={copy} />
       </ContextMenu>
     </div>
   )
@@ -193,44 +194,46 @@ type SidebarProps = {
   similar: Similar[]
 }
 
-const Sidebar = ({ similar }: SidebarProps) => (
-  <Card>
-    <Typography variant='h5' className='text-center'>
-      Similar Stars
-    </Typography>
+function Sidebar({ similar }: SidebarProps) {
+  return (
+    <Card>
+      <Typography variant='h5' className='text-center'>
+        Similar Stars
+      </Typography>
 
-    <CardContent>
-      <Grid id={styles.similar}>
-        {similar.map((star, idx) => (
-          <Link key={star.id} href={`/star/${star.id}`} className={styles.star}>
-            <RibbonContainer component={Card}>
-              <ImageCard
-                src={`${serverConfig.api}/star/${star.id}/image`}
-                width={200}
-                height={275}
-                missing={star.image === null}
-                scale={5}
-                alt='star'
-                priority={idx === 0}
-              />
+      <CardContent>
+        <Grid id={styles.similar}>
+          {similar.map((star, idx) => (
+            <Link key={star.id} href={`/star/${star.id}`} className={styles.star}>
+              <RibbonContainer component={Card}>
+                <ImageCard
+                  src={`${serverConfig.api}/star/${star.id}/image`}
+                  width={200}
+                  height={275}
+                  missing={star.image === null}
+                  scale={5}
+                  alt='star'
+                  priority={idx === 0}
+                />
 
-              <Typography>{star.name}</Typography>
+                <Typography>{star.name}</Typography>
 
-              <Ribbon label={`${star.match}%`} />
-            </RibbonContainer>
-          </Link>
-        ))}
-      </Grid>
-    </CardContent>
-  </Card>
-)
+                <Ribbon label={`${star.match}%`} />
+              </RibbonContainer>
+            </Link>
+          ))}
+        </Grid>
+      </CardContent>
+    </Card>
+  )
+}
 
 type StarImageDropboxProps = {
   star: Star
   update: SetState<Star | undefined>
   onModal: ModalHandler
 }
-const StarImageDropbox = ({ star, update, onModal }: StarImageDropboxProps) => {
+function StarImageDropbox({ star, update, onModal }: StarImageDropboxProps) {
   const router = useRouter()
 
   const removeStar = () => {
@@ -296,7 +299,7 @@ const StarImageDropbox = ({ star, update, onModal }: StarImageDropboxProps) => {
           </ContextMenuTrigger>
 
           <ContextMenu id='star__image'>
-            <IconWithText component={MenuItem} icon='delete' text='Delete Image' onClick={removeImage} />
+            <IconWithText component={ContextMenuItem} icon='delete' text='Delete Image' onClick={removeImage} />
           </ContextMenu>
         </>
       ) : (
@@ -306,7 +309,7 @@ const StarImageDropbox = ({ star, update, onModal }: StarImageDropboxProps) => {
           </ContextMenuTrigger>
 
           <ContextMenu id='star__dropbox'>
-            <IconWithText component={MenuItem} icon='delete' text='Remove Star' onClick={removeStar} />
+            <IconWithText component={ContextMenuItem} icon='delete' text='Remove Star' onClick={removeStar} />
           </ContextMenu>
         </>
       )}
@@ -323,7 +326,7 @@ type StarFormProps = {
   }>
   update: SetState<Star | undefined>
 }
-const StarForm = ({ star, starData, update }: StarFormProps) => {
+function StarForm({ star, starData, update }: StarFormProps) {
   const router = useRouter()
 
   const addHaircolor = (name: string) => {
@@ -385,9 +388,9 @@ const StarForm = ({ star, starData, update }: StarFormProps) => {
       <StarInputForm
         update={addHaircolor}
         name='Haircolor'
-        emptyByDefault
         value={star.info.haircolor}
         list={starData.haircolor}
+        emptyByDefault
       >
         <InputFormData label='haircolor' data={star.info.haircolor} remove={removeHaircolor} />
       </StarInputForm>
@@ -399,5 +402,3 @@ const StarForm = ({ star, starData, update }: StarFormProps) => {
     </>
   )
 }
-
-export default StarPage

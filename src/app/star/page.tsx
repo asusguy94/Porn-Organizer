@@ -5,12 +5,12 @@ import prisma from '@utils/server/prisma'
 
 export const dynamic = 'force-dynamic'
 
-const StarsPage = async () => {
+export default async function StarsPage() {
   const stars = await prisma.star.findMany({
     select: { id: true, name: true, image: true },
     where: {
       OR: [
-        { image: null }, // without image
+        { image: null },
         {
           // without profile data
           breast: null,
@@ -20,7 +20,7 @@ const StarsPage = async () => {
           height: null,
           weight: null
         },
-        { autoTaggerIgnore: true }, // disabled profile
+        { autoTaggerIgnore: true },
         { api: null } // missing profile
       ]
     }
@@ -34,5 +34,3 @@ const StarsPage = async () => {
 
   return <Client stars={stars} missing={missing} />
 }
-
-export default StarsPage

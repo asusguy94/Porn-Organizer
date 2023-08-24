@@ -6,7 +6,7 @@ import { Container, CssBaseline } from '@mui/material'
 
 import NavBar from '@components/navbar'
 
-import '@styles/globals.scss'
+import '@styles/globals.css'
 import 'plyr/dist/plyr.css'
 
 const roboto = Roboto({
@@ -15,7 +15,7 @@ const roboto = Roboto({
   subsets: ['latin']
 })
 
-function ClientLayout({ children }: { children: React.ReactNode }) {
+export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <NavBar />
@@ -27,5 +27,3 @@ function ClientLayout({ children }: { children: React.ReactNode }) {
     </>
   )
 }
-
-export default ClientLayout

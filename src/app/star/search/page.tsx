@@ -5,7 +5,7 @@ import { getUnique } from '@utils/shared'
 
 export const dynamic = 'force-dynamic'
 
-const StarSearchPage = async () => {
+export default async function StarSearchPage() {
   const websites = await prisma.website.findMany({ orderBy: { name: 'asc' } })
 
   const breast = await prisma.star.findMany({
@@ -36,5 +36,3 @@ const StarSearchPage = async () => {
     />
   )
 }
-
-export default StarSearchPage

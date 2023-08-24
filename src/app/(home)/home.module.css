@@ -10,7 +10,7 @@
   .title {
     text-align: center;
 
-    // restrict to 3 lines
+    /* restrict to 3 lines */
     -webkit-line-clamp: 3;
     display: -webkit-box;
     -webkit-box-orient: vertical;

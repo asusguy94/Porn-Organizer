@@ -3,7 +3,7 @@ import utc from 'dayjs/plugin/utc'
 
 dayjs.extend(utc)
 
-export const getUnique = <T>(arr: T[], prop?: keyof T): T[] => {
+export function getUnique<T>(arr: T[], prop?: keyof T): T[] {
   if (prop !== undefined) {
     return arr.filter((obj, idx) => arr.findIndex(item => item[prop] === obj[prop]) === idx)
   }
@@ -24,13 +24,13 @@ export function clamp(value: number, minOrMax: number, max?: number): number {
   return Math.min(Math.max(value, minOrMax), max)
 }
 
-export const printError = (error: unknown) => {
+export function printError(error: unknown) {
   if (error instanceof Error) {
     console.error(`Error: ${error.message}`)
   }
 }
 
-export const formatDate = (dateStr: string | Date, raw = false, addDays = 0): string => {
+export function formatDate(dateStr: string | Date, raw = false, addDays = 0): string {
   const date = dayjs.utc(dateStr).add(addDays, 'days')
 
   return raw ? date.format('YYYY-MM-DD') : date.format('D MMMM YYYY')

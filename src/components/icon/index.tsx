@@ -1,4 +1,3 @@
-import { Grid, SvgIconTypeMap } from '@mui/material'
 import {
   AccessTimeOutlined,
   AddLocationAltOutlined,
@@ -15,6 +14,8 @@ import {
   SlideshowOutlined,
   SyncOutlined
 } from '@mui/icons-material'
+import { Grid, SvgIconTypeMap } from '@mui/material'
+
 import { ContextMenuItem } from 'rctx-contextmenu'
 
 type Toggle = 'toggle-no' | 'toggle-yes'
@@ -25,7 +26,7 @@ type IconProps = Omit<SvgIconTypeMap['props'], 'children'> & {
   code: Basic | Toggle | Map | 'copy' | 'time' | 'calendar' | 'film' | 'tag' | 'person' | 'sync'
   style?: React.CSSProperties
 }
-export const Icon = ({ code, ...other }: IconProps) => {
+export default function Icon({ code, ...other }: IconProps) {
   switch (code) {
     case 'edit':
       return <BorderColorOutlined {...other} />
@@ -63,10 +64,10 @@ type IconWithTextProps = Omit<ContextMenuItem, 'className' | 'children'> & {
   text: string
   component: React.ElementType
 }
-export const IconWithText = ({ icon: code, text, component, ...other }: IconWithTextProps) => (
-  <Grid item component={component} alignItems='center' className='d-flex' {...other}>
-    <Icon code={code} style={{ marginRight: 6 }} /> {text}
-  </Grid>
-)
-
-export default Icon
+export function IconWithText({ icon: code, text, component, ...other }: IconWithTextProps) {
+  return (
+    <Grid item component={component} alignItems='center' className='d-flex' {...other}>
+      <Icon code={code} style={{ marginRight: 6 }} /> {text}
+    </Grid>
+  )
+}

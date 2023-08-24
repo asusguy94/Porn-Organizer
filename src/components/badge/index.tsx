@@ -4,7 +4,7 @@ type BadgeProps = {
   content: number
   children: React.ReactNode
 }
-const Badge = ({ content, children }: BadgeProps) => {
+export default function Badge({ content, children }: BadgeProps) {
   const badgeClass = content < 10 ? styles.small : styles.large
 
   return (
@@ -13,5 +13,3 @@ const Badge = ({ content, children }: BadgeProps) => {
     </div>
   )
 }
-
-export default Badge

@@ -1,11 +1,10 @@
 'use client'
 
-import { NextPage } from 'next/types'
 import { useEffect, useRef, useState } from 'react'
 
 import { Grid, Card, Typography, TextField } from '@mui/material'
 
-import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
+import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
 import Badge from '@components/badge'
 import { IconWithText } from '@components/icon'
@@ -18,21 +17,30 @@ import Spinner from '@components/spinner'
 import { Header, Player as VideoPlayer, Timeline } from '@components/video'
 
 import { serverConfig } from '@config'
-import { Bookmark as VideoBookmark, Video, VideoStar, SetState, Bookmark, General } from '@interfaces'
+import { Bookmark, Video, VideoStar, SetState, General } from '@interfaces'
 import { Attribute, Category, Location } from '@prisma/client'
 import { videoService } from '@service'
 import { daysToYears } from '@utils/client/date-time'
 
-import styles from './video.module.scss'
+import styles from './video.module.css'
 
-const VideoPage: NextPage<{
+type VideoPageProps = {
   attributes: Attribute[]
   categories: Category[]
   locations: Location[]
   video: Video
   star: VideoStar | null
   bookmarks: Bookmark[]
-}> = ({ attributes, categories, locations, video: videoData, star: starData, bookmarks: bookmarksData }) => {
+}
+
+export default function VideoPage({
+  attributes,
+  categories,
+  locations,
+  video: videoData,
+  star: starData,
+  bookmarks: bookmarksData
+}: VideoPageProps) {
   const [video, setVideo] = useState<typeof videoData>() //FIXME videoData cannot be used directly
   const [star, setStar] = useState(starData)
   const [bookmarks, setBookmarks] = useState(bookmarksData)
@@ -81,7 +89,7 @@ type SectionProps = {
   locations?: General[]
   attributes?: General[]
   categories?: General[]
-  bookmarks: VideoBookmark[]
+  bookmarks: Bookmark[]
   star?: VideoStar | null
   update: {
     video: SetState<Video | undefined>
@@ -91,7 +99,7 @@ type SectionProps = {
   onModal: ModalHandler
   modalData: Modal
 }
-const Section = ({
+function Section({
   video,
   locations,
   attributes,
@@ -101,7 +109,7 @@ const Section = ({
   update,
   onModal,
   modalData
-}: SectionProps) => {
+}: SectionProps) {
   const plyrRef = useRef<PlyrWithMetadata | null>(null)
   const playerRef = useRef<HTMLVideoElement>(null)
 
@@ -151,7 +159,7 @@ type StarProps = {
   video: Video
   update: SetState<VideoStar | null>
 }
-const Star = ({ star, video, update }: StarProps) => {
+function Star({ star, video, update }: StarProps) {
   const removeStarHandler = () => {
     videoService.removeStar(video.id).then(() => {
       update(null)
@@ -186,7 +194,7 @@ const Star = ({ star, video, update }: StarProps) => {
       </RibbonContainer>
 
       <ContextMenu id='star'>
-        <IconWithText component={MenuItem} icon='delete' text='Remove' onClick={removeStarHandler} />
+        <IconWithText component={ContextMenuItem} icon='delete' text='Remove' onClick={removeStarHandler} />
       </ContextMenu>
     </div>
   )
@@ -197,7 +205,7 @@ type StarInputProps = {
   update: SetState<VideoStar | null>
   disabled?: boolean
 }
-const StarInput = ({ video, update, disabled = false }: StarInputProps) => {
+function StarInput({ video, update, disabled = false }: StarInputProps) {
   const addStar = (star: string) => {
     videoService.addStar(video.id, star).then(({ data }) => update(data))
   }
@@ -209,7 +217,7 @@ const StarInput = ({ video, update, disabled = false }: StarInputProps) => {
       label='Star'
       variant='outlined'
       autoFocus
-      onKeyDown={e => {
+      onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
           addStar((e.target as HTMLInputElement).value)
         }
@@ -217,5 +225,3 @@ const StarInput = ({ video, update, disabled = false }: StarInputProps) => {
     />
   )
 }
-
-export default VideoPage

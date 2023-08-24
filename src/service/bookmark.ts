@@ -1,4 +1,5 @@
 import { createApi } from '@config'
+
 const { api } = createApi('/bookmark')
 
 export default {

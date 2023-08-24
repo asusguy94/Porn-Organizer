@@ -4,7 +4,7 @@ import { Button, Grid, Typography } from '@mui/material'
 
 import Link from '@components/link'
 
-function NotFound() {
+export default function NotFound() {
   return (
     <Grid item className='text-center'>
       <Typography variant='h4'>Oops!</Typography>
@@ -16,5 +16,3 @@ function NotFound() {
     </Grid>
   )
 }
-
-export default NotFound

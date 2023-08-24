@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+
 import { Button, Card, Modal as MUIModal, Typography } from '@mui/material'
 
 import { useKey } from 'react-use'
@@ -14,7 +15,7 @@ export type Modal = {
 }
 export type ModalHandler = (title?: Modal['title'], data?: Modal['data'], filter?: Modal['filter']) => void
 
-export const useModal = () => {
+export function useModal() {
   const [modal, setModal] = useState<Modal>({ visible: false, title: '', data: null, filter: false, width: null })
 
   const handleModal: ModalHandler = (title = '', data = null, filter = false) => {
@@ -36,7 +37,7 @@ type ModalProps = {
   onClose: () => void
 }
 
-const ModalComponent = ({ title, visible, filter, children, onClose }: ModalProps) => {
+export default function ModalComponent({ title, visible, filter, children, onClose }: ModalProps) {
   const [query, setQuery] = useState('')
 
   const isLetter = (e: KeyboardEvent) => /^Key([A-Z])$/.test(e.code)
@@ -73,7 +74,7 @@ type ModalChildProps = {
   onClose: () => void
 }
 
-const ModalChild = ({ title, filter, children, query, onClose }: ModalChildProps) => {
+function ModalChild({ title, filter, children, query, onClose }: ModalChildProps) {
   const lowerQuery = query.toLowerCase()
 
   const handleFilter = () => {
@@ -120,5 +121,3 @@ const ModalChild = ({ title, filter, children, query, onClose }: ModalChildProps
     </MUIModal>
   )
 }
-
-export default ModalComponent

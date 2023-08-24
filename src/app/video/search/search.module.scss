@@ -1,5 +1,3 @@
-@import '@styles/variables';
-
 #sidebar {
   h2 {
     margin-bottom: 0;
@@ -18,9 +16,10 @@
   .video {
     margin: 5px;
 
-    width: $thumbnailWidth;
+    min-width: var(--thumb-width);
+    width: min-content;
     img {
-      height: $thumbnailHeight;
+      height: auto;
     }
 
     .title {

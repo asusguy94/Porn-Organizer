@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 import { Button, Grid, ImageList, ImageListItem, TextField, Typography } from '@mui/material'
 
-import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
+import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { useCopyToClipboard } from 'usehooks-ts'
 
@@ -25,45 +25,49 @@ type HeaderProps = {
   update: SetState<Video | undefined>
   onModal: ModalHandler
 }
-const Header = ({ video, attributes, locations, update, onModal }: HeaderProps) => (
-  <Grid container>
-    <Grid container item alignItems='center' component='header' id={styles.header}>
-      <HeaderTitle video={video} attributes={attributes} locations={locations} update={update} onModal={onModal} />
+export default function Header({ video, attributes, locations, update, onModal }: HeaderProps) {
+  return (
+    <Grid container>
+      <Grid container item alignItems='center' component='header' id={styles.header}>
+        <HeaderTitle video={video} attributes={attributes} locations={locations} update={update} onModal={onModal} />
 
-      <HeaderSlug video={video} hidden={video.slug !== null} onModal={onModal} />
-      <HeaderCover video={video} hidden={video.image !== null || video.slug === null} />
-      <ValidateTitle video={video} hidden={video.validated || video.slug === null} onModal={onModal} />
+        <HeaderSlug video={video} hidden={video.slug !== null} onModal={onModal} />
+        <HeaderCover video={video} hidden={video.image !== null || video.slug === null} />
+        <ValidateTitle video={video} hidden={video.validated || video.slug === null} onModal={onModal} />
 
-      <HeaderDate video={video} />
+        <HeaderDate video={video} />
 
-      <HeaderLocations video={video} update={update} />
-      <HeaderAttributes video={video} update={update} />
-      <HeaderSite video={video} />
+        <HeaderLocations video={video} update={update} />
+        <HeaderAttributes video={video} update={update} />
+        <HeaderSite video={video} />
+      </Grid>
     </Grid>
-  </Grid>
-)
+  )
+}
 
 type HeaderSiteProps = {
   video: Video
 }
-const HeaderSite = ({ video }: HeaderSiteProps) => (
-  <Grid item xs={12} id={styles.site}>
-    <span id={styles.wsite}>{video.website}</span>
-    {video.subsite && (
-      <>
-        <span className='divider'>-</span>
-        <span id={styles.site}>{video.subsite}</span>
-      </>
-    )}
-  </Grid>
-)
+function HeaderSite({ video }: HeaderSiteProps) {
+  return (
+    <Grid item xs={12} id={styles.site}>
+      <span id={styles.wsite}>{video.website}</span>
+      {video.subsite && (
+        <>
+          <span className='divider'>-</span>
+          <span id={styles.site}>{video.subsite}</span>
+        </>
+      )}
+    </Grid>
+  )
+}
 
 type HeaderSlugProps = {
   video: Video
   hidden?: boolean
   onModal: ModalHandler
 }
-const HeaderSlug = ({ video, hidden = false, onModal }: HeaderSlugProps) => {
+function HeaderSlug({ video, hidden = false, onModal }: HeaderSlugProps) {
   const viewSlugs = () => {
     const GAP = 4
     const MAX_ROWS = 4
@@ -92,28 +96,32 @@ const HeaderSlug = ({ video, hidden = false, onModal }: HeaderSlugProps) => {
       onModal(
         'Select Slug',
         <ImageList cols={calcCols(data)} sx={{ margin: 0, height: (275 + GAP) * calcRows(data) }}>
-          {data.map(item => (
-            <ImageListItem
-              key={item.id}
-              onClick={() => {
-                setSlug(item.id)
-                onModal()
-              }}
-              style={{ alignItems: 'center' }}
-            >
-              <pre>{item.title}</pre>
-              <LazyLoadImage
-                src={item.image}
-                delayMethod='debounce'
-                delayTime={100}
-                className={styles['select-slug']}
-                alt=''
-              />
-              <pre>[{item.site}]</pre>
+          {data.map(item => {
+            const title = item.title.length <= 30 ? item.title : `${item.title.substring(0, 30 - 3)}...`
 
-              {data.length > 1 && <pre>{item.date}</pre>}
-            </ImageListItem>
-          ))}
+            return (
+              <ImageListItem
+                key={item.id}
+                onClick={() => {
+                  setSlug(item.id)
+                  onModal()
+                }}
+                style={{ alignItems: 'center' }}
+              >
+                <pre>{title}</pre>
+                <LazyLoadImage
+                  src={item.image}
+                  delayMethod='debounce'
+                  delayTime={100}
+                  className={styles['select-slug']}
+                  alt=''
+                />
+                <pre>[{item.site}]</pre>
+
+                {data.length > 1 && <pre>{item.date}</pre>}
+              </ImageListItem>
+            )
+          })}
         </ImageList>
       )
     })
@@ -138,7 +146,7 @@ type HeaderCoverProps = {
   video: Video
   hidden?: boolean
 }
-const HeaderCover = ({ video, hidden = false }: HeaderCoverProps) => {
+function HeaderCover({ video, hidden = false }: HeaderCoverProps) {
   const router = useRouter()
 
   const [clicked, setClicked] = useState(false)
@@ -147,10 +155,10 @@ const HeaderCover = ({ video, hidden = false }: HeaderCoverProps) => {
     setClicked(true)
 
     videoService.setThumbnail(video.id).then(() => {
-      if (settingsConfig.userAction.thumbnail.reload) {
-        router.refresh()
-      } else if (settingsConfig.userAction.thumbnail.close) {
+      if (settingsConfig.userAction.thumbnail.close) {
         window.close()
+      } else {
+        router.refresh()
       }
     })
   }
@@ -169,7 +177,7 @@ type ValidateTitleProps = {
   hidden: boolean
   onModal: ModalHandler
 }
-const ValidateTitle = ({ video, hidden, onModal }: ValidateTitleProps) => {
+function ValidateTitle({ video, hidden, onModal }: ValidateTitleProps) {
   const [disabled, setDisabled] = useState(hidden)
   const [value, setValue] = useState('Validate Title')
 
@@ -222,7 +230,7 @@ type HeaderLocationsProps = {
   video: Video
   update: SetState<Video | undefined>
 }
-const HeaderLocations = ({ video, update }: HeaderLocationsProps) => {
+function HeaderLocations({ video, update }: HeaderLocationsProps) {
   const removeLocation = (location: General) => {
     locationService.removeVideo(video.id, location.id).then(() => {
       update({ ...video, locations: video.locations.filter(item => item.id !== location.id) })
@@ -254,7 +262,7 @@ type HeaderAttributesProps = {
   video: Video
   update: SetState<Video | undefined>
 }
-const HeaderAttributes = ({ video, update }: HeaderAttributesProps) => {
+function HeaderAttributes({ video, update }: HeaderAttributesProps) {
   const removeAttribute = (attribute: General) => {
     attributeService.removeVideo(video.id, attribute.id).then(() => {
       update({ ...video, attributes: video.attributes.filter(item => item.id !== attribute.id) })
@@ -285,7 +293,7 @@ const HeaderAttributes = ({ video, update }: HeaderAttributesProps) => {
 type HeaderDateProps = {
   video: Video
 }
-const HeaderDate = ({ video }: HeaderDateProps) => {
+function HeaderDate({ video }: HeaderDateProps) {
   const router = useRouter()
 
   const fixDate = () => {
@@ -315,9 +323,9 @@ const HeaderDate = ({ video }: HeaderDateProps) => {
       </ContextMenuTrigger>
 
       <ContextMenu id='menu__date'>
-        <IconWithText component={MenuItem} icon='sync' text='Refresh Date' onClick={fixDate} />
+        <IconWithText component={ContextMenuItem} icon='sync' text='Refresh Date' onClick={fixDate} />
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='edit'
           text='Auto Rename (EXPERIMENTAL)'
           onClick={autoRename}
@@ -335,7 +343,7 @@ type HeaderTitleProps = {
   update: SetState<Video | undefined>
   onModal: ModalHandler
 }
-const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTitleProps) => {
+function HeaderTitle({ video, attributes, locations, update, onModal }: HeaderTitleProps) {
   const [, setClipboard] = useCopyToClipboard()
 
   const addLocationHandler = (location: General) => {
@@ -372,7 +380,7 @@ const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTi
 
       <ContextMenu id='title'>
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='edit'
           text='Rename Title'
           onClick={() => {
@@ -397,7 +405,7 @@ const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTi
         />
 
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='add'
           text='Add Attribute'
           onClick={() => {
@@ -424,7 +432,7 @@ const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTi
         />
 
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='add-map'
           text='Add Location'
           onClick={() => {
@@ -452,11 +460,9 @@ const HeaderTitle = ({ video, attributes, locations, update, onModal }: HeaderTi
 
         <hr />
 
-        <IconWithText component={MenuItem} icon='copy' text='Copy Title' onClick={copyTitle} />
-        <IconWithText component={MenuItem} icon='person' text='Copy Star' onClick={copyStar} />
+        <IconWithText component={ContextMenuItem} icon='copy' text='Copy Title' onClick={copyTitle} />
+        <IconWithText component={ContextMenuItem} icon='person' text='Copy Star' onClick={copyStar} />
       </ContextMenu>
     </Typography>
   )
 }
-
-export default Header

@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { NextPage } from 'next/types'
 import { useState, useEffect } from 'react'
 
 import { Grid, TextField, Card, CardActionArea, CardContent, Button, Typography } from '@mui/material'
@@ -17,14 +16,16 @@ import { getUnique } from '@utils/shared'
 
 type Missing = { videoId: number; name: string }
 
-const Stars: NextPage<{
-  missing: Missing[]
+type StarsProps = {
   stars: {
     id: number
     name: string
     image: string | null
   }[]
-}> = ({ stars, missing: videoStars }) => {
+  missing: Missing[]
+}
+
+export default function Stars({ stars, missing: videoStars }: StarsProps) {
   const router = useRouter()
 
   const [starInput, setStarInput] = useSessionStorage('starInput', '')
@@ -51,6 +52,7 @@ const Stars: NextPage<{
       setStarInput(input)
       starService.add(input).finally(() => {
         router.refresh()
+        setInput('')
       })
     }
   }
@@ -58,6 +60,7 @@ const Stars: NextPage<{
   const handleSubmitAll = () => {
     Promise.allSettled(missing.map(missing => starService.add(missing.name))).finally(() => {
       router.refresh()
+      setInput('')
     })
   }
 
@@ -146,30 +149,30 @@ type IndexChanger = {
   index: number
   setIndex: (index: number) => void
 }
-const IndexChanger = ({ total, index, setIndex }: IndexChanger) => (
-  <span className='mx-1' style={total.length ? {} : { display: 'none' }}>
-    <Button
-      variant='outlined'
-      onClick={() => setIndex(index - 1)}
-      disabled={index <= 0}
-      style={{ maxHeight: 30, minWidth: 30 }}
-    >
-      -
-    </Button>
+function IndexChanger({ total, index, setIndex }: IndexChanger) {
+  return (
+    <span className='mx-1' style={total.length ? {} : { display: 'none' }}>
+      <Button
+        variant='outlined'
+        onClick={() => setIndex(index - 1)}
+        disabled={index <= 0}
+        style={{ maxHeight: 30, minWidth: 30 }}
+      >
+        -
+      </Button>
 
-    <span className='d-inline-block mx-1' style={{ verticalAlign: 'middle' }}>
-      {index}
+      <span className='d-inline-block mx-1' style={{ verticalAlign: 'middle' }}>
+        {index}
+      </span>
+
+      <Button
+        variant='outlined'
+        onClick={() => setIndex(index + 1)}
+        disabled={index >= total.length - 1}
+        style={{ maxHeight: 30, minWidth: 30 }}
+      >
+        +
+      </Button>
     </span>
-
-    <Button
-      variant='outlined'
-      onClick={() => setIndex(index + 1)}
-      disabled={index >= total.length - 1}
-      style={{ maxHeight: 30, minWidth: 30 }}
-    >
-      +
-    </Button>
-  </span>
-)
-
-export default Stars
+  )
+}

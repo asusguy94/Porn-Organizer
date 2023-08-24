@@ -1,9 +1,21 @@
-function getValue(label: string, defaultValue: string): string {
-  if (!label.startsWith('NEXT_PUBLIC_')) label = `NEXT_PUBLIC_${label}`
-
+function getValueWithType<T>(label: string, defaultValue: T): T {
   try {
-    return process.env[label] ?? localStorage[label] ?? defaultValue
-  } catch (e) {
+    const value = process.env[label] ?? localStorage.getItem(`NEXT_PUBLIC_${label}`)
+
+    if (value !== null) {
+      try {
+        // Always attempt JSON parsing first
+        return JSON.parse(value) as T
+      } catch {
+        // If it fails, treat the value as a raw string
+        if (typeof defaultValue === 'string') {
+          return value as T
+        }
+      }
+    }
+
+    return defaultValue
+  } catch {
     return defaultValue
   }
 }
@@ -11,20 +23,21 @@ function getValue(label: string, defaultValue: string): string {
 export default {
   qualities: [1080, 720, 480, 360],
   timeline: {
-    spacing: parseFloat(getValue('TIMELINE_SPACING', '0'))
+    spacing: getValueWithType<number>('TIMELINE_SPACING', 0)
   },
   player: {
-    thumbnails: getValue('PLAYER_THUMBNAILS', 'false') === 'true',
-    quality: parseInt(getValue('PLAYER_QUALITY', '1080'))
+    thumbnails: getValueWithType<boolean>('PLAYER_THUMBNAILS', false),
+    quality: {
+      max: getValueWithType<number>('PLAYER_QUALITY_MAX', 1080)
+    }
   },
   THUMB_RES: parseInt(process.env.THUMBNAIL_RES ?? '290'),
   IMAGE_RES: parseInt(process.env.IMAGE_RES ?? '1920'),
   THEPORNDB_API: process.env.THEPORNDB_API ?? '',
   userAction: {
     thumbnail: {
-      close: getValue('USER_THUMB', 'reload') === 'close',
-      reload: getValue('USER_THUMB', 'reload') === 'reload'
+      close: getValueWithType<'reload' | 'close'>('USER_THUMB', 'reload') === 'close'
     }
   },
-  debug: getValue('DEBUG', 'false') === 'true'
+  debug: getValueWithType<boolean>('DEBUG', false)
 }

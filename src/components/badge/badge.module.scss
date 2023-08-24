@@ -1,14 +1,7 @@
-@mixin circle($sizeY, $sizeX: $sizeY) {
-  width: $sizeX;
-  height: $sizeY;
-  line-height: $sizeY;
-}
-
 .badge[data-badge] {
   &:after {
     content: attr(data-badge);
     position: absolute;
-    @include circle(5px);
     background: green;
     color: white;
     text-align: center;
@@ -17,15 +10,24 @@
 
     left: 3px;
     top: 3px;
+
+    // Cicrle size
+    width: 5px;
+    height: 5px;
+    line-height: 5px;
   }
 
   // 1-9 Videos
   &.small:after {
-    @include circle(23px);
+    width: 23px;
+    height: 23px;
+    line-height: 23px;
   }
 
   // 10-99 videos
   &.large:after {
-    @include circle(23px, 26px);
+    width: 26px;
+    height: 23px;
+    line-height: 23px;
   }
 }

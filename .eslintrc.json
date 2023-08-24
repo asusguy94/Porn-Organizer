@@ -13,12 +13,20 @@
     "project": true
   },
   "rules": {
-    "import/no-anonymous-default-export": "off",
+    // Common Eslint
+    "import/no-anonymous-default-export": "off", // required for index-files
     "eqeqeq": "warn",
+    "no-duplicate-imports": "warn",
+
+    // Typescript Eslint
     "@typescript-eslint/no-unsafe-return": "off",
     "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-member-access": "off",
     "@typescript-eslint/no-unsafe-call": "off",
+    "@typescript-eslint/no-floating-promises": "off",
+    "@typescript-eslint/consistent-type-definitions": ["warn", "type"],
+
+    // NextJs
     "@typescript-eslint/no-misused-promises": "off", // required for server-actions
     "@typescript-eslint/no-floating-promises": "off",
     "@typescript-eslint/consistent-type-definitions": ["warn", "type"]

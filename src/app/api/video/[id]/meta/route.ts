@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { Params } from '@interfaces'
-import { findBroadSceneSlug } from '@utils/server/metadata'
+import findBroadSceneSlug from '@utils/server/metadata'
 import prisma from '@utils/server/prisma'
 import { getUnique } from '@utils/shared'
 

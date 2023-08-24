@@ -10,7 +10,7 @@ export type HandlerProps = {
   checked: boolean
   indeterminate: boolean
 }
-const handler = ({ checked, indeterminate }: HandlerProps) => {
+function handler({ checked, indeterminate }: HandlerProps) {
   if (checked) {
     return { indeterminate: true, checked: false }
   } else if (indeterminate) {
@@ -26,15 +26,27 @@ type RegularItemProps<T> = {
   item?: T
   callback: (result: RegularHandlerProps, item: T) => void
   defaultChecked?: boolean
+  disabled?: boolean
+  softDisabled?: boolean
 }
 
-export function RegularItem<T>({ label, value, item, callback, defaultChecked = false }: RegularItemProps<T>) {
+export function RegularItem<T>({
+  label,
+  value,
+  item,
+  callback,
+  defaultChecked = false,
+  disabled,
+  softDisabled = false
+}: RegularItemProps<T>) {
   const [checked, setChecked] = useState(defaultChecked)
 
   return (
     <FormControlLabel
       label={label}
       value={value}
+      disabled={disabled}
+      style={softDisabled ? { opacity: 0.5 } : {}}
       control={
         <Checkbox
           checked={checked}
@@ -59,7 +71,7 @@ type ItemProps<T> = {
   callback: (result: HandlerProps, item?: T) => void
 }
 
-function Item<T>({ label, value, item = undefined, callback }: ItemProps<T>) {
+export default function Item<T>({ label, value, item = undefined, callback }: ItemProps<T>) {
   const [indeterminate, setIndeterminate] = useState(false)
   const [checked, setChecked] = useState(false)
 
@@ -84,5 +96,3 @@ function Item<T>({ label, value, item = undefined, callback }: ItemProps<T>) {
     />
   )
 }
-
-export default Item

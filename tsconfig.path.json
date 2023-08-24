@@ -6,6 +6,7 @@
       "@config": ["./src/config"],
       "@pages/*": ["./src/pages/*"],
       "@styles/*": ["./src/styles/*"],
+      "@hooks/*": ["./src/hooks/*"],
       "@utils/shared": ["./src/utils/shared"],
       "@utils/client/*": ["./src/utils/client/*"],
       "@utils/server/*": ["./src/utils/server/*"],

@@ -1,5 +1,5 @@
 import { serverConfig } from '@config'
 
-const apiUrl = (path: string) => `${serverConfig.api}/${path}`
-
-export default apiUrl
+export default function apiUrl(path: string) {
+  return `${serverConfig.api}/${path}`
+}

@@ -1,6 +1,6 @@
 import { VirtuosoGrid } from 'react-virtuoso'
 
-import styles from './virtuoso.module.scss'
+import styles from './virtuoso.module.css'
 
 type GridProps = {
   renderData: (id: number) => JSX.Element
@@ -9,14 +9,14 @@ type GridProps = {
   itemRows?: number
   listClassName?: string
 }
-const Grid = ({ renderData, total, itemHeight, itemRows = 1, listClassName = '' }: GridProps) => (
-  <VirtuosoGrid
-    useWindowScroll
-    overscan={itemHeight * itemRows}
-    totalCount={total}
-    itemContent={renderData}
-    listClassName={`${styles['grid-list']} ${listClassName}`}
-  />
-)
-
-export default Grid
+export default function Grid({ renderData, total, itemHeight, itemRows = 1, listClassName = '' }: GridProps) {
+  return (
+    <VirtuosoGrid
+      useWindowScroll
+      overscan={itemHeight * itemRows}
+      totalCount={total}
+      itemContent={renderData}
+      listClassName={`${styles['grid-list']} ${listClassName}`}
+    />
+  )
+}

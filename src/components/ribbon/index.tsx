@@ -6,7 +6,7 @@ type RibbonProps = {
   align?: string
   label?: string | number
 }
-const Ribbon = ({ isFirst = false, isLast = false, align, label }: RibbonProps) => {
+export default function Ribbon({ isFirst = false, isLast = false, align, label }: RibbonProps) {
   const className = `${styles.ribbon} ${align === 'left' ? `${styles.left} ${styles.purple}` : ''}`
 
   if (isFirst) {
@@ -26,17 +26,15 @@ type ContainerProps = {
   className?: string
   style?: React.CSSProperties
 }
-export const RibbonContainer = ({
+export function RibbonContainer({
   children,
   component: Component = 'div',
   className = '',
   style = {}
-}: ContainerProps) => {
+}: ContainerProps) {
   return (
     <Component className={`${styles.container} ${className}`} style={style}>
       {children}
     </Component>
   )
 }
-
-export default Ribbon

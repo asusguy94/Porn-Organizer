@@ -11,7 +11,7 @@ type PlyrProps = {
   poster: string
   thumbnail: string
 }
-const PlyrComponent = ({ plyrRef, playerRef, source, poster, thumbnail }: PlyrProps) => {
+export default function PlyrComponent({ plyrRef, playerRef, source, poster, thumbnail }: PlyrProps) {
   useEffect(() => {
     const player = new Plyr('.plyr-js', {
       controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'settings'],
@@ -40,4 +40,3 @@ const PlyrComponent = ({ plyrRef, playerRef, source, poster, thumbnail }: PlyrPr
 }
 
 export type PlyrWithMetadata = Plyr & { media: HTMLVideoElement }
-export default PlyrComponent

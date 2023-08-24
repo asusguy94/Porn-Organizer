@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 
-import { Button, Grid, Card, CardActionArea, CardContent, CardMedia as MUICardMedia, Typography } from '@mui/material'
+import { Button, Grid, Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material'
 
 import { Flipper, Flipped } from 'react-flip-toolkit'
 
@@ -18,7 +18,7 @@ import styles from './star.module.scss'
 type VideosProps = {
   videos?: StarVideo[]
 }
-const Videos = ({ videos }: VideosProps) => {
+export default function Videos({ videos }: VideosProps) {
   const [websites, setWebsites] = useState<string[]>([])
   const [sites, setSites] = useState<string[]>([])
 
@@ -119,7 +119,7 @@ type VideoProps = {
   isLast: boolean
   isHidden: boolean
 }
-const Video = ({ video, isFirst, isLast, isHidden }: VideoProps) => {
+function Video({ video, isFirst, isLast, isHidden }: VideoProps) {
   const [src, setSrc] = useState('')
   const [dataSrc, setDataSrc] = useState(`${serverConfig.api}/video/${video.id}/file`)
 
@@ -187,7 +187,7 @@ const Video = ({ video, isFirst, isLast, isHidden }: VideoProps) => {
   return (
     <RibbonContainer component={Card}>
       <CardActionArea>
-        <MUICardMedia
+        <CardMedia
           component='video'
           src={src}
           data-src={dataSrc}
@@ -219,5 +219,3 @@ const Video = ({ video, isFirst, isLast, isHidden }: VideoProps) => {
     </RibbonContainer>
   )
 }
-
-export default Videos

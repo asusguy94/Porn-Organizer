@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Button, TextField } from '@mui/material'
 
 import Hls, { HlsConfig, HlsListeners } from 'hls.js'
-import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
+import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { useKey } from 'react-use'
 import { useSessionStorage } from 'usehooks-ts'
 
@@ -17,11 +17,7 @@ import { serverConfig, settingsConfig } from '@config'
 import { Bookmark, General, SetState, Video, VideoStar } from '@interfaces'
 import { videoService } from '@service'
 
-const useHls = (
-  video: Video,
-  plyrRef: React.MutableRefObject<PlyrWithMetadata | null>,
-  hlsConfig: Partial<HlsConfig>
-) => {
+function useHls(video: Video, plyrRef: React.MutableRefObject<PlyrWithMetadata | null>, hlsConfig: Partial<HlsConfig>) {
   const playAddedRef = useRef(false)
   const newVideoRef = useRef(false)
 
@@ -93,7 +89,11 @@ const useHls = (
             console.log(e, data)
           }
 
-          hls.autoLevelCapping = data.levels.filter(level => level.height <= settingsConfig.player.quality).length
+          const maxLevel = data.levels.filter(level => level.height <= settingsConfig.player.quality.max).length - 1
+
+          hls.startLevel = maxLevel - 1
+          hls.autoLevelCapping = maxLevel
+
           hls.startLoad(localBookmark)
         }
 
@@ -144,7 +144,7 @@ type VideoPlayerProps = {
   modalData: Modal
 }
 
-const VideoPlayer = ({
+export default function VideoPlayer({
   video,
   categories,
   bookmarks,
@@ -154,7 +154,7 @@ const VideoPlayer = ({
   update,
   onModal,
   modalData
-}: VideoPlayerProps) => {
+}: VideoPlayerProps) {
   const router = useRouter()
 
   useHls(video, plyrRef, { maxBufferLength: Infinity, autoStartLoad: false })
@@ -259,7 +259,7 @@ const VideoPlayer = ({
 
       <ContextMenu id='video'>
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='add'
           text='Add Bookmark'
           onClick={() => {
@@ -286,7 +286,7 @@ const VideoPlayer = ({
         <hr />
 
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='edit'
           text='Rename File'
           onClick={() => {
@@ -313,17 +313,17 @@ const VideoPlayer = ({
         <hr />
 
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='delete'
           text='Remove Bookmarks'
           disabled={!bookmarks.length}
           onClick={clearBookmarks}
         />
 
-        <IconWithText component={MenuItem} icon='delete' text='Remove Plays' onClick={() => resetPlays()} />
+        <IconWithText component={ContextMenuItem} icon='delete' text='Remove Plays' onClick={() => resetPlays()} />
 
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='delete'
           text='Remove Video'
           disabled={star !== null || bookmarks.length > 0}
@@ -333,5 +333,3 @@ const VideoPlayer = ({
     </div>
   )
 }
-
-export default VideoPlayer

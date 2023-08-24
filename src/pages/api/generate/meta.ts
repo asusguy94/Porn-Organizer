@@ -1,12 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import { Video } from '@prisma/client'
-import {
-  rebuildVideoFile,
-  getDuration as videoDuration,
-  getHeight as videoHeight,
-  getWidth as videoWidth
-} from '@utils/server/ffmpeg'
+import { rebuildVideoFile, getDuration, getHeight, getWidth } from '@utils/server/ffmpeg'
 import { generateStarName } from '@utils/server/generate'
 import { fileExists, logger, sleep } from '@utils/server/helper'
 import { aliasExists, aliasIsIgnored, getAliasAsStar, starExists, starIsIgnored } from '@utils/server/helper.db'
@@ -75,9 +70,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           // TODO Remove stream-directory in videos/
           // TODO Remove VTT & JPG files in /vtt
 
-          const width = await videoWidth(absoluteVideoPath)
-          const height = await videoHeight(absoluteVideoPath)
-          const duration = await videoDuration(absoluteVideoPath)
+          const width = await getWidth(absoluteVideoPath)
+          const height = await getHeight(absoluteVideoPath)
+          const duration = await getDuration(absoluteVideoPath)
 
           logger(`Refreshing: "${video.path}"`)
           await prisma.video.update({

@@ -15,18 +15,16 @@ export async function GET() {
    * @param sites the sites to check
    * @returns a number between 0 and 1
    */
-  const calculateSiteScore = (website: Website & { sites: Site[] }, sites: Site[]): number => {
+  function calculateSiteScore(website: Website & { sites: Site[] }, sites: Site[]): number {
     return sites.filter(site => site.websiteID === website.id).length / website.sites.length
   }
 
   // highest siteScore is currently 2.6, or 26 when *10
-  const calculateScore = (websitesWithSites: (Website & { sites: Site[] })[], sites: Site[]) => {
-    const siteScore = websitesWithSites
+  function calculateScore(websitesWithSites: (Website & { sites: Site[] })[], sites: Site[]) {
+    return websitesWithSites
       .map(website => calculateSiteScore(website, sites) * 10)
       .filter(score => !isNaN(score))
       .reduce((sum, score) => sum + score, 0)
-
-    return siteScore
   }
 
   return NextResponse.json(

@@ -1,6 +1,5 @@
 'use client'
 
-import { NextPage } from 'next/types'
 import { useEffect, useState } from 'react'
 
 import { Button, Checkbox, FormControlLabel, Grid, List, TextField } from '@mui/material'
@@ -10,7 +9,11 @@ import { useLocalStorage } from 'usehooks-ts'
 import { General, LocalWebsite, SetState, WebsiteWithCount } from '@interfaces'
 import { clamp } from '@utils/shared'
 
-const SettingsPage: NextPage<{ websites: WebsiteWithCount[] }> = ({ websites }) => {
+type SettingsPageProps = {
+  websites: WebsiteWithCount[]
+}
+
+export default function SettingsPage({ websites }: SettingsPageProps) {
   const [rawWebsites, setRawWebsites] = useLocalStorage<LocalWebsite[]>('websites', [])
   const [localWebsites, setLocalWebsites] = useState<LocalWebsite[]>([])
   const [changed, setChanged] = useState(false)
@@ -95,15 +98,17 @@ type WebsiteListProps = {
   websites: General[]
   addWebsite: (wsite: string) => void
 }
-const WebsiteList = ({ websites, addWebsite }: WebsiteListProps) => (
-  <List style={{ display: 'inline-block' }}>
-    {websites.map(website => (
-      <div key={website.id} onClick={() => addWebsite(website.name)}>
-        {`ADD "${website.name}"`}
-      </div>
-    ))}
-  </List>
-)
+function WebsiteList({ websites, addWebsite }: WebsiteListProps) {
+  return (
+    <List style={{ display: 'inline-block' }}>
+      {websites.map(website => (
+        <div key={website.id} onClick={() => addWebsite(website.name)}>
+          {`ADD "${website.name}"`}
+        </div>
+      ))}
+    </List>
+  )
+}
 
 type InputProps = {
   website: LocalWebsite
@@ -112,7 +117,7 @@ type InputProps = {
   max?: number
   onChange: () => void
 }
-const Input = ({ website, update, localWebsites, max = 0, onChange }: InputProps) => {
+function Input({ website, update, localWebsites, max = 0, onChange }: InputProps) {
   const [count, setCount] = useState(website.count)
   const [finished, setFinished] = useState(website.finished)
 
@@ -162,5 +167,3 @@ const Input = ({ website, update, localWebsites, max = 0, onChange }: InputProps
     </Grid>
   )
 }
-
-export default SettingsPage

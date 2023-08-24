@@ -1,12 +1,13 @@
-import { CardMedia as MUICardMedia } from '@mui/material'
 import NextImage, { ImageProps as NextImageProps } from 'next/image'
-import ImageNotSupportedOutlinedIcon from '@mui/icons-material/ImageNotSupportedOutlined'
 
-export const ResponsiveImage = ({ alt, ...other }: NextImageProps & MissingImage) => {
+import ImageNotSupportedOutlinedIcon from '@mui/icons-material/ImageNotSupportedOutlined'
+import { CardMedia as MUICardMedia } from '@mui/material'
+
+export function ResponsiveImage({ alt, ...other }: NextImageProps & MissingImage) {
   return <Image style={{ width: '100%', height: 'auto' }} alt={alt} {...other} />
 }
 
-const Image = ({ missing, scale, renderStyle, ...nextProps }: NextImageProps & MissingImage) => {
+export default function Image({ missing, scale, renderStyle, ...nextProps }: NextImageProps & MissingImage) {
   if (missing) return <MissingImage scale={scale} renderStyle={renderStyle} />
 
   // Main Image Component
@@ -20,14 +21,14 @@ type CardProps = {
 } & Omit<NextImageProps, 'alt' | 'height'> &
   MissingImage
 
-export const ImageCard = ({
+export function ImageCard({
   height,
   alt,
   missing = false,
   renderStyle = 'height',
   responsive = false,
   ...other
-}: CardProps) => {
+}: CardProps) {
   return (
     <MUICardMedia style={missing ? { height, textAlign: 'center' } : {}}>
       {responsive ? (
@@ -48,7 +49,7 @@ type MissingImageProps = {
   renderStyle?: 'height' | 'transform'
 }
 
-const MissingImage = ({ scale = 1, renderStyle }: MissingImageProps) => {
+function MissingImage({ scale = 1, renderStyle }: MissingImageProps) {
   if (scale <= 0) throw new Error('Scale must be greater than zero')
 
   return (
@@ -66,5 +67,3 @@ const MissingImage = ({ scale = 1, renderStyle }: MissingImageProps) => {
     />
   )
 }
-
-export default Image

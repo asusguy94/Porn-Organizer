@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment } from 'react'
 
 import { Button, TextField, Grid, Autocomplete } from '@mui/material'
 
-import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
+import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 
 import { IconWithText } from '@components/icon'
 import Spinner from '@components/spinner'
@@ -19,7 +19,7 @@ type StarInputFormProps = {
   noDropdown?: boolean
   emptyByDefault?: boolean
 }
-const StarInputForm = ({
+export default function StarInputForm({
   update,
   value,
   name,
@@ -28,7 +28,7 @@ const StarInputForm = ({
   capitalize = false,
   noDropdown = false,
   emptyByDefault = false
-}: StarInputFormProps) => {
+}: StarInputFormProps) {
   const hasDropdown = !noDropdown
 
   const [open, setOpen] = useState(false)
@@ -115,24 +115,24 @@ type InputFormDataProps = {
   remove: (name: string) => void
   label: string
 }
-export const InputFormData = ({ label, data, remove }: InputFormDataProps) => (
-  <>
-    {data.map(item => (
-      <Fragment key={item}>
-        <ContextMenuTrigger id={`${label}-${item}`} className='d-inline-block'>
-          <span className={styles.data}>
-            <Button size='small' variant='outlined' color='primary'>
-              {item}
-            </Button>
-          </span>
-        </ContextMenuTrigger>
+export function InputFormData({ label, data, remove }: InputFormDataProps) {
+  return (
+    <>
+      {data.map(item => (
+        <Fragment key={item}>
+          <ContextMenuTrigger id={`${label}-${item}`} className='d-inline-block'>
+            <span className={styles.data}>
+              <Button size='small' variant='outlined' color='primary'>
+                {item}
+              </Button>
+            </span>
+          </ContextMenuTrigger>
 
-        <ContextMenu id={`${label}-${item}`}>
-          <IconWithText component={MenuItem} icon='delete' text='Remove' onClick={() => remove(item)} />
-        </ContextMenu>
-      </Fragment>
-    ))}
-  </>
-)
-
-export default StarInputForm
+          <ContextMenu id={`${label}-${item}`}>
+            <IconWithText component={ContextMenuItem} icon='delete' text='Remove' onClick={() => remove(item)} />
+          </ContextMenu>
+        </Fragment>
+      ))}
+    </>
+  )
+}

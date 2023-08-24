@@ -2,7 +2,7 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 
 import { Button, Grid } from '@mui/material'
 
-import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
+import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { useWindowSize } from 'usehooks-ts'
 
 import { IconWithText } from '../icon'
@@ -13,7 +13,7 @@ import { settingsConfig } from '@config'
 import { Bookmark, General, SetState, Video } from '@interfaces'
 import { bookmarkService } from '@service'
 
-import styles from './timeline.module.scss'
+import styles from './timeline.module.css'
 
 const spacing = { top: 3, bookmarks: 36 }
 
@@ -26,7 +26,15 @@ type TimelineProps = {
   update: SetState<Bookmark[]>
   onModal: ModalHandler
 }
-const Timeline = ({ bookmarks, video, playVideo, categories, playerRef, update, onModal }: TimelineProps) => {
+export default function Timeline({
+  bookmarks,
+  video,
+  playVideo,
+  categories,
+  playerRef,
+  update,
+  onModal
+}: TimelineProps) {
   const windowSize = useWindowSize()
   const bookmarksRef = useRef<HTMLButtonElement[]>([])
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
@@ -134,7 +142,7 @@ const Timeline = ({ bookmarks, video, playVideo, categories, playerRef, update, 
 
           <ContextMenu id={`bookmark-${bookmark.start}`}>
             <IconWithText
-              component={MenuItem}
+              component={ContextMenuItem}
               icon='edit'
               text='Change Category'
               onClick={() => {
@@ -160,16 +168,24 @@ const Timeline = ({ bookmarks, video, playVideo, categories, playerRef, update, 
               }}
             />
 
-            <IconWithText component={MenuItem} icon='time' text='Change Time' onClick={() => setTime(bookmark)} />
+            <IconWithText
+              component={ContextMenuItem}
+              icon='time'
+              text='Change Time'
+              onClick={() => setTime(bookmark)}
+            />
 
             <hr />
 
-            <IconWithText component={MenuItem} icon='delete' text='Delete' onClick={() => removeBookmark(bookmark)} />
+            <IconWithText
+              component={ContextMenuItem}
+              icon='delete'
+              text='Delete'
+              onClick={() => removeBookmark(bookmark)}
+            />
           </ContextMenu>
         </Fragment>
       ))}
     </Grid>
   )
 }
-
-export default Timeline

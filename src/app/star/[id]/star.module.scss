@@ -1,5 +1,3 @@
-@import '@styles/variables';
-
 #similar {
   text-align: center;
 
@@ -17,15 +15,15 @@
 
 // When changing images
 .profile {
-  max-height: $starHeight;
-  width: $starWidth !important;
+  max-height: var(--star-height);
+  width: var(--star-width) !important;
   object-fit: inherit !important;
 }
 
 #star {
   #profile {
-    max-height: $starHeight;
-    width: $starWidth;
+    max-height: var(--star-height);
+    width: var(--star-width);
   }
 
   #ignored {
@@ -61,7 +59,7 @@
 
 .video {
   margin: 0 10px 10px 5px !important;
-  width: $thumbnailWidth;
+  width: var(--thumb-width);
 
   &.hidden {
     opacity: 0.2;
