@@ -1,24 +1,34 @@
 # Define the base image
-FROM node:alpine3.18 AS custom_node
+FROM node:18-alpine3.18 AS custom_node
 
-# Install dependencies only when needed
+##### DEPENDENCIES
 FROM custom_node AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install dependencies
-COPY package.json yarn.lock ./
-RUN yarn install
+# Install dependencies based on the preferred package manager
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml\* ./
+RUN \
+ if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+ elif [ -f package-lock.json ]; then npm ci; \
+ elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i; \
+ else echo "Lockfile not found." && exit 1; \
+ fi
 
-# Rebuild the source code only when needed
+##### BUILDER
 FROM custom_node AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npx prisma generate
-RUN yarn build
 
-# Production image, copy all the files and run next
+RUN \
+ if [ -f yarn.lock ]; then yarn build; \
+ elif [ -f package-lock.json ]; then npm run build; \
+ elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm run build; \
+ else echo "Lockfile not found." && exit 1; \
+ fi
+
+##### RUNNER
 FROM custom_node AS runner
 RUN apk add ffmpeg
 WORKDIR /app
@@ -28,10 +38,7 @@ ENV NODE_ENV production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-#COPY --from=builder /app/public ./public
-COPY --from=builder /app/node_modules/@ffprobe-installer ./node_modules/@ffprobe-installer
-
-# Automatically leverage output traces to reduce image size
+COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
