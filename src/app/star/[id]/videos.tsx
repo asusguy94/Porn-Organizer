@@ -123,7 +123,7 @@ function Video({ video, isFirst, isLast, isHidden }: VideoProps) {
   const [src, setSrc] = useState('')
   const [dataSrc, setDataSrc] = useState(`${serverConfig.api}/video/${video.id}/file`)
 
-  const thumbnail = useRef<NodeJS.Timer>()
+  const thumbnail = useRef<NodeJS.Timeout>()
 
   // eslint-disable-next-line @typescript-eslint/require-await
   const reload = async () => {

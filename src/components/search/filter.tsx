@@ -7,7 +7,7 @@ import Spinner from '@components/spinner'
 
 import { General } from '@interfaces'
 
-import styles from './filter.module.scss'
+import styles from './filter.module.css'
 
 type FilterObjProps<T extends General> = {
   data?: T[]

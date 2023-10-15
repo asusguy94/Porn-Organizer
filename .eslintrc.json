@@ -9,9 +9,7 @@
   ],
   "plugins": ["@typescript-eslint", "react"],
   "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "project": true
-  },
+  "parserOptions": { "project": true },
   "rules": {
     // Common Eslint
     "import/no-anonymous-default-export": "off", // required for index-files
@@ -23,8 +21,6 @@
     "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-member-access": "off",
     "@typescript-eslint/no-unsafe-call": "off",
-    "@typescript-eslint/no-floating-promises": "off",
-    "@typescript-eslint/consistent-type-definitions": ["warn", "type"],
 
     // NextJs
     "@typescript-eslint/no-misused-promises": "off", // required for server-actions
