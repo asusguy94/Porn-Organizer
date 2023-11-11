@@ -29,7 +29,7 @@
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.11.16",
     "@prisma/client": "^5",
-    "axios": "^1.3.5",
+    "axios": "^1.6.0",
     "capitalize": "^2.0.4",
     "dayjs": "^1.11.7",
     "ffmpeg-generate-video-preview": "^1.0.3",
