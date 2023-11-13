@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { Params } from '@interfaces'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
 //NEXT /star/[id]
@@ -16,16 +16,16 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     await req.json()
   )
 
-  const star = await prisma.star.findFirstOrThrow({ where: { id } })
+  const star = await db.star.findFirstOrThrow({ where: { id } })
   if (remove !== undefined) {
     return NextResponse.json(
-      await prisma.starHaircolors.delete({
+      await db.starHaircolors.delete({
         where: { starId_hair: { starId: star.id, hair: name } }
       })
     )
   } else {
     return NextResponse.json(
-      await prisma.starHaircolors.create({
+      await db.starHaircolors.create({
         data: {
           star: { connect: { id: star.id } },
           haircolor: { connectOrCreate: { create: { name }, where: { name } } }

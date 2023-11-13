@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { Params } from '@interfaces'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 
 //NEXT /video/[id]
 export async function DELETE(req: Request, { params }: Params<['id', 'videoId']>) {
@@ -9,7 +9,7 @@ export async function DELETE(req: Request, { params }: Params<['id', 'videoId']>
   const videoId = parseInt(params.videoId)
 
   return NextResponse.json(
-    await prisma.videoAttributes.delete({
+    await db.videoAttributes.delete({
       where: { attributeID_videoID: { attributeID: id, videoID: videoId } }
     })
   )

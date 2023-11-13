@@ -4,12 +4,12 @@ import Client, { File } from './client'
 
 import { generateDate, generateSite, generateTitle } from '@utils/server/generate'
 import { dirOnly, extOnly } from '@utils/server/helper'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AddVideoPage() {
-  const filesDB = await prisma.video.findMany()
+  const filesDB = await db.video.findMany()
   const filesArr = filesDB.map(video => video.path)
 
   // TODO skip this check if directory is missing?

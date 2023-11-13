@@ -1,14 +1,14 @@
 import fs from 'fs'
 
 import { fileExists } from '@utils/server/helper'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 
 export const dynamic = 'force-dynamic'
 
 //NEXT (used for debugging)
 export async function GET() {
-  const websites = (await prisma.website.findMany()).map(website => website.name)
-  const videos = await prisma.video.findMany()
+  const websites = (await db.website.findMany()).map(website => website.name)
+  const videos = await db.video.findMany()
 
   // checks for unused video-files
   for await (const website of websites) {

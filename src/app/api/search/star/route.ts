@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { Site, Website } from '@prisma/client'
 import { dateDiff } from '@utils/server/helper'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import { getUnique } from '@utils/shared'
 
 export const dynamic = 'force-dynamic'
@@ -29,7 +29,7 @@ export async function GET() {
 
   return NextResponse.json(
     (
-      await prisma.star.findMany({
+      await db.star.findMany({
         orderBy: { name: 'asc' },
         include: { videos: { include: { website: { include: { sites: true } }, site: true } }, haircolors: true }
       })

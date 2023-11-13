@@ -5,7 +5,7 @@ import fetch from 'node-fetch'
 import fs from 'fs'
 import path from 'path'
 
-import prisma from './prisma'
+import { db } from './prisma'
 
 import { settingsConfig } from '@config'
 import { SimilarStar } from '@interfaces/api'
@@ -110,13 +110,13 @@ export function formatBreastSize(input: string): string {
 }
 
 export async function getSimilarStars(starID: number, maxMaxLength = 9): Promise<SimilarStar[]> {
-  const currentStar = await prisma.star.findFirstOrThrow({ where: { id: starID }, include: { haircolors: true } })
+  const currentStar = await db.star.findFirstOrThrow({ where: { id: starID }, include: { haircolors: true } })
 
   const match_default = 2
   const match_important = 5
   const decimals = 0
 
-  const otherStars = (await prisma.star.findMany({ where: { id: { not: starID } }, include: { haircolors: true } }))
+  const otherStars = (await db.star.findMany({ where: { id: { not: starID } }, include: { haircolors: true } }))
     .map(otherStar => {
       let match = 100
 

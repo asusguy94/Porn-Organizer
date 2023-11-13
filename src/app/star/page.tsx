@@ -1,12 +1,12 @@
 import Client from './client'
 
 import { generateStarName } from '@utils/server/generate'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 
 export const dynamic = 'force-dynamic'
 
 export default async function StarsPage() {
-  const stars = await prisma.star.findMany({
+  const stars = await db.star.findMany({
     select: { id: true, name: true, image: true },
     where: {
       OR: [
@@ -27,7 +27,7 @@ export default async function StarsPage() {
   })
 
   // VideoStars Without STAR
-  const missing = (await prisma.video.findMany({ where: { star: null } })).map(video => ({
+  const missing = (await db.video.findMany({ where: { star: null } })).map(video => ({
     videoId: video.id,
     name: generateStarName(video.path)
   }))

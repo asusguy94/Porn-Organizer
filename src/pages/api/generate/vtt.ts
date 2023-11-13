@@ -2,12 +2,12 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import { extractVtt } from '@utils/server/ffmpeg'
 import { fileExists, logger } from '@utils/server/helper'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 
 //NEXT /video/add
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const videos = await prisma.video.findMany({ where: { duration: { gt: 0 }, height: { gt: 0 }, width: { gt: 0 } } })
+    const videos = await db.video.findMany({ where: { duration: { gt: 0 }, height: { gt: 0 }, width: { gt: 0 } } })
 
     logger('Generating VTT')
     for await (const video of videos) {

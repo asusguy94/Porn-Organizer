@@ -4,17 +4,17 @@ import { Params, VideoStar } from '@interfaces'
 import { generateStarName } from '@utils/server/generate'
 import { dateDiff } from '@utils/server/helper'
 import { getSceneData } from '@utils/server/metadata'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import { formatDate } from '@utils/shared'
 
 export default async function VideoPage({ params }: Params<'id'>) {
   const id = parseInt(params.id)
 
-  const attributes = await prisma.attribute.findMany()
-  const categories = await prisma.category.findMany()
-  const locations = await prisma.location.findMany()
+  const attributes = await db.attribute.findMany()
+  const categories = await db.category.findMany()
+  const locations = await db.location.findMany()
 
-  const bookmarks = await prisma.bookmark.findMany({
+  const bookmarks = await db.bookmark.findMany({
     select: {
       id: true,
       category: { select: { id: true, name: true } },
@@ -24,14 +24,14 @@ export default async function VideoPage({ params }: Params<'id'>) {
     orderBy: { start: 'asc' }
   })
 
-  const star = await prisma.star.findFirst({
+  const star = await db.star.findFirst({
     where: { videos: { some: { id } } },
     select: { id: true, name: true, image: true, birthdate: true }
   })
 
   let starVal: VideoStar | null = null
   if (star !== null) {
-    const videos = await prisma.video.findMany({
+    const videos = await db.video.findMany({
       where: { starID: star.id }
     })
 
@@ -43,7 +43,7 @@ export default async function VideoPage({ params }: Params<'id'>) {
     }
   }
 
-  const video = await prisma.video.findFirstOrThrow({
+  const video = await db.video.findFirstOrThrow({
     where: { id },
     select: {
       id: true,
@@ -72,7 +72,7 @@ export default async function VideoPage({ params }: Params<'id'>) {
         video.apiDate = (await getSceneData(video.api)).date.trim()
 
         // ony update database with new apiDate if nessesary
-        await prisma.video.update({
+        await db.video.update({
           where: { id: video.id },
           data: { apiDate: video.apiDate }
         })

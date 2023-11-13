@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { Params } from '@interfaces'
 import { dateDiff } from '@utils/server/helper'
 import { aliasExists, getAliasAsStar } from '@utils/server/helper.db'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
 //NEXT /video/[id]
@@ -19,17 +19,17 @@ export async function POST(req: Request, { params }: Params<'id'>) {
 
   const starID = (
     !(await aliasExists(name))
-      ? await prisma.star.upsert({ where: { name }, update: {}, create: { name } })
+      ? await db.star.upsert({ where: { name }, update: {}, create: { name } })
       : await getAliasAsStar(name)
   ).id
 
   // Insert VIDEOSTAR into table
-  const video = await prisma.video.update({
+  const video = await db.video.update({
     where: { id },
     data: { star: { connect: { id: starID } } }
   })
 
-  const star = await prisma.star.findFirstOrThrow({
+  const star = await db.star.findFirstOrThrow({
     where: { id: starID },
     select: {
       id: true,
@@ -53,7 +53,7 @@ export async function DELETE(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
   return NextResponse.json(
-    await prisma.video.update({
+    await db.video.update({
       where: { id },
       data: { star: { disconnect: true } }
     })

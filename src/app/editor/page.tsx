@@ -2,7 +2,7 @@ import { revalidatePath } from 'next/cache'
 
 import Client, { EditorPageProps } from './client'
 
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
 export const dynamic = 'force-dynamic'
@@ -12,7 +12,7 @@ export default async function EditorPage() {
 
   const attributes: Prop = {
     name: 'attribute',
-    data: await prisma.attribute.findMany({ orderBy: { id: 'asc' } }),
+    data: await db.attribute.findMany({ orderBy: { id: 'asc' } }),
     add: async data => {
       'use server'
 
@@ -23,7 +23,7 @@ export default async function EditorPage() {
         data
       )
 
-      await prisma.attribute.create({ data: { name } })
+      await db.attribute.create({ data: { name } })
       revalidatePath('/editor')
       revalidatePath('/video/[id]')
     },
@@ -38,7 +38,7 @@ export default async function EditorPage() {
         data
       )
 
-      await prisma.attribute.update({ where: { id }, data: { name } })
+      await db.attribute.update({ where: { id }, data: { name } })
       revalidatePath('/editor')
       revalidatePath('/video/[id]')
     }
@@ -46,7 +46,7 @@ export default async function EditorPage() {
 
   const categories: Prop = {
     name: 'category',
-    data: await prisma.category.findMany({ orderBy: { id: 'asc' } }),
+    data: await db.category.findMany({ orderBy: { id: 'asc' } }),
     add: async data => {
       'use server'
 
@@ -57,7 +57,7 @@ export default async function EditorPage() {
         data
       )
 
-      await prisma.category.create({ data: { name } })
+      await db.category.create({ data: { name } })
       revalidatePath('/editor')
       revalidatePath('/video/[id]')
     },
@@ -72,7 +72,7 @@ export default async function EditorPage() {
         data
       )
 
-      await prisma.category.update({ where: { id }, data: { name } })
+      await db.category.update({ where: { id }, data: { name } })
       revalidatePath('/editor')
       revalidatePath('/video/[id]')
     }
@@ -80,7 +80,7 @@ export default async function EditorPage() {
 
   const locations: Prop = {
     name: 'location',
-    data: await prisma.location.findMany({ orderBy: { id: 'asc' } }),
+    data: await db.location.findMany({ orderBy: { id: 'asc' } }),
     add: async data => {
       'use server'
 
@@ -91,7 +91,7 @@ export default async function EditorPage() {
         data
       )
 
-      await prisma.location.create({ data: { name } })
+      await db.location.create({ data: { name } })
       revalidatePath('/editor')
     },
     update: async data => {
@@ -105,7 +105,7 @@ export default async function EditorPage() {
         data
       )
 
-      await prisma.location.update({ where: { id }, data: { name } })
+      await db.location.update({ where: { id }, data: { name } })
       revalidatePath('/editor')
       revalidatePath('/video/[id]')
     }

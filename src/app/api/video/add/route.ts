@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import type { Video } from '@prisma/client'
 import { getDate } from '@utils/server/helper'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
 //NEXT /video/add
@@ -25,13 +25,13 @@ export async function POST(req: Request) {
   const result: Video[] = []
   for await (const video of videos) {
     // Create WEBSITE if missing
-    const website = await prisma.website.upsert({
+    const website = await db.website.upsert({
       where: { name: video.website },
       create: { name: video.website },
       update: {}
     })
 
-    const newVideo = await prisma.video.create({
+    const newVideo = await db.video.create({
       data: {
         path: video.path,
         name: video.title,
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     // Site should be used
     if (video.site.length) {
       // Create SITE if missing
-      const site = await prisma.site.upsert({
+      const site = await db.site.upsert({
         where: { name: video.site },
         create: { name: video.site, website: { connect: { id: website.id } } },
         update: {}
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
 
       // Set SITE
       result.push(
-        await prisma.video.update({
+        await db.video.update({
           where: { id: newVideo.id },
           data: { site: { connect: { id: site.id } } }
         })

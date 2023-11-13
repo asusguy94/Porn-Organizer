@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { Params } from '@interfaces'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
 //NEXT /video/[id]
@@ -18,7 +18,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
 
   if (time !== undefined) {
     return NextResponse.json(
-      await prisma.bookmark.update({
+      await db.bookmark.update({
         where: { id },
         data: { start: time }
       })
@@ -26,7 +26,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
   } else if (categoryID !== undefined) {
     // Change CategoryID
     return NextResponse.json(
-      await prisma.bookmark.update({
+      await db.bookmark.update({
         where: { id },
         data: { category: { connect: { id: categoryID } } }
       })
@@ -39,7 +39,7 @@ export async function DELETE(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
   return NextResponse.json(
-    await prisma.bookmark.delete({
+    await db.bookmark.delete({
       where: { id }
     })
   )

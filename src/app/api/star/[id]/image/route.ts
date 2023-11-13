@@ -4,14 +4,14 @@ import fs from 'fs'
 
 import { Params } from '@interfaces'
 import { downloader, sendFile } from '@utils/server/helper'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
 //NEXT /star, /star/[id], /video/[id]
 export async function GET(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
-  const star = await prisma.star.findFirstOrThrow({ where: { id } })
+  const star = await db.star.findFirstOrThrow({ where: { id } })
   if (star.image !== null) {
     return await sendFile(`./media/images/stars/${star.image}`)
   }
@@ -29,7 +29,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
   )
 
   // Update Database
-  const star = await prisma.star.update({ where: { id }, data: { image: `${id}.jpg` } })
+  const star = await db.star.update({ where: { id }, data: { image: `${id}.jpg` } })
 
   if (star.image !== null) {
     // Download Image
@@ -45,11 +45,11 @@ export async function POST(req: Request, { params }: Params<'id'>) {
 export async function DELETE(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
-  const star = await prisma.star.findFirstOrThrow({ where: { id } })
+  const star = await db.star.findFirstOrThrow({ where: { id } })
   if (star.image !== null) {
     const path = `images/stars/${star.image}`
 
-    const result = await prisma.star.update({ where: { id }, data: { image: null } })
+    const result = await db.star.update({ where: { id }, data: { image: null } })
     fs.unlinkSync(`./media/${path}`)
 
     return NextResponse.json(result)

@@ -2,18 +2,18 @@ import Client from './client'
 
 import { Params } from '@interfaces'
 import { dateDiff, getSimilarStars } from '@utils/server/helper'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import { formatDate, getUnique } from '@utils/shared'
 
 export default async function StarPage({ params }: Params<'id'>) {
   const id = parseInt(params.id)
 
-  const breasts = await prisma.star.findMany({ where: { breast: { not: null } }, orderBy: { breast: 'asc' } })
-  const haircolors = await prisma.haircolor.findMany({ orderBy: { name: 'asc' } })
-  const ethnicities = await prisma.star.findMany({ where: { ethnicity: { not: null } }, orderBy: { ethnicity: 'asc' } })
-  const websites = await prisma.website.findMany({ orderBy: { name: 'asc' } })
+  const breasts = await db.star.findMany({ where: { breast: { not: null } }, orderBy: { breast: 'asc' } })
+  const haircolors = await db.haircolor.findMany({ orderBy: { name: 'asc' } })
+  const ethnicities = await db.star.findMany({ where: { ethnicity: { not: null } }, orderBy: { ethnicity: 'asc' } })
+  const websites = await db.website.findMany({ orderBy: { name: 'asc' } })
 
-  const videos = await prisma.video.findMany({
+  const videos = await db.video.findMany({
     where: { starID: id },
     select: {
       id: true,
@@ -29,7 +29,7 @@ export default async function StarPage({ params }: Params<'id'>) {
     orderBy: { date: 'asc' }
   })
 
-  const { haircolors: starHaircolors, ...star } = await prisma.star.findFirstOrThrow({
+  const { haircolors: starHaircolors, ...star } = await db.star.findFirstOrThrow({
     where: { id },
     select: {
       id: true,

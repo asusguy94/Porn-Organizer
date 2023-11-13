@@ -16,7 +16,7 @@ import {
   removeThumbnails
 } from '@utils/server/helper'
 import { getSceneData, getSceneSlug } from '@utils/server/metadata'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 import { formatDate, printError } from '@utils/shared'
 
@@ -40,70 +40,70 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       )
 
       if (title !== undefined) {
-        await prisma.video.update({
+        await db.video.update({
           where: { id: parseInt(id) },
           data: { name: title }
         })
       } else if (starAge !== undefined) {
-        await prisma.video.update({
+        await db.video.update({
           where: { id: parseInt(id) },
           data: { starAge: starAge }
         })
       } else if (validated !== undefined) {
-        await prisma.video.update({
+        await db.video.update({
           where: { id: parseInt(id) },
           data: { validated: validated }
         })
       } else if (plays !== undefined) {
         if (!plays) {
           // Reset PLAYS
-          await prisma.plays.deleteMany({ where: { videoID: parseInt(id) } })
+          await db.plays.deleteMany({ where: { videoID: parseInt(id) } })
         } else {
           // Add PLAY
-          await prisma.plays.create({
+          await db.plays.create({
             data: { video: { connect: { id: parseInt(id) } } }
           })
         }
       } else if (slug !== undefined) {
         if (!slug) {
           // Reset SLUG
-          await prisma.video.update({
+          await db.video.update({
             where: { id: parseInt(id) },
             data: { api: null, apiDate: null }
           })
         } else {
           // Add Slug
           await getSceneSlug(slug).then(async data => {
-            await prisma.video.update({
+            await db.video.update({
               where: { id: parseInt(id) },
               data: { api: data, apiDate: null }
             })
           })
         }
       } else if (path !== undefined) {
-        const { path: oldPath } = await prisma.video.findFirstOrThrow({
+        const orig = await db.video.findFirstOrThrow({
           where: { id: parseInt(id) }
         })
 
         // Update Database
-        await prisma.video.update({ where: { id: parseInt(id) }, data: { path } }).then(async video => {
+        await db.video.update({ where: { id: orig.id }, data: { path } }).then(async video => {
           await Promise.allSettled([
             // Rename File
-            fs.promises.rename(`./media/videos/${oldPath}`, `./media/videos/${video.path}`),
+            fs.promises.rename(`./media/videos/${orig.path}`, `./media/videos/${video.path}`),
 
             // Rename Dir
-            fs.promises.rename(`./media/videos/${noExt(oldPath)}`, `./media/videos/${noExt(video.path)}`)
+            fs.promises.rename(`./media/videos/${noExt(orig.path)}`, `./media/videos/${noExt(video.path)}`)
           ])
         })
       } else if (date !== undefined) {
-        const video = await prisma.video.findFirstOrThrow({
+        const video = await db.video.findFirstOrThrow({
           where: { id: parseInt(id) },
           include: { star: true }
         })
         const fileDate = generateDate(video.path)
 
         if (isNewDate(video.date, fileDate)) {
-          await prisma.video.update({
+          await db.video.update({
             where: { id: parseInt(id) },
             data: { date: getDate(fileDate) }
           })
@@ -114,7 +114,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           age: dateDiff(video.star?.birthdate, video.date)
         })
       } else if (cover !== undefined) {
-        const video = await prisma.video.findFirstOrThrow({
+        const video = await db.video.findFirstOrThrow({
           where: { id: parseInt(id) }
         })
         if (video.api) {
@@ -141,7 +141,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 await resizeImage(`./media/${imagePath_low}`, settingsConfig.THUMB_RES)
               }
 
-              await prisma.video.update({ where: { id: video.id }, data: { cover: `${video.id}.jpg` } })
+              await db.video.update({ where: { id: video.id }, data: { cover: `${video.id}.jpg` } })
             }
           } catch (error) {
             printError(error)
@@ -151,7 +151,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Refresh Video
 
         // Update Database
-        await prisma.video.update({
+        await db.video.update({
           where: { id: parseInt(id) },
           data: { duration: 0, height: 0 }
         })
@@ -163,7 +163,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.end()
     } else if (req.method === 'DELETE') {
       if (typeof id === 'string') {
-        await prisma.video.delete({ where: { id: parseInt(id) } }).then(async video => {
+        await db.video.delete({ where: { id: parseInt(id) } }).then(async video => {
           await removeThumbnails(video.id)
 
           await Promise.allSettled([

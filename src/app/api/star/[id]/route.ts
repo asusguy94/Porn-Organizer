@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { Params } from '@interfaces'
 import { formatBreastSize, getDate, getSimilarStars } from '@utils/server/helper'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 import { formatDate } from '@utils/shared'
 
@@ -25,7 +25,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     //TODO this @unique-field on name-column is not working?
     // seems to not rename, but also slow down performance on original table?
     return NextResponse.json(
-      await prisma.star.update({
+      await db.star.update({
         where: { id },
         data: { name }
       })
@@ -34,7 +34,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     if (slug.length) {
       // add slug
       return NextResponse.json(
-        await prisma.star.update({
+        await db.star.update({
           where: { id },
           data: { api: slug }
         })
@@ -42,7 +42,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     } else {
       // reset slug
       return NextResponse.json(
-        await prisma.star.update({
+        await db.star.update({
           where: { id },
           data: { api: null }
         })
@@ -61,7 +61,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
 
     if (!data.length) {
       data = null
-      await prisma.star.update({ where: { id }, data: { [label]: null } })
+      await db.star.update({ where: { id }, data: { [label]: null } })
     } else {
       const valueRef = data
 
@@ -84,7 +84,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
           data = valueRef
       }
 
-      await prisma.star.update({ where: { id }, data: { [label]: data } })
+      await db.star.update({ where: { id }, data: { [label]: data } })
     }
 
     return NextResponse.json({
@@ -94,7 +94,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     })
   } else if (ignore !== undefined) {
     return NextResponse.json(
-      await prisma.star.update({
+      await db.star.update({
         where: { id },
         data: { autoTaggerIgnore: ignore }
       })
@@ -107,7 +107,7 @@ export async function DELETE(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
   return NextResponse.json(
-    await prisma.star.delete({
+    await db.star.delete({
       where: { id }
     })
   )
