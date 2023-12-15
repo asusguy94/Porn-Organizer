@@ -16,6 +16,8 @@ import {
   Paper
 } from '@mui/material'
 
+import Progress from './progress'
+
 import { generateService, videoService } from '@service'
 
 import styles from './add.module.css'
@@ -43,6 +45,8 @@ export default function AddVideoPage({ files: videos, pages }: AddVideoPageProps
         <div className='text-center'>
           <Action label='Generate Metadata' callback={generateService.metadata} />
           <Action label='Generate VTT' callback={generateService.vtt} />
+
+          <Progress />
         </div>
       ) : (
         <>
