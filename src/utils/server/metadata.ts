@@ -29,8 +29,8 @@ type BasicModel = {
 //TODO Check if title.toLowerCase() matches videodata.title.toLowercase()
 
 function createConfig(longTimeout = false): AxiosRequestConfig {
-  const TIMEOUT_DEFAULT = 5
-  const TIMEOUT_LONG = 20
+  const TIMEOUT_DEFAULT = 10
+  const TIMEOUT_LONG = 30
 
   return {
     headers: { Authorization: `Bearer ${settingsConfig.THEPORNDB_API}` },
