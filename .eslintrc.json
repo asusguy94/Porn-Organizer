@@ -11,20 +11,21 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": { "project": true },
   "rules": {
-    // Common Eslint
-    "import/no-anonymous-default-export": "off", // required for index-files
+    // Common eslint
+    "import/no-anonymous-default-export": "off",
     "eqeqeq": "warn",
     "no-duplicate-imports": "warn",
 
     // Typescript Eslint
-    "@typescript-eslint/no-unsafe-return": "off",
     "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-member-access": "off",
     "@typescript-eslint/no-unsafe-call": "off",
-
-    // NextJs
-    "@typescript-eslint/no-misused-promises": "off", // required for server-actions
     "@typescript-eslint/no-floating-promises": "off",
-    "@typescript-eslint/consistent-type-definitions": ["warn", "type"]
+    // "@typescript-eslint/consistent-type-definitions": ["warn", "type"],
+    // "@typescript-eslint/unified-signatures": "off",
+    // "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+
+    // NextJS
+    "@typescript-eslint/no-misused-promises": "off" // Promise<void> is still broken
   }
 }

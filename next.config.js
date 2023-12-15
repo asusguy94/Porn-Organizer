@@ -3,7 +3,6 @@ module.exports = {
   reactStrictMode: false,
   output: 'standalone',
   eslint: { ignoreDuringBuilds: true },
-  experimental: { serverActions: true },
   modularizeImports: {
     '@mui/material': {
       transform: '@mui/material/{{member}}'
