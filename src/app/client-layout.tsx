@@ -6,6 +6,8 @@ import { Container, CssBaseline } from '@mui/material'
 
 import NavBar from '@components/navbar'
 
+import Providers from './providers'
+
 import '@styles/globals.css'
 import 'plyr/dist/plyr.css'
 
@@ -22,7 +24,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
       <CssBaseline />
       <Container component='main' maxWidth={false} className={roboto.className}>
-        {children}
+        <Providers>{children}</Providers>
       </Container>
     </>
   )
