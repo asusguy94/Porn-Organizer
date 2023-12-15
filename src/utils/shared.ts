@@ -35,3 +35,10 @@ export function formatDate(dateStr: string | Date, raw = false, addDays = 0): st
 
   return raw ? date.format('YYYY-MM-DD') : date.format('D MMMM YYYY')
 }
+
+export function getProgress(index: number, total: number) {
+  return {
+    progress: clamp((index + 1) / (total + 1), 1),
+    buffer: clamp((index + 2) / (total + 1), 1)
+  }
+}

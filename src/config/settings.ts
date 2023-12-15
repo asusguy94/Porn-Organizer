@@ -39,5 +39,11 @@ export default {
       close: getValueWithType<'reload' | 'close'>('USER_THUMB', 'reload') === 'close'
     }
   },
+  pusher: {
+    appId: process.env['PUSHER_APP_ID'] ?? '',
+    key: getValueWithType('PUSHER_KEY', ''),
+    secret: process.env['PUSHER_SECRET'] ?? '',
+    cluster: getValueWithType('PUSHER_CLUSTER', 'eu')
+  },
   debug: getValueWithType<boolean>('DEBUG', false)
 }
