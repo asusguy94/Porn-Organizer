@@ -25,7 +25,7 @@ export default async function EditorPage() {
 
       await db.attribute.create({ data: { name } })
       revalidatePath('/editor')
-      revalidatePath('/video/[id]')
+      revalidatePath('/video/[id]', 'page')
     },
     update: async data => {
       'use server'
@@ -40,7 +40,7 @@ export default async function EditorPage() {
 
       await db.attribute.update({ where: { id }, data: { name } })
       revalidatePath('/editor')
-      revalidatePath('/video/[id]')
+      revalidatePath('/video/[id]', 'page')
     }
   }
 
@@ -59,7 +59,7 @@ export default async function EditorPage() {
 
       await db.category.create({ data: { name } })
       revalidatePath('/editor')
-      revalidatePath('/video/[id]')
+      revalidatePath('/video/[id]', 'page')
     },
     update: async data => {
       'use server'
@@ -74,7 +74,7 @@ export default async function EditorPage() {
 
       await db.category.update({ where: { id }, data: { name } })
       revalidatePath('/editor')
-      revalidatePath('/video/[id]')
+      revalidatePath('/video/[id]', 'page')
     }
   }
 
@@ -93,6 +93,7 @@ export default async function EditorPage() {
 
       await db.location.create({ data: { name } })
       revalidatePath('/editor')
+      revalidatePath('/video/[id]', 'page')
     },
     update: async data => {
       'use server'
@@ -107,7 +108,7 @@ export default async function EditorPage() {
 
       await db.location.update({ where: { id }, data: { name } })
       revalidatePath('/editor')
-      revalidatePath('/video/[id]')
+      revalidatePath('/video/[id]', 'page')
     }
   }
 
