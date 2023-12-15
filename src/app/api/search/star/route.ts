@@ -20,6 +20,7 @@ export async function GET() {
   }
 
   // highest siteScore is currently 2.6, or 26 when *10
+  //TODO currently a star with 1 site and 1 video is scored the same as a star with 1 site and 2 videos
   function calculateScore(websitesWithSites: (Website & { sites: Site[] })[], sites: Site[]) {
     return websitesWithSites
       .map(website => calculateSiteScore(website, sites) * 10)

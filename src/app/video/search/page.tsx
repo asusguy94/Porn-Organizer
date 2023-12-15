@@ -10,5 +10,5 @@ export default async function VideoSearchPage() {
   const categories = await db.category.findMany()
   const websites = await db.website.findMany()
 
-  return <Client attributes={attributes} locations={locations} categories={categories} websites={websites} />
+  return <Client videoInfo={{ attributes, locations, categories }} websites={websites} />
 }

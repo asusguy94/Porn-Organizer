@@ -1,3 +1,7 @@
+/*TODO re-create this file from scratch
+- use more regex with .test() and .match() rather than .split()
+- use .at() rather than [] for arrays
+*/
 import { dirOnly } from './helper'
 
 const starRegex: RegExp[] = []
@@ -38,4 +42,8 @@ export function generateSite(path: string) {
   const file = dirOnly(path)
 
   return file.split(siteRegex[0])[1].split(siteRegex[1])[0]
+}
+
+export function generateWebsite(path: string) {
+  return dirOnly(path)
 }

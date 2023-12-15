@@ -2,7 +2,7 @@ import fs from 'fs'
 
 import Client, { File } from './client'
 
-import { generateDate, generateSite, generateTitle } from '@utils/server/generate'
+import { generateDate, generateSite, generateTitle, generateWebsite } from '@utils/server/generate'
 import { dirOnly, extOnly } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
 
@@ -26,15 +26,16 @@ export default async function AddVideoPage() {
 
         for await (const file of files) {
           const filePath = `${dirPath}/${file}`
-          const dir = dirOnly(dirPath)
+          const wsite = generateWebsite(dirPath)
           if (
-            !filesArr.includes(`${dir}/${file}`) &&
+            !filesArr.includes(`${wsite}/${file}`) &&
             (await fs.promises.lstat(filePath)).isFile() &&
-            extOnly(filePath) === '.mp4' // Prevent random files from being imported!
+            extOnly(filePath) === '.mp4' && // Prevent random files from being imported!
+            !dirOnly(file).endsWith('_') // ignore files with '_' at the end
           ) {
             newFiles.push({
-              path: `${dir}/${file}`,
-              website: dir,
+              path: `${wsite}/${file}`,
+              website: wsite,
               date: generateDate(filePath),
               site: generateSite(filePath),
               title: generateTitle(filePath)

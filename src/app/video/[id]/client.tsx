@@ -41,7 +41,7 @@ export default function VideoPage({
   star: starData,
   bookmarks: bookmarksData
 }: VideoPageProps) {
-  const [video, setVideo] = useState<typeof videoData>() //FIXME videoData cannot be used directly
+  const [video, setVideo] = useState<typeof videoData>() //THROWS ReferenceError: document is not defined (if set directly)
   const [star, setStar] = useState(starData)
   const [bookmarks, setBookmarks] = useState(bookmarksData)
 

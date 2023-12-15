@@ -53,7 +53,7 @@ type StarPageProps = {
 }
 
 export default function StarPage({ breast, haircolor, ethnicity, videos, star: starData }: StarPageProps) {
-  const [star, setStar] = useState<typeof starData>() //FIXME starData cannot be used directly
+  const [star, setStar] = useState<typeof starData>() //THROWS ReferenceError: document is not defined (if set directly)
   const { modal, setModal } = useModal()
 
   useEffect(() => {
@@ -63,13 +63,11 @@ export default function StarPage({ breast, haircolor, ethnicity, videos, star: s
   if (star === undefined) return <Spinner />
 
   return (
-    <Grid container>
+    <Grid container style={{ marginTop: 12 }}>
       <Grid item xs={7}>
         <div id={styles.star}>
           <StarImageDropbox star={star} update={setStar} onModal={setModal} />
-
           <StarTitle star={star} update={setStar} onModal={setModal} />
-
           <StarForm starData={{ breast, ethnicity, haircolor }} star={star} update={setStar} />
         </div>
 

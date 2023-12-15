@@ -60,7 +60,7 @@ function MissingImage({ scale = 1, renderStyle }: MissingImageProps) {
         ...(renderStyle === 'height'
           ? { height: '100%' }
           : renderStyle === 'transform'
-          ? { transform: 'translateY(100%)' }
+          ? { transform: 'translateY(100%)' } //TODO why 100%
           : {}),
         scale: scale.toString()
       }}
