@@ -86,8 +86,8 @@ function ModalChild({ title, filter, children, query, onClose }: ModalChildProps
       })
       .filter(item => item.props.children.toLowerCase().includes(lowerQuery))
       .sort((a, b) => {
-        const valA = a.props.children.toLowerCase()
-        const valB = b.props.children.toLowerCase()
+        const valA: string = a.props.children.toLowerCase()
+        const valB: string = b.props.children.toLowerCase()
 
         if (query.length > 0) {
           if (valA.startsWith(lowerQuery) && valB.startsWith(lowerQuery)) return 0

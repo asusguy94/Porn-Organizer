@@ -2,16 +2,19 @@ import { Website } from '@prisma/client'
 
 // Common types
 export type SetState<T> = React.Dispatch<React.SetStateAction<T>>
-export type ServerAction = (data: FormData) => Promise<void>
 
 export type General = {
   id: number
   name: string
 }
 
+export type ServerAction = (data: FormData) => Promise<void>
+export type StaticParams<T extends string | string[]> = Promise<Record<T extends string ? T : T[number], string>[]>
 export type Params<T extends string | string[]> = {
   params: Record<T extends string ? T : T[number], string>
 }
+
+export type AllowString<T> = T | (string & NonNullable<unknown>)
 
 // Other Types
 export type WebsiteWithSites = {

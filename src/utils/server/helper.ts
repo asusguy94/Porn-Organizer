@@ -177,11 +177,21 @@ function setCache(ageInSeconds: number, delay = 100) {
   return { 'Cache-Control': cacheArr.join(',') }
 }
 
-const errorResponse = new Response(null, { status: 404 })
+export function response(message: string, statusCode: number): Response
+export function response(statusCode: number): Response
+export function response(messageOrStatusCode: string | number, statusCode?: number): Response {
+  if (typeof messageOrStatusCode === 'string') {
+    return new Response(messageOrStatusCode, { status: statusCode })
+  }
+
+  return new Response(null, { status: statusCode })
+}
+
+const missingFileError = response(404)
 
 export async function sendFile(path: string) {
   if (!(await fileExists(path))) {
-    return errorResponse
+    return missingFileError
   }
 
   return new Response(await fs.promises.readFile(path), {
@@ -193,7 +203,7 @@ export async function sendPartial(req: Request, path: string, mb = 2) {
   const chunkSize = 1024 * 1024 * mb
 
   if (!(await fileExists(path))) {
-    return errorResponse
+    return missingFileError
   }
 
   return new Promise<Response>((resolve, reject) => {
@@ -312,6 +322,10 @@ export function getDividableWidth(width: number, limits = { min: 120, max: 240 }
   throw new Error(`Could not find dividable width for ${width}`)
 }
 
-export function logger(message: string) {
+export function logger(message: unknown) {
   console.log(message)
+}
+
+export function isError(e: unknown): e is Error {
+  return e instanceof Error
 }
