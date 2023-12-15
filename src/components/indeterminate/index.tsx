@@ -2,9 +2,7 @@ import { useState } from 'react'
 
 import { Checkbox, FormControlLabel, FormControlLabelProps } from '@mui/material'
 
-export type RegularHandlerProps = {
-  checked: boolean
-}
+import RegularItem, { RegularHandlerProps } from './regular-item'
 
 export type HandlerProps = {
   checked: boolean
@@ -19,59 +17,13 @@ function handler({ checked, indeterminate }: HandlerProps) {
     return { indeterminate: false, checked: true }
   }
 }
-
-type RegularItemProps<T> = {
-  label: FormControlLabelProps['label']
-  value: string
-  item?: T
-  callback: (result: RegularHandlerProps, item: T) => void
-  defaultChecked?: boolean
-  disabled?: boolean
-  softDisabled?: boolean
-}
-
-export function RegularItem<T>({
-  label,
-  value,
-  item,
-  callback,
-  defaultChecked = false,
-  disabled,
-  softDisabled = false
-}: RegularItemProps<T>) {
-  const [checked, setChecked] = useState(defaultChecked)
-
-  return (
-    <FormControlLabel
-      label={label}
-      value={value}
-      disabled={disabled}
-      style={softDisabled ? { opacity: 0.5 } : {}}
-      control={
-        <Checkbox
-          checked={checked}
-          onChange={() => {
-            setChecked(checked => {
-              const status = !checked
-
-              callback({ checked: status }, item as T)
-              return !checked
-            })
-          }}
-        />
-      }
-    />
-  )
-}
-
 type ItemProps<T> = {
   label: FormControlLabelProps['label']
   value: string
   item?: T
   callback: (result: HandlerProps, item?: T) => void
 }
-
-export default function Item<T>({ label, value, item = undefined, callback }: ItemProps<T>) {
+export default function Item<T>({ label, value, item, callback }: ItemProps<T>) {
   const [indeterminate, setIndeterminate] = useState(false)
   const [checked, setChecked] = useState(false)
 
@@ -88,7 +40,6 @@ export default function Item<T>({ label, value, item = undefined, callback }: It
 
             setIndeterminate(result.indeterminate)
             setChecked(result.checked)
-
             callback(result, item)
           }}
         />
@@ -96,3 +47,5 @@ export default function Item<T>({ label, value, item = undefined, callback }: It
     />
   )
 }
+
+export { RegularItem, type RegularHandlerProps }

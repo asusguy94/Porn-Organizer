@@ -1,43 +1,108 @@
 import { FormControlLabel, Radio } from '@mui/material'
-import { StarSearch as Star, VideoSearch as Video } from './helper'
 
-type SortObjProps = {
-  label: {
-    asc: string
-    desc: string
-  }
-  id: string
+import { AllowString, StarSearch, VideoSearch } from '@interfaces'
+
+const reverseChar = '-'
+function createReverse<T extends string>(sort: T) {
+  return `${reverseChar}${sort}` as const
+}
+
+type SortObjProps<T extends DefaultObj> = {
+  labels: [string, string]
+  id: T['sort']
   callback: (reversed: boolean) => void
   reversed?: boolean
 }
-const SortObj = ({ id, label, callback, reversed = false }: SortObjProps) => (
-  <>
-    <FormControlLabel
-      label={reversed ? label.desc : label.asc}
-      value={id}
-      control={<Radio />}
-      onChange={() => callback(reversed)}
-    />
-    <FormControlLabel
-      label={reversed ? label.asc : label.desc}
-      value={`${id}_reverse`}
-      control={<Radio />}
-      onChange={() => callback(!reversed)}
-    />
-  </>
-)
+function SortObj<T extends DefaultObj>({ id, labels, callback, reversed = false }: SortObjProps<T>) {
+  return (
+    <>
+      <FormControlLabel
+        label={labels[0]}
+        value={getSortString(reversed ? createReverse(id) : id)}
+        control={<Radio />}
+        onChange={() => callback(reversed)}
+      />
+      <FormControlLabel
+        label={labels[1]}
+        value={getSortString(!reversed ? createReverse(id) : id)}
+        control={<Radio />}
+        onChange={() => callback(!reversed)}
+      />
+    </>
+  )
+}
 
-type Sort<T extends string> = { type: T; reverse?: boolean }
+export function getSortString(sort: string, reverseSort = isReverseSort(sort)) {
+  return reverseSort ? createReverse(sort) : sort
+}
 
-export type SortTypeVideo = Sort<'alphabetically' | 'added' | 'date' | 'age' | 'plays' | 'title-length'>
-export type SortTypeStar = Sort<'alphabetically' | 'added' | 'age' | 'videos' | 'score'>
-export type SortMethodVideo = (a: Video, b: Video) => number
-export type SortMethodStar = (a: Star, b: Star) => number
+function isReverseSort(sort: string) {
+  return sort.startsWith(reverseChar)
+}
 
-export function getVideoSort(sort: SortTypeVideo): SortMethodVideo {
+function getBaseSort<T extends string>(sort: T) {
+  return sort.replace(new RegExp(`^${reverseChar}`), '') as WithoutReverse<T>
+}
+
+export function SortObjVideo(params: SortObjProps<DefaultVideoObj>) {
+  return <SortObj {...params} />
+}
+
+export function SortObjStar(params: SortObjProps<DefaultStarObj>) {
+  return <SortObj {...params} />
+}
+
+type SortMethod<T> = (a: T, b: T) => number
+export type SortMethodVideo = SortMethod<VideoSearch>
+export type SortMethodStar = SortMethod<StarSearch>
+
+type WithReverse<T extends string> = T | ReturnType<typeof createReverse<T>>
+type WithoutReverse<T extends string> = T extends ReturnType<typeof createReverse<infer U extends string>> ? U : T
+
+type DefaultVideoObj = {
+  category: string
+  nullCategory: '0' | '1'
+  attribute: string
+  location: string
+  website: string
+  query: string
+  sort: WithReverse<'alphabetical' | 'added' | 'date' | 'age' | 'plays' | 'title-length'>
+}
+
+type DefaultStarObj = {
+  breast: AllowString<'NULL'>
+  haircolor: string
+  ethnicity: string
+  website: string
+  query: string
+  sort: WithReverse<'alphabetical' | 'added' | 'age' | 'videos' | 'score'>
+}
+
+export const defaultVideoObj: DefaultVideoObj = {
+  category: '',
+  nullCategory: '0',
+  attribute: '',
+  location: '',
+  website: 'ALL',
+  query: '',
+  sort: 'date'
+}
+
+export const defaultStarObj: DefaultStarObj = {
+  breast: '',
+  haircolor: '',
+  ethnicity: '',
+  website: 'ALL',
+  query: '',
+  sort: 'alphabetical'
+}
+
+export type DefaultObj = DefaultVideoObj | DefaultStarObj
+
+export function getVideoSort(type: DefaultVideoObj['sort']): SortMethodVideo {
   let sortMethod: SortMethodVideo
 
-  switch (sort.type) {
+  switch (getBaseSort(type)) {
     case 'added':
       sortMethod = (a, b) => a.id - b.id
       break
@@ -54,16 +119,16 @@ export function getVideoSort(sort: SortTypeVideo): SortMethodVideo {
       sortMethod = (a, b) => a.name.length - b.name.length
       break
     default:
-      sortMethod = (a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en')
+      sortMethod = (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'case' })
   }
 
-  return sort.reverse ? (a, b) => sortMethod(b, a) : sortMethod
+  return isReverseSort(type) ? (a, b) => sortMethod(b, a) : sortMethod
 }
 
-export function getStarSort(sort: SortTypeStar): SortMethodStar {
+export function getStarSort(type: DefaultStarObj['sort']): SortMethodStar {
   let sortMethod: SortMethodStar
 
-  switch (sort.type) {
+  switch (getBaseSort(type)) {
     case 'added':
       sortMethod = (a, b) => a.id - b.id
       break
@@ -80,7 +145,5 @@ export function getStarSort(sort: SortTypeStar): SortMethodStar {
       sortMethod = (a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en')
   }
 
-  return sort.reverse ? (a, b) => sortMethod(b, a) : sortMethod
+  return isReverseSort(type) ? (a, b) => sortMethod(b, a) : sortMethod
 }
-
-export default SortObj

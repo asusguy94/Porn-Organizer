@@ -4,27 +4,33 @@ import Badge from '@components/badge'
 import { ImageCard } from '@components/image'
 import Link from '@components/link'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
-import { getVisible, HiddenStar as Hidden, StarSearch as Star } from '@components/search/helper'
-import { SortMethodStar } from '@components/search/sort'
+import { isDefault } from '@components/search/filter'
+import { defaultStarObj as defaultObj, getStarSort as getSort } from '@components/search/sort'
 import Spinner from '@components/spinner'
 import VGrid from '@components/virtualized/virtuoso'
 
 import { serverConfig } from '@config'
+import { useAllSearchParams } from '@hooks/search'
+import { StarSearch as Star } from '@interfaces'
 import { searchService } from '@service'
 import { daysToYears } from '@utils/client/date-time'
 
 import styles from './search.module.scss'
 
-type StarsProps = {
-  hidden: Hidden
-  sortMethod: SortMethodStar
-}
-const Stars = ({ hidden, sortMethod }: StarsProps) => {
-  const { data: stars } = searchService.useStars()
+export default function Stars() {
+  const { breast, haircolor, query, sort, website } = useAllSearchParams(defaultObj)
+  const { data: stars, isLoading } = searchService.useStars()
 
-  if (stars === undefined) return <Spinner />
+  if (isLoading || stars === undefined) return <Spinner />
 
-  const visible = getVisible(stars.sort(sortMethod), hidden)
+  const visible = stars
+    .sort(getSort(sort))
+    .filter(s => s.name.toLowerCase().includes(query.toLowerCase()) || isDefault(query, defaultObj.query))
+    .filter(
+      s => s.breast === breast || (s.breast === null && breast === 'NULL') || isDefault(breast, defaultObj.breast)
+    )
+    .filter(s => s.haircolor.includes(haircolor) || isDefault(haircolor, defaultObj.haircolor))
+    .filter(s => s.websites.includes(website) || isDefault(website, defaultObj.website))
 
   return (
     <div id={styles.stars}>
@@ -40,7 +46,7 @@ const Stars = ({ hidden, sortMethod }: StarsProps) => {
 type StarCardProps = {
   star?: Star
 }
-const StarCard = ({ star }: StarCardProps) => {
+function StarCard({ star }: StarCardProps) {
   if (star === undefined) return null
 
   return (
@@ -66,5 +72,3 @@ const StarCard = ({ star }: StarCardProps) => {
     </Link>
   )
 }
-
-export default Stars

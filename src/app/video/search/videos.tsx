@@ -7,28 +7,26 @@ import { useReadLocalStorage } from 'usehooks-ts'
 import { ImageCard } from '@components/image'
 import Link from '@components/link'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
-import { getVisible, HiddenVideo as Hidden, VideoSearch as Video } from '@components/search/helper'
-import { getVideoSort, SortMethodVideo } from '@components/search/sort'
+import { isDefault } from '@components/search/filter'
+import { defaultVideoObj as defaultObj, getVideoSort as getSort } from '@components/search/sort'
 import Spinner from '@components/spinner'
 import VGrid from '@components/virtualized/virtuoso'
 
 import { serverConfig } from '@config'
-import { LocalWebsite } from '@interfaces'
+import { useAllSearchParams } from '@hooks/search'
+import { LocalWebsite, VideoSearch } from '@interfaces'
 import { searchService } from '@service'
 import { daysToYears } from '@utils/client/date-time'
 
 import styles from './search.module.scss'
 
-type VideosProps = {
-  hidden: Hidden
-  sortMethod: SortMethodVideo
-}
-const Videos = ({ hidden, sortMethod }: VideosProps) => {
-  const localWebsites = useReadLocalStorage<LocalWebsite[]>('websites')
-  const [filtered, setFiltered] = useState<Video[]>([])
-  const [data, setData] = useState<{ label: string; count: number }[]>([])
+export default function Videos() {
+  const { sort, query, attribute, category, nullCategory, location, website } = useAllSearchParams(defaultObj)
+  const { data: videos, isLoading } = searchService.useVideos()
 
-  const { data: videos } = searchService.useVideos()
+  const localWebsites = useReadLocalStorage<LocalWebsite[]>('websites')
+  const [filtered, setFiltered] = useState<VideoSearch[]>([])
+  const [data, setData] = useState<{ label: string; count: number }[]>([])
 
   useEffect(() => {
     if (videos === undefined) return
@@ -42,39 +40,54 @@ const Videos = ({ hidden, sortMethod }: VideosProps) => {
 
     let stop = false
     setFiltered(
-      videos
-        .sort(getVideoSort({ type: 'date' }))
-        .filter(video => {
-          const website = initialData.find(wsite => wsite.label === video.website)
+      videos.sort(getSort('date')).filter(video => {
+        const website = initialData.find(wsite => wsite.label === video.website)
 
-          if (website !== undefined && website.count-- > 1) {
-            return true
+        if (website !== undefined && website.count-- > 1) {
+          return true
+        }
+
+        if (video.categories.length === 0 && !stop) {
+          const isNewWebsite = map.get(video.website) === undefined
+
+          if (isNewWebsite && map.size >= 3) {
+            // 3rd website found
+            stop = true
           }
 
-          if (video.categories.length === 0 && !stop) {
-            const isNewWebsite = map.get(video.website) === undefined
-
-            if (isNewWebsite && map.size >= 3) {
-              // 3rd website found
-              stop = true
-            }
-
-            if (!stop || !isNewWebsite) {
-              // add or increment website
-              map.set(video.website, (map.get(video.website) ?? 0) + 1)
-            }
+          if (!stop || !isNewWebsite) {
+            // add or increment website
+            map.set(video.website, (map.get(video.website) ?? 0) + 1)
           }
+        }
 
-          return false
-        })
+        return false
+      })
     )
 
     setData([...map].map(([key, value]) => ({ label: key, count: value })))
-  }, [localWebsites, videos, hidden])
+  }, [localWebsites, videos])
 
-  if (videos === undefined) return <Spinner />
+  if (isLoading || videos === undefined) return <Spinner />
 
-  const visible = getVisible(filtered.sort(sortMethod), hidden)
+  const visible = filtered
+    .sort(getSort(sort))
+    .filter(v => v.name.toLowerCase().includes(query.toLowerCase()) || isDefault(query, defaultObj.query))
+    .filter(
+      v => category.split(',').every(cat => v.categories.includes(cat)) || isDefault(category, defaultObj.category)
+    )
+    .filter(
+      v =>
+        (nullCategory !== defaultObj.nullCategory && v.categories.length === 0) ||
+        isDefault(nullCategory, defaultObj.nullCategory)
+    )
+    .filter(
+      v => attribute.split(',').every(attr => v.attributes.includes(attr)) || isDefault(attribute, defaultObj.attribute)
+    )
+    .filter(
+      v => location.split(',').every(loc => v.locations.includes(loc)) || isDefault(location, defaultObj.location)
+    )
+    .filter(v => v.website === website || isDefault(website, defaultObj.website))
 
   return (
     <div id={styles.videos}>
@@ -99,9 +112,9 @@ const Videos = ({ hidden, sortMethod }: VideosProps) => {
 }
 
 type VideoCardProps = {
-  video?: Video
+  video?: VideoSearch
 }
-const VideoCard = ({ video }: VideoCardProps) => {
+function VideoCard({ video }: VideoCardProps) {
   if (video === undefined) return null
 
   return (
@@ -127,5 +140,3 @@ const VideoCard = ({ video }: VideoCardProps) => {
     </Link>
   )
 }
-
-export default Videos

@@ -107,3 +107,34 @@ export type Performer = {
   image: string
   thumbnail: string
 }
+
+export type StarSearch = {
+  id: number
+  name: string
+  image: string | null
+  age: number
+  breast: string | null
+  ethnicity: string | null
+  haircolor: string[]
+  score: number
+  websites: string[]
+  sites: string[]
+  videoCount: number
+}
+
+export type VideoSearch = {
+  id: number
+  name: string
+  ageInVideo: number
+  attributes: string[]
+  categories: string[]
+  date: string
+  image: string | null
+  locations: string[]
+  plays: number
+  quality: number
+  site: string | null
+  star: string | null
+  website: string
+  api: string | null
+}
