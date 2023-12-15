@@ -57,7 +57,7 @@
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/capitalize": "^2.0.0",
     "@types/fluent-ffmpeg": "^2.1.21",
-    "@types/node": "^18.15.11",
+    "@types/node": "^20",
     "@types/react": "^18.0.33",
     "@types/react-dom": "^18.0.11",
     "@types/react-lazy-load-image-component": "^1.5.2",

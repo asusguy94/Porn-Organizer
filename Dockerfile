@@ -1,5 +1,5 @@
 # Define the base image
-FROM node:18-alpine3.18 AS custom_node
+FROM node:20-alpine3.18 AS custom_node
 
 ##### DEPENDENCIES
 FROM custom_node AS deps
