@@ -20,18 +20,16 @@ type VideosProps = {
 }
 export default function Videos({ videos }: VideosProps) {
   const [websites, setWebsites] = useState<string[]>([])
-  const [sites, setSites] = useState<string[]>([])
-
   const [focus, setFocus] = useState<string[]>([])
 
-  const toggleFocus = (websiteOrSite: string) => {
+  const toggleFocus = (website: string) => {
     // allow multiple items to be selected
-    if (focus.includes(websiteOrSite)) {
+    if (focus.includes(website)) {
       // remove item from focus
-      setFocus(focus.filter(item => item !== websiteOrSite))
+      setFocus(focus.filter(item => item !== website))
     } else {
       // add item to focus
-      setFocus(prev => [...prev, websiteOrSite])
+      setFocus(prev => [...prev, website])
     }
   }
 
@@ -40,7 +38,6 @@ export default function Videos({ videos }: VideosProps) {
       setFocus([])
 
       setWebsites(getUnique(videos.map(video => video.website)))
-      setSites(getUnique(videos.flatMap(video => (video.site !== null ? [video.site] : []))))
     }
   }, [videos])
 
@@ -49,46 +46,27 @@ export default function Videos({ videos }: VideosProps) {
   return (
     <div>
       <Typography variant='h6'>
-        Videos
-        {websites.length > 1
-          ? websites.map(website => (
-              <Button
-                key={website}
-                size='small'
-                variant={focus.includes(website) ? 'contained' : 'outlined'}
-                color='primary'
-                style={{ marginLeft: 8 }}
-                onClick={() => toggleFocus(website)}
-              >
-                {website}
-              </Button>
-            ))
-          : sites.length > 1
-          ? sites.map(site => (
-              <Button
-                key={site}
-                size='small'
-                variant={focus.includes(site) ? 'contained' : 'outlined'}
-                color='primary'
-                style={{ marginLeft: 8 }}
-                onClick={() => toggleFocus(site)}
-              >
-                {site}
-              </Button>
-            ))
-          : null}
+        {websites.length > 1 &&
+          websites.map(website => (
+            <Button
+              key={website}
+              size='small'
+              variant={focus.includes(website) ? 'contained' : 'outlined'}
+              color='primary'
+              style={{ marginLeft: 8 }}
+              onClick={() => toggleFocus(website)}
+            >
+              {website}
+            </Button>
+          ))}
       </Typography>
 
       <Flipper flipKey={videos.map(video => video.id)}>
         <Grid container style={{ marginTop: 8 }}>
           {videos
             .map(video => {
-              if (focus.length > 0) {
-                if (websites.length > 1) {
-                  return { ...video, hidden: !focus.includes(video.website) }
-                } else if (sites.length > 1 && video.site !== null) {
-                  return { ...video, hidden: !focus.includes(video.site) }
-                }
+              if (focus.length > 0 && websites.length > 1) {
+                return { ...video, hidden: !focus.includes(video.website) }
               }
 
               return { ...video, hidden: false }
