@@ -13,9 +13,9 @@
     "<THIRD_PARTY_MODULES>",
     "path|fs",
     "^@components/(.*)",
-    "^(?!.*.(css|scss)$)[./]",
+    "^(?!.*\\.(css|scss)$)[./]",
     "^(@utils|@interfaces|@config|@service|@prisma|@hooks)",
-    ".(css|scss)$"
+    "\\.(css|scss)$"
   ],
   "importOrderSeparation": true,
   "plugins": ["@trivago/prettier-plugin-sort-imports"]

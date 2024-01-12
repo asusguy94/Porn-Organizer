@@ -187,7 +187,7 @@ export function response(messageOrStatusCode: string | number, statusCode?: numb
   return new Response(null, { status: statusCode })
 }
 
-const missingFileError = response(404)
+const missingFileError = response('File is missing', 404)
 
 export async function sendFile(path: string) {
   if (!(await fileExists(path))) {
