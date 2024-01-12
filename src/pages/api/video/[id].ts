@@ -93,6 +93,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             // Rename Dir
             fs.promises.rename(`./media/videos/${noExt(orig.path)}`, `./media/videos/${noExt(video.path)}`)
+            //TODO the last one throws if the folder doesn't exist
           ])
         })
       } else if (date !== undefined) {
