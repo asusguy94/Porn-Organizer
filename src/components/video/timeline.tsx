@@ -47,7 +47,7 @@ export default function Timeline({
 
     bookmarkService.setTime(bookmark.id, time).then(() => {
       update(
-        [...bookmarks]
+        bookmarks
           .map(bookmarkItem => {
             if (bookmarkItem.id === bookmark.id) {
               return { ...bookmarkItem, start: time }
@@ -55,7 +55,7 @@ export default function Timeline({
 
             return bookmarkItem
           })
-          .sort((a, b) => a.start - b.start)
+          .toSorted((a, b) => a.start - b.start)
       )
     })
   }
