@@ -1,7 +1,7 @@
 #timeline {
   position: relative;
-  margin-left: 95px;
-  margin-right: 95px;
+  margin-left: 20px;
+  margin-right: 25px;
 
   .bookmark {
     position: absolute;
