@@ -10,11 +10,11 @@ import Badge from '@components/badge'
 import { IconWithText } from '@components/icon'
 import { ImageCard } from '@components/image'
 import Link from '@components/link'
-import ModalComponent, { useModal, ModalHandler, Modal } from '@components/modal'
-import { PlyrWithMetadata } from '@components/plyr'
+import ModalComponent, { useModal, ModalHandler } from '@components/modal'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Spinner from '@components/spinner'
 import { Header, Player as VideoPlayer, Timeline } from '@components/video'
+import { MediaPlayerInstance } from '@components/vidstack'
 
 import { serverConfig } from '@config'
 import { Bookmark, Video, VideoStar, SetState, General } from '@interfaces'
@@ -62,7 +62,6 @@ export default function VideoPage({
         star={star}
         update={{ video: setVideo, star: setStar, bookmarks: setBookmarks }}
         onModal={setModal}
-        modalData={modal}
       />
 
       <Grid item xs={2} id={styles.sidebar} component='aside'>
@@ -97,25 +96,13 @@ type SectionProps = {
     bookmarks: SetState<Bookmark[]>
   }
   onModal: ModalHandler
-  modalData: Modal
 }
-function Section({
-  video,
-  locations,
-  attributes,
-  categories,
-  bookmarks,
-  star = null,
-  update,
-  onModal,
-  modalData
-}: SectionProps) {
-  const plyrRef = useRef<PlyrWithMetadata | null>(null)
-  const playerRef = useRef<HTMLVideoElement>(null)
+function Section({ video, locations, attributes, categories, bookmarks, star = null, update, onModal }: SectionProps) {
+  const playerRef = useRef<MediaPlayerInstance>(null)
 
   // Helper script for getting the player
   const playVideo = (time: number) => {
-    const player = plyrRef.current
+    const player = playerRef.current
 
     if (player !== null) {
       player.currentTime = time
@@ -134,11 +121,9 @@ function Section({
         categories={categories}
         bookmarks={bookmarks}
         star={star}
-        plyrRef={plyrRef}
         playerRef={playerRef}
         update={update}
         onModal={onModal}
-        modalData={modalData}
       />
 
       <Timeline

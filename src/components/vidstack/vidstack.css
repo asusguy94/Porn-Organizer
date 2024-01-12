@@ -1,0 +1,25 @@
+@import '@vidstack/react/player/styles/default/theme.css';
+@import '@vidstack/react/player/styles/default/layouts/video.css';
+
+.vds-slider {
+  --media-slider-track-height: 6px;
+
+  --media-slider-track-fill-bg: rgb(0, 200, 0);
+  --media-slider-track-progress-bg: rgb(162, 0, 255);
+  --media-slider-track-bg: rgba(255, 255, 255, 0.25);
+}
+
+.src-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-top: 40px;
+  margin-inline: auto;
+  max-width: 300px;
+}
+
+/* Disable buttons */
+.vds-pip-button,
+.vds-fullscreen-button {
+  display: none;
+}

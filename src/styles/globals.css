@@ -6,11 +6,6 @@
   --star-height: 275px;
 
   --thumb-width: 290px;
-
-  /* Plyr */
-  --plyr-range-fill-background: rgb(0, 200, 0); /* Start of seekbar */
-  --plyr-video-progress-buffered-background: rgb(162, 0, 255); /* End of seekbar */
-  --plyr-video-range-track-background: rgba(255, 255, 255, 0.25); /* Seekbar background */
 }
 
 h1,

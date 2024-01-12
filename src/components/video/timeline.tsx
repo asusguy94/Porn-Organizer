@@ -5,6 +5,8 @@ import { Button, Grid } from '@mui/material'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { useWindowSize } from 'usehooks-ts'
 
+import { MediaPlayerInstance } from '@components/vidstack'
+
 import { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'
 import Spinner from '../spinner'
@@ -22,7 +24,7 @@ type TimelineProps = {
   bookmarks: Bookmark[]
   categories?: General[]
   playVideo: (time: number) => void
-  playerRef: React.RefObject<HTMLVideoElement>
+  playerRef: React.RefObject<MediaPlayerInstance>
   update: SetState<Bookmark[]>
   onModal: ModalHandler
 }
@@ -110,8 +112,8 @@ export default function Timeline({
 
     setBookmarkLevels(levels)
 
-    const videoElement = playerRef.current
-    if (videoElement) {
+    const videoElement = playerRef.current?.el ?? null
+    if (videoElement !== null) {
       const videoTop = videoElement.getBoundingClientRect().top
       videoElement.style.maxHeight = `calc(100vh - (${spacing.bookmarks}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
     }
