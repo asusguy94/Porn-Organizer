@@ -292,7 +292,13 @@ export async function generateVTTData(
       await writeToFile(vtt, '\n')
       await writeToFile(vtt, `\n${++counter}`)
       await writeToFile(vtt, `\n${start} --> ${end}`)
-      await writeToFile(vtt, `\nvtt/thumb#xywh=${posX},${posY},${dimension.width},${dimension.height}`)
+
+      // this is required for vidstack to work
+      await writeToFile(
+        vtt,
+        `\n/api/video/${videoID}/vtt/thumb#xywh=${posX},${posY},${dimension.width},${dimension.height}`
+      )
+      // await writeToFile(vtt, `\nvtt/thumb#xywh=${posX},${posY},${dimension.width},${dimension.height}`)
     }
   }
 }
