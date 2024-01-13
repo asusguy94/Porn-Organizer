@@ -8,7 +8,7 @@ import { formatDate } from '@utils/shared'
 
 //NEXT /star/[id]
 export async function PUT(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const { name, slug, label, value, ignore } = validate(
     z.object({
@@ -104,7 +104,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
 
 //NEXT /star/[id]
 export async function DELETE(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   return NextResponse.json(
     await db.star.delete({

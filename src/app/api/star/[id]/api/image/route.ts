@@ -3,11 +3,12 @@ import { NextResponse } from 'next/server'
 import { Params } from '@interfaces'
 import { getStarData, getStarSlug } from '@utils/server/metadata'
 import { db } from '@utils/server/prisma'
+import validate, { z } from '@utils/server/validation'
 import { printError } from '@utils/shared'
 
 //NEXT /star/[id]
 export async function POST(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   let star = await db.star.findFirstOrThrow({ where: { id } })
   if (!star.api) {

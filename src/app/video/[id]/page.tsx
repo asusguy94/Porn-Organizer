@@ -5,10 +5,11 @@ import { generateStarName } from '@utils/server/generate'
 import { dateDiff } from '@utils/server/helper'
 import { getSceneData } from '@utils/server/metadata'
 import { db } from '@utils/server/prisma'
+import validate, { z } from '@utils/server/validation'
 import { formatDate } from '@utils/shared'
 
 export default async function VideoPage({ params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const attributes = await db.attribute.findMany()
   const categories = await db.category.findMany()

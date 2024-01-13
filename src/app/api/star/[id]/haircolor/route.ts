@@ -6,7 +6,7 @@ import validate, { z } from '@utils/server/validation'
 
 //NEXT /star/[id]
 export async function PUT(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const { name, remove } = validate(
     z.object({

@@ -3,10 +3,11 @@ import Client from './client'
 import { Params } from '@interfaces'
 import { dateDiff, getSimilarStars } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
+import validate, { z } from '@utils/server/validation'
 import { formatDate, getUnique } from '@utils/shared'
 
 export default async function StarPage({ params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const breasts = await db.star.findMany({ where: { breast: { not: null } }, orderBy: { breast: 'asc' } })
   const haircolors = await db.haircolor.findMany({ orderBy: { name: 'asc' } })

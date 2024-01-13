@@ -6,7 +6,7 @@ import validate, { z } from '@utils/server/validation'
 
 //NEXT /video/[id]
 export async function POST(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const { categoryID, time } = validate(
     z.object({
@@ -29,7 +29,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
 
 //NEXT /video/[id]
 export async function DELETE(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   return NextResponse.json(
     await db.bookmark.deleteMany({

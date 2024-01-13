@@ -6,11 +6,12 @@ import { Params } from '@interfaces'
 import { formatBreastSize, getDate } from '@utils/server/helper'
 import { getStarData, getStarSlug } from '@utils/server/metadata'
 import { db } from '@utils/server/prisma'
+import validate, { z } from '@utils/server/validation'
 import { printError } from '@utils/shared'
 
 //NEXT /star/[id]
 export async function POST(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   let star = await db.star.findFirstOrThrow({ where: { id } })
   if (!star.api) {
@@ -66,7 +67,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
 
 //NEXT /star/[id]
 export async function DELETE(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   await db.starHaircolors.deleteMany({ where: { starId: id } })
 

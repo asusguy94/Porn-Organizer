@@ -9,7 +9,7 @@ import validate, { z } from '@utils/server/validation'
 
 //NEXT /star, /star/[id], /video/[id]
 export async function GET(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const star = await db.star.findFirstOrThrow({ where: { id } })
   if (star.image !== null) {
@@ -19,7 +19,7 @@ export async function GET(req: Request, { params }: Params<'id'>) {
 
 //NEXT /star/[id]
 export async function POST(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const { url } = validate(
     z.object({
@@ -43,7 +43,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
 
 //NEXT /star/[id]
 export async function DELETE(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const star = await db.star.findFirstOrThrow({ where: { id } })
   if (star.image !== null) {
