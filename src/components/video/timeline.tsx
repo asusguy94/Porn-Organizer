@@ -122,7 +122,7 @@ export default function Timeline({
   if (categories === undefined) return <Spinner />
 
   return (
-    <Grid id={styles.timeline} style={bookmarks.length > 0 ? { marginTop: spacing.top } : {}}>
+    <Grid id={styles.timeline}>
       {bookmarks.map((bookmark, idx) => (
         <Fragment key={bookmark.start}>
           <ContextMenuTrigger id={`bookmark-${bookmark.start}`}>

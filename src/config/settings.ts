@@ -26,10 +26,7 @@ export default {
     spacing: getValueWithType<number>('TIMELINE_SPACING', 0)
   },
   player: {
-    thumbnails: getValueWithType<boolean>('PLAYER_THUMBNAILS', false),
-    quality: {
-      max: getValueWithType<number>('PLAYER_QUALITY_MAX', 1080)
-    }
+    thumbnails: getValueWithType<boolean>('PLAYER_THUMBNAILS', false)
   },
   THUMB_RES: parseInt(process.env.THUMBNAIL_RES ?? '290'),
   IMAGE_RES: parseInt(process.env.IMAGE_RES ?? '1920'),
