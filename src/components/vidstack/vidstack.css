@@ -23,3 +23,8 @@
 .vds-fullscreen-button {
   display: none;
 }
+
+/* Always show Timeline-DOT */
+.vds-time-slider .vds-slider-thumb {
+  opacity: 1;
+}

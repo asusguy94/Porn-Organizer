@@ -7,7 +7,7 @@ import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextme
 import Player, { MediaPlayerInstance } from '@components/vidstack'
 
 import { IconWithText } from '../icon'
-import { ModalHandler } from '../modal'
+import { Modal, ModalHandler } from '../modal'
 import Spinner from '../spinner'
 
 import { serverConfig } from '@config'
@@ -25,7 +25,7 @@ type VideoPlayerProps = {
     star: SetState<VideoStar | null>
     bookmarks: SetState<Bookmark[]>
   }
-  onModal: ModalHandler
+  modal: { data: Modal; handler: ModalHandler }
 }
 
 export default function VideoPlayer({
@@ -35,7 +35,7 @@ export default function VideoPlayer({
   star,
   playerRef,
   update,
-  onModal
+  modal
 }: VideoPlayerProps) {
   const router = useRouter()
 
@@ -84,6 +84,7 @@ export default function VideoPlayer({
     <>
       <ContextMenuTrigger id='video'>
         <Player
+          title={video.name}
           playerRef={playerRef}
           video={video}
           poster={`${serverConfig.api}/video/${video.id}/image`}
@@ -92,6 +93,7 @@ export default function VideoPlayer({
             video: `${serverConfig.api}/video/${video.id}/file`,
             hls: `${serverConfig.api}/video/${video.id}/hls`
           }}
+          modal={modal.data}
         />
       </ContextMenuTrigger>
 
@@ -101,7 +103,7 @@ export default function VideoPlayer({
           icon='add'
           text='Add Bookmark'
           onClick={() => {
-            onModal(
+            modal.handler(
               'Add Bookmark',
               categories.map(category => (
                 <Button
@@ -109,7 +111,7 @@ export default function VideoPlayer({
                   color='primary'
                   key={category.id}
                   onClick={() => {
-                    onModal()
+                    modal.handler()
                     addBookmark(category)
                   }}
                 >
@@ -128,7 +130,7 @@ export default function VideoPlayer({
           icon='edit'
           text='Rename File'
           onClick={() => {
-            onModal(
+            modal.handler(
               'Rename Video',
               <TextField
                 variant='outlined'
@@ -137,7 +139,7 @@ export default function VideoPlayer({
                 autoFocus
                 onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                   if (e.key === 'Enter') {
-                    onModal()
+                    modal.handler()
 
                     renameVideo((e.target as HTMLInputElement).value)
                   }

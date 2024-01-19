@@ -6,12 +6,16 @@ import {
   MediaProvider,
   MediaProviderAdapter,
   MediaTimeUpdateEventDetail,
+  MediaVolumeChange,
   Poster,
+  VideoQuality,
   isHLSProvider
 } from '@vidstack/react'
 import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/layouts/default'
 import Hls, { ErrorData, ManifestParsedData } from 'hls.js'
-import { useSessionStorage } from 'usehooks-ts'
+import { useLocalStorage, useSessionStorage } from 'usehooks-ts'
+
+import { Modal } from '@components/modal'
 
 import { settingsConfig } from '@config'
 import { Video } from '@interfaces'
@@ -20,16 +24,18 @@ import { videoService } from '@service'
 import './vidstack.css'
 
 type PlayerProps = {
-  title?: string
+  title: string
   src: { video: string; hls: string }
   poster?: string
   thumbnails?: string
   video: Video
   playerRef: React.RefObject<MediaPlayerInstance>
+  modal: Modal
 }
 
-export default function Player({ src, poster, thumbnails, title = '', video, playerRef }: PlayerProps) {
+export default function Player({ src, poster, thumbnails, title, video, playerRef, modal }: PlayerProps) {
   const hlsRef = useRef<Hls>()
+  const [config, setConfig] = useLocalStorage('vidstack', { volume: 1, res: 1080 })
 
   const playAdddedRef = useRef(false)
   const newVideoRef = useRef(false)
@@ -56,7 +62,10 @@ export default function Player({ src, poster, thumbnails, title = '', video, pla
   }
 
   const onTimeUpdate = (detail: MediaTimeUpdateEventDetail) => {
-    setLocalBookmark(Math.round(detail.currentTime))
+    // TODO ommitting this resets the video to the beginning every time
+    if (detail.currentTime > 0) {
+      setLocalBookmark(Math.round(detail.currentTime))
+    }
   }
 
   const onPlay = () => {
@@ -78,7 +87,7 @@ export default function Player({ src, poster, thumbnails, title = '', video, pla
     if (hlsRef.current === undefined) return
 
     /* Limit to 720p */
-    const maxLevel = data.levels.filter(level => level.height <= settingsConfig.player.quality.max).length - 1
+    const maxLevel = data.levels.filter(level => level.height <= config.res).length - 1
     hlsRef.current.startLevel = maxLevel - 1
     hlsRef.current.autoLevelCapping = maxLevel
 
@@ -102,10 +111,19 @@ export default function Player({ src, poster, thumbnails, title = '', video, pla
     playerRef.current.currentTime += 10 * Math.sign(e.deltaY) * -1
   }
 
+  const onVolumeChange = (details: MediaVolumeChange) => {
+    setConfig({ ...config, volume: details.volume })
+  }
+
+  const onQualityChange = (detail: VideoQuality | null) => {
+    if (detail !== null) {
+      setConfig({ ...config, res: detail.height })
+    }
+  }
+
   return (
     <MediaPlayer
       ref={playerRef}
-      title={title}
       src={[
         { src: src.video, type: 'video/mp4' },
         { src: src.hls, type: 'application/x-mpegurl' }
@@ -114,12 +132,13 @@ export default function Player({ src, poster, thumbnails, title = '', video, pla
       load='eager'
       viewType='video'
       onProviderChange={onProviderChange}
-      onHlsManifestParsed={onManifestParsed}
-      onHlsInstance={hls => (hlsRef.current = hls)}
       onTimeUpdate={onTimeUpdate}
       onPlay={onPlay}
-      onHlsError={onHlsError}
       onWheel={onWheel}
+      onHlsManifestParsed={onManifestParsed}
+      onHlsInstance={hls => (hlsRef.current = hls)}
+      onHlsError={onHlsError}
+      keyDisabled={modal.visible}
       keyTarget='document'
       keyShortcuts={{
         togglePaused: ['Space'],
@@ -129,6 +148,9 @@ export default function Player({ src, poster, thumbnails, title = '', video, pla
         volumeUp: ['ArrowUp'],
         volumeDown: ['ArrowDown']
       }}
+      volume={config.volume}
+      onVolumeChange={onVolumeChange}
+      onQualityChange={onQualityChange}
     >
       <MediaProvider>
         {poster !== undefined && <Poster className='vds-poster' src={poster} alt={title} />}

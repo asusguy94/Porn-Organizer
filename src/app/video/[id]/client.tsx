@@ -10,7 +10,7 @@ import Badge from '@components/badge'
 import { IconWithText } from '@components/icon'
 import { ImageCard } from '@components/image'
 import Link from '@components/link'
-import ModalComponent, { useModal, ModalHandler } from '@components/modal'
+import ModalComponent, { useModal, ModalHandler, Modal } from '@components/modal'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Spinner from '@components/spinner'
 import { Header, Player as VideoPlayer, Timeline } from '@components/video'
@@ -61,7 +61,7 @@ export default function VideoPage({
         bookmarks={bookmarks}
         star={star}
         update={{ video: setVideo, star: setStar, bookmarks: setBookmarks }}
-        onModal={setModal}
+        modal={{ data: modal, handler: setModal }}
       />
 
       <Grid item xs={2} id={styles.sidebar} component='aside'>
@@ -95,9 +95,9 @@ type SectionProps = {
     star: SetState<VideoStar | null>
     bookmarks: SetState<Bookmark[]>
   }
-  onModal: ModalHandler
+  modal: { data: Modal; handler: ModalHandler }
 }
-function Section({ video, locations, attributes, categories, bookmarks, star = null, update, onModal }: SectionProps) {
+function Section({ video, locations, attributes, categories, bookmarks, star = null, update, modal }: SectionProps) {
   const playerRef = useRef<MediaPlayerInstance>(null)
 
   // Helper script for getting the player
@@ -114,7 +114,13 @@ function Section({ video, locations, attributes, categories, bookmarks, star = n
 
   return (
     <Grid item xs={10} component='section'>
-      <Header video={video} locations={locations} attributes={attributes} update={update.video} onModal={onModal} />
+      <Header
+        video={video}
+        locations={locations}
+        attributes={attributes}
+        update={update.video}
+        onModal={modal.handler}
+      />
 
       <VideoPlayer
         video={video}
@@ -123,7 +129,7 @@ function Section({ video, locations, attributes, categories, bookmarks, star = n
         star={star}
         playerRef={playerRef}
         update={update}
-        onModal={onModal}
+        modal={modal}
       />
 
       <Timeline
@@ -133,7 +139,7 @@ function Section({ video, locations, attributes, categories, bookmarks, star = n
         playVideo={playVideo}
         playerRef={playerRef}
         update={update.bookmarks}
-        onModal={onModal}
+        onModal={modal.handler}
       />
     </Grid>
   )
