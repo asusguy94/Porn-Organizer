@@ -143,8 +143,22 @@ export default function Player({ src, poster, thumbnails, title, video, playerRe
       keyShortcuts={{
         togglePaused: ['Space'],
         toggleMuted: ['m'],
-        seekBackward: ['ArrowLeft'],
-        seekForward: ['ArrowRight'],
+        seekBackward: {
+          keys: ['ArrowLeft'],
+          callback(e) {
+            if (playerRef.current !== null && e.type === 'keydown') {
+              playerRef.current.currentTime -= 1
+            }
+          }
+        },
+        seekForward: {
+          keys: ['ArrowRight'],
+          callback(e) {
+            if (playerRef.current !== null && e.type === 'keydown') {
+              playerRef.current.currentTime += 1
+            }
+          }
+        },
         volumeUp: ['ArrowUp'],
         volumeDown: ['ArrowDown']
       }}
