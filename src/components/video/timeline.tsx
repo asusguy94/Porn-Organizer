@@ -38,7 +38,7 @@ export default function Timeline({
   onModal
 }: TimelineProps) {
   const windowSize = useWindowSize()
-  const bookmarksRef = useRef<HTMLButtonElement[]>([])
+  const bookmarksRef = useRef<HTMLElement[]>([])
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
 
   const setTime = (bookmark: Bookmark) => {
@@ -136,7 +136,11 @@ export default function Timeline({
                 top: `${(bookmarkLevels[idx] - 1) * spacing.bookmarks}px`
               }}
               onClick={() => playVideo(bookmark.start)}
-              ref={(bookmark: HTMLButtonElement) => (bookmarksRef.current[idx] = bookmark)}
+              ref={bookmark => {
+                if (bookmark !== null) {
+                  bookmarksRef.current[idx] = bookmark
+                }
+              }}
             >
               {bookmark.category.name}
             </Button>
