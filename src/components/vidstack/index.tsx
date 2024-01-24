@@ -9,7 +9,8 @@ import {
   MediaVolumeChange,
   Poster,
   VideoQuality,
-  isHLSProvider
+  isHLSProvider,
+  useMediaRemote
 } from '@vidstack/react'
 import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/layouts/default'
 import Hls, { ErrorData, ManifestParsedData } from 'hls.js'
@@ -34,6 +35,7 @@ type PlayerProps = {
 }
 
 export default function Player({ src, poster, thumbnails, title, video, playerRef, modal }: PlayerProps) {
+  const remote = useMediaRemote(playerRef)
   const hlsRef = useRef<Hls>()
   const [config, setConfig] = useLocalStorage('vidstack', { volume: 1, res: 1080 })
 
@@ -141,7 +143,14 @@ export default function Player({ src, poster, thumbnails, title, video, playerRe
       keyDisabled={modal.visible}
       keyTarget='document'
       keyShortcuts={{
-        togglePaused: ['Space'],
+        togglePaused: {
+          keys: ['Space'],
+          callback: e => {
+            if (e.type === 'keyup') {
+              remote.togglePaused()
+            }
+          }
+        },
         toggleMuted: ['m'],
         seekBackward: {
           keys: ['ArrowLeft'],

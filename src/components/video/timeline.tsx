@@ -135,7 +135,7 @@ export default function Timeline({
                 left: `${(bookmark.start / video.duration) * 100}%`,
                 top: `${(bookmarkLevels[idx] - 1) * spacing.bookmarks}px`
               }}
-              onClick={() => playVideo(bookmark.start)}
+              onMouseDown={e => e.button === 0 && playVideo(bookmark.start)}
               ref={bookmark => {
                 if (bookmark !== null) {
                   bookmarksRef.current[idx] = bookmark
