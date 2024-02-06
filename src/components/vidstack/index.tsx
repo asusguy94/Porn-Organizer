@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 
 import {
   MediaPlayer,
@@ -6,21 +6,21 @@ import {
   MediaProvider,
   MediaProviderAdapter,
   MediaTimeUpdateEventDetail,
-  MediaVolumeChange,
   Poster,
-  VideoQuality,
+  Track,
   isHLSProvider,
   useMediaRemote
 } from '@vidstack/react'
 import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/layouts/default'
-import Hls, { ErrorData, ManifestParsedData } from 'hls.js'
-import { useLocalStorage, useSessionStorage } from 'usehooks-ts'
+import Hls, { ErrorData } from 'hls.js'
+import { useSessionStorage } from 'usehooks-ts'
 
 import { Modal } from '@components/modal'
 
 import { settingsConfig } from '@config'
-import { Video } from '@interfaces'
+import { Bookmark, Video } from '@interfaces'
 import { videoService } from '@service'
+import { calculateTimeCode } from '@utils/shared'
 
 import './vidstack.css'
 
@@ -32,27 +32,42 @@ type PlayerProps = {
   video: Video
   playerRef: React.RefObject<MediaPlayerInstance>
   modal: Modal
+  bookmarks: Bookmark[]
 }
 
-export default function Player({ src, poster, thumbnails, title, video, playerRef, modal }: PlayerProps) {
+function generateChapters(json: Pick<VTTCue, 'startTime' | 'endTime' | 'text'>[]): string {
+  let chapters = ''
+  json.forEach(chapter => {
+    chapters += `${calculateTimeCode(chapter.startTime)} --> ${calculateTimeCode(chapter.endTime)}\n${chapter.text}\n\n`
+  })
+  return chapters
+}
+
+export default function Player({ src, poster, thumbnails, title, video, playerRef, modal, bookmarks }: PlayerProps) {
   const remote = useMediaRemote(playerRef)
   const hlsRef = useRef<Hls>()
-  const [config, setConfig] = useLocalStorage('vidstack', { volume: 1, res: 1080 })
-
-  const playAdddedRef = useRef(false)
-  const newVideoRef = useRef(false)
 
   const [localVideo, setLocalVideo] = useSessionStorage('video', 0)
   const [localBookmark, setLocalBookmark] = useSessionStorage('bookmark', 0)
 
-  useEffect(() => {
-    newVideoRef.current = localVideo !== video.id
-    if (newVideoRef.current) {
+  const canAddPlay = useRef(false)
+
+  // TODO does this need to be memoized? using useMemo
+  const chapters = generateChapters(
+    bookmarks.map((bookmark, idx, arr) => ({
+      startTime: bookmark.start,
+      text: bookmark.category.name,
+      endTime: arr.at(idx + 1)?.start ?? video.duration
+    }))
+  )
+
+  const onCanLoad = () => {
+    if (localVideo !== video.id) {
       setLocalVideo(video.id)
       setLocalBookmark(0)
+      canAddPlay.current = true
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playerRef])
+  }
 
   const onProviderChange = (provider: MediaProviderAdapter | null) => {
     if (provider === null) return
@@ -71,8 +86,8 @@ export default function Player({ src, poster, thumbnails, title, video, playerRe
   }
 
   const onPlay = () => {
-    if (newVideoRef.current && !playAdddedRef.current) {
-      playAdddedRef.current = true
+    if (canAddPlay.current) {
+      canAddPlay.current = false
 
       videoService
         .addPlay(video.id)
@@ -80,28 +95,23 @@ export default function Player({ src, poster, thumbnails, title, video, playerRe
           console.log('Play Added')
         })
         .catch(() => {
-          playAdddedRef.current = false
+          canAddPlay.current = true
         })
     }
   }
 
-  const onManifestParsed = (data: ManifestParsedData) => {
-    if (hlsRef.current === undefined) return
-
-    /* Limit to 720p */
-    const maxLevel = data.levels.filter(level => level.height <= config.res).length - 1
-    hlsRef.current.startLevel = maxLevel - 1
-    hlsRef.current.autoLevelCapping = maxLevel
-
-    hlsRef.current.startLoad(localBookmark)
+  const onManifestParsed = () => {
+    if (hlsRef.current !== undefined) {
+      hlsRef.current.startLoad(localBookmark)
+    }
   }
 
-  const onHlsError = (detail: ErrorData) => {
+  const onHlsError = (data: ErrorData) => {
     if (settingsConfig.debug) {
-      console.log(detail)
+      console.log('onHlsError', data)
     }
 
-    if (detail.fatal) {
+    if (data.fatal) {
       // TODO do some more stuff
       hlsRef.current?.destroy()
     }
@@ -111,16 +121,6 @@ export default function Player({ src, poster, thumbnails, title, video, playerRe
     if (playerRef.current === null) return
 
     playerRef.current.currentTime += 10 * Math.sign(e.deltaY) * -1
-  }
-
-  const onVolumeChange = (details: MediaVolumeChange) => {
-    setConfig({ ...config, volume: details.volume })
-  }
-
-  const onQualityChange = (detail: VideoQuality | null) => {
-    if (detail !== null) {
-      setConfig({ ...config, res: detail.height })
-    }
   }
 
   return (
@@ -133,8 +133,10 @@ export default function Player({ src, poster, thumbnails, title, video, playerRe
       streamType='on-demand'
       load='eager'
       viewType='video'
+      storage='vidstack'
       onProviderChange={onProviderChange}
       onTimeUpdate={onTimeUpdate}
+      onCanLoad={onCanLoad}
       onPlay={onPlay}
       onWheel={onWheel}
       onHlsManifestParsed={onManifestParsed}
@@ -143,43 +145,34 @@ export default function Player({ src, poster, thumbnails, title, video, playerRe
       keyDisabled={modal.visible}
       keyTarget='document'
       keyShortcuts={{
+        toggleMuted: 'm',
+        volumeUp: 'ArrowUp',
+        volumeDown: 'ArrowDown',
+        seekBackward: 'ArrowLeft',
+        seekForward: 'ArrowRight',
         togglePaused: {
-          keys: ['Space'],
+          keys: 'Space',
           callback: e => {
             if (e.type === 'keyup') {
               remote.togglePaused()
             }
           }
-        },
-        toggleMuted: ['m'],
-        seekBackward: {
-          keys: ['ArrowLeft'],
-          callback(e) {
-            if (playerRef.current !== null && e.type === 'keydown') {
-              playerRef.current.currentTime -= 1
-            }
-          }
-        },
-        seekForward: {
-          keys: ['ArrowRight'],
-          callback(e) {
-            if (playerRef.current !== null && e.type === 'keydown') {
-              playerRef.current.currentTime += 1
-            }
-          }
-        },
-        volumeUp: ['ArrowUp'],
-        volumeDown: ['ArrowDown']
+        }
       }}
-      volume={config.volume}
-      onVolumeChange={onVolumeChange}
-      onQualityChange={onQualityChange}
     >
       <MediaProvider>
         {poster !== undefined && <Poster className='vds-poster' src={poster} alt={title} />}
+
+        <Track kind='chapters' content={chapters} default />
       </MediaProvider>
 
-      <DefaultVideoLayout thumbnails={thumbnails} icons={defaultLayoutIcons} />
+      <DefaultVideoLayout
+        thumbnails={thumbnails}
+        icons={defaultLayoutIcons}
+        seekStep={1}
+        slots={{ googleCastButton: null, pipButton: null, fullscreenButton: null }}
+        noScrubGesture={false}
+      />
     </MediaPlayer>
   )
 }

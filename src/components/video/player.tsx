@@ -87,6 +87,7 @@ export default function VideoPlayer({
           title={video.name}
           playerRef={playerRef}
           video={video}
+          bookmarks={bookmarks}
           poster={`${serverConfig.api}/video/${video.id}/image`}
           thumbnails={`${serverConfig.api}/video/${video.id}/vtt`}
           src={{

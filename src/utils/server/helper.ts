@@ -9,6 +9,7 @@ import { db } from './prisma'
 
 import { settingsConfig } from '@config'
 import { SimilarStar } from '@interfaces/api'
+import { calculateTimeCode } from '@utils/shared'
 
 dayjs.extend(utc)
 
@@ -252,12 +253,6 @@ export const toCamelCase = (str: string) => str.replace(/([a-z])([A-Z])/g, '$1 $
  */
 const writeToFile = async (path: string, content: string) => fs.promises.appendFile(path, content)
 
-function calculateTime(secs: number) {
-  return dayjs(0)
-    .hour(0)
-    .millisecond(secs * 1000)
-}
-
 export async function generateVTTData(
   videoID: number,
   frameDelay: number,
@@ -270,15 +265,12 @@ export async function generateVTTData(
   const generateTimeCodes = () => {
     const timeCodeFormat = 'HH:mm:ss.SSS'
 
-    const start = calculateTime(nextTimeCode)
-    const end = calculateTime(nextTimeCode + frameDelay)
+    const start = calculateTimeCode(nextTimeCode, timeCodeFormat)
+    const end = calculateTimeCode(nextTimeCode + frameDelay, timeCodeFormat)
 
     nextTimeCode += frameDelay
 
-    return {
-      start: start.format(timeCodeFormat),
-      end: end.format(timeCodeFormat)
-    }
+    return { start, end }
   }
 
   await writeToFile(vtt, 'WEBVTT')

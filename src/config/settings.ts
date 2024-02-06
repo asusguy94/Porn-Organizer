@@ -25,9 +25,6 @@ export default {
   timeline: {
     spacing: getValueWithType<number>('TIMELINE_SPACING', 0)
   },
-  player: {
-    thumbnails: getValueWithType<boolean>('PLAYER_THUMBNAILS', false)
-  },
   THUMB_RES: parseInt(process.env.THUMBNAIL_RES ?? '290'),
   IMAGE_RES: parseInt(process.env.IMAGE_RES ?? '1920'),
   THEPORNDB_API: process.env.THEPORNDB_API ?? '',
