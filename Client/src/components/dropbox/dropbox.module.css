@@ -1,0 +1,15 @@
+#dropbox {
+  width: 200px;
+  height: 275px;
+  border: 2px dashed rgba(255, 0, 0, 0.3);
+
+  &.hover {
+    border-color: rgba(255, 0, 0, 1);
+  }
+
+  .label {
+    position: relative;
+    text-align: center;
+    top: 50%;
+  }
+}

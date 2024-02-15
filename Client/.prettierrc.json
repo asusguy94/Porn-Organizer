@@ -1,0 +1,22 @@
+{
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "none",
+  "printWidth": 120,
+  "useTabs": false,
+  "semi": false,
+  "arrowParens": "avoid",
+  "importOrder": [
+    "(^next/(.*))|(^react$)",
+    "^@mui/(.*)",
+    "<THIRD_PARTY_MODULES>",
+    "path|fs",
+    "^@components/(.*)",
+    "^(?!.*\\.(css|scss)$)[./]",
+    "^(@utils|@interfaces|@config|@service|@prisma|@hooks)",
+    "\\.(css|scss)$"
+  ],
+  "importOrderSeparation": true,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"]
+}

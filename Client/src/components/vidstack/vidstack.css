@@ -1,0 +1,15 @@
+@import '@vidstack/react/player/styles/default/theme.css';
+@import '@vidstack/react/player/styles/default/layouts/video.css';
+
+.vds-slider {
+  --media-slider-track-height: 6px;
+
+  --media-slider-track-fill-bg: rgb(0, 200, 0);
+  --media-slider-track-progress-bg: rgb(162, 0, 255);
+  --media-slider-track-bg: rgba(255, 255, 255, 0.25);
+}
+
+/* Always show Timeline-DOT */
+.vds-time-slider .vds-slider-thumb {
+  opacity: 1;
+}

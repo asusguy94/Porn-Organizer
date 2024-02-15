@@ -1,0 +1,10 @@
+#timeline {
+  position: relative;
+  margin-left: 20px;
+  margin-right: 25px;
+
+  .bookmark {
+    position: absolute;
+    white-space: nowrap;
+  }
+}
