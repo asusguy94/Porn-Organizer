@@ -1,4 +1,4 @@
-# Porn NextJS
+# PornTS
 
 ## Note about thumbnails
 
