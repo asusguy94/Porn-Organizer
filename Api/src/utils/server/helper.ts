@@ -25,19 +25,6 @@ export function dateDiff(
   return relative ? Math.abs(diff) : diff
 }
 
-function getClosest(search: number, arr: number[]): number {
-  return arr.reduce((a, b) => {
-    const aDiff = Math.abs(a - search)
-    const bDiff = Math.abs(b - search)
-
-    if (aDiff === bDiff) {
-      return a > b ? a : b
-    } else {
-      return bDiff < aDiff ? b : a
-    }
-  })
-}
-
 export async function downloader(url: string, dest: string, type: 'URL' | 'FILE'): Promise<void> {
   let buffer: Uint8Array
   if (type === 'URL') {
@@ -78,14 +65,6 @@ export async function removeThumbnails(videoID: number) {
     fs.promises.unlink(`./media/vtt/${videoID}.vtt`),
     fs.promises.unlink(`./media/vtt/${videoID}.jpg`)
   ])
-}
-
-export function getClosestQ(quality: number): number {
-  if (quality === 396) {
-    return 480
-  }
-
-  return getClosest(quality, settingsConfig.qualities)
 }
 
 /**

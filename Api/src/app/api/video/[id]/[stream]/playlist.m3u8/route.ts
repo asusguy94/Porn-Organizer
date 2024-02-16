@@ -3,7 +3,6 @@ import { noExt, sendFile } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
-//NEXT /video/[id]
 export async function GET(req: Request, { params }: Params<['id', 'stream']>) {
   const { id, stream } = validate(
     z.object({

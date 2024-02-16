@@ -1,5 +1,5 @@
-import { createApi } from '@config'
-import { Similar } from '@interfaces'
+import { createApi } from '@/config'
+import { Similar } from '@/types'
 
 const { api } = createApi('/star')
 

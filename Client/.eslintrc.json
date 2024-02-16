@@ -1,13 +1,14 @@
 {
+  "root": true,
+  "env": { "browser": true, "es2020": true },
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:@typescript-eslint/strict",
-    "plugin:react/recommended",
-    "next/core-web-vitals",
+    "plugin:react-hooks/recommended",
     "prettier"
   ],
-  "plugins": ["@typescript-eslint", "react"],
+  "plugins": ["react-refresh", "@typescript-eslint"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": { "project": true },
   "rules": {
@@ -23,9 +24,13 @@
     "@typescript-eslint/no-floating-promises": "off",
     // "@typescript-eslint/consistent-type-definitions": ["warn", "type"],
     // "@typescript-eslint/unified-signatures": "off",
-    // "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-misused-promises": "off",
+    "@typescript-eslint/no-redundant-type-constituents": "off",
+    "@typescript-eslint/no-unsafe-argument": "off",
 
-    // NextJS
-    "@typescript-eslint/no-misused-promises": "off" // Promise<void> is still broken
-  }
+    // Hooks
+    "react-refresh/only-export-components": ["warn", { "allowConstantExport": true }]
+  },
+  "ignorePatterns": ["dist", "vite.config.ts"]
 }

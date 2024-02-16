@@ -1,29 +1,38 @@
-import NextImage, { ImageProps as NextImageProps } from 'next/image'
+import { HTMLAttributes } from 'react'
 
 import ImageNotSupportedOutlinedIcon from '@mui/icons-material/ImageNotSupportedOutlined'
 import { CardMedia as MUICardMedia } from '@mui/material'
 
-export function ResponsiveImage({ alt, ...other }: NextImageProps & MissingImage) {
-  return <Image style={{ width: '100%', height: 'auto' }} alt={alt} {...other} />
+type ImageDimensions = {
+  width?: number
+  height?: number
 }
 
-export default function Image({ missing, scale, renderStyle, ...nextProps }: NextImageProps & MissingImage) {
+export function ResponsiveImage({
+  ...other
+}: HTMLAttributes<HTMLImageElement> & MissingImage & ImageDimensions & { src: string }) {
+  return <Image style={{ width: '100%', height: 'auto' }} {...other} />
+}
+
+export default function Image({
+  missing,
+  scale,
+  renderStyle,
+  ...props
+}: HTMLAttributes<HTMLImageElement> & MissingImage & ImageDimensions & { src: string }) {
   if (missing) return <MissingImage scale={scale} renderStyle={renderStyle} />
 
   // Main Image Component
-  return <NextImage {...nextProps} />
+  return <img {...props} />
 }
 
 type CardProps = {
   height: number
-  alt: string
   responsive?: boolean
-} & Omit<NextImageProps, 'alt' | 'height'> &
-  MissingImage
+} & MissingImage & { src: string }
 
 export function ImageCard({
   height,
-  alt,
   missing = false,
   renderStyle = 'height',
   responsive = false,
@@ -32,9 +41,9 @@ export function ImageCard({
   return (
     <MUICardMedia style={missing ? { height, textAlign: 'center' } : {}}>
       {responsive ? (
-        <ResponsiveImage alt={alt} height={height} missing={missing} renderStyle={renderStyle} {...other} />
+        <ResponsiveImage height={height} missing={missing} renderStyle={renderStyle} {...other} />
       ) : (
-        <Image alt={alt} height={height} missing={missing} renderStyle={renderStyle} {...other} />
+        <Image height={height} missing={missing} renderStyle={renderStyle} {...other} />
       )}
     </MUICardMedia>
   )
@@ -42,7 +51,9 @@ export function ImageCard({
 
 type MissingImage = {
   missing?: boolean
-} & MissingImageProps
+} & MissingImageProps &
+  HTMLAttributes<HTMLImageElement> &
+  ImageDimensions
 
 type MissingImageProps = {
   scale?: number
@@ -60,8 +71,8 @@ function MissingImage({ scale = 1, renderStyle }: MissingImageProps) {
         ...(renderStyle === 'height'
           ? { height: '100%' }
           : renderStyle === 'transform'
-          ? { transform: 'translateY(100%)' } //TODO why 100%
-          : {}),
+            ? { transform: 'translateY(100%)' } //TODO why 100%
+            : {}),
         scale: scale.toString()
       }}
     />

@@ -4,7 +4,6 @@ import { Params } from '@interfaces'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
-//NEXT /video/[id]
 export async function POST(req: Request, { params }: Params<'id'>) {
   const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
@@ -27,13 +26,28 @@ export async function POST(req: Request, { params }: Params<'id'>) {
   )
 }
 
-//NEXT /video/[id]
 export async function DELETE(req: Request, { params }: Params<'id'>) {
   const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   return NextResponse.json(
     await db.bookmark.deleteMany({
       where: { videoID: id }
+    })
+  )
+}
+
+export async function GET(req: Request, { params }: Params<'id'>) {
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
+
+  return NextResponse.json(
+    await db.bookmark.findMany({
+      select: {
+        id: true,
+        category: { select: { id: true, name: true } },
+        start: true
+      },
+      where: { videoID: id },
+      orderBy: { start: 'asc' }
     })
   )
 }

@@ -6,7 +6,6 @@ import { formatDate, getUnique } from '@utils/shared'
 
 export const dynamic = 'force-dynamic'
 
-//NEXT /video/search
 export async function GET() {
   return NextResponse.json(
     (

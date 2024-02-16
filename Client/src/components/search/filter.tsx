@@ -2,13 +2,12 @@ import { FormControl, FormControlLabel, MenuItem, Radio, RadioGroup, Select, Sel
 
 import capitalize from 'capitalize'
 
-import { RegularHandlerProps, RegularItem } from '@components/indeterminate'
-import Spinner from '@components/spinner'
+import { RegularHandlerProps, RegularItem } from '@/components/indeterminate'
+import Spinner from '@/components/spinner'
+import { useSearchParam } from '@/hooks/search'
+import { General } from '@/types'
 
 import { DefaultObj } from './sort'
-
-import { useSearchParam } from '@hooks/search'
-import { General } from '@interfaces'
 
 import styles from './filter.module.css'
 

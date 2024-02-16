@@ -1,6 +1,4 @@
-import Link from '../link'
-
-import { serverConfig } from '@config'
+import { Link } from 'react-router-dom'
 
 import styles from './navbar.module.scss'
 
@@ -21,7 +19,6 @@ export default function NavBar() {
         <NavBarItem name='Settings' path='/settings' />
         <NavBarItem name='DB Editor' path='/editor' />
         <NavBarItem name='Import Videos' path='/video/add' />
-        <NavBarItem name='DB' path={serverConfig.db} />
       </ul>
     </nav>
   )
@@ -38,7 +35,7 @@ function NavBarItem({ name, path, children, disabled = false }: NavBarItemProps)
 
   return (
     <li>
-      <Link href={path}>{name}</Link>
+      <Link to={path}>{name}</Link>
 
       {children ? <ul className={styles.sub}>{children}</ul> : null}
     </li>

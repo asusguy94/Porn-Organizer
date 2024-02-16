@@ -8,13 +8,13 @@
   "semi": false,
   "arrowParens": "avoid",
   "importOrder": [
-    "(^next/(.*))|(^react$)",
+    "^react$",
+    "^@tanstack/(.*)$",
     "^@mui/(.*)",
     "<THIRD_PARTY_MODULES>",
     "path|fs",
-    "^@components/(.*)",
+    "^@/(.*)$",
     "^(?!.*\\.(css|scss)$)[./]",
-    "^(@utils|@interfaces|@config|@service|@prisma|@hooks)",
     "\\.(css|scss)$"
   ],
   "importOrderSeparation": true,

@@ -15,12 +15,11 @@ import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/l
 import Hls, { ErrorData } from 'hls.js'
 import { useSessionStorage } from 'usehooks-ts'
 
-import { Modal } from '@components/modal'
-
-import { settingsConfig } from '@config'
-import { Bookmark, Video } from '@interfaces'
-import { videoService } from '@service'
-import { calculateTimeCode } from '@utils/shared'
+import { Modal } from '@/components/modal'
+import { settingsConfig } from '@/config'
+import { videoService } from '@/service'
+import { Bookmark, Video } from '@/types'
+import { calculateTimeCode } from '@/utils/shared'
 
 import './vidstack.css'
 
@@ -140,7 +139,9 @@ export default function Player({ src, poster, thumbnails, title, video, playerRe
       onPlay={onPlay}
       onWheel={onWheel}
       onHlsManifestParsed={onManifestParsed}
-      onHlsInstance={hls => (hlsRef.current = hls)}
+      onHlsInstance={hls => {
+        hlsRef.current = hls
+      }}
       onHlsError={onHlsError}
       keyDisabled={modal.visible}
       keyTarget='document'

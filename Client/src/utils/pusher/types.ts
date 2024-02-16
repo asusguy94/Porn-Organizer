@@ -20,4 +20,3 @@ type Events = {
 }
 
 export type EventsForChannel<T extends Channel> = Extract<Events[keyof Events], { name: ChannelEvents[T] }>
-export type MessageTypeForKey<K extends keyof Message> = Message[K]

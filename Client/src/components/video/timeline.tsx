@@ -5,15 +5,14 @@ import { Button, Grid } from '@mui/material'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { useWindowSize } from 'usehooks-ts'
 
-import { MediaPlayerInstance } from '@components/vidstack'
+import { MediaPlayerInstance } from '@/components/vidstack'
+import { settingsConfig } from '@/config'
+import { bookmarkService } from '@/service'
+import { Bookmark, General, SetState, Video } from '@/types'
 
 import { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'
 import Spinner from '../spinner'
-
-import { settingsConfig } from '@config'
-import { Bookmark, General, SetState, Video } from '@interfaces'
-import { bookmarkService } from '@service'
 
 import styles from './timeline.module.css'
 

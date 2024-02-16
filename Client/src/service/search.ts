@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { createApi } from '@config'
-import { StarSearch, VideoSearch } from '@interfaces'
+import { createApi } from '@/config'
+import { StarSearch, VideoSearch } from '@/types'
 
 const { baseURL } = createApi('/search')
 

@@ -1,5 +1,5 @@
-import { createApi } from '@config'
-import { Bookmark, General, VideoStar } from '@interfaces'
+import { createApi } from '@/config'
+import { Bookmark, General, VideoStar } from '@/types'
 
 const { api } = createApi('/video')
 

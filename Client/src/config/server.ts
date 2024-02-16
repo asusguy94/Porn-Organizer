@@ -1,4 +1,6 @@
+import { getRelativePath } from '@/utils/shared'
+
 export default {
-  api: '/api',
+  api: getRelativePath('/api'),
   db: 'http://localhost:5555'
 }

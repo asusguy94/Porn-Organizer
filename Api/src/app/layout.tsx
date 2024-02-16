@@ -1,18 +1,11 @@
-import NextTopLoader from 'nextjs-toploader'
-
-import ClientLayout from './client-layout'
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en'>
       <head>
-        <title>Porn</title>
+        <title>Porn - API</title>
       </head>
 
-      <body>
-        <NextTopLoader />
-        <ClientLayout>{children}</ClientLayout>
-      </body>
+      <body>{children}</body>
     </html>
   )
 }

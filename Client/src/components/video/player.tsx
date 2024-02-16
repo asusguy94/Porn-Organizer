@@ -1,18 +1,15 @@
-import { useRouter } from 'next/navigation'
-
 import { Button, TextField } from '@mui/material'
 
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 
-import Player, { MediaPlayerInstance } from '@components/vidstack'
+import Player, { MediaPlayerInstance } from '@/components/vidstack'
+import { serverConfig } from '@/config'
+import { videoService } from '@/service'
+import { Bookmark, General, SetState, Video, VideoStar } from '@/types'
 
 import { IconWithText } from '../icon'
 import { Modal, ModalHandler } from '../modal'
 import Spinner from '../spinner'
-
-import { serverConfig } from '@config'
-import { Bookmark, General, SetState, Video, VideoStar } from '@interfaces'
-import { videoService } from '@service'
 
 type VideoPlayerProps = {
   video: Video
@@ -37,11 +34,9 @@ export default function VideoPlayer({
   update,
   modal
 }: VideoPlayerProps) {
-  const router = useRouter()
-
   const deleteVideo = () => {
     videoService.delete(video.id).then(() => {
-      router.replace('/')
+      location.replace('/')
     })
   }
 
@@ -74,7 +69,7 @@ export default function VideoPlayer({
 
   const renameVideo = (path: string) => {
     videoService.rename(video.id, path).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 

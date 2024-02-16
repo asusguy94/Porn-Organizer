@@ -1,35 +1,33 @@
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Button, Grid, ImageList, ImageListItem, TextField, Typography } from '@mui/material'
 
+import axios from 'axios'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { useCopyToClipboard } from 'usehooks-ts'
+
+import { serverConfig, settingsConfig } from '@/config'
+import { attributeService, locationService, videoService } from '@/service'
+import { General, SetState, Video } from '@/types'
+import { formatDate } from '@/utils/shared'
 
 import Icon, { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'
 import Spinner from '../spinner'
 
-import { settingsConfig } from '@config'
-import { General, SetState, Video } from '@interfaces'
-import { attributeService, locationService, videoService } from '@service'
-import { formatDate } from '@utils/shared'
-
 import styles from './header.module.scss'
 
 type HeaderProps = {
   video: Video
-  attributes?: General[]
-  locations?: General[]
   update: SetState<Video | undefined>
   onModal: ModalHandler
 }
-export default function Header({ video, attributes, locations, update, onModal }: HeaderProps) {
+export default function Header({ video, update, onModal }: HeaderProps) {
   return (
     <Grid container>
       <Grid container item alignItems='center' component='header' id={styles.header}>
-        <HeaderTitle video={video} attributes={attributes} locations={locations} update={update} onModal={onModal} />
+        <HeaderTitle video={video} update={update} onModal={onModal} />
 
         <HeaderSlug video={video} hidden={video.slug !== null} onModal={onModal} />
         <HeaderCover video={video} hidden={video.image !== null || video.slug === null} />
@@ -147,8 +145,6 @@ type HeaderCoverProps = {
   hidden?: boolean
 }
 function HeaderCover({ video, hidden = false }: HeaderCoverProps) {
-  const router = useRouter()
-
   const [clicked, setClicked] = useState(false)
 
   const handleClick = () => {
@@ -158,7 +154,7 @@ function HeaderCover({ video, hidden = false }: HeaderCoverProps) {
       if (settingsConfig.userAction.thumbnail.close) {
         window.close()
       } else {
-        router.refresh()
+        location.reload()
       }
     })
   }
@@ -294,11 +290,9 @@ type HeaderDateProps = {
   video: Video
 }
 function HeaderDate({ video }: HeaderDateProps) {
-  const router = useRouter()
-
   const fixDate = () => {
     videoService.fixDate(video.id).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 
@@ -338,12 +332,18 @@ function HeaderDate({ video }: HeaderDateProps) {
 
 type HeaderTitleProps = {
   video: Video
-  attributes?: General[]
-  locations?: General[]
   update: SetState<Video | undefined>
   onModal: ModalHandler
 }
-function HeaderTitle({ video, attributes, locations, update, onModal }: HeaderTitleProps) {
+function HeaderTitle({ video, update, onModal }: HeaderTitleProps) {
+  const [attributes, setAttributes] = useState<General[]>()
+  const [locations, setLocations] = useState<General[]>()
+
+  useEffect(() => {
+    axios.get<General[]>(`${serverConfig.api}/attribute`).then(({ data }) => setAttributes(data))
+    axios.get<General[]>(`${serverConfig.api}/location`).then(({ data }) => setLocations(data))
+  }, [])
+
   const [, setClipboard] = useCopyToClipboard()
 
   const addLocationHandler = (location: General) => {

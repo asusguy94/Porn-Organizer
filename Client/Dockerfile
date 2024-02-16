@@ -1,40 +1,23 @@
-# Define the base image
-FROM node:20-alpine3.18 AS custom_node
+FROM node:20-alpine3.18 as base
 
-##### DEPENDENCIES
-FROM custom_node AS deps
-RUN apk add --no-cache libc6-compat
+# Stage 1: Build the React application
+FROM base as build
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* ./
-RUN yarn --frozen-lockfile
+COPY package.json yarn.lock ./
+RUN yarn install
 
-##### BUILDER
-FROM custom_node AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
 RUN yarn build
 
-##### RUNNER
-FROM custom_node AS runner
-RUN apk add ffmpeg
-WORKDIR /app
+# Stage 2: Serve the React application with Nginx
+FROM base as serve
 
-ENV NODE_ENV production
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/vite.config.ts ./vite.config.ts
 
 EXPOSE 3000
-ENV PORT 3000
 
-CMD ["node", "server.js"]
+CMD ["npx", "vite", "preview", "--port", "3000"]

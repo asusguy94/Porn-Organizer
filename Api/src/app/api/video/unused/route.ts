@@ -5,7 +5,6 @@ import { db } from '@utils/server/prisma'
 
 export const dynamic = 'force-dynamic'
 
-//NEXT (used for debugging)
 export async function GET() {
   const websites = (await db.website.findMany()).map(website => website.name)
   const videos = await db.video.findMany()

@@ -7,7 +7,6 @@ import { getUnique } from '@utils/shared'
 
 export const dynamic = 'force-dynamic'
 
-//NEXT /star/search
 export async function GET() {
   /**
    * Returns a site-activity percentage as a decimal

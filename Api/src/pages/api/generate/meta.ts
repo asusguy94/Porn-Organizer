@@ -10,7 +10,6 @@ import { findSceneSlug } from '@utils/server/metadata'
 import { db } from '@utils/server/prisma'
 import { getProgress } from '@utils/shared'
 
-//NEXT /video/add
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const checkStarRelation = async (video: Video, progress: number) => {
