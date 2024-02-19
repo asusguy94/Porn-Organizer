@@ -6,7 +6,6 @@ import { fileExists } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
 import { getProgress } from '@utils/shared'
 
-//NEXT /video/add
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const videos = await db.video.findMany({ where: { duration: { gt: 0 }, height: { gt: 0 }, width: { gt: 0 } } })

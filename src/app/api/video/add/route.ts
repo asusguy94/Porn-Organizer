@@ -5,7 +5,6 @@ import { getDate } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
-//NEXT /video/add
 export async function POST(req: Request) {
   const { videos } = validate(
     z.object({

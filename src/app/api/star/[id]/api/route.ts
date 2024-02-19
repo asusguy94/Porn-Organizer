@@ -9,7 +9,6 @@ import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 import { printError } from '@utils/shared'
 
-//NEXT /star/[id]
 export async function POST(req: Request, { params }: Params<'id'>) {
   const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
@@ -65,7 +64,6 @@ export async function POST(req: Request, { params }: Params<'id'>) {
   }
 }
 
-//NEXT /star/[id]
 export async function DELETE(req: Request, { params }: Params<'id'>) {
   const { id } = validate(z.object({ id: z.coerce.number() }), params)
 

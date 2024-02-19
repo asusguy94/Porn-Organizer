@@ -20,7 +20,6 @@ import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 import { formatDate, printError } from '@utils/shared'
 
-//NEXT /video/[id]
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = validate(z.object({ id: z.coerce.number() }), req.query)
 

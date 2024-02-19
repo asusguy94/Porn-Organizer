@@ -10,5 +10,3 @@ export type Settings = Partial<Record<SettingKey, SettingValue>>
 export const defaultSettings: Required<Settings> = { bookmark_spacing: 0 }
 
 export const useSettings = () => useReadLocalStorage<Settings>(settingsKey)
-
-//NEXT usefull settings-code
