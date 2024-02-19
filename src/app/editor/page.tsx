@@ -1,116 +1,130 @@
-import { revalidatePath } from 'next/cache'
+'use client'
 
-import Client, { EditorPageProps } from './client'
+import { useState } from 'react'
 
-import { db } from '@utils/server/prisma'
-import validate, { z } from '@utils/server/validation'
+import {
+  Grid,
+  Button,
+  Table as MuiTable,
+  TableContainer,
+  TableHead,
+  TableRow as MuiTableRow,
+  TableCell,
+  TableBody,
+  TextField,
+  Paper
+} from '@mui/material'
 
-export const dynamic = 'force-dynamic'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
+import capitalize from 'capitalize'
 
-export default async function EditorPage() {
-  type Prop = EditorPageProps['data'][number]
+import Spinner from '@components/spinner'
 
-  const attributes: Prop = {
-    name: 'attribute',
-    data: await db.attribute.findMany({ orderBy: { id: 'asc' } }),
-    add: async data => {
-      'use server'
+import { General } from '@interfaces'
 
-      const { name } = validate(
-        z.object({
-          name: z.string().min(3)
-        }),
-        data
-      )
+import styles from './editor.module.css'
 
-      await db.attribute.create({ data: { name } })
-      revalidatePath('/editor')
-      revalidatePath('/video/[id]', 'page')
-    },
-    update: async data => {
-      'use server'
+export default function EditorPage() {
+  return (
+    <Grid container>
+      <Table name='attribute' />
+      <Table name='category' />
+      <Table name='location' />
+    </Grid>
+  )
+}
 
-      const { id, name } = validate(
-        z.object({
-          id: z.coerce.number().int().positive(),
-          name: z.string().min(3)
-        }),
-        data
-      )
+type TableProps = {
+  name: string
+}
+function Table({ name }: TableProps) {
+  const [value, setValue] = useState('')
 
-      await db.attribute.update({ where: { id }, data: { name } })
-      revalidatePath('/editor')
-      revalidatePath('/video/[id]', 'page')
-    }
+  const { data } = useQuery({
+    queryKey: ['editor', name],
+    queryFn: async () => axios.get<General[]>(`/api/${name}`).then(res => res.data)
+  })
+
+  const onSubmit = () => {
+    setValue('')
+    axios.post(`/api/${name}`, { name: value }).then(() => {
+      location.reload()
+    })
   }
 
-  const categories: Prop = {
-    name: 'category',
-    data: await db.category.findMany({ orderBy: { id: 'asc' } }),
-    add: async data => {
-      'use server'
+  if (data === undefined) return <Spinner />
 
-      const { name } = validate(
-        z.object({
-          name: z.string().min(3)
-        }),
-        data
-      )
+  return (
+    <Grid item xs={4} style={{ paddingLeft: 5, paddingRight: 5, marginTop: 5 }}>
+      <Grid container justifyContent='center' style={{ marginBottom: 10 }}>
+        <Grid item component='form' onSubmit={onSubmit}>
+          <TextField
+            variant='standard'
+            name='name'
+            label={capitalize(name)}
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            style={{ marginLeft: 5, marginRight: 5 }}
+          />
 
-      await db.category.create({ data: { name } })
-      revalidatePath('/editor')
-      revalidatePath('/video/[id]', 'page')
-    },
-    update: async data => {
-      'use server'
+          <Button type='submit' variant='contained' color='primary' size='small' style={{ marginTop: 2 }}>
+            Add {name}
+          </Button>
+        </Grid>
+      </Grid>
 
-      const { id, name } = validate(
-        z.object({
-          id: z.coerce.number().int().positive(),
-          name: z.string().min(3)
-        }),
-        data
-      )
+      <TableContainer component={Paper} style={{ overflowX: 'visible' }}>
+        <MuiTable size='small' className={styles['table-striped']} stickyHeader>
+          <TableHead>
+            <MuiTableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>{capitalize(name)}</TableCell>
+            </MuiTableRow>
+          </TableHead>
 
-      await db.category.update({ where: { id }, data: { name } })
-      revalidatePath('/editor')
-      revalidatePath('/video/[id]', 'page')
-    }
+          <TableBody>{data?.map(item => <TableRow name={name} key={item.id} data={item} />)}</TableBody>
+        </MuiTable>
+      </TableContainer>
+    </Grid>
+  )
+}
+
+type TableRowProps = {
+  data: General
+  name: string
+}
+function TableRow({ data, name }: TableRowProps) {
+  const [edit, setEdit] = useState(false)
+  const [input, setInput] = useState(data.name)
+
+  const handleSubmit = () => {
+    setEdit(false)
+
+    axios.put(`/api/${name}/${data.id}`, { name: input }).then(() => {
+      location.reload()
+    })
   }
 
-  const locations: Prop = {
-    name: 'location',
-    data: await db.location.findMany({ orderBy: { id: 'asc' } }),
-    add: async data => {
-      'use server'
-
-      const { name } = validate(
-        z.object({
-          name: z.string().min(3)
-        }),
-        data
-      )
-
-      await db.location.create({ data: { name } })
-      revalidatePath('/editor')
-      revalidatePath('/video/[id]', 'page')
-    },
-    update: async data => {
-      'use server'
-
-      const { id, name } = validate(
-        z.object({
-          id: z.coerce.number().int().positive(),
-          name: z.string().min(3)
-        }),
-        data
-      )
-
-      await db.location.update({ where: { id }, data: { name } })
-      revalidatePath('/editor')
-      revalidatePath('/video/[id]', 'page')
-    }
-  }
-
-  return <Client data={[attributes, categories, locations]} />
+  return (
+    <MuiTableRow>
+      <TableCell>{data.id}</TableCell>
+      <TableCell>
+        {edit ? (
+          <form onSubmit={handleSubmit}>
+            <TextField
+              name='name'
+              variant='standard'
+              defaultValue={data.name}
+              autoFocus
+              onBlur={() => setEdit(false)}
+              onChange={e => setInput(e.target.value)}
+            />
+          </form>
+        ) : (
+          <span onClick={() => setEdit(true)}>{data.name}</span>
+        )}
+      </TableCell>
+    </MuiTableRow>
+  )
 }
