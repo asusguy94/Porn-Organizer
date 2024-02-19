@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
@@ -11,7 +9,7 @@ export async function POST(req: Request) {
     await req.json()
   )
 
-  return NextResponse.json(
+  return Response.json(
     await db.star.create({
       data: { name }
     })

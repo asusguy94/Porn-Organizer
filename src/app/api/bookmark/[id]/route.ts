@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Params } from '@interfaces'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
@@ -16,7 +14,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
   )
 
   if (time !== undefined) {
-    return NextResponse.json(
+    return Response.json(
       await db.bookmark.update({
         where: { id },
         data: { start: time }
@@ -24,7 +22,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     )
   } else if (categoryID !== undefined) {
     // Change CategoryID
-    return NextResponse.json(
+    return Response.json(
       await db.bookmark.update({
         where: { id },
         data: { category: { connect: { id: categoryID } } }
@@ -36,7 +34,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
 export async function DELETE(req: Request, { params }: Params<'id'>) {
   const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
-  return NextResponse.json(
+  return Response.json(
     await db.bookmark.delete({
       where: { id }
     })

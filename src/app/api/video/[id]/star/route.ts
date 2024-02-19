@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Params } from '@interfaces'
 import { dateDiff } from '@utils/server/helper'
 import { aliasExists, getAliasAsStar } from '@utils/server/helper.db'
@@ -40,7 +38,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
   })
 
   const { birthdate, _count, ...rest } = star
-  return NextResponse.json({
+  return Response.json({
     ...rest,
     ageInVideo: video.starAge ?? dateDiff(birthdate, video.date),
     numVideos: _count.videos
@@ -50,7 +48,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
 export async function DELETE(req: Request, { params }: Params<'id'>) {
   const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
-  return NextResponse.json(
+  return Response.json(
     await db.video.update({
       where: { id },
       data: { star: { disconnect: true } }

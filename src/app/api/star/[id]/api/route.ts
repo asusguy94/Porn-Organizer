@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import capitalize from 'capitalize'
 
 import { Params } from '@interfaces'
@@ -51,7 +49,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
       }
 
       if (update) {
-        return NextResponse.json(
+        return Response.json(
           await db.star.update({
             where: { id },
             data: star
@@ -69,7 +67,7 @@ export async function DELETE(req: Request, { params }: Params<'id'>) {
 
   await db.starHaircolors.deleteMany({ where: { starId: id } })
 
-  return NextResponse.json(
+  return Response.json(
     await db.star.update({
       where: { id },
       data: {

@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Params } from '@interfaces'
 import { formatBreastSize, getDate, getSimilarStars } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
@@ -23,7 +21,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
   if (name !== undefined) {
     //TODO this @unique-field on name-column is not working?
     // seems to not rename, but also slow down performance on original table?
-    return NextResponse.json(
+    return Response.json(
       await db.star.update({
         where: { id },
         data: { name }
@@ -32,7 +30,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
   } else if (slug !== undefined) {
     if (slug.length) {
       // add slug
-      return NextResponse.json(
+      return Response.json(
         await db.star.update({
           where: { id },
           data: { api: slug }
@@ -40,7 +38,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
       )
     } else {
       // reset slug
-      return NextResponse.json(
+      return Response.json(
         await db.star.update({
           where: { id },
           data: { api: null }
@@ -86,13 +84,13 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
       await db.star.update({ where: { id }, data: { [label]: data } })
     }
 
-    return NextResponse.json({
+    return Response.json({
       reload,
       content: data,
       similar: await getSimilarStars(id)
     })
   } else if (ignore !== undefined) {
-    return NextResponse.json(
+    return Response.json(
       await db.star.update({
         where: { id },
         data: { autoTaggerIgnore: ignore }
@@ -104,7 +102,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
 export async function DELETE(req: Request, { params }: Params<'id'>) {
   const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
-  return NextResponse.json(
+  return Response.json(
     await db.star.delete({
       where: { id }
     })

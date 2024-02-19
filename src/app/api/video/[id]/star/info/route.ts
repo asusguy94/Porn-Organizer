@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Params } from '@interfaces'
 import { getSceneData } from '@utils/server/metadata'
 import { db } from '@utils/server/prisma'
@@ -12,7 +10,7 @@ export async function GET(req: Request, { params }: Params<'id'>) {
   const video = await db.video.findFirstOrThrow({ where: { id } })
   if (video.api) {
     try {
-      return NextResponse.json(await getSceneData(video.api))
+      return Response.json(await getSceneData(video.api))
     } catch (error) {
       printError(error)
     }

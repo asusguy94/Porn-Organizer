@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Site, Website } from '@prisma/client'
 import { dateDiff } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
@@ -27,7 +25,7 @@ export async function GET() {
       .reduce((sum, score) => sum + score, 0)
   }
 
-  return NextResponse.json(
+  return Response.json(
     (
       await db.star.findMany({
         orderBy: { name: 'asc' },

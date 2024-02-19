@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Params } from '@interfaces'
 import findBroadSceneSlug from '@utils/server/metadata'
 import { db } from '@utils/server/prisma'
@@ -22,5 +20,5 @@ export async function GET(req: Request, { params }: Params<'id'>) {
     result = await findBroadSceneSlug(video.name)
   }
 
-  return NextResponse.json(getUnique(result, 'id'))
+  return Response.json(getUnique(result, 'id'))
 }

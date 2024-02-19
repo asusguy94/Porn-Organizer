@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Params } from '@interfaces'
 import { generateDate } from '@utils/server/generate'
 import { dateDiff, getDate } from '@utils/server/helper'
@@ -17,7 +15,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     include: { star: true }
   })
 
-  return NextResponse.json({
+  return Response.json({
     ...video,
     age: dateDiff(video.star?.birthdate, video.date)
   })

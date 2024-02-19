@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Params } from '@interfaces'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
@@ -14,7 +12,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
     await req.json()
   )
 
-  return NextResponse.json(
+  return Response.json(
     (
       await db.videoAttributes.create({
         data: { attributeID, videoID: id },

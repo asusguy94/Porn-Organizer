@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Params } from '@interfaces'
 import { getStarData, getStarSlug } from '@utils/server/metadata'
 import { db } from '@utils/server/prisma'
@@ -20,7 +18,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
   if (star.api) {
     try {
       const starData = await getStarData(star.api)
-      return NextResponse.json({
+      return Response.json({
         images: starData.posters
       })
     } catch (error) {

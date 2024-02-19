@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { dateDiff } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
 import { formatDate, getUnique } from '@utils/shared'
@@ -7,7 +5,7 @@ import { formatDate, getUnique } from '@utils/shared'
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  return NextResponse.json(
+  return Response.json(
     (
       await db.video.findMany({
         select: {

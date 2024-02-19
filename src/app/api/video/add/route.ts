@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import type { Video } from '@prisma/client'
 import { getDate } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
@@ -59,5 +57,5 @@ export async function POST(req: Request) {
     }
   }
 
-  return NextResponse.json(result)
+  return Response.json(result)
 }
