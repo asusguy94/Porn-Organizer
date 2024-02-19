@@ -8,6 +8,7 @@ import {
   MediaTimeUpdateEventDetail,
   Poster,
   Track,
+  VTTContent,
   isHLSProvider,
   useMediaRemote
 } from '@vidstack/react'
@@ -20,7 +21,6 @@ import { Modal } from '@components/modal'
 import { settingsConfig } from '@config'
 import { Bookmark, Video } from '@interfaces'
 import { videoService } from '@service'
-import { calculateTimeCode } from '@utils/shared'
 
 import './vidstack.css'
 
@@ -35,14 +35,6 @@ type PlayerProps = {
   bookmarks: Bookmark[]
 }
 
-function generateChapters(json: Pick<VTTCue, 'startTime' | 'endTime' | 'text'>[]): string {
-  let chapters = ''
-  json.forEach(chapter => {
-    chapters += `${calculateTimeCode(chapter.startTime)} --> ${calculateTimeCode(chapter.endTime)}\n${chapter.text}\n\n`
-  })
-  return chapters
-}
-
 export default function Player({ src, poster, thumbnails, title, video, playerRef, modal, bookmarks }: PlayerProps) {
   const remote = useMediaRemote(playerRef)
   const hlsRef = useRef<Hls>()
@@ -52,14 +44,13 @@ export default function Player({ src, poster, thumbnails, title, video, playerRe
 
   const canAddPlay = useRef(false)
 
-  // TODO does this need to be memoized? using useMemo
-  const chapters = generateChapters(
-    bookmarks.map((bookmark, idx, arr) => ({
+  const chapters: VTTContent = {
+    cues: bookmarks.map((bookmark, idx, arr) => ({
       startTime: bookmark.start,
-      text: bookmark.category.name,
-      endTime: arr.at(idx + 1)?.start ?? video.duration
+      endTime: arr.at(idx + 1)?.start ?? video.duration,
+      text: bookmark.category.name
     }))
-  )
+  }
 
   const onCanLoad = () => {
     if (localVideo !== video.id) {
@@ -163,7 +154,7 @@ export default function Player({ src, poster, thumbnails, title, video, playerRe
       <MediaProvider>
         {poster !== undefined && <Poster className='vds-poster' src={poster} alt={title} />}
 
-        <Track kind='chapters' content={chapters} default />
+        <Track kind='chapters' content={chapters} default type='json' />
       </MediaProvider>
 
       <DefaultVideoLayout
