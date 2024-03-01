@@ -1,6 +1,7 @@
 import NextTopLoader from 'nextjs-toploader'
 
 import ClientLayout from './client-layout'
+import NonSSRLayout from './nonssr-layout'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,7 +12,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
       <body>
         <NextTopLoader />
-        <ClientLayout>{children}</ClientLayout>
+        <NonSSRLayout>
+          <ClientLayout>{children}</ClientLayout>
+        </NonSSRLayout>
       </body>
     </html>
   )
