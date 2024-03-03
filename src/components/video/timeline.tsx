@@ -11,7 +11,7 @@ import { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'
 import Spinner from '../spinner'
 
-import { settingsConfig } from '@config'
+import useCollision from '@hooks/use-collision'
 import { Bookmark, General, Video } from '@interfaces'
 import { bookmarkService } from '@service'
 
@@ -31,6 +31,7 @@ export default function Timeline({ bookmarks, video, playVideo, categories, play
   const windowSize = useWindowSize()
   const bookmarksRef = useRef<HTMLElement[]>([])
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
+  const { collisionCheck } = useCollision()
 
   // TODO make bookmark it's own component
 
@@ -56,18 +57,6 @@ export default function Timeline({ bookmarks, video, playVideo, categories, play
   }
 
   useEffect(() => {
-    const collisionCheck = (a: HTMLElement | null, b: HTMLElement | null) => {
-      if (a === null || b === null) return false
-
-      const aRect = a.getBoundingClientRect()
-      const bRect = b.getBoundingClientRect()
-
-      return (
-        aRect.x + aRect.width >= bRect.x - settingsConfig.timeline.spacing &&
-        aRect.x - settingsConfig.timeline.spacing <= bRect.x + bRect.width
-      )
-    }
-
     const bookmarksArr = bookmarks.length > 0 ? bookmarksRef.current : []
     const levels: number[] = new Array(bookmarks.length).fill(0)
     let maxLevel = 0
@@ -92,7 +81,7 @@ export default function Timeline({ bookmarks, video, playVideo, categories, play
       const videoTop = videoElement.getBoundingClientRect().top
       videoElement.style.maxHeight = `calc(100vh - (${spacing.bookmarks}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
     }
-  }, [bookmarks, playerRef, windowSize.width])
+  }, [bookmarks, collisionCheck, playerRef, windowSize.width])
 
   if (categories === undefined) return <Spinner />
 
