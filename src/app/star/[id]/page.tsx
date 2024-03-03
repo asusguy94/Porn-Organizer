@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 
 import { Button, TextField, Grid, Card, CardContent, Typography, ImageList, ImageListItem } from '@mui/material'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { useCopyToClipboard } from 'usehooks-ts'
@@ -23,6 +24,7 @@ import { serverConfig } from '@config'
 import { Similar, Star } from '@interfaces'
 import { starService } from '@service'
 import validate, { z } from '@utils/server/validation'
+import { mutateAndInvalidate } from '@utils/shared'
 
 import styles from './star.module.scss'
 
@@ -202,6 +204,8 @@ type StarImageDropboxProps = {
 }
 function StarImageDropbox({ star, onModal }: StarImageDropboxProps) {
   const router = useRouter()
+  const { mutate } = starService.useAddImage(star.id)
+  const queryClient = useQueryClient()
 
   const removeStar = () => {
     starService.remove(star.id).then(() => {
@@ -216,8 +220,11 @@ function StarImageDropbox({ star, onModal }: StarImageDropboxProps) {
   }
 
   const addImage = (url: string) => {
-    starService.addImage(star.id, url).then(() => {
-      location.reload()
+    mutateAndInvalidate({
+      mutate,
+      queryClient,
+      queryKey: ['star', star.id],
+      variables: { image: url }
     })
   }
 

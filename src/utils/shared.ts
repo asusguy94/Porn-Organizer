@@ -63,7 +63,7 @@ export function mutateAndInvalidate<TData, TResult>({
   reloadByDefault = true,
   exact = true
 }: MutateAndInvalidateProps<TData, TResult>) {
-  return mutate(variables, {
+  mutate(variables, {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey, exact })
 

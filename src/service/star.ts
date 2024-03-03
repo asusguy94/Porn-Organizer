@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 import { createApi } from '@config'
 import { Missing, Similar, Star, StarVideo } from '@interfaces'
@@ -20,7 +20,14 @@ export default {
     return legacyApi.put<T & { autoTaggerIgnore: boolean }>(`/${star.id}`, { ignore: !star.ignored })
   },
   removeImage: (id: number) => legacyApi.delete(`/${id}/image`),
-  addImage: (id: number, url: string) => legacyApi.post<{ image: string }>(`/${id}/image`, { url }),
+  useAddImage: (id: number) => {
+    const { mutate } = useMutation<unknown, Error, { image: string }>({
+      mutationKey: ['star', id, 'addImage'],
+      mutationFn: payload => api.post(`/${id}/image`, payload)
+    })
+
+    return { mutate }
+  },
   getImages: (id: number) => legacyApi.post<{ images: string[] }>(`/${id}/api/image`),
   addHaircolor: (id: number, name: string) => legacyApi.put(`/${id}/haircolor`, { name }),
   removeHaircolor: (id: number, name: string) => legacyApi.put(`/${id}/haircolor`, { name, remove: true }),
