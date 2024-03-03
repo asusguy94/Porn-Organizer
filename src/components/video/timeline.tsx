@@ -2,6 +2,8 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 
 import { Button, Grid } from '@mui/material'
 
+import { keys } from '@keys'
+import { useQueryClient } from '@tanstack/react-query'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { useWindowSize } from 'usehooks-ts'
 
@@ -14,6 +16,7 @@ import Spinner from '../spinner'
 import useCollision from '@hooks/use-collision'
 import { Bookmark, General, Video } from '@interfaces'
 import { bookmarkService } from '@service'
+import { mutateAndInvalidate } from '@utils/shared'
 
 import styles from './timeline.module.css'
 
@@ -34,6 +37,8 @@ export default function Timeline({ bookmarks, video, playVideo, categories, play
   const { collisionCheck } = useCollision()
 
   // TODO make bookmark it's own component
+  const { mutate } = bookmarkService.useSetCategory()
+  const queryClient = useQueryClient()
 
   const setTime = (bookmark: Bookmark) => {
     const player = document.getElementsByTagName('video')[0]
@@ -51,8 +56,11 @@ export default function Timeline({ bookmarks, video, playVideo, categories, play
   }
 
   const changeCategory = (category: General, bookmark: Bookmark) => {
-    bookmarkService.setCategory(bookmark.id, category.id).then(() => {
-      location.reload()
+    mutateAndInvalidate({
+      mutate,
+      queryClient,
+      ...keys.video.byId(video.id)._ctx.bookmark,
+      variables: { id: bookmark.id, categoryID: category.id }
     })
   }
 
