@@ -1,13 +1,25 @@
 #loader {
   border: 16px solid #f3f3f3;
+  width: 120px;
+  height: 120px;
+
   border-top-color: #3498db;
   border-bottom-color: #3498db;
   border-radius: 50%;
-  width: 120px;
-  height: 120px;
   animation: spin 2s linear infinite;
-
   margin: 0 auto;
+}
+
+.small {
+  width: 30px;
+  height: 30px;
+  border-width: 4px;
+}
+
+.medium {
+  width: 60px;
+  height: 60px;
+  border-width: 8px;
 }
 
 @keyframes spin {

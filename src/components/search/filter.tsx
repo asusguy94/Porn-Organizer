@@ -87,7 +87,7 @@ export function FilterCheckbox<TData extends string | General, TObj extends Defa
   const { currentValue, defaultValue } = useSearchParam(defaultObj, label)
   const currentArrayValue = currentValue.split(',')
 
-  if (data === undefined) return <Spinner />
+  if (data === undefined) return <Spinner size='small' />
   return (
     <>
       <h2>{capitalize(label, true)}</h2>
