@@ -1,116 +1,179 @@
-import Client from './client'
+'use client'
 
-import { Params, VideoStar } from '@interfaces'
-import { generateStarName } from '@utils/server/generate'
-import { dateDiff } from '@utils/server/helper'
-import { getSceneData } from '@utils/server/metadata'
-import { db } from '@utils/server/prisma'
+import { useParams } from 'next/navigation'
+import { useRef } from 'react'
+
+import { Grid, Card, Typography, TextField } from '@mui/material'
+
+import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
+
+import Badge from '@components/badge'
+import { IconWithText } from '@components/icon'
+import { ImageCard } from '@components/image'
+import Link from '@components/link'
+import ModalComponent, { useModal, ModalHandler, Modal } from '@components/modal'
+import Ribbon, { RibbonContainer } from '@components/ribbon'
+import Spinner from '@components/spinner'
+import { Header, Player as VideoPlayer, Timeline } from '@components/video'
+import { MediaPlayerInstance } from '@components/vidstack'
+
+import { serverConfig } from '@config'
+import { Video, VideoStar } from '@interfaces'
+import { categoryService, videoService } from '@service'
+import { daysToYears } from '@utils/client/date-time'
 import validate, { z } from '@utils/server/validation'
-import { formatDate } from '@utils/shared'
 
-export default async function VideoPage({ params }: Params<'id'>) {
+import styles from './video.module.css'
+
+export default function VideoPage() {
+  const params = useParams()
   const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
-  const attributes = await db.attribute.findMany()
-  const categories = await db.category.findMany()
-  const locations = await db.location.findMany()
+  const { data: video } = videoService.useVideo(id)
+  const { data: star } = videoService.useStar(id)
 
-  const bookmarks = await db.bookmark.findMany({
-    select: {
-      id: true,
-      category: { select: { id: true, name: true } },
-      start: true
-    },
-    where: { videoID: id },
-    orderBy: { start: 'asc' }
-  })
+  const { modal, setModal } = useModal()
 
-  const star = await db.star.findFirst({
-    where: { videos: { some: { id } } },
-    select: { id: true, name: true, image: true, birthdate: true }
-  })
+  if (video === undefined || star === undefined) return <Spinner />
 
-  let starVal: VideoStar | null = null
-  if (star !== null) {
-    const videos = await db.video.findMany({
-      where: { starID: star.id }
-    })
-
-    const { birthdate, ...rest } = star
-    starVal = {
-      ...rest,
-      ageInVideo: dateDiff(videos.find(v => v.id === id)?.date, birthdate),
-      numVideos: videos.length
-    }
-  }
-
-  const video = await db.video.findFirstOrThrow({
-    where: { id },
-    select: {
-      id: true,
-      name: true,
-      cover: true,
-      api: true,
-      path: true,
-      added: true,
-      date: true,
-      duration: true,
-      height: true,
-      plays: true,
-      website: true,
-      locations: { select: { location: true } },
-      attributes: { select: { attribute: true } },
-      site: true,
-      apiDate: true,
-      validated: true
-    }
-  })
-
-  if (video.api !== null) {
-    // check if date has been validated
-    if (!(video.apiDate !== null && formatDate(video.date, true) === video.apiDate)) {
-      try {
-        video.apiDate = (await getSceneData(video.api)).date.trim()
-
-        // ony update database with new apiDate if nessesary
-        await db.video.update({
-          where: { id: video.id },
-          data: { apiDate: video.apiDate }
-        })
-      } catch (error) {
-        console.error(error)
-      }
-    }
-  }
-
-  const { cover, api, path, added, site, apiDate, ...rest } = video
   return (
-    <Client
-      attributes={attributes}
-      categories={categories}
-      locations={locations}
-      video={{
-        ...rest,
-        image: cover,
-        slug: api,
-        path: {
-          file: path,
-          stream: `${path.split('.').slice(0, -1).join('.')}/master.m3u8`
-        },
-        date: {
-          added: formatDate(added),
-          published: formatDate(rest.date),
-          apiDate: apiDate !== null ? formatDate(apiDate) : null
-        },
-        plays: rest.plays.length,
-        website: rest.website.name,
-        star: generateStarName(path),
-        locations: rest.locations.map(({ location }) => location),
-        attributes: rest.attributes.map(({ attribute }) => attribute),
-        subsite: site?.name ?? ''
+    <Grid container>
+      <Section video={video} star={star} modal={{ data: modal, handler: setModal }} />
+
+      <Grid item xs={2} id={styles.sidebar} component='aside'>
+        <div id={styles.stars}>
+          {video !== undefined && (
+            <>
+              {star !== null && <Star video={video} star={star} />}
+
+              <StarInput video={video} disabled={star !== null} />
+            </>
+          )}
+        </div>
+      </Grid>
+
+      <ModalComponent visible={modal.visible} title={modal.title} filter={modal.filter} onClose={setModal}>
+        {modal.data}
+      </ModalComponent>
+    </Grid>
+  )
+}
+
+type SectionProps = {
+  video: Video
+  star: VideoStar | null
+  modal: { data: Modal; handler: ModalHandler }
+}
+function Section({ video, star = null, modal }: SectionProps) {
+  const playerRef = useRef<MediaPlayerInstance>(null)
+  const { data: categories } = categoryService.useAll()
+  const { data: bookmarks } = videoService.useBookmarks(video.id)
+
+  // Helper script for getting the player
+  const playVideo = (time: number) => {
+    const player = playerRef.current
+
+    if (player !== null) {
+      player.currentTime = time
+      player.play()
+    }
+  }
+
+  if (video === undefined || categories === undefined || bookmarks === undefined) return <Spinner />
+
+  return (
+    <Grid item xs={10} component='section'>
+      <Header video={video} onModal={modal.handler} />
+
+      <VideoPlayer
+        video={video}
+        categories={categories}
+        bookmarks={bookmarks}
+        star={star}
+        playerRef={playerRef}
+        modal={modal}
+      />
+
+      <Timeline
+        bookmarks={bookmarks}
+        video={video}
+        categories={categories}
+        playVideo={playVideo}
+        playerRef={playerRef}
+        onModal={modal.handler}
+      />
+    </Grid>
+  )
+}
+
+type StarProps = {
+  star: VideoStar
+  video: Video
+}
+function Star({ star, video }: StarProps) {
+  const removeStarHandler = () => {
+    videoService.removeStar(video.id).then(() => {
+      location.reload()
+    })
+  }
+
+  return (
+    <div className={styles.star}>
+      <RibbonContainer component={Card}>
+        <Badge content={star.numVideos}>
+          <ContextMenuTrigger id='star'>
+            <ImageCard
+              src={`${serverConfig.legacyApi}/star/${star.id}/image`}
+              width={250}
+              height={380}
+              missing={star.image === null}
+              renderStyle='transform'
+              scale={5}
+              alt='star'
+              priority
+              responsive
+              sizes={`${(100 / 12) * 2}vw`}
+            />
+
+            <Link href={`/star/${star.id}`}>
+              <Typography className='unselectable'>{star.name}</Typography>
+            </Link>
+
+            {star.ageInVideo > 0 && <Ribbon label={daysToYears(star.ageInVideo)} />}
+          </ContextMenuTrigger>
+        </Badge>
+      </RibbonContainer>
+
+      <ContextMenu id='star'>
+        <IconWithText component={ContextMenuItem} icon='delete' text='Remove' onClick={removeStarHandler} />
+      </ContextMenu>
+    </div>
+  )
+}
+
+type StarInputProps = {
+  video: Video
+  disabled?: boolean
+}
+function StarInput({ video, disabled = false }: StarInputProps) {
+  const addStar = (star: string) => {
+    videoService.addStar(video.id, star).then(() => {
+      location.reload()
+    })
+  }
+
+  if (disabled) return null
+
+  return (
+    <TextField
+      label='Star'
+      variant='outlined'
+      autoFocus
+      onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+          addStar((e.target as HTMLInputElement).value)
+        }
       }}
-      star={starVal}
-      bookmarks={bookmarks}
     />
   )
 }

@@ -122,7 +122,7 @@ function VideoCard({ video }: VideoCardProps) {
       <RibbonContainer component={Card} className={styles.video}>
         <CardActionArea>
           <ImageCard
-            src={`${serverConfig.api}/video/${video.id}/image`}
+            src={`${serverConfig.legacyApi}/video/${video.id}/image`}
             width={290}
             height={170}
             missing={video.image === null}

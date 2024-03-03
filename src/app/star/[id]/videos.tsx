@@ -9,18 +9,20 @@ import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Spinner from '@components/spinner'
 
 import { serverConfig } from '@config'
-import { StarVideo } from '@interfaces'
+import { Star, StarVideo } from '@interfaces'
+import { starService } from '@service'
 import { daysToYears } from '@utils/client/date-time'
 import { getUnique } from '@utils/shared'
 
 import styles from './star.module.scss'
 
 type VideosProps = {
-  videos?: StarVideo[]
+  star: Star
 }
-export default function Videos({ videos }: VideosProps) {
+export default function Videos({ star }: VideosProps) {
   const [websites, setWebsites] = useState<string[]>([])
   const [focus, setFocus] = useState<string[]>([])
+  const { data: videos } = starService.useVideos(star.id)
 
   const toggleFocus = (website: string) => {
     // allow multiple items to be selected
@@ -99,7 +101,7 @@ type VideoProps = {
 }
 function Video({ video, isFirst, isLast, isHidden }: VideoProps) {
   const [src, setSrc] = useState('')
-  const [dataSrc, setDataSrc] = useState(`${serverConfig.api}/video/${video.id}/file`)
+  const [dataSrc, setDataSrc] = useState(`${serverConfig.legacyApi}/video/${video.id}/file`)
 
   const thumbnail = useRef<NodeJS.Timeout>()
 
@@ -169,7 +171,7 @@ function Video({ video, isFirst, isLast, isHidden }: VideoProps) {
           component='video'
           src={src}
           data-src={dataSrc}
-          poster={`${serverConfig.api}/video/${video.id}/thumb`}
+          poster={`${serverConfig.legacyApi}/video/${video.id}/thumb`}
           preload='metadata'
           muted
           onMouseEnter={handleMouseEnter}

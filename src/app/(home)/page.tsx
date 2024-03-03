@@ -1,60 +1,73 @@
-import Client, { HomePageProps } from './client'
+'use client'
 
-import { db } from '@utils/server/prisma'
+import { Grid } from '@mui/material'
 
-export const dynamic = 'force-dynamic'
+import capitalize from 'capitalize'
 
-export default async function HomePage() {
-  type Props = HomePageProps['data'][number]
+import { ResponsiveImage } from '@components/image'
+import Link from '@components/link'
+import Ribbon, { RibbonContainer } from '@components/ribbon'
+import Spinner from '@components/spinner'
 
-  let cols = 12
-  const recent: Props = {
-    cols,
-    label: 'recent',
-    videos: (
-      await db.video.findMany({
-        select: { id: true, name: true, cover: true },
-        orderBy: { id: 'desc' },
-        take: 1 * cols
-      })
-    ).map(({ cover, ...video }) => ({
-      ...video,
-      image: cover
-    }))
-  }
+import { serverConfig } from '@config'
+import { homeService } from '@service'
 
-  cols = 12
-  const newest: Props = {
-    cols,
-    label: 'newest',
-    videos: (
-      await db.video.findMany({
-        select: { id: true, name: true, cover: true },
-        orderBy: { date: 'desc' },
-        take: 1 * cols
-      })
-    ).map(({ cover, ...video }) => ({
-      ...video,
-      image: cover
-    }))
-  }
+import classes from './home.module.css'
 
-  cols = 10
-  const popular: Props = {
-    cols,
-    label: 'popular',
-    videos: (
-      await db.video.findMany({
-        include: { plays: true },
-        orderBy: [{ plays: { _count: 'desc' } }, { date: 'desc' }],
-        take: 3 * cols
-      })
-    ).map(({ cover, plays, ...video }) => ({
-      ...video,
-      image: cover,
-      total: plays.length
-    }))
-  }
+type ColumnProps = {
+  label: string
+  cols: number
+  rows?: number
+}
+function Column({ label, cols, rows = 1 }: ColumnProps) {
+  const { data: videos } = homeService.useVideos(label, cols * rows)
 
-  return <Client data={[recent, newest, popular]} />
+  if (videos === undefined) return <Spinner />
+
+  return (
+    <Grid container component='section' style={{ marginBottom: '0.5em' }}>
+      <h2 style={{ marginTop: 0, marginBottom: 0 }}>
+        {capitalize(label)} (<span style={{ color: 'green' }}>{videos.length}</span>)
+      </h2>
+
+      <Grid container spacing={2} columns={cols}>
+        {videos.map((video, idx) => {
+          const isMissing = video.image === null
+
+          return (
+            <Grid item xs={1} key={video.id}>
+              <Link href={`/video/${video.id}`}>
+                <RibbonContainer className={classes.video} style={isMissing ? { textAlign: 'center' } : {}}>
+                  <ResponsiveImage
+                    src={`${serverConfig.legacyApi}/video/${video.id}/image`}
+                    width={185}
+                    height={105}
+                    missing={isMissing}
+                    className={classes.thumb}
+                    alt='video'
+                    priority={idx % cols === 0}
+                    sizes={`${100 / cols}vw`}
+                  />
+
+                  <div className={classes.title}>{video.name}</div>
+
+                  {video.total !== undefined && <Ribbon label={video.total} />}
+                </RibbonContainer>
+              </Link>
+            </Grid>
+          )
+        })}
+      </Grid>
+    </Grid>
+  )
+}
+
+export default function HomePage() {
+  return (
+    <Grid container>
+      <Column label='recent' cols={12} />
+      <Column label='newest' cols={12} />
+      <Column label='popular' cols={10} rows={3} />
+    </Grid>
+  )
 }

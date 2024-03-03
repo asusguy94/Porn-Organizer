@@ -1,8 +1,8 @@
 import { createApi } from '@config'
 
-const { api } = createApi('/generate')
+const { legacyApi } = createApi('/generate')
 
 export default {
-  metadata: () => api.post('/meta'),
-  vtt: () => api.post('/vtt')
+  metadata: () => legacyApi.post('/meta'),
+  vtt: () => legacyApi.post('/vtt')
 }

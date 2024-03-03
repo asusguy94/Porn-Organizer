@@ -55,7 +55,7 @@ function StarCard({ star }: StarCardProps) {
         <Badge content={star.videoCount}>
           <CardActionArea>
             <ImageCard
-              src={`${serverConfig.api}/star/${star.id}/image`}
+              src={`${serverConfig.legacyApi}/star/${star.id}/image`}
               width={200}
               height={275}
               missing={star.image === null}

@@ -1,7 +1,25 @@
+import { useMutation, useQuery } from '@tanstack/react-query'
+
 import { createApi } from '@config'
+import { General } from '@interfaces'
 
 const { api } = createApi('/attribute')
 
 export default {
-  removeVideo: (videoID: number, attributeId: number) => api.delete(`/${attributeId}/${videoID}`)
+  useRemoveVideo: (videoId: number) => {
+    const { mutate } = useMutation<unknown, Error, { attributeId: number }>({
+      mutationKey: ['attribute', 'removeVideo'],
+      mutationFn: ({ attributeId }) => api.delete(`/${attributeId}/${videoId}`)
+    })
+
+    return { mutate }
+  },
+  useAll: () => {
+    const query = useQuery<General[]>({
+      queryKey: ['attribute'],
+      queryFn: () => api.get('')
+    })
+
+    return { data: query.data }
+  }
 }

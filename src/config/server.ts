@@ -1,4 +1,5 @@
 export default {
-  api: '/api',
+  legacyApi: '/api',
+  api: 'http://localhost:5454/api',
   db: 'http://localhost:5555'
 }

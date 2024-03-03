@@ -4,6 +4,44 @@ import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 import { formatDate } from '@utils/shared'
 
+export async function GET(req: Request, { params }: Params<'id'>) {
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
+
+  const { haircolors: starHaircolors, ...star } = await db.star.findFirstOrThrow({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      autoTaggerIgnore: true,
+      breast: true,
+      haircolors: true,
+      ethnicity: true,
+      birthdate: true,
+      height: true,
+      weight: true,
+      api: true
+    }
+  })
+
+  const { autoTaggerIgnore, breast, ethnicity, birthdate, height, weight, api, ...rest } = star
+  return Response.json({
+    ...rest,
+    slug: api,
+    ignored: autoTaggerIgnore,
+    info: {
+      breast: breast ?? '',
+      haircolor: starHaircolors.map(({ hair: haircolor }) => haircolor),
+      ethnicity: ethnicity ?? '',
+      // items without autocomplete
+      birthdate: birthdate ? formatDate(birthdate, true) : '',
+      height: height?.toString() ?? '',
+      weight: weight?.toString() ?? ''
+    },
+    similar: await getSimilarStars(star.id)
+  })
+}
+
 export async function PUT(req: Request, { params }: Params<'id'>) {
   const { id } = validate(z.object({ id: z.coerce.number() }), params)
 

@@ -12,7 +12,7 @@ import { ModalHandler } from '../modal'
 import Spinner from '../spinner'
 
 import { settingsConfig } from '@config'
-import { Bookmark, General, SetState, Video } from '@interfaces'
+import { Bookmark, General, Video } from '@interfaces'
 import { bookmarkService } from '@service'
 
 import styles from './timeline.module.css'
@@ -25,58 +25,33 @@ type TimelineProps = {
   categories?: General[]
   playVideo: (time: number) => void
   playerRef: React.RefObject<MediaPlayerInstance>
-  update: SetState<Bookmark[]>
   onModal: ModalHandler
 }
-export default function Timeline({
-  bookmarks,
-  video,
-  playVideo,
-  categories,
-  playerRef,
-  update,
-  onModal
-}: TimelineProps) {
+export default function Timeline({ bookmarks, video, playVideo, categories, playerRef, onModal }: TimelineProps) {
   const windowSize = useWindowSize()
   const bookmarksRef = useRef<HTMLElement[]>([])
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
+
+  // TODO make bookmark it's own component
 
   const setTime = (bookmark: Bookmark) => {
     const player = document.getElementsByTagName('video')[0]
     const time = Math.round(player.currentTime)
 
     bookmarkService.setTime(bookmark.id, time).then(() => {
-      update(
-        bookmarks
-          .map(bookmarkItem => {
-            if (bookmarkItem.id === bookmark.id) {
-              return { ...bookmarkItem, start: time }
-            }
-
-            return bookmarkItem
-          })
-          .toSorted((a, b) => a.start - b.start)
-      )
+      location.reload()
     })
   }
 
   const removeBookmark = (bookmark: Bookmark) => {
     bookmarkService.delete(bookmark.id).then(() => {
-      update(bookmarks.filter(item => item.start !== bookmark.start))
+      location.reload()
     })
   }
 
   const changeCategory = (category: General, bookmark: Bookmark) => {
     bookmarkService.setCategory(bookmark.id, category.id).then(() => {
-      update(
-        bookmarks.map(bookmarkItem => {
-          if (bookmarkItem.start === bookmark.start) {
-            return { ...bookmarkItem, category }
-          }
-
-          return bookmarkItem
-        })
-      )
+      location.reload()
     })
   }
 

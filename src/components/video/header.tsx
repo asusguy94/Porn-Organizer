@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 import { Button, Grid, ImageList, ImageListItem, TextField, Typography } from '@mui/material'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { useCopyToClipboard } from 'usehooks-ts'
@@ -12,24 +13,21 @@ import { ModalHandler } from '../modal'
 import Spinner from '../spinner'
 
 import { settingsConfig } from '@config'
-import { General, SetState, Video } from '@interfaces'
+import { General, Video } from '@interfaces'
 import { attributeService, locationService, videoService } from '@service'
-import { formatDate } from '@utils/shared'
+import { formatDate, mutateAndInvalidate } from '@utils/shared'
 
 import styles from './header.module.scss'
 
 type HeaderProps = {
   video: Video
-  attributes?: General[]
-  locations?: General[]
-  update: SetState<Video | undefined>
   onModal: ModalHandler
 }
-export default function Header({ video, attributes, locations, update, onModal }: HeaderProps) {
+export default function Header({ video, onModal }: HeaderProps) {
   return (
     <Grid container>
       <Grid container item alignItems='center' component='header' id={styles.header}>
-        <HeaderTitle video={video} attributes={attributes} locations={locations} update={update} onModal={onModal} />
+        <HeaderTitle video={video} onModal={onModal} />
 
         <HeaderSlug video={video} hidden={video.slug !== null} onModal={onModal} />
         <HeaderCover video={video} hidden={video.image !== null || video.slug === null} />
@@ -37,8 +35,8 @@ export default function Header({ video, attributes, locations, update, onModal }
 
         <HeaderDate video={video} />
 
-        <HeaderLocations video={video} update={update} />
-        <HeaderAttributes video={video} update={update} />
+        <HeaderLocations video={video} />
+        <HeaderAttributes video={video} />
         <HeaderSite video={video} />
       </Grid>
     </Grid>
@@ -228,12 +226,18 @@ function ValidateTitle({ video, hidden, onModal }: ValidateTitleProps) {
 
 type HeaderLocationsProps = {
   video: Video
-  update: SetState<Video | undefined>
 }
-function HeaderLocations({ video, update }: HeaderLocationsProps) {
+function HeaderLocations({ video }: HeaderLocationsProps) {
+  const { mutate } = locationService.useRemoveVideo(video.id)
+
+  const queryClient = useQueryClient()
+
   const removeLocation = (location: General) => {
-    locationService.removeVideo(video.id, location.id).then(() => {
-      update({ ...video, locations: video.locations.filter(item => item.id !== location.id) })
+    mutateAndInvalidate({
+      mutate,
+      queryClient,
+      queryKey: ['video', video.id, 'location'],
+      variables: { locationId: location.id }
     })
   }
 
@@ -260,12 +264,18 @@ function HeaderLocations({ video, update }: HeaderLocationsProps) {
 
 type HeaderAttributesProps = {
   video: Video
-  update: SetState<Video | undefined>
 }
-function HeaderAttributes({ video, update }: HeaderAttributesProps) {
+function HeaderAttributes({ video }: HeaderAttributesProps) {
+  const { mutate } = attributeService.useRemoveVideo(video.id)
+
+  const queryClient = useQueryClient()
+
   const removeAttribute = (attribute: General) => {
-    attributeService.removeVideo(video.id, attribute.id).then(() => {
-      update({ ...video, attributes: video.attributes.filter(item => item.id !== attribute.id) })
+    mutateAndInvalidate({
+      mutate,
+      queryClient,
+      queryKey: ['video', video.id, 'attribute'],
+      variables: { attributeId: attribute.id }
     })
   }
 
@@ -338,33 +348,44 @@ function HeaderDate({ video }: HeaderDateProps) {
 
 type HeaderTitleProps = {
   video: Video
-  attributes?: General[]
-  locations?: General[]
-  update: SetState<Video | undefined>
   onModal: ModalHandler
 }
-function HeaderTitle({ video, attributes, locations, update, onModal }: HeaderTitleProps) {
+function HeaderTitle({ video, onModal }: HeaderTitleProps) {
+  const { data: attributes } = attributeService.useAll()
+  const { data: locations } = locationService.useAll()
+  const { mutate: mutateLocation } = videoService.useAddLocation(video.id)
+  const { mutate: mutateAttribute } = videoService.useAddAttribute(video.id)
+  const { mutate: mutateTitle } = videoService.useRenameTitle(video.id)
+
+  const queryClient = useQueryClient()
+
   const [, setClipboard] = useCopyToClipboard()
 
   const addLocationHandler = (location: General) => {
-    videoService.addLocation(video.id, location.id).then(({ data }) => {
-      update({
-        ...video,
-        locations: [...video.locations, data].sort((a, b) => {
-          return a.name.localeCompare(b.name)
-        })
-      })
+    mutateAndInvalidate({
+      mutate: mutateLocation,
+      queryClient,
+      queryKey: ['video', video.id, 'location'],
+      variables: { locationID: location.id }
     })
   }
 
   const addAttribute = (attribute: General) => {
-    videoService.addAttribute(video.id, attribute.id).then(({ data }) => {
-      update({ ...video, attributes: [...video.attributes, data].sort((a, b) => a.name.localeCompare(b.name)) })
+    mutateAndInvalidate({
+      mutate: mutateAttribute,
+      queryClient,
+      queryKey: ['video', video.id, 'attribute'],
+      variables: { attributeID: attribute.id }
     })
   }
 
   const renameTitle = (title: string) => {
-    videoService.renameTitle(video.id, title).then(() => update({ ...video, name: title }))
+    mutateAndInvalidate({
+      mutate: mutateTitle,
+      queryClient,
+      queryKey: ['video', video.id],
+      variables: { title }
+    })
   }
 
   const copyTitle = async () => await setClipboard(video.name)

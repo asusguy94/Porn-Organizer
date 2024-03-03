@@ -137,3 +137,33 @@ export type VideoSearch = {
   website: string
   api: string | null
 }
+
+export type File = {
+  path: string
+  website: string
+  site: string
+  title: string
+  date: string
+}
+
+export type Missing = {
+  videoId: number
+  name: string
+}
+
+export type Star = {
+  id: number
+  name: string
+  image: string | null
+  slug: string | null
+  ignored: boolean
+  info: {
+    breast: string
+    haircolor: string[]
+    ethnicity: string
+    birthdate: string
+    height: string
+    weight: string
+  }
+  similar: Similar[]
+}

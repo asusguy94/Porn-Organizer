@@ -1,54 +1,122 @@
-import fs from 'fs'
+'use client'
 
-import Client, { File } from './client'
+import { useState } from 'react'
 
-import { generateDate, generateSite, generateTitle, generateWebsite } from '@utils/server/generate'
-import { dirOnly, extOnly } from '@utils/server/helper'
-import { db } from '@utils/server/prisma'
+import {
+  Grid,
+  Button,
+  Table,
+  TableContainer,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableHead,
+  Typography,
+  Paper
+} from '@mui/material'
 
-export const dynamic = 'force-dynamic'
+import { useQueryClient } from '@tanstack/react-query'
 
-export default async function AddVideoPage() {
-  const filesDB = await db.video.findMany()
-  const filesArr = filesDB.map(video => video.path)
+import Spinner from '@components/spinner'
 
-  // TODO skip this check if directory is missing?
-  const paths = await fs.promises.readdir('./media/videos')
+import Progress from './progress'
 
-  const newFiles: File[] = []
-  for await (const path of paths) {
-    if (path.includes('_')) continue
+import { generateService, videoService } from '@service'
+import { mutateAndInvalidate } from '@utils/shared'
 
-    const dirPath = `./media/videos/${path}`
-    if ((await fs.promises.lstat(dirPath)).isDirectory()) {
-      try {
-        const files = await fs.promises.readdir(dirPath)
+import styles from './add.module.css'
 
-        for await (const file of files) {
-          const filePath = `${dirPath}/${file}`
-          const wsite = generateWebsite(dirPath)
-          if (
-            !filesArr.includes(`${wsite}/${file}`) &&
-            (await fs.promises.lstat(filePath)).isFile() &&
-            extOnly(filePath) === '.mp4' && // Prevent random files from being imported!
-            !dirOnly(file).endsWith('_') // ignore files with '_' at the end
-          ) {
-            newFiles.push({
-              path: `${wsite}/${file}`,
-              website: wsite,
-              date: generateDate(filePath),
-              site: generateSite(filePath),
-              title: generateTitle(filePath)
-            })
-          }
-        }
-      } catch {
-        console.log(`"${dirPath}" is not readable, skipping`)
+type ActionProps = {
+  label: string
+  callback?: () => void
+  disabled?: boolean
+}
+function Action({ label, callback = undefined, disabled = false }: ActionProps) {
+  const [isDisabled, setIsDisabled] = useState(disabled)
+
+  const clickHandler = () => {
+    if (!isDisabled) {
+      setIsDisabled(true)
+
+      if (callback !== undefined) {
+        callback()
+        setIsDisabled(false)
       }
     }
   }
 
-  const newFilesSliced = newFiles.slice(0, 33)
+  return (
+    <Button
+      variant='outlined'
+      color='primary'
+      disabled={isDisabled}
+      onClick={clickHandler}
+      style={{ marginLeft: 6, marginRight: 6 }}
+    >
+      {label}
+    </Button>
+  )
+}
 
-  return <Client files={newFilesSliced} pages={Math.ceil(newFiles.length / newFilesSliced.length) || 0} />
+export default function AddVideoPage() {
+  const { data } = videoService.useNew()
+  const { mutate } = videoService.useAddVideos()
+
+  const queryClient = useQueryClient()
+
+  if (data === undefined) return <Spinner />
+
+  return (
+    <Grid className='text-center'>
+      <Typography style={{ marginBottom: 8 }}>Import Videos</Typography>
+      {data.files.length === 0 ? (
+        <div className='text-center'>
+          <Action label='Generate Metadata' callback={generateService.metadata} />
+          <Action label='Generate VTT' callback={generateService.vtt} />
+
+          <Progress />
+        </div>
+      ) : (
+        <>
+          <TableContainer component={Paper}>
+            <Table size='small' className={styles['table-striped']}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>website</TableCell>
+                  <TableCell>site</TableCell>
+                  <TableCell>path</TableCell>
+                  <TableCell>title</TableCell>
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                {data.files.map(file => (
+                  <TableRow key={file.path}>
+                    <TableCell>{file.website}</TableCell>
+                    <TableCell>{file.site}</TableCell>
+                    <TableCell>{file.path}</TableCell>
+                    <TableCell>{file.title}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <div style={{ marginTop: 8 }}>
+            <Action
+              label={`Add Videos (page 1 of ${data.pages})`}
+              callback={() => {
+                mutateAndInvalidate({
+                  mutate,
+                  queryClient,
+                  queryKey: ['video', 'new'],
+                  variables: { videos: data.files }
+                })
+              }}
+            />
+          </div>
+        </>
+      )}
+    </Grid>
+  )
 }

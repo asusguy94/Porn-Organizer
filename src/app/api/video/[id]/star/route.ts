@@ -1,8 +1,33 @@
-import { Params } from '@interfaces'
+import { Params, VideoStar } from '@interfaces'
 import { dateDiff } from '@utils/server/helper'
 import { aliasExists, getAliasAsStar } from '@utils/server/helper.db'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
+
+export async function GET(req: Request, { params }: Params<'id'>) {
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
+
+  const star = await db.star.findFirst({
+    where: { videos: { some: { id } } },
+    select: { id: true, name: true, image: true, birthdate: true }
+  })
+
+  let starVal: VideoStar | null = null
+  if (star !== null) {
+    const videos = await db.video.findMany({
+      where: { starID: star.id }
+    })
+
+    const { birthdate, ...rest } = star
+    starVal = {
+      ...rest,
+      ageInVideo: dateDiff(videos.find(v => v.id === id)?.date, birthdate),
+      numVideos: videos.length
+    }
+  }
+
+  return Response.json(starVal)
+}
 
 export async function POST(req: Request, { params }: Params<'id'>) {
   const { id } = validate(z.object({ id: z.coerce.number() }), params)

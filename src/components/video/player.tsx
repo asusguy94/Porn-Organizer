@@ -11,7 +11,7 @@ import { Modal, ModalHandler } from '../modal'
 import Spinner from '../spinner'
 
 import { serverConfig } from '@config'
-import { Bookmark, General, SetState, Video, VideoStar } from '@interfaces'
+import { Bookmark, General, Video, VideoStar } from '@interfaces'
 import { videoService } from '@service'
 
 type VideoPlayerProps = {
@@ -20,23 +20,10 @@ type VideoPlayerProps = {
   bookmarks: Bookmark[]
   star: VideoStar | null
   playerRef: React.RefObject<MediaPlayerInstance>
-  update: {
-    video: SetState<Video | undefined>
-    star: SetState<VideoStar | null>
-    bookmarks: SetState<Bookmark[]>
-  }
   modal: { data: Modal; handler: ModalHandler }
 }
 
-export default function VideoPlayer({
-  video,
-  categories,
-  bookmarks,
-  star,
-  playerRef,
-  update,
-  modal
-}: VideoPlayerProps) {
+export default function VideoPlayer({ video, categories, bookmarks, star, playerRef, modal }: VideoPlayerProps) {
   const router = useRouter()
 
   const deleteVideo = () => {
@@ -57,18 +44,20 @@ export default function VideoPlayer({
           start: data.start
         })
 
-        update.bookmarks([...bookmarks].sort((a, b) => a.start - b.start))
+        location.reload()
       })
     }
   }
 
   const clearBookmarks = () => {
-    videoService.removeBookmark(video.id).then(() => update.bookmarks([]))
+    videoService.removeBookmark(video.id).then(() => {
+      location.reload()
+    })
   }
 
   const resetPlays = () => {
     videoService.removePlays(video.id).then(() => {
-      update.video({ ...video, plays: 0 })
+      location.reload()
     })
   }
 
@@ -88,11 +77,11 @@ export default function VideoPlayer({
           playerRef={playerRef}
           video={video}
           bookmarks={bookmarks}
-          poster={`${serverConfig.api}/video/${video.id}/image`}
-          thumbnails={`${serverConfig.api}/video/${video.id}/vtt`}
+          poster={`${serverConfig.legacyApi}/video/${video.id}/image`}
+          thumbnails={`${serverConfig.legacyApi}/video/${video.id}/vtt`}
           src={{
-            video: `${serverConfig.api}/video/${video.id}/file`,
-            hls: `${serverConfig.api}/video/${video.id}/hls`
+            video: `${serverConfig.legacyApi}/video/${video.id}/file`,
+            hls: `${serverConfig.legacyApi}/video/${video.id}/hls`
           }}
           modal={modal.data}
         />

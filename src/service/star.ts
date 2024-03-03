@@ -1,26 +1,72 @@
-import { createApi } from '@config'
-import { Similar } from '@interfaces'
+import { useQuery } from '@tanstack/react-query'
 
-const { api } = createApi('/star')
+import { createApi } from '@config'
+import { Missing, Similar, Star, StarVideo } from '@interfaces'
+
+const { api, legacyApi } = createApi('/star')
+
+type StarInfo = {
+  breast: string[]
+  haircolor: string[]
+  ethnicity: string[]
+}
 
 export default {
-  add: (star: string) => api.post('/', { name: star }),
-  remove: (id: number) => api.delete(`/${id}`),
-  renameStar: (id: number, name: string) => api.put(`/${id}`, { name }),
-  setSlug: (id: number, slug: string) => api.put(`/${id}`, { slug }),
+  add: (star: string) => legacyApi.post('/', { name: star }),
+  remove: (id: number) => legacyApi.delete(`/${id}`),
+  renameStar: (id: number, name: string) => legacyApi.put(`/${id}`, { name }),
+  setSlug: (id: number, slug: string) => legacyApi.put(`/${id}`, { slug }),
   ignoreStar: <T extends { id: number; ignored: boolean }>(star: T) => {
-    return api.put<T & { autoTaggerIgnore: boolean }>(`/${star.id}`, { ignore: !star.ignored })
+    return legacyApi.put<T & { autoTaggerIgnore: boolean }>(`/${star.id}`, { ignore: !star.ignored })
   },
-  removeImage: (id: number) => api.delete(`/${id}/image`),
-  addImage: (id: number, url: string) => api.post<{ image: string }>(`/${id}/image`, { url }),
-  getImages: (id: number) => api.post<{ images: string[] }>(`/${id}/api/image`),
-  addHaircolor: (id: number, name: string) => api.put(`/${id}/haircolor`, { name }),
-  removeHaircolor: (id: number, name: string) => api.put(`/${id}/haircolor`, { name, remove: true }),
+  removeImage: (id: number) => legacyApi.delete(`/${id}/image`),
+  addImage: (id: number, url: string) => legacyApi.post<{ image: string }>(`/${id}/image`, { url }),
+  getImages: (id: number) => legacyApi.post<{ images: string[] }>(`/${id}/api/image`),
+  addHaircolor: (id: number, name: string) => legacyApi.put(`/${id}/haircolor`, { name }),
+  removeHaircolor: (id: number, name: string) => legacyApi.put(`/${id}/haircolor`, { name, remove: true }),
   updateInfo: (id: number, label: string, value: string) =>
-    api.put<{ reload: boolean; content: string | Date | number | null; similar: Similar[] }>(`/${id}`, {
+    legacyApi.put<{ reload: boolean; content: string | Date | number | null; similar: Similar[] }>(`/${id}`, {
       label,
       value
     }),
-  resetInfo: (id: number) => api.delete(`/${id}/api`),
-  getData: (id: number) => api.post(`/${id}/api`)
+  resetInfo: (id: number) => legacyApi.delete(`/${id}/api`),
+  getData: (id: number) => legacyApi.post(`/${id}/api`),
+  useInfo: () => {
+    const query = useQuery<StarInfo>({
+      queryKey: ['star', 'info'],
+      queryFn: () => api.get('')
+    })
+
+    return { data: query.data }
+  },
+  useAll: () => {
+    type Star = {
+      id: number
+      name: string
+      image: string | null
+    }
+
+    const query = useQuery<{ stars: Star[]; missing: Missing[] }>({
+      queryKey: ['star'],
+      queryFn: () => api.get('')
+    })
+
+    return { data: query.data }
+  },
+  useVideos: (id: number) => {
+    const query = useQuery<StarVideo[]>({
+      queryKey: ['star', id, 'videos'],
+      queryFn: () => api.get(`/${id}/video`)
+    })
+
+    return { data: query.data }
+  },
+  useStar: (id: number) => {
+    const query = useQuery<Star>({
+      queryKey: ['star', id],
+      queryFn: () => api.get(`/${id}`)
+    })
+
+    return { data: query.data }
+  }
 }

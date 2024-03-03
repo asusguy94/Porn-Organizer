@@ -1,9 +1,9 @@
 import { createApi } from '@config'
 
-const { api } = createApi('/bookmark')
+const { legacyApi } = createApi('/bookmark')
 
 export default {
-  setTime: (id: number, time: number) => api.put(`/${id}`, { time }),
-  delete: (id: number) => api.delete(`/${id}`),
-  setCategory: (id: number, categoryID: number) => api.put(`/${id}`, { categoryID })
+  setTime: (id: number, time: number) => legacyApi.put(`/${id}`, { time }),
+  delete: (id: number) => legacyApi.delete(`/${id}`),
+  setCategory: (id: number, categoryID: number) => legacyApi.put(`/${id}`, { categoryID })
 }
