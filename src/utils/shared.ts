@@ -1,3 +1,4 @@
+import { DefaultError, QueryClient, QueryKey, UseMutateAsyncFunction, UseMutateFunction } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
@@ -43,4 +44,58 @@ export function getProgress(index: number, total: number) {
     progress: clamp((index + 1) / (total + 1), 1),
     buffer: clamp((index + 2) / (total + 1), 1)
   }
+}
+
+type MutateAndInvalidateProps<TData, TResult> = {
+  mutate: UseMutateFunction<TResult, DefaultError, TData>
+  queryClient: QueryClient
+  queryKey: QueryKey
+  variables: TData
+  reloadByDefault?: boolean
+  exact?: boolean
+}
+
+export function mutateAndInvalidate<TData, TResult>({
+  mutate,
+  queryClient,
+  queryKey,
+  variables,
+  reloadByDefault = true,
+  exact = true
+}: MutateAndInvalidateProps<TData, TResult>) {
+  return mutate(variables, {
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey, exact })
+
+      if (reloadByDefault) {
+        location.reload()
+      }
+    }
+  })
+}
+
+type MutateAndInvalidateAllProps<TData, TResult> = {
+  mutate: UseMutateAsyncFunction<TResult, DefaultError, TData>
+  queryClient: QueryClient
+  queryKey: QueryKey
+  variables: TData[]
+  reloadByDefault?: boolean
+  exact?: boolean
+}
+
+export function mutateAndInvalidateAll<TData, TResult>({
+  mutate,
+  queryClient,
+  queryKey,
+  variables,
+  reloadByDefault = false,
+  exact = true
+}: MutateAndInvalidateAllProps<TData, TResult>) {
+  Promise.allSettled(variables.map(variable => mutate(variable))).then(() => {
+    if (reloadByDefault) {
+      location.reload()
+    } else {
+      queryClient.invalidateQueries({ queryKey, exact })
+    }
+  })
 }
