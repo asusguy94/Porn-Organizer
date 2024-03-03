@@ -54,7 +54,7 @@ function Table({ name }: TableProps) {
     queryFn: () => api.get('')
   })
 
-  const { mutate } = useMutation<General, Error, { name: string }>({
+  const { mutate } = useMutation<unknown, Error, { name: string }>({
     mutationKey: [name, 'add'],
     mutationFn: payload => api.post('', payload)
   })
@@ -119,7 +119,7 @@ function TableRow({ data, name }: TableRowProps) {
 
   const { api } = createApi(`/api/${name}`)
 
-  const { mutate } = useMutation<General, Error, { name: string }>({
+  const { mutate } = useMutation<unknown, Error, { name: string }>({
     mutationKey: [name, 'update'],
     mutationFn: payload => api.put(`/${data.id}`, payload)
   })
