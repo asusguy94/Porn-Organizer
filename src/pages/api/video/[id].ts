@@ -4,7 +4,7 @@ import fs from 'fs'
 
 import { settingsConfig } from '@config'
 import { resizeImage } from '@utils/server/ffmpeg'
-import { generateDate } from '@utils/server/generate'
+import { generateDate, generateStarName } from '@utils/server/generate'
 import {
   dateDiff,
   downloader,
@@ -23,7 +23,68 @@ import { formatDate, printError } from '@utils/shared'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = validate(z.object({ id: z.coerce.number() }), req.query)
 
-  if (req.method === 'PUT') {
+  if (req.method === 'GET') {
+    const video = await db.video.findFirstOrThrow({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        cover: true,
+        api: true,
+        path: true,
+        added: true,
+        date: true,
+        duration: true,
+        height: true,
+        plays: true,
+        website: true,
+        locations: { select: { location: true } },
+        attributes: { select: { attribute: true } },
+        site: true,
+        apiDate: true,
+        validated: true
+      }
+    })
+
+    if (video.api !== null) {
+      // check if date has been validated
+      if (!(video.apiDate !== null && formatDate(video.date, true) === video.apiDate)) {
+        try {
+          video.apiDate = (await getSceneData(video.api)).date.trim()
+
+          // ony update database with new apiDate if nessesary
+          await db.video.update({
+            where: { id: video.id },
+            data: { apiDate: video.apiDate }
+          })
+        } catch (error) {
+          console.error(error)
+        }
+      }
+    }
+
+    const { cover, api, path, added, site, apiDate, ...rest } = video
+    res.send({
+      ...rest,
+      image: cover,
+      slug: api,
+      path: {
+        file: path,
+        stream: `${path.split('.').slice(0, -1).join('.')}/master.m3u8`
+      },
+      date: {
+        added: formatDate(added),
+        published: formatDate(rest.date),
+        apiDate: apiDate !== null ? formatDate(apiDate) : null
+      },
+      plays: rest.plays.length,
+      website: rest.website.name,
+      star: generateStarName(path),
+      locations: rest.locations.map(({ location }) => location),
+      attributes: rest.attributes.map(({ attribute }) => attribute),
+      subsite: site?.name ?? ''
+    })
+  } else if (req.method === 'PUT') {
     const { title, starAge, plays, slug, path, date, cover, validated } = validate(
       z.object({
         title: z.string().optional(),
