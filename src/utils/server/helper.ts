@@ -9,7 +9,6 @@ import { db } from './prisma'
 
 import { settingsConfig } from '@config'
 import { SimilarStar } from '@interfaces/api'
-import { calculateTimeCode } from '@utils/shared'
 
 dayjs.extend(utc)
 
@@ -252,6 +251,13 @@ export const toCamelCase = (str: string) => str.replace(/([a-z])([A-Z])/g, '$1 $
  * @param content text to write to file
  */
 const writeToFile = async (path: string, content: string) => fs.promises.appendFile(path, content)
+
+function calculateTimeCode(seconds: number, timeFormat = 'HH:mm:ss'): string {
+  return dayjs(0)
+    .hour(0)
+    .millisecond(seconds * 1000)
+    .format(timeFormat) // use .SSS for milliseconds
+}
 
 export async function generateVTTData(
   videoID: number,

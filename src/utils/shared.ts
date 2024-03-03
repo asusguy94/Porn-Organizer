@@ -44,10 +44,3 @@ export function getProgress(index: number, total: number) {
     buffer: clamp((index + 2) / (total + 1), 1)
   }
 }
-
-export function calculateTimeCode(seconds: number, timeFormat = 'HH:mm:ss'): string {
-  return dayjs(0)
-    .hour(0)
-    .millisecond(seconds * 1000)
-    .format(timeFormat) // use .SSS for milliseconds
-}
