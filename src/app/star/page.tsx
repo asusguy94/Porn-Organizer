@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { Grid, TextField, Card, CardActionArea, CardContent, Button, Typography } from '@mui/material'
@@ -17,8 +16,6 @@ import { starService } from '@service'
 import { getUnique } from '@utils/shared'
 
 export default function Stars() {
-  const router = useRouter()
-
   const [starInput, setStarInput] = useSessionStorage('starInput', '')
 
   const [input, setInput] = useState('')
@@ -50,16 +47,14 @@ export default function Stars() {
     if (input.length) {
       setStarInput(input)
       starService.add(input).finally(() => {
-        router.refresh()
-        setInput('')
+        location.reload()
       })
     }
   }
 
   const handleSubmitAll = () => {
     Promise.allSettled(missing.map(missing => starService.add(missing.name))).finally(() => {
-      router.refresh()
-      setInput('')
+      location.reload()
     })
   }
 

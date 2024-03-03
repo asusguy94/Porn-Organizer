@@ -65,8 +65,6 @@ type StarTitleProps = {
   onModal: ModalHandler
 }
 function StarTitle({ star, onModal }: StarTitleProps) {
-  const router = useRouter()
-
   const [, setClipboard] = useCopyToClipboard()
 
   const copy = async () => await setClipboard(star.name)
@@ -79,7 +77,7 @@ function StarTitle({ star, onModal }: StarTitleProps) {
 
   const setSlug = (value: string) => {
     starService.setSlug(star.id, value).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 
@@ -290,8 +288,6 @@ type StarFormProps = {
   star: Star
 }
 function StarForm({ star }: StarFormProps) {
-  const router = useRouter()
-
   const { data: starData } = starService.useInfo()
 
   const addHaircolor = (name: string) => {
@@ -314,13 +310,13 @@ function StarForm({ star }: StarFormProps) {
 
   const resetData = () => {
     starService.resetInfo(star.id).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 
   const getData = () => {
     starService.getData(star.id).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 

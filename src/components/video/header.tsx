@@ -145,8 +145,6 @@ type HeaderCoverProps = {
   hidden?: boolean
 }
 function HeaderCover({ video, hidden = false }: HeaderCoverProps) {
-  const router = useRouter()
-
   const [clicked, setClicked] = useState(false)
 
   const handleClick = () => {
@@ -156,7 +154,7 @@ function HeaderCover({ video, hidden = false }: HeaderCoverProps) {
       if (settingsConfig.userAction.thumbnail.close) {
         window.close()
       } else {
-        router.refresh()
+        location.reload()
       }
     })
   }

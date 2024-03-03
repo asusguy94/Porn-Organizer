@@ -63,7 +63,7 @@ export default function VideoPlayer({ video, categories, bookmarks, star, player
 
   const renameVideo = (path: string) => {
     videoService.rename(video.id, path).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 
