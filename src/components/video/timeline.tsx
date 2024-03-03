@@ -36,15 +36,19 @@ export default function Timeline({ bookmarks, video, playVideo, categories, play
   const { collisionCheck } = useCollision()
 
   // TODO make bookmark it's own component
-  const { mutate } = bookmarkService.useSetCategory()
+  const { mutate: mutateSetCategory } = bookmarkService.useSetCategory()
+  const { mutate: mutateSetTime } = bookmarkService.useSetTime()
   const queryClient = useQueryClient()
 
   const setTime = (bookmark: Bookmark) => {
     const player = document.getElementsByTagName('video')[0]
     const time = Math.round(player.currentTime)
 
-    bookmarkService.setTime(bookmark.id, time).then(() => {
-      location.reload()
+    mutateAndInvalidate({
+      mutate: mutateSetTime,
+      queryClient,
+      ...keys.video.byId(video.id)._ctx.bookmark,
+      variables: { id: bookmark.id, time }
     })
   }
 
@@ -56,7 +60,7 @@ export default function Timeline({ bookmarks, video, playVideo, categories, play
 
   const changeCategory = (category: General, bookmark: Bookmark) => {
     mutateAndInvalidate({
-      mutate,
+      mutate: mutateSetCategory,
       queryClient,
       ...keys.video.byId(video.id)._ctx.bookmark,
       variables: { id: bookmark.id, categoryID: category.id }
