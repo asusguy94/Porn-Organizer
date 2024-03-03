@@ -34,7 +34,7 @@ export default {
   useInfo: () => {
     const query = useQuery<StarInfo>({
       queryKey: ['star', 'info'],
-      queryFn: () => api.get('')
+      queryFn: () => api.get('/info')
     })
 
     return { data: query.data }
