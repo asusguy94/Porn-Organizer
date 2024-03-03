@@ -70,7 +70,9 @@ type StarTitleProps = {
 function StarTitle({ star, onModal }: StarTitleProps) {
   const [, setClipboard] = useCopyToClipboard()
 
-  const copy = async () => await setClipboard(star.name)
+  const copy = () => {
+    ;(async () => await setClipboard(star.name))()
+  }
 
   const renameStar = (value: string) => {
     starService.renameStar(star.id, value).then(() => {

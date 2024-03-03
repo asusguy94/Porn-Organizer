@@ -17,13 +17,13 @@ async function getRawDuration(file: string) {
   return new Promise<number>((resolve, reject) => {
     ffmpeg.ffprobe(file, (err, data) => {
       if (err) {
-        reject(err)
+        reject(err as Error)
         return
       }
 
       const format = data.format.duration
       if (format === undefined) {
-        reject('Duration is undefined')
+        reject(new Error('Duration is undefined'))
         return
       }
 
@@ -90,7 +90,7 @@ export async function rebuildVideoFile(src: string): Promise<boolean> {
       .audioCodec('copy')
       .output(src)
       .on('end', () => fs.unlink(newSrc, err => resolve(err !== null)))
-      .on('error', err => reject(err))
+      .on('error', err => reject(err as Error))
       .run()
   })
 }

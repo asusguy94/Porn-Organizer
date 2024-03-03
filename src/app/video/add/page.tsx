@@ -29,7 +29,7 @@ import styles from './add.module.css'
 
 type ActionProps = {
   label: string
-  callback?: () => void
+  callback?: (() => void) | (() => Promise<void>)
   disabled?: boolean
 }
 function Action({ label, callback = undefined, disabled = false }: ActionProps) {

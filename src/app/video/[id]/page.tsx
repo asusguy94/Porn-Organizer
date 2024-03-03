@@ -42,13 +42,9 @@ export default function VideoPage() {
 
       <Grid item xs={2} id={styles.sidebar} component='aside'>
         <div id={styles.stars}>
-          {video !== undefined && (
-            <>
-              {star !== null && <Star video={video} star={star} />}
+          {star !== null && <Star video={video} star={star} />}
 
-              <StarInput video={video} disabled={star !== null} />
-            </>
-          )}
+          <StarInput video={video} disabled={star !== null} />
         </div>
       </Grid>
 
@@ -79,7 +75,7 @@ function Section({ video, star = null, modal }: SectionProps) {
     }
   }
 
-  if (video === undefined || categories === undefined || bookmarks === undefined) return <Spinner />
+  if (categories === undefined || bookmarks === undefined) return <Spinner />
 
   return (
     <Grid item xs={10} component='section'>

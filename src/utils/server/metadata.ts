@@ -120,9 +120,9 @@ export async function findSceneSlug(videoStar: string, videoTitle: string, siteO
       // choose the one with the most bookmarks
       // throw an error if number of bookmarks are the same
       // otherwise throw an error
-      reject('too many slugs')
+      reject(new Error('too many slugs'))
     } else if (result.data.length === 0) {
-      reject('too few slugs')
+      reject(new Error('too few slugs'))
     }
 
     //FIXME this sometimes returns an error " cannot read 'id' of 'undefined' "

@@ -235,7 +235,7 @@ export async function sendPartial(req: Request, path: string, mb = 2) {
           })
         )
       })
-      stream.on('error', error => reject(error.cause))
+      stream.on('error', error => reject(error))
     })
   })
 }

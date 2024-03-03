@@ -11,7 +11,6 @@ import { MediaPlayerInstance } from '@components/vidstack'
 
 import { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'
-import Spinner from '../spinner'
 
 import useCollision from '@hooks/use-collision'
 import { Bookmark, General, Video } from '@interfaces'
@@ -66,7 +65,7 @@ export default function Timeline({ bookmarks, video, playVideo, categories, play
 
   useEffect(() => {
     const bookmarksArr = bookmarks.length > 0 ? bookmarksRef.current : []
-    const levels: number[] = new Array(bookmarks.length).fill(0)
+    const levels = Array<number>(bookmarks.length).fill(0)
     let maxLevel = 0
 
     for (let i = 0; i < bookmarksArr.length; i++) {
@@ -90,8 +89,6 @@ export default function Timeline({ bookmarks, video, playVideo, categories, play
       videoElement.style.maxHeight = `calc(100vh - (${spacing.bookmarks}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
     }
   }, [bookmarks, collisionCheck, playerRef, windowSize.width])
-
-  if (categories === undefined) return <Spinner />
 
   return (
     <Grid id={styles.timeline}>

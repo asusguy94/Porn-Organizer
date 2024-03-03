@@ -11,7 +11,6 @@ import { useCopyToClipboard } from 'usehooks-ts'
 
 import Icon, { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'
-import Spinner from '../spinner'
 
 import { settingsConfig } from '@config'
 import { General, Video } from '@interfaces'
@@ -387,10 +386,13 @@ function HeaderTitle({ video, onModal }: HeaderTitleProps) {
     })
   }
 
-  const copyTitle = async () => await setClipboard(video.name)
-  const copyStar = async () => await setClipboard(video.star)
+  const copyTitle = () => {
+    ;(async () => await setClipboard(video.name))()
+  }
 
-  if (attributes === undefined || locations === undefined) return <Spinner />
+  const copyStar = () => {
+    ;(async () => await setClipboard(video.star))()
+  }
 
   return (
     <Typography variant='h4'>
@@ -432,7 +434,7 @@ function HeaderTitle({ video, onModal }: HeaderTitleProps) {
             onModal(
               'Add Attribute',
               attributes
-                .filter(attribute => video.attributes.every(attr => attr.name !== attribute.name))
+                ?.filter(attribute => video.attributes.every(attr => attr.name !== attribute.name))
                 .map(attribute => (
                   <Button
                     variant='outlined'
@@ -459,7 +461,7 @@ function HeaderTitle({ video, onModal }: HeaderTitleProps) {
             onModal(
               'Add Location',
               locations
-                .filter(location => video.locations.every(loc => loc.name !== location.name))
+                ?.filter(location => video.locations.every(loc => loc.name !== location.name))
                 .map(location => (
                   <Button
                     variant='outlined'

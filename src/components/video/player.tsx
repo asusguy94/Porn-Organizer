@@ -10,7 +10,6 @@ import Player, { MediaPlayerInstance } from '@components/vidstack'
 
 import { IconWithText } from '../icon'
 import { Modal, ModalHandler } from '../modal'
-import Spinner from '../spinner'
 
 import { serverConfig } from '@config'
 import { Bookmark, General, Video, VideoStar } from '@interfaces'
@@ -68,8 +67,6 @@ export default function VideoPlayer({ video, categories, bookmarks, star, player
       location.reload()
     })
   }
-
-  if (categories === undefined) return <Spinner />
 
   return (
     <>

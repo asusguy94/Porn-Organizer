@@ -14,7 +14,6 @@ export function getUnique<T>(arr: T[], prop?: keyof T): T[] {
   return [...new Set(arr)]
 }
 
-// eslint-disable-next-line @typescript-eslint/unified-signatures
 export function clamp(value: number, min: number, max: number): number
 export function clamp(value: number, max: number): number
 export function clamp(value: number, minOrMax: number, max?: number): number {
