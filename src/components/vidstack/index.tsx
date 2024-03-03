@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 
 import {
   MediaPlayer,
@@ -44,13 +44,15 @@ export default function Player({ src, poster, thumbnails, title, video, playerRe
 
   const canAddPlay = useRef(false)
 
-  const chapters: VTTContent = {
-    cues: bookmarks.map((bookmark, idx, arr) => ({
-      startTime: bookmark.start,
-      endTime: arr.at(idx + 1)?.start ?? video.duration,
-      text: bookmark.category.name
-    }))
-  }
+  const memoizedChapters = useMemo<VTTContent>(() => {
+    return {
+      cues: bookmarks.map((bookmark, idx, arr) => ({
+        startTime: bookmark.start,
+        endTime: arr.at(idx + 1)?.start ?? video.duration,
+        text: bookmark.category.name
+      }))
+    }
+  }, [bookmarks, video.duration])
 
   const onCanLoad = () => {
     if (localVideo !== video.id) {
@@ -154,7 +156,7 @@ export default function Player({ src, poster, thumbnails, title, video, playerRe
       <MediaProvider>
         {poster !== undefined && <Poster className='vds-poster' src={poster} alt={title} />}
 
-        <Track kind='chapters' content={chapters} default type='json' />
+        <Track kind='chapters' content={memoizedChapters} default type='json' />
       </MediaProvider>
 
       <DefaultVideoLayout
