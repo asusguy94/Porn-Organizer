@@ -9,6 +9,14 @@ export default {
   addBookmark: (id: number, categoryID: number, time: number) => {
     return legacyApi.post<Bookmark>(`/${id}/bookmark`, { categoryID, time })
   },
+  useAddBookmark: (id: number) => {
+    const { mutate } = useMutation<unknown, Error, { categoryID: number; time: number }>({
+      mutationKey: ['video', id, 'bookmark', 'add'],
+      mutationFn: payload => api.post(`/${id}/bookmark`, payload)
+    })
+
+    return { mutate }
+  },
   addStar: (id: number, star: string) => legacyApi.post<VideoStar>(`/${id}/star`, { name: star }),
   removeStar: (id: number) => legacyApi.delete(`/${id}/star`),
   useAddLocation: (id: number) => {

@@ -60,7 +60,7 @@ export function mutateAndInvalidate<TData, TResult>({
   queryClient,
   queryKey,
   variables,
-  reloadByDefault = true,
+  reloadByDefault = false,
   exact = true
 }: MutateAndInvalidateProps<TData, TResult>) {
   mutate(variables, {
