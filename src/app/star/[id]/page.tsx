@@ -227,7 +227,7 @@ function StarImageDropbox({ star, onModal }: StarImageDropboxProps) {
       mutate,
       queryClient,
       ...keys.star.byId(star.id),
-      variables: { image: url }
+      variables: { url }
     })
   }
 

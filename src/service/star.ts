@@ -22,7 +22,7 @@ export default {
   },
   removeImage: (id: number) => legacyApi.delete(`/${id}/image`),
   useAddImage: (id: number) => {
-    const { mutate } = useMutation<unknown, Error, { image: string }>({
+    const { mutate } = useMutation<unknown, Error, { url: string }>({
       mutationKey: ['star', id, 'addImage'],
       mutationFn: payload => api.post(`/${id}/image`, payload)
     })

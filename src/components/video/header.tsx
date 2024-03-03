@@ -234,7 +234,7 @@ function HeaderLocations({ video }: HeaderLocationsProps) {
     mutateAndInvalidate({
       mutate,
       queryClient,
-      ...keys.video.byId(video.id)._ctx.location,
+      ...keys.video.byId(video.id),
       variables: { locationId: location.id }
     })
   }
@@ -272,7 +272,7 @@ function HeaderAttributes({ video }: HeaderAttributesProps) {
     mutateAndInvalidate({
       mutate,
       queryClient,
-      ...keys.video.byId(video.id)._ctx.attribute,
+      ...keys.video.byId(video.id),
       variables: { attributeId: attribute.id }
     })
   }
@@ -363,7 +363,7 @@ function HeaderTitle({ video, onModal }: HeaderTitleProps) {
     mutateAndInvalidate({
       mutate: mutateLocation,
       queryClient,
-      ...keys.video.byId(video.id)._ctx.location,
+      ...keys.video.byId(video.id),
       variables: { locationID: location.id }
     })
   }
@@ -372,7 +372,7 @@ function HeaderTitle({ video, onModal }: HeaderTitleProps) {
     mutateAndInvalidate({
       mutate: mutateAttribute,
       queryClient,
-      ...keys.video.byId(video.id)._ctx.attribute,
+      ...keys.video.byId(video.id),
       variables: { attributeID: attribute.id }
     })
   }

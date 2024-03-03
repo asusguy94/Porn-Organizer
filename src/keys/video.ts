@@ -4,8 +4,6 @@ export const video = createQueryKeys('video', {
   byId: (id: number) => ({
     queryKey: [id],
     contextQueries: {
-      location: null,
-      attribute: null,
       bookmark: null,
       star: null
     }
@@ -13,6 +11,5 @@ export const video = createQueryKeys('video', {
   home: (label: string) => ({
     queryKey: [label]
   }),
-  new: null,
-  all: null
+  new: null
 })

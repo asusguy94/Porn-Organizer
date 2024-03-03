@@ -106,7 +106,7 @@ export default {
     return { data: query.data }
   },
   useStar: (id: number) => {
-    const query = useQuery<VideoStar>({
+    const query = useQuery<VideoStar | null>({
       ...keys.video.byId(id)._ctx.star,
       queryFn: () => api.get(`/${id}/star`)
     })
