@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createApi } from '@config'
 import { General } from '@interfaces'
 
-const { api } = createApi('/location')
+const { api } = createApi('/category')
 
 export default {
   useAll: () => {
