@@ -42,7 +42,7 @@ const SERVER_ERROR = 'Server might be down'
 
 const inToCm = (cm: number) => Math.round(cm * 2.54)
 const lbsToKg = (lbs: number) => Math.round(lbs * 0.45359237)
-const getCupSize = (input: string) => input.match(/[A-Z]+$/i)?.[0] ?? null
+const getCupSize = (input: string) => input.match(/[A-Z]+$/i)?.at(0) ?? null
 
 const getUrl = (path = '') => new URL(`https://api.metadataapi.net${path}`)
 
@@ -175,7 +175,7 @@ export async function getSceneData(slug: string, longTimeout = false) {
             birthday: performer.extra.birthday,
             ethnicity: performer.extra.ethnicity,
             nationality: performer.extra.nationality,
-            haircolor: performer.extra.haircolor?.split(';')[0],
+            haircolor: performer.extra.haircolor?.split(';').at(0),
             height: performer.extra.height ? inToCm(parseInt(performer.extra.height)).toString() : null,
             weight: performer.extra.weight ? lbsToKg(parseInt(performer.extra.weight)).toString() : null,
             cupsize: performer.extra.cupsize ? getCupSize(performer.extra.cupsize) : null
@@ -214,11 +214,11 @@ export async function getStarData(slug: string) {
 
     return {
       cupsize: result.data.extras.cupsize ? getCupSize(result.data.extras.cupsize) : null,
-      haircolor: result.data.extras.hair_colour?.split(';')[0],
+      haircolor: result.data.extras.hair_colour?.split(';').at(0),
       ethnicity: result.data.extras.ethnicity,
       birthdate: result.data.extras.birthday,
-      height: result.data.extras.height ? parseInt(result.data.extras.height.match(/^\d+/)?.[0] ?? '0') : null,
-      weight: result.data.extras.weight ? parseInt(result.data.extras.weight.match(/^\d+/)?.[0] ?? '0') : null,
+      height: result.data.extras.height ? parseInt(result.data.extras.height.match(/^\d+/)?.at(0) ?? '0') : null,
+      weight: result.data.extras.weight ? parseInt(result.data.extras.weight.match(/^\d+/)?.at(0) ?? '0') : null,
       posters: result.data.posters.map(poster => poster.url)
     }
   } catch (error) {

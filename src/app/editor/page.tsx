@@ -100,7 +100,11 @@ function Table({ name }: TableProps) {
             </MuiTableRow>
           </TableHead>
 
-          <TableBody>{data?.map(item => <TableRow name={name} key={item.id} data={item} />)}</TableBody>
+          <TableBody>
+            {data.map(item => (
+              <TableRow name={name} key={item.id} data={item} />
+            ))}
+          </TableBody>
         </MuiTable>
       </TableContainer>
     </Grid>

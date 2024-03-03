@@ -16,7 +16,7 @@ import { videoService } from '@service'
 
 type VideoPlayerProps = {
   video: Video
-  categories?: General[]
+  categories: General[]
   bookmarks: Bookmark[]
   star: VideoStar | null
   playerRef: React.RefObject<MediaPlayerInstance>

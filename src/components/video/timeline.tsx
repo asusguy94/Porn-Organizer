@@ -22,7 +22,7 @@ const spacing = { top: 3, bookmarks: 36 }
 type TimelineProps = {
   video: Video
   bookmarks: Bookmark[]
-  categories?: General[]
+  categories: General[]
   playVideo: (time: number) => void
   playerRef: React.RefObject<MediaPlayerInstance>
   onModal: ModalHandler

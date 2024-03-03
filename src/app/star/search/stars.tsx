@@ -38,7 +38,7 @@ export default function Stars() {
         <span id={styles.count}>{visible.length}</span> Stars
       </Typography>
 
-      <VGrid itemHeight={309} total={visible.length} renderData={idx => <StarCard star={visible[idx]} />} />
+      <VGrid itemHeight={309} total={visible.length} renderData={idx => <StarCard star={visible.at(idx)} />} />
     </div>
   )
 }

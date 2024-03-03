@@ -106,7 +106,7 @@ export default function Videos() {
         </Typography>
       )}
 
-      <VGrid itemHeight={300} total={visible.length} renderData={idx => <VideoCard video={visible[idx]} />} />
+      <VGrid itemHeight={300} total={visible.length} renderData={idx => <VideoCard video={visible.at(idx)} />} />
     </div>
   )
 }

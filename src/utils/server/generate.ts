@@ -23,25 +23,25 @@ titleRegex[0] = /^{\d{4}-\d{2}-\d{2}} \[.*\] .*_/
 export function generateTitle(path: string) {
   const file = dirOnly(path)
 
-  return file.split(titleRegex[0])[1]
+  return file.split(titleRegex[0]).at(1) ?? ''
 }
 
 export function generateStarName(path: string) {
   const file = dirOnly(path)
 
-  return file.split(starRegex[0])[1].split(starRegex[1])[0]
+  return file.split(starRegex[0]).at(1)?.split(starRegex[1]).at(0) ?? ''
 }
 
 export function generateDate(path: string) {
   const file = dirOnly(path)
 
-  return file.split(dateRegex[0])[1].split(dateRegex[1])[0]
+  return file.split(dateRegex[0]).at(1)?.split(dateRegex[1]).at(0) ?? ''
 }
 
 export function generateSite(path: string) {
   const file = dirOnly(path)
 
-  return file.split(siteRegex[0])[1].split(siteRegex[1])[0]
+  return file.split(siteRegex[0]).at(1)?.split(siteRegex[1]).at(0) ?? ''
 }
 
 export function generateWebsite(path: string) {

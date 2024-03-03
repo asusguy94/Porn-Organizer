@@ -215,7 +215,8 @@ export async function sendPartial(req: Request, path: string, mb = 2) {
         .get('range')
         ?.match(/^bytes=(\d+)-/)
         ?.slice(1)
-      const start = parseInt(ranges?.[0] ?? '0')
+
+      const start = parseInt(ranges?.at(0) ?? '0')
       const end = Math.min(start + chunkSize, data.size - 1)
 
       const stream = fs.createReadStream(path, { start, end })
