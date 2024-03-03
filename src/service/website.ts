@@ -1,3 +1,4 @@
+import { keys } from '@keys'
 import { useQuery } from '@tanstack/react-query'
 
 import createApi from '../config/api'
@@ -9,7 +10,7 @@ const { api } = createApi('/website')
 export default {
   useAll: () => {
     const query = useQuery<WebsiteWithCount[]>({
-      queryKey: ['website'],
+      ...keys.website.all,
       queryFn: () => api.get('')
     })
 

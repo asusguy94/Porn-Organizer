@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 
 import { Button, TextField, Grid, Card, CardContent, Typography, ImageList, ImageListItem } from '@mui/material'
 
+import { keys } from '@keys'
 import { useQueryClient } from '@tanstack/react-query'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
@@ -223,7 +224,7 @@ function StarImageDropbox({ star, onModal }: StarImageDropboxProps) {
     mutateAndInvalidate({
       mutate,
       queryClient,
-      queryKey: ['star', star.id],
+      ...keys.star.byId(star.id),
       variables: { image: url }
     })
   }

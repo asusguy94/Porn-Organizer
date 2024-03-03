@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 import { Button, Grid, ImageList, ImageListItem, TextField, Typography } from '@mui/material'
 
+import { keys } from '@keys'
 import { useQueryClient } from '@tanstack/react-query'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
@@ -234,7 +235,7 @@ function HeaderLocations({ video }: HeaderLocationsProps) {
     mutateAndInvalidate({
       mutate,
       queryClient,
-      queryKey: ['video', video.id, 'location'],
+      ...keys.video.byId(video.id)._ctx.location,
       variables: { locationId: location.id }
     })
   }
@@ -272,7 +273,7 @@ function HeaderAttributes({ video }: HeaderAttributesProps) {
     mutateAndInvalidate({
       mutate,
       queryClient,
-      queryKey: ['video', video.id, 'attribute'],
+      ...keys.video.byId(video.id)._ctx.attribute,
       variables: { attributeId: attribute.id }
     })
   }
@@ -363,7 +364,7 @@ function HeaderTitle({ video, onModal }: HeaderTitleProps) {
     mutateAndInvalidate({
       mutate: mutateLocation,
       queryClient,
-      queryKey: ['video', video.id, 'location'],
+      ...keys.video.byId(video.id)._ctx.location,
       variables: { locationID: location.id }
     })
   }
@@ -372,7 +373,7 @@ function HeaderTitle({ video, onModal }: HeaderTitleProps) {
     mutateAndInvalidate({
       mutate: mutateAttribute,
       queryClient,
-      queryKey: ['video', video.id, 'attribute'],
+      ...keys.video.byId(video.id)._ctx.attribute,
       variables: { attributeID: attribute.id }
     })
   }
@@ -381,7 +382,7 @@ function HeaderTitle({ video, onModal }: HeaderTitleProps) {
     mutateAndInvalidate({
       mutate: mutateTitle,
       queryClient,
-      queryKey: ['video', video.id],
+      ...keys.video.byId(video.id),
       variables: { title }
     })
   }

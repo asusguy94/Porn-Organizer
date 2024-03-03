@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
       "@service": ["./src/service"],
       "@components/*": ["./src/components/*"],
@@ -12,7 +13,8 @@
       "@utils/server/*": ["./src/utils/server/*"],
       "@utils/pusher/*": ["./src/utils/pusher/*"],
       "@interfaces": ["./src/types"],
-      "@interfaces/api": ["./src/types/api"]
+      "@interfaces/api": ["./src/types/api"],
+      "@keys": ["./src/keys"]
     }
   }
 }

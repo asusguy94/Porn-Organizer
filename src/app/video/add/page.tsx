@@ -15,6 +15,7 @@ import {
   Paper
 } from '@mui/material'
 
+import { keys } from '@keys'
 import { useQueryClient } from '@tanstack/react-query'
 
 import Spinner from '@components/spinner'
@@ -109,7 +110,7 @@ export default function AddVideoPage() {
                 mutateAndInvalidate({
                   mutate,
                   queryClient,
-                  queryKey: ['video', 'new'],
+                  ...keys.video.new,
                   variables: { videos: data.files }
                 })
               }}

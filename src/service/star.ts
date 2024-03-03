@@ -1,3 +1,4 @@
+import { keys } from '@keys'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
 import { createApi } from '@config'
@@ -40,7 +41,7 @@ export default {
   getData: (id: number) => legacyApi.post(`/${id}/api`),
   useInfo: () => {
     const query = useQuery<StarInfo>({
-      queryKey: ['star', 'info'],
+      ...keys.star.info,
       queryFn: () => api.get('/info')
     })
 
@@ -54,7 +55,7 @@ export default {
     }
 
     const query = useQuery<{ stars: Star[]; missing: Missing[] }>({
-      queryKey: ['star'],
+      ...keys.star.all,
       queryFn: () => api.get('')
     })
 
@@ -62,7 +63,7 @@ export default {
   },
   useVideos: (id: number) => {
     const query = useQuery<StarVideo[]>({
-      queryKey: ['star', id, 'videos'],
+      ...keys.star.byId(id)._ctx.video,
       queryFn: () => api.get(`/${id}/video`)
     })
 
@@ -70,7 +71,7 @@ export default {
   },
   useStar: (id: number) => {
     const query = useQuery<Star>({
-      queryKey: ['star', id],
+      ...keys.star.byId(id),
       queryFn: () => api.get(`/${id}`)
     })
 

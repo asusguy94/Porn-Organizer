@@ -2,6 +2,7 @@ import { useRouter } from 'next/navigation'
 
 import { Button, TextField } from '@mui/material'
 
+import { keys } from '@keys'
 import { useQueryClient } from '@tanstack/react-query'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 
@@ -44,7 +45,7 @@ export default function VideoPlayer({ video, categories, bookmarks, star, player
       mutateAndInvalidate({
         mutate,
         queryClient,
-        queryKey: ['video', video.id, 'bookmark'],
+        ...keys.video.byId(video.id)._ctx.bookmark,
         variables: { categoryID: category.id, time }
       })
     }

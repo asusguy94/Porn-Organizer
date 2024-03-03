@@ -1,3 +1,4 @@
+import { keys } from '@keys'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
 import { createApi } from '@config'
@@ -16,7 +17,7 @@ export default {
   },
   useAll: () => {
     const query = useQuery<General[]>({
-      queryKey: ['location'],
+      ...keys.location.all,
       queryFn: () => api.get('')
     })
 

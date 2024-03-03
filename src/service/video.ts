@@ -1,3 +1,4 @@
+import { keys } from '@keys'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
 import { createApi } from '@config'
@@ -82,7 +83,7 @@ export default {
   },
   useNew: () => {
     const query = useQuery<{ files: File[]; pages: number }>({
-      queryKey: ['video', 'new'],
+      ...keys.video.new,
       queryFn: () => api.get('/add')
     })
 
@@ -90,7 +91,7 @@ export default {
   },
   useBookmarks: (id: number) => {
     const query = useQuery<Bookmark[]>({
-      queryKey: ['video', id, 'bookmark'],
+      ...keys.video.byId(id)._ctx.bookmark,
       queryFn: () => api.get(`/${id}/bookmark`)
     })
 
@@ -98,7 +99,7 @@ export default {
   },
   useVideo: (id: number) => {
     const query = useQuery<Video>({
-      queryKey: ['video', id],
+      ...keys.video.byId(id),
       queryFn: () => api.get(`/${id}`)
     })
 
@@ -106,7 +107,7 @@ export default {
   },
   useStar: (id: number) => {
     const query = useQuery<VideoStar>({
-      queryKey: ['video', id, 'star'],
+      ...keys.video.byId(id)._ctx.star,
       queryFn: () => api.get(`/${id}/star`)
     })
 

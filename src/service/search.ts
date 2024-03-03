@@ -1,3 +1,4 @@
+import { keys } from '@keys'
 import { useQuery } from '@tanstack/react-query'
 
 import { createApi } from '@config'
@@ -8,7 +9,7 @@ const { api } = createApi('/search')
 export default {
   useStars: () => {
     const query = useQuery<StarSearch[]>({
-      queryKey: ['star'],
+      ...keys.search.star,
       queryFn: () => api.get('/star'),
       placeholderData: prevData => prevData
     })
@@ -17,7 +18,7 @@ export default {
   },
   useVideos: () => {
     const query = useQuery<VideoSearch[]>({
-      queryKey: ['video'],
+      ...keys.search.video,
       queryFn: () => api.get('/video'),
       placeholderData: prevData => prevData
     })

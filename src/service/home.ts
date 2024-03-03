@@ -1,3 +1,4 @@
+import { keys } from '@keys'
 import { useQuery } from '@tanstack/react-query'
 
 import { createApi } from '@config'
@@ -14,7 +15,7 @@ type Video = {
 export default {
   useVideos: (label: string, limit: number) => {
     const query = useQuery<Video[]>({
-      queryKey: ['home', label],
+      ...keys.video.home(label),
       queryFn: () => api.get<Video[]>(`/${label}/${limit}`)
     })
 
