@@ -79,3 +79,7 @@ Status of functionality can be found at [features.md](FEATURES.md)
 | 1080p      | 0-18                                |
 | 1440p      | 19-37                               |
 | 2160p      | 38+                                 |
+
+## Notes about incompatible packages
+
+- [sharp@0.33.2](https://github.com/vercel/next.js/issues/59516)
