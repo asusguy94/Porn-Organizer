@@ -15,15 +15,19 @@ import {
   Paper
 } from '@mui/material'
 
-import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import capitalize from 'capitalize'
 
 import Spinner from '@components/spinner'
 
+import createApi from '../../config/api'
+
 import { General } from '@interfaces'
+import { mutateAndInvalidate } from '@utils/shared'
 
 import styles from './editor.module.css'
+
+type TableKeys = 'attribute' | 'category' | 'location'
 
 export default function EditorPage() {
   return (
@@ -36,21 +40,34 @@ export default function EditorPage() {
 }
 
 type TableProps = {
-  name: string
+  name: TableKeys
 }
 function Table({ name }: TableProps) {
   const [value, setValue] = useState('')
 
-  const { data } = useQuery({
-    queryKey: ['editor', name],
-    queryFn: async () => axios.get<General[]>(`/api/${name}`).then(res => res.data)
+  const queryClient = useQueryClient()
+
+  const { api } = createApi(`/api/${name}`)
+
+  const { data } = useQuery<General[]>({
+    queryKey: [name],
+    queryFn: () => api.get('')
   })
 
-  const onSubmit = () => {
-    setValue('')
-    axios.post(`/api/${name}`, { name: value }).then(() => {
-      location.reload()
+  const { mutate } = useMutation<General, Error, { name: string }>({
+    mutationKey: [name, 'add'],
+    mutationFn: payload => api.post('', payload)
+  })
+
+  const handleSubmit = () => {
+    mutateAndInvalidate({
+      mutate,
+      queryClient,
+      queryKey: [name],
+      variables: { name: value }
     })
+
+    setValue('')
   }
 
   if (data === undefined) return <Spinner />
@@ -58,7 +75,7 @@ function Table({ name }: TableProps) {
   return (
     <Grid item xs={4} style={{ paddingLeft: 5, paddingRight: 5, marginTop: 5 }}>
       <Grid container justifyContent='center' style={{ marginBottom: 10 }}>
-        <Grid item component='form' onSubmit={onSubmit}>
+        <Grid item component='form' onSubmit={handleSubmit}>
           <TextField
             variant='standard'
             name='name'
@@ -92,18 +109,30 @@ function Table({ name }: TableProps) {
 
 type TableRowProps = {
   data: General
-  name: string
+  name: TableKeys
 }
 function TableRow({ data, name }: TableRowProps) {
   const [edit, setEdit] = useState(false)
   const [input, setInput] = useState(data.name)
 
-  const handleSubmit = () => {
-    setEdit(false)
+  const queryClient = useQueryClient()
 
-    axios.put(`/api/${name}/${data.id}`, { name: input }).then(() => {
-      location.reload()
+  const { api } = createApi(`/api/${name}`)
+
+  const { mutate } = useMutation<General, Error, { name: string }>({
+    mutationKey: [name, 'update'],
+    mutationFn: payload => api.put(`/${data.id}`, payload)
+  })
+
+  const handleSubmit = () => {
+    mutateAndInvalidate({
+      mutate,
+      queryClient,
+      queryKey: [name],
+      variables: { name: input }
     })
+
+    setEdit(false)
   }
 
   return (
