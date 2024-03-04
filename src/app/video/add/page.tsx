@@ -15,15 +15,11 @@ import {
   Paper
 } from '@mui/material'
 
-import { keys } from '@keys'
-import { useQueryClient } from '@tanstack/react-query'
-
 import Spinner from '@components/spinner'
 
 import Progress from './progress'
 
 import { generateService, videoService } from '@service'
-import { mutateAndInvalidate } from '@utils/shared'
 
 import styles from './add.module.css'
 
@@ -62,8 +58,6 @@ function Action({ label, callback = undefined, disabled = false }: ActionProps) 
 export default function AddVideoPage() {
   const { data } = videoService.useNew()
   const { mutate } = videoService.useAddVideos()
-
-  const queryClient = useQueryClient()
 
   if (data === undefined) return <Spinner />
 
@@ -104,17 +98,7 @@ export default function AddVideoPage() {
           </TableContainer>
 
           <div style={{ marginTop: 8 }}>
-            <Action
-              label={`Add Videos (page 1 of ${data.pages})`}
-              callback={() => {
-                mutateAndInvalidate({
-                  mutate,
-                  queryClient,
-                  ...keys.video.new,
-                  variables: { videos: data.files }
-                })
-              }}
-            />
+            <Action label={`Add Videos (page 1 of ${data.pages})`} callback={() => mutate({ videos: data.files })} />
           </div>
         </>
       )}

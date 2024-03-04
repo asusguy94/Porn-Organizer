@@ -77,9 +77,12 @@ export default {
     }>(`/${id}/star/info`)
   },
   useAddVideos: () => {
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { videos: File[] }>({
       mutationKey: ['video', 'new', 'add'],
-      mutationFn: payload => api.post('/add', payload)
+      mutationFn: payload => api.post('/add', payload),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.new })
     })
 
     return { mutate }
