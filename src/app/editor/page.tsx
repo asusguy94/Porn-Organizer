@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { FormEvent, useState } from 'react'
 
 import {
   Grid,
@@ -23,7 +23,6 @@ import Spinner from '@components/spinner'
 import createApi from '../../config/api'
 
 import { General } from '@interfaces'
-import { mutateAndInvalidate } from '@utils/shared'
 
 import styles from './editor.module.css'
 
@@ -56,16 +55,14 @@ function Table({ name }: TableProps) {
 
   const { mutate } = useMutation<unknown, Error, { name: string }>({
     mutationKey: [name, 'add'],
-    mutationFn: payload => api.post('', payload)
+    mutationFn: payload => api.post('', payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [name] })
   })
 
-  const handleSubmit = () => {
-    mutateAndInvalidate({
-      mutate,
-      queryClient,
-      queryKey: [name],
-      variables: { name: value }
-    })
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault()
+
+    mutate({ name: value })
 
     setValue('')
   }
@@ -125,16 +122,14 @@ function TableRow({ data, name }: TableRowProps) {
 
   const { mutate } = useMutation<unknown, Error, { name: string }>({
     mutationKey: [name, 'update'],
-    mutationFn: payload => api.put(`/${data.id}`, payload)
+    mutationFn: payload => api.put(`/${data.id}`, payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [name] })
   })
 
-  const handleSubmit = () => {
-    mutateAndInvalidate({
-      mutate,
-      queryClient,
-      queryKey: [name],
-      variables: { name: input }
-    })
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault()
+
+    mutate({ name: input })
 
     setEdit(false)
   }
