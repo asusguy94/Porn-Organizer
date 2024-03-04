@@ -1,5 +1,5 @@
 import { keys } from '@keys'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { createApi } from '@config'
 import { Missing, Similar, Star, StarVideo } from '@interfaces'
@@ -22,9 +22,12 @@ export default {
   },
   removeImage: (id: number) => legacyApi.delete(`/${id}/image`),
   useAddImage: (id: number) => {
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { url: string }>({
       mutationKey: ['star', id, 'addImage'],
-      mutationFn: payload => api.post(`/${id}/image`, payload)
+      mutationFn: payload => api.post(`/${id}/image`, payload),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.star.byId(id) })
     })
 
     return { mutate }
