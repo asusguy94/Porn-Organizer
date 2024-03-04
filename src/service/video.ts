@@ -23,7 +23,7 @@ export default {
     const { mutate } = useMutation<unknown, Error, { locationID: number }>({
       mutationKey: ['video', id, 'location', 'add'],
       mutationFn: payload => api.post(`/${id}/location`, payload),
-      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id), exact: true })
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id) })
     })
 
     return { mutate }
@@ -34,7 +34,7 @@ export default {
     const { mutate } = useMutation<unknown, Error, { attributeID: number }>({
       mutationKey: ['video', id, 'attribute', 'add'],
       mutationFn: payload => api.post(`/${id}/attribute`, payload),
-      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id), exact: true })
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id) })
     })
 
     return { mutate }

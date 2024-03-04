@@ -59,12 +59,11 @@ export function mutateAndInvalidate<TData, TResult>({
   queryClient,
   queryKey,
   variables,
-  reloadByDefault = false,
-  exact = true
+  reloadByDefault = false
 }: MutateAndInvalidateProps<TData, TResult>) {
   mutate(variables, {
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey, exact })
+      queryClient.invalidateQueries({ queryKey })
 
       if (reloadByDefault) {
         location.reload()
@@ -87,14 +86,13 @@ export function mutateAndInvalidateAll<TData, TResult>({
   queryClient,
   queryKey,
   variables,
-  reloadByDefault = false,
-  exact = true
+  reloadByDefault = false
 }: MutateAndInvalidateAllProps<TData, TResult>) {
   Promise.allSettled(variables.map(variable => mutate(variable))).then(() => {
     if (reloadByDefault) {
       location.reload()
     } else {
-      queryClient.invalidateQueries({ queryKey, exact })
+      queryClient.invalidateQueries({ queryKey })
     }
   })
 }
