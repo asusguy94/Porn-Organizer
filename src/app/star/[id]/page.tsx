@@ -290,11 +290,10 @@ type StarFormProps = {
 }
 function StarForm({ star }: StarFormProps) {
   const { data: starData } = starService.useInfo()
+  const { mutate } = starService.useAddHaircolor(star.id)
 
   const addHaircolor = (name: string) => {
-    starService.addHaircolor(star.id, name).then(() => {
-      location.reload()
-    })
+    mutate({ name })
   }
 
   const removeHaircolor = (name: string) => {

@@ -33,7 +33,17 @@ export default {
     return { mutate }
   },
   getImages: (id: number) => legacyApi.post<{ images: string[] }>(`/${id}/api/image`),
-  addHaircolor: (id: number, name: string) => legacyApi.put(`/${id}/haircolor`, { name }),
+  useAddHaircolor: (id: number) => {
+    const queryClient = useQueryClient()
+
+    const { mutate } = useMutation<unknown, Error, { name: string }>({
+      mutationKey: ['star', id, 'addHaircolor'],
+      mutationFn: payload => api.put(`/${id}/haircolor`, payload),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.star.byId(id) })
+    })
+
+    return { mutate }
+  },
   removeHaircolor: (id: number, name: string) => legacyApi.put(`/${id}/haircolor`, { name, remove: true }),
   updateInfo: (id: number, label: string, value: string) =>
     legacyApi.put<{ reload: boolean; content: string | Date | number | null; similar: Similar[] }>(`/${id}`, {
