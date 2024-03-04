@@ -360,21 +360,11 @@ function HeaderTitle({ video, onModal }: HeaderTitleProps) {
   const [, setClipboard] = useCopyToClipboard()
 
   const addLocationHandler = (location: General) => {
-    mutateAndInvalidate({
-      mutate: mutateLocation,
-      queryClient,
-      ...keys.video.byId(video.id),
-      variables: { locationID: location.id }
-    })
+    mutateLocation({ locationID: location.id })
   }
 
   const addAttribute = (attribute: General) => {
-    mutateAndInvalidate({
-      mutate: mutateAttribute,
-      queryClient,
-      ...keys.video.byId(video.id),
-      variables: { attributeID: attribute.id }
-    })
+    mutateAttribute({ attributeID: attribute.id })
   }
 
   const renameTitle = (title: string) => {

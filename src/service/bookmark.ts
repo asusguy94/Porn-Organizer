@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 
 import { createApi } from '@config'
 
-const { api, legacyApi } = createApi('/bookmark')
+const { api } = createApi('/bookmark')
 
 export default {
   useSetTime: () => {
@@ -13,7 +13,14 @@ export default {
 
     return { mutate }
   },
-  delete: (id: number) => legacyApi.delete(`/${id}`),
+  useDeleteBookmark: () => {
+    const { mutate } = useMutation<unknown, Error, { id: number }>({
+      mutationKey: ['bookmark', 'delete'],
+      mutationFn: ({ id }) => api.delete(`/${id}`)
+    })
+
+    return { mutate }
+  },
   useSetCategory: () => {
     const { mutate } = useMutation<unknown, Error, { id: number; categoryID: number }>({
       mutationKey: ['bookmark', 'setCategory'],

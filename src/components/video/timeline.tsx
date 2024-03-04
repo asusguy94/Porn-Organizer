@@ -38,6 +38,7 @@ export default function Timeline({ bookmarks, video, playVideo, categories, play
   // TODO make bookmark it's own component
   const { mutate: mutateSetCategory } = bookmarkService.useSetCategory()
   const { mutate: mutateSetTime } = bookmarkService.useSetTime()
+  const { mutate: mutateDelete } = bookmarkService.useDeleteBookmark()
   const queryClient = useQueryClient()
 
   const setTime = (bookmark: Bookmark) => {
@@ -53,8 +54,11 @@ export default function Timeline({ bookmarks, video, playVideo, categories, play
   }
 
   const removeBookmark = (bookmark: Bookmark) => {
-    bookmarkService.delete(bookmark.id).then(() => {
-      location.reload()
+    mutateAndInvalidate({
+      mutate: mutateDelete,
+      queryClient,
+      ...keys.video.byId(video.id)._ctx.bookmark,
+      variables: { id: bookmark.id }
     })
   }
 
