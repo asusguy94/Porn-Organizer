@@ -3,7 +3,6 @@ import { FormControl, FormControlLabel, MenuItem, Radio, RadioGroup, Select, Sel
 import capitalize from 'capitalize'
 
 import { RegularHandlerProps, RegularItem } from '@components/indeterminate'
-import Spinner from '@components/spinner'
 
 import { DefaultObj } from './sort'
 
@@ -13,7 +12,7 @@ import { General } from '@interfaces'
 import styles from './filter.module.css'
 
 type FilterRadioProps<T extends DefaultObj> = {
-  data?: string[]
+  data: string[]
   label: string & keyof T
   callback: (item: string) => void
   globalCallback?: () => void
@@ -30,7 +29,6 @@ export function FilterRadio<T extends DefaultObj>({
 }: FilterRadioProps<T>) {
   const { currentValue, defaultValue } = useSearchParam(defaultObj, label)
 
-  if (data === undefined) return <Spinner />
   return (
     <>
       <h2>{capitalize(label, true)}</h2>
@@ -69,7 +67,7 @@ export function FilterRadio<T extends DefaultObj>({
 }
 
 type FilterCheckboxProps<TData extends string | General, TObj extends DefaultObj> = {
-  data?: TData[]
+  data: TData[]
   label: string & keyof TObj
   callback: (ref: RegularHandlerProps, item: TData) => void
   nullCallback?: (e: RegularHandlerProps) => void
@@ -87,7 +85,6 @@ export function FilterCheckbox<TData extends string | General, TObj extends Defa
   const { currentValue, defaultValue } = useSearchParam(defaultObj, label)
   const currentArrayValue = currentValue.split(',')
 
-  if (data === undefined) return <Spinner size='small' />
   return (
     <>
       <h2>{capitalize(label, true)}</h2>
@@ -135,8 +132,6 @@ export function FilterDropdown<TData extends string | General, TObj extends Defa
 }: FilterDropdownProps<TData, TObj>) {
   const { currentValue } = useSearchParam(defaultObj, label)
 
-  if (data === undefined) return <Spinner />
-
   return (
     <>
       <h2>{capitalize(label, true)}</h2>
@@ -145,7 +140,7 @@ export function FilterDropdown<TData extends string | General, TObj extends Defa
         <Select variant='standard' id={label} defaultValue={currentValue} onChange={callback}>
           <MenuItem value='ALL'>All</MenuItem>
 
-          {data.map(item => {
+          {data?.map(item => {
             const key = typeof item === 'string' ? item : item.id
             const value = typeof item === 'string' ? item : item.name
 

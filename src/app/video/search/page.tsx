@@ -7,6 +7,7 @@ import ScrollToTop from 'react-scroll-to-top'
 import { RegularHandlerProps } from '@components/indeterminate'
 import { FilterDropdown, FilterCheckbox, isDefault } from '@components/search/filter'
 import { SortObjVideo as SortObj, defaultVideoObj as defaultObj, getSortString } from '@components/search/sort'
+import Spinner from '@components/spinner'
 
 import Videos from './videos'
 
@@ -198,17 +199,23 @@ function Filter() {
     <>
       <FilterDropdown data={websites} label='website' callback={website_DROP} defaultObj={defaultObj} />
 
-      <FilterCheckbox
-        data={categories}
-        label='category'
-        callback={category}
-        nullCallback={category_NULL}
-        defaultNull={nullCategoryParam !== defaultObj.nullCategory}
-        defaultObj={defaultObj}
-      />
+      {categories === undefined || attributes === undefined || locations === undefined ? (
+        <Spinner size='small' />
+      ) : (
+        <>
+          <FilterCheckbox
+            data={categories}
+            label='category'
+            callback={category}
+            nullCallback={category_NULL}
+            defaultNull={nullCategoryParam !== defaultObj.nullCategory}
+            defaultObj={defaultObj}
+          />
 
-      <FilterCheckbox data={attributes} label='attribute' callback={attribute} defaultObj={defaultObj} />
-      <FilterCheckbox data={locations} label='location' callback={location} defaultObj={defaultObj} />
+          <FilterCheckbox data={attributes} label='attribute' callback={attribute} defaultObj={defaultObj} />
+          <FilterCheckbox data={locations} label='location' callback={location} defaultObj={defaultObj} />
+        </>
+      )}
     </>
   )
 }

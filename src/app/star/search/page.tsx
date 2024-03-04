@@ -6,6 +6,7 @@ import ScrollToTop from 'react-scroll-to-top'
 
 import { FilterDropdown, FilterRadio, isDefault } from '@components/search/filter'
 import { SortObjStar as SortObj, defaultStarObj as defaultObj, getSortString } from '@components/search/sort'
+import Spinner from '@components/spinner'
 
 import Stars from './stars'
 
@@ -97,30 +98,36 @@ function Filter() {
     <>
       <FilterDropdown data={websites} label='website' callback={website_DROP} defaultObj={defaultObj} />
 
-      <FilterRadio
-        data={starData?.breast}
-        label='breast'
-        callback={breast}
-        nullCallback={breast_NULL}
-        globalCallback={breast_ALL}
-        defaultObj={defaultObj}
-      />
+      {starData === undefined ? (
+        <Spinner size='small' />
+      ) : (
+        <>
+          <FilterRadio
+            data={starData.breast}
+            label='breast'
+            callback={breast}
+            nullCallback={breast_NULL}
+            globalCallback={breast_ALL}
+            defaultObj={defaultObj}
+          />
 
-      <FilterRadio
-        data={starData?.haircolor}
-        label='haircolor'
-        callback={haircolor}
-        globalCallback={haircolor_ALL}
-        defaultObj={defaultObj}
-      />
+          <FilterRadio
+            data={starData.haircolor}
+            label='haircolor'
+            callback={haircolor}
+            globalCallback={haircolor_ALL}
+            defaultObj={defaultObj}
+          />
 
-      <FilterRadio
-        data={starData?.ethnicity}
-        label='ethnicity'
-        callback={ethnicity}
-        globalCallback={ethnicity_ALL}
-        defaultObj={defaultObj}
-      />
+          <FilterRadio
+            data={starData.ethnicity}
+            label='ethnicity'
+            callback={ethnicity}
+            globalCallback={ethnicity_ALL}
+            defaultObj={defaultObj}
+          />
+        </>
+      )}
     </>
   )
 }
