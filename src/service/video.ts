@@ -1,5 +1,5 @@
 import { keys } from '@keys'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { createApi } from '@config'
 import { Bookmark, File, Video, VideoStar } from '@interfaces'
@@ -18,17 +18,23 @@ export default {
   addStar: (id: number, star: string) => legacyApi.post<VideoStar>(`/${id}/star`, { name: star }),
   removeStar: (id: number) => legacyApi.delete(`/${id}/star`),
   useAddLocation: (id: number) => {
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { locationID: number }>({
       mutationKey: ['video', id, 'location', 'add'],
-      mutationFn: payload => api.post(`/${id}/location`, payload)
+      mutationFn: payload => api.post(`/${id}/location`, payload),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id), exact: true })
     })
 
     return { mutate }
   },
   useAddAttribute: (id: number) => {
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { attributeID: number }>({
       mutationKey: ['video', id, 'attribute', 'add'],
-      mutationFn: payload => api.post(`/${id}/attribute`, payload)
+      mutationFn: payload => api.post(`/${id}/attribute`, payload),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id), exact: true })
     })
 
     return { mutate }
