@@ -47,7 +47,7 @@ function Table({ name }: TableProps) {
 
   const queryClient = useQueryClient()
 
-  const { api } = createApi(`/api/${name}`)
+  const { api } = createApi(`/${name}`)
 
   const { data } = useQuery<General[]>({
     queryKey: [name],
