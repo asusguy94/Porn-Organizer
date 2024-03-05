@@ -6,7 +6,7 @@
     "next/core-web-vitals",
     "prettier"
   ],
-  "plugins": ["@typescript-eslint", "react"],
+  "plugins": ["@typescript-eslint", "react", "react-refresh"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": { "project": true },
   "rules": {
@@ -18,13 +18,13 @@
     // Typescript Eslint
     "@typescript-eslint/no-floating-promises": "off",
     "@typescript-eslint/no-confusing-void-expression": "off",
-    "@typescript-eslint/unified-signatures": "off"
+    "@typescript-eslint/unified-signatures": "off",
     // // "@typescript-eslint/consistent-type-definitions": ["warn", "type"],
     // // "@typescript-eslint/unified-signatures": "off",
     // // "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
 
     // // NextJS
     // "@typescript-eslint/no-misused-promises": "off", // Promise<void> is still broken
-    // Other
+    "react-refresh/only-export-components": "warn"
   }
 }
