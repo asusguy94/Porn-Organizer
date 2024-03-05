@@ -118,7 +118,7 @@ function TableRow({ data, name }: TableRowProps) {
 
   const queryClient = useQueryClient()
 
-  const { api } = createApi(`/api/${name}`)
+  const { api } = createApi(`/${name}`)
 
   const { mutate } = useMutation<unknown, Error, { name: string }>({
     mutationKey: [name, 'update'],
