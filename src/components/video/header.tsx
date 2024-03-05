@@ -3,8 +3,6 @@ import { useState } from 'react'
 
 import { Button, Grid, ImageList, ImageListItem, TextField, Typography } from '@mui/material'
 
-import { keys } from '@keys'
-import { useQueryClient } from '@tanstack/react-query'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { useCopyToClipboard } from 'usehooks-ts'
@@ -15,7 +13,7 @@ import { ModalHandler } from '../modal'
 import { settingsConfig } from '@config'
 import { General, Video } from '@interfaces'
 import { attributeService, locationService, videoService } from '@service'
-import { formatDate, mutateAndInvalidate } from '@utils/shared'
+import { formatDate } from '@utils/shared'
 
 import styles from './header.module.scss'
 
@@ -228,15 +226,8 @@ type HeaderLocationsProps = {
 function HeaderLocations({ video }: HeaderLocationsProps) {
   const { mutate } = locationService.useRemoveVideo(video.id)
 
-  const queryClient = useQueryClient()
-
   const removeLocation = (location: General) => {
-    mutateAndInvalidate({
-      mutate,
-      queryClient,
-      ...keys.video.byId(video.id),
-      variables: { locationId: location.id }
-    })
+    mutate({ locationId: location.id })
   }
 
   return (
@@ -266,15 +257,8 @@ type HeaderAttributesProps = {
 function HeaderAttributes({ video }: HeaderAttributesProps) {
   const { mutate } = attributeService.useRemoveVideo(video.id)
 
-  const queryClient = useQueryClient()
-
   const removeAttribute = (attribute: General) => {
-    mutateAndInvalidate({
-      mutate,
-      queryClient,
-      ...keys.video.byId(video.id),
-      variables: { attributeId: attribute.id }
-    })
+    mutate({ attributeId: attribute.id })
   }
 
   return (
@@ -355,8 +339,6 @@ function HeaderTitle({ video, onModal }: HeaderTitleProps) {
   const { mutate: mutateAttribute } = videoService.useAddAttribute(video.id)
   const { mutate: mutateTitle } = videoService.useRenameTitle(video.id)
 
-  const queryClient = useQueryClient()
-
   const [, setClipboard] = useCopyToClipboard()
 
   const addLocationHandler = (location: General) => {
@@ -368,12 +350,7 @@ function HeaderTitle({ video, onModal }: HeaderTitleProps) {
   }
 
   const renameTitle = (title: string) => {
-    mutateAndInvalidate({
-      mutate: mutateTitle,
-      queryClient,
-      ...keys.video.byId(video.id),
-      variables: { title }
-    })
+    mutateTitle({ title })
   }
 
   const copyTitle = () => {

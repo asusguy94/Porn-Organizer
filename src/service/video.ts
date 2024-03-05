@@ -8,9 +8,12 @@ const { api, legacyApi } = createApi('/video')
 
 export default {
   useAddBookmark: (id: number) => {
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { categoryID: number; time: number }>({
       mutationKey: ['video', id, 'bookmark', 'add'],
-      mutationFn: payload => api.post(`/${id}/bookmark`, payload)
+      mutationFn: payload => api.post(`/${id}/bookmark`, payload),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
     })
 
     return { mutate }
@@ -42,9 +45,12 @@ export default {
   fixDate: (id: number) => legacyApi.put(`/${id}/fix-date`),
   renameTitle: (id: number, title: string) => legacyApi.put(`/${id}`, { title }),
   useRenameTitle: (id: number) => {
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { title: string }>({
       mutationKey: ['video', 'rename', 'title'],
-      mutationFn: payload => api.put(`/${id}`, { title: payload.title })
+      mutationFn: payload => api.put(`/${id}`, { title: payload.title }),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id) })
     })
 
     return { mutate }

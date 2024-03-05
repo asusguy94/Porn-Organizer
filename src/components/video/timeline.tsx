@@ -2,8 +2,6 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 
 import { Button, Grid } from '@mui/material'
 
-import { keys } from '@keys'
-import { useQueryClient } from '@tanstack/react-query'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { useWindowSize } from 'usehooks-ts'
 
@@ -15,7 +13,6 @@ import { ModalHandler } from '../modal'
 import useCollision from '@hooks/use-collision'
 import { Bookmark, General, Video } from '@interfaces'
 import { bookmarkService } from '@service'
-import { mutateAndInvalidate } from '@utils/shared'
 
 import styles from './timeline.module.css'
 
@@ -39,36 +36,20 @@ export default function Timeline({ bookmarks, video, playVideo, categories, play
   const { mutate: mutateSetCategory } = bookmarkService.useSetCategory()
   const { mutate: mutateSetTime } = bookmarkService.useSetTime()
   const { mutate: mutateDelete } = bookmarkService.useDeleteBookmark()
-  const queryClient = useQueryClient()
 
   const setTime = (bookmark: Bookmark) => {
     const player = document.getElementsByTagName('video')[0]
     const time = Math.round(player.currentTime)
 
-    mutateAndInvalidate({
-      mutate: mutateSetTime,
-      queryClient,
-      ...keys.video.byId(video.id)._ctx.bookmark,
-      variables: { id: bookmark.id, time }
-    })
+    mutateSetTime({ id: bookmark.id, time })
   }
 
   const removeBookmark = (bookmark: Bookmark) => {
-    mutateAndInvalidate({
-      mutate: mutateDelete,
-      queryClient,
-      ...keys.video.byId(video.id)._ctx.bookmark,
-      variables: { id: bookmark.id }
-    })
+    mutateDelete({ id: bookmark.id })
   }
 
   const changeCategory = (category: General, bookmark: Bookmark) => {
-    mutateAndInvalidate({
-      mutate: mutateSetCategory,
-      queryClient,
-      ...keys.video.byId(video.id)._ctx.bookmark,
-      variables: { id: bookmark.id, categoryID: category.id }
-    })
+    mutateSetCategory({ id: bookmark.id, categoryID: category.id })
   }
 
   useEffect(() => {
