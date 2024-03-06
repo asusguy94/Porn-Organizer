@@ -44,7 +44,7 @@ const inToCm = (cm: number) => Math.round(cm * 2.54)
 const lbsToKg = (lbs: number) => Math.round(lbs * 0.45359237)
 const getCupSize = (input: string) => input.match(/[A-Z]+$/i)?.at(0) ?? null
 
-const getUrl = (path = '') => new URL(`https://api.metadataapi.net${path}`)
+const getUrl = (path = '') => new URL(`https://api.theporndb.net${path}`)
 
 export async function getSceneSlug(slug: string): Promise<string> {
   type Scene = {
