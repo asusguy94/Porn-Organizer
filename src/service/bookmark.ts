@@ -6,35 +6,35 @@ import { createApi } from '@config'
 const { api } = createApi('/bookmark')
 
 export default {
-  useSetTime: () => {
+  useSetTime: (videoId: number) => {
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { id: number; time: number }>({
       mutationKey: ['bookmark', 'setTime'],
       mutationFn: ({ id, ...payload }) => api.put(`/${id}`, payload),
-      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
     })
 
     return { mutate }
   },
-  useDeleteBookmark: () => {
+  useDeleteBookmark: (videoId: number) => {
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { id: number }>({
       mutationKey: ['bookmark', 'delete'],
       mutationFn: ({ id }) => api.delete(`/${id}`),
-      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
     })
 
     return { mutate }
   },
-  useSetCategory: () => {
+  useSetCategory: (videoId: number) => {
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { id: number; categoryID: number }>({
       mutationKey: ['bookmark', 'setCategory'],
       mutationFn: ({ id, ...payload }) => api.put(`/${id}`, payload),
-      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
     })
 
     return { mutate }

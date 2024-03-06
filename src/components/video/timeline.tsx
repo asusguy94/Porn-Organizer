@@ -33,9 +33,9 @@ export default function Timeline({ bookmarks, video, playVideo, categories, play
   const { collisionCheck } = useCollision()
 
   // TODO make bookmark it's own component
-  const { mutate: mutateSetCategory } = bookmarkService.useSetCategory()
-  const { mutate: mutateSetTime } = bookmarkService.useSetTime()
-  const { mutate: mutateDelete } = bookmarkService.useDeleteBookmark()
+  const { mutate: mutateSetCategory } = bookmarkService.useSetCategory(video.id)
+  const { mutate: mutateSetTime } = bookmarkService.useSetTime(video.id)
+  const { mutate: mutateDelete } = bookmarkService.useDeleteBookmark(video.id)
 
   const setTime = (bookmark: Bookmark) => {
     const player = document.getElementsByTagName('video')[0]
