@@ -1,9 +1,22 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
-import { Button, TextField, Grid, Card, CardContent, Typography, ImageList, ImageListItem } from '@mui/material'
+import {
+  Button,
+  TextField,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  ImageList,
+  ImageListItem,
+  FormControlLabel,
+  Checkbox
+} from '@mui/material'
 
+import dayjs from 'dayjs'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { useCopyToClipboard } from 'usehooks-ts'
@@ -19,8 +32,8 @@ import Spinner from '@components/spinner'
 import StarInputForm, { InputFormData } from './input-form'
 import StarVideos from './videos'
 
-import { serverConfig } from '@config'
-import { Similar, Star } from '@interfaces'
+import { serverConfig, settingsConfig } from '@config'
+import { Similar, Star, StarVideo } from '@interfaces'
 import { starService } from '@service'
 import validate, { z } from '@utils/server/validation'
 
@@ -31,6 +44,7 @@ export default function StarPage() {
   const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const { data: star } = starService.useStar(id)
+  const { data: videos } = starService.useVideos(id)
   const { modal, setModal } = useModal()
 
   if (star === undefined) return <Spinner />
@@ -42,10 +56,11 @@ export default function StarPage() {
           <StarImageDropbox star={star} onModal={setModal} />
           <StarTitle star={star} onModal={setModal} />
           <StarForm star={star} />
+          <RetiredStarStatus star={star} videos={videos} />
         </div>
 
         <Grid item xs={12} marginRight='1em'>
-          <StarVideos star={star} />
+          <StarVideos videos={videos} />
         </Grid>
       </Grid>
 
@@ -351,5 +366,46 @@ function StarForm({ star }: StarFormProps) {
       <StarInputForm update={updateInfo} name='Height' value={star.info.height.toString()} noDropdown />
       <StarInputForm update={updateInfo} name='Weight' value={star.info.weight.toString()} noDropdown />
     </>
+  )
+}
+
+type RetiredStarStatusProps = {
+  star: Star
+  videos?: StarVideo[]
+}
+
+function RetiredStarStatus({ star, videos }: RetiredStarStatusProps) {
+  const [checked, setChecked] = useState(false)
+  const { mutate } = starService.useSetRetired(star.id)
+
+  useEffect(() => {
+    setChecked(star.retired)
+  }, [star])
+
+  if (videos === undefined) return <Spinner />
+
+  const latestVideo = videos
+    .map(video => dayjs(video.date))
+    .sort((a, b) => b.diff(a))
+    .at(0)
+
+  if (latestVideo === undefined) return null
+
+  const currentDate = dayjs()
+  const yearDiff = currentDate.diff(latestVideo, 'year')
+
+  const shouldBeRetired = yearDiff > settingsConfig.maxRetiredYears
+
+  const toggleStatus = (status: boolean) => {
+    mutate({ retired: status })
+  }
+
+  if (star.retired === shouldBeRetired) return null
+
+  return (
+    <FormControlLabel
+      label={shouldBeRetired ? 'Mark as Retired?' : 'Mark as Active?'}
+      control={<Checkbox checked={checked} onChange={(e, status) => toggleStatus(status)} />}
+    />
   )
 }

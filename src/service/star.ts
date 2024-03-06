@@ -89,5 +89,16 @@ export default {
     })
 
     return { data: query.data }
+  },
+  useSetRetired: (id: number) => {
+    const queryClient = useQueryClient()
+
+    const { mutate } = useMutation<unknown, Error, { retired: boolean }>({
+      mutationKey: ['star', id, 'retired'],
+      mutationFn: payload => legacyApi.put(`/${id}`, payload),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.star.byId(id) })
+    })
+
+    return { mutate }
   }
 }

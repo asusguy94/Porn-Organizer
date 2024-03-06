@@ -20,7 +20,8 @@ export async function GET(req: Request, { params }: Params<'id'>) {
       birthdate: true,
       height: true,
       weight: true,
-      api: true
+      api: true,
+      retired: true
     }
   })
 
@@ -45,13 +46,14 @@ export async function GET(req: Request, { params }: Params<'id'>) {
 export async function PUT(req: Request, { params }: Params<'id'>) {
   const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
-  const { name, slug, label, value, ignore } = validate(
+  const { name, slug, label, value, ignore, retired } = validate(
     z.object({
       name: z.string().optional(),
       slug: z.string().optional(),
       label: z.string().optional(),
       value: z.string().optional(),
-      ignore: z.boolean().optional()
+      ignore: z.boolean().optional(),
+      retired: z.boolean().optional()
     }),
     await req.json()
   )
@@ -83,6 +85,13 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
         })
       )
     }
+  } else if (retired !== undefined) {
+    return Response.json(
+      await db.star.update({
+        where: { id },
+        data: { retired }
+      })
+    )
   } else if (label !== undefined && value !== undefined) {
     // TODO make code more readable
     // reusing multiple variables

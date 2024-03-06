@@ -110,6 +110,7 @@ model Star {
   weight           Int?
   autoTaggerIgnore Boolean   @default(false)
   api              String?   @unique @db.VarChar(36)
+  retired          Boolean   @default(false)
 
   haircolors StarHaircolors[]
   alias      StarAlias[]

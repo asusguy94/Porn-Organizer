@@ -166,4 +166,5 @@ export type Star = {
     weight: string
   }
   similar: Similar[]
+  retired: boolean
 }

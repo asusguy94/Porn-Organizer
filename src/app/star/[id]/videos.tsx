@@ -9,20 +9,18 @@ import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Spinner from '@components/spinner'
 
 import { serverConfig } from '@config'
-import { Star, StarVideo } from '@interfaces'
-import { starService } from '@service'
+import { StarVideo } from '@interfaces'
 import { daysToYears } from '@utils/client/date-time'
 import { getUnique } from '@utils/shared'
 
 import styles from './star.module.scss'
 
 type VideosProps = {
-  star: Star
+  videos?: StarVideo[]
 }
-export default function Videos({ star }: VideosProps) {
+export default function Videos({ videos }: VideosProps) {
   const [websites, setWebsites] = useState<string[]>([])
   const [focus, setFocus] = useState<string[]>([])
-  const { data: videos } = starService.useVideos(star.id)
 
   const toggleFocus = (website: string) => {
     // allow multiple items to be selected
