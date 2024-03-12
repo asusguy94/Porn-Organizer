@@ -1,4 +1,4 @@
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useNavigate } from '@tanstack/react-router'
 
 import { DefaultObj } from '@/components/search/sort'
 
@@ -7,12 +7,9 @@ import { AllowString } from '@/interface'
 type ParamValue<T, K extends keyof T> = T[K] extends string ? AllowString<T[K]> : never
 
 export function useDynamicSearchParam<T extends DefaultObj>(defaultValue: T) {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const pathname = usePathname()
+  const navigate = useNavigate()
 
-  // TODO it seems like useSearchParams() detects that pages directory exists and defaults to null
-  const currentSearchParams = new URLSearchParams(searchParams)
+  const currentSearchParams = new URLSearchParams(location.search)
 
   const setParam = <K extends keyof T & string>(param: K, value: ParamValue<T, K>) => {
     if (value !== defaultValue[param]) {
@@ -23,14 +20,18 @@ export function useDynamicSearchParam<T extends DefaultObj>(defaultValue: T) {
   }
 
   const update = () => {
-    router.replace(`${pathname}?${currentSearchParams.toString()}`, { scroll: false })
+    navigate({
+      to: location.pathname + '?' + currentSearchParams,
+      replace: true,
+      resetScroll: false
+    })
   }
 
   return { setParam, update }
 }
 
 export function useAllSearchParams<T extends Record<string, string>>(defaultParams: T): T {
-  const searchParams = useSearchParams()
+  const searchParams = new URLSearchParams(location.search)
 
   const result: Record<string, string> = {}
   for (const key in defaultParams) {

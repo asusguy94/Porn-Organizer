@@ -1,17 +1,18 @@
 {
   "name": "pornts-next",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "MIT",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "prisma generate && next build",
-    "start": "next start",
-    "lint": "next lint",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "start": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write .",
     "test": "jest",
-    "docker:build": "docker build -t asusguy94/pornts .",
-    "docker:push": "docker push asusguy94/pornts",
+    "docker:build": "docker build -t asusguy94/pornts:vite .",
+    "docker:push": "docker push asusguy94/pornts:vite",
     "docker:remove": "docker image prune -f",
     "docker": "yarn docker:build && yarn docker:push && yarn docker:remove",
     "docker:watch": "nodemon --exec \"yarn docker\""
@@ -22,16 +23,13 @@
     "@lukemorales/query-key-factory": "^1.3.4",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.11.16",
-    "@prisma/client": "^5",
     "@tanstack/react-query": "^5",
+    "@tanstack/react-router": "^1.19.9",
     "@vidstack/react": "^1.9.8",
     "axios": "^1.3.5",
     "capitalize": "^2.0.4",
     "dayjs": "^1.11.7",
     "hls.js": "^1.3.5",
-    "next": "^14.0.0",
-    "nextjs-toploader": "^1.4.2",
-    "prisma": "^5.8.0",
     "pusher-js": "^8.3.0",
     "rctx-contextmenu": "^1.4.1",
     "react": "^18.2.0",
@@ -47,6 +45,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@tanstack/router-vite-plugin": "^1.19.6",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/capitalize": "^2.0.0",
     "@types/node": "^20.11.0",
@@ -55,11 +54,13 @@
     "@types/react-lazy-load-image-component": "^1.5.2",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
+    "@vitejs/plugin-react-swc": "^3.5.0",
     "eslint": "^8.37.0",
-    "eslint-config-next": "^14.0.4",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "prettier": "^3.1.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "vite": "^5.1.6"
   }
 }

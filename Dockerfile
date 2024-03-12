@@ -6,14 +6,13 @@ FROM custom_node AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json yarn.lock* ./
-RUN yarn install --frozen-lockfile
+RUN yarn install
 
 ##### BUILDER
 FROM custom_node AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
 RUN yarn build
 
 ##### RUNNER

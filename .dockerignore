@@ -3,6 +3,6 @@ Dockerfile
 .dockerignore
 node_modules
 README.md
-.next
+dist
 .git
 media

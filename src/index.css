@@ -1,0 +1,67 @@
+:root {
+  /* Star Image */
+  --star-width: 200px;
+  --star-height: 275px;
+
+  --thumb-width: 290px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 400;
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+}
+
+.divider {
+  color: grey;
+
+  &::before,
+  &::after {
+    content: ' ';
+  }
+}
+
+.unselectable,
+label {
+  user-select: none;
+  outline: none;
+}
+
+button {
+  font-weight: 400 !important;
+  font-size: 0.9rem !important;
+  cursor: default !important;
+}
+
+/* Utils */
+.text-center {
+  text-align: center;
+}
+
+.d-inline-block {
+  display: inline-block;
+}
+
+.d-flex {
+  display: flex !important;
+}
+
+.mx-1 {
+  margin-left: 0.5em !important;
+  margin-right: 0.5em !important;
+}
+
+/* MUI Link Color */
+a {
+  color: rgb(25, 118, 212);
+  text-decoration: underline rgba(25, 118, 212, 0.4);
+}
+
+a:hover {
+  text-decoration-color: rgba(25, 118, 212, 1);
+}

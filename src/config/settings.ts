@@ -1,6 +1,6 @@
 function getValueWithType<T>(label: string, defaultValue: T): T {
   try {
-    const value = process.env[label] ?? localStorage.getItem(`NEXT_PUBLIC_${label}`)
+    const value = import.meta.env[label] ?? localStorage.getItem(label)
 
     if (value !== null) {
       try {
@@ -21,24 +21,22 @@ function getValueWithType<T>(label: string, defaultValue: T): T {
 }
 
 export default {
-  qualities: [1080, 720, 480, 360],
   timeline: {
     spacing: getValueWithType<number>('TIMELINE_SPACING', 0)
   },
   maxRetiredYears: getValueWithType<number>('MAX_RETIRED_YEARS', 1),
-  THUMB_RES: parseInt(process.env.THUMBNAIL_RES ?? '290'),
-  IMAGE_RES: parseInt(process.env.IMAGE_RES ?? '1920'),
-  THEPORNDB_API: process.env.THEPORNDB_API ?? '',
+  THUMB_RES: parseInt(import.meta.env.THUMBNAIL_RES ?? '290'),
+  IMAGE_RES: parseInt(import.meta.env.IMAGE_RES ?? '1920'),
+  THEPORNDB_API: import.meta.env.THEPORNDB_API ?? '',
   userAction: {
     thumbnail: {
       close: getValueWithType<'reload' | 'close'>('USER_THUMB', 'reload') === 'close'
     }
   },
   pusher: {
-    appId: process.env['PUSHER_APP_ID'] ?? '',
+    appId: import.meta.env['PUSHER_APP_ID'] ?? '',
     key: getValueWithType('PUSHER_KEY', ''),
-    secret: process.env['PUSHER_SECRET'] ?? '',
+    secret: import.meta.env['PUSHER_SECRET'] ?? '',
     cluster: getValueWithType('PUSHER_CLUSTER', 'eu')
-  },
-  debug: getValueWithType<boolean>('DEBUG', false)
+  }
 }

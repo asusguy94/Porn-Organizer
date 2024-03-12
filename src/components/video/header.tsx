@@ -1,4 +1,3 @@
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { Button, Grid, ImageList, ImageListItem, TextField, Typography } from '@mui/material'
@@ -314,11 +313,9 @@ type HeaderDateProps = {
   video: Video
 }
 function HeaderDate({ video }: HeaderDateProps) {
-  const router = useRouter()
-
   const fixDate = () => {
     videoService.fixDate(video.id).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 
@@ -382,11 +379,11 @@ function HeaderTitle({ video, onModal }: HeaderTitleProps) {
   }
 
   const copyTitle = () => {
-    ;(async () => await setClipboard(video.name))()
+    setClipboard(video.name)
   }
 
   const copyStar = () => {
-    ;(async () => await setClipboard(video.star))()
+    setClipboard(video.star)
   }
 
   return (

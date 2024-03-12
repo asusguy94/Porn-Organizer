@@ -18,7 +18,6 @@ import { useSessionStorage } from 'usehooks-ts'
 
 import { Modal } from '@/components/modal'
 
-import { settingsConfig } from '@/config'
 import { Bookmark, Video } from '@/interface'
 import { videoService } from '@/service'
 
@@ -100,10 +99,6 @@ export default function Player({ src, poster, thumbnails, title, video, playerRe
   }
 
   const onHlsError = (data: ErrorData) => {
-    if (settingsConfig.debug) {
-      console.log('onHlsError', data)
-    }
-
     if (data.fatal) {
       // TODO do some more stuff
       hlsRef.current?.destroy()

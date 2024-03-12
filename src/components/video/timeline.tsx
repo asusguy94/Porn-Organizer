@@ -10,7 +10,7 @@ import { MediaPlayerInstance } from '@/components/vidstack'
 import { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'
 
-import useCollision from '@/hooks/use-collision'
+import useCollision from '@/hooks/useCollision'
 import { Bookmark, General, Video } from '@/interface'
 import { bookmarkService } from '@/service'
 
