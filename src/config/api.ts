@@ -11,7 +11,7 @@ async function getResponse<T>(promise: Promise<AxiosResponse<T>>) {
 }
 
 export default function createApi(suffix: string, options?: Partial<Options>) {
-  const baseURL = serverConfig[options?.serverKey || 'legacyApi'] + suffix
+  const baseURL = serverConfig[options?.serverKey ?? 'newApi'] + suffix
 
   const api = axios.create({ baseURL })
 

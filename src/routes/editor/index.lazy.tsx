@@ -45,16 +45,16 @@ function Table({ name }: TableProps) {
 
   const queryClient = useQueryClient()
 
-  const { api: newApi } = createApi(`/${name}`, { serverKey: 'newApi' })
+  const { api } = createApi(`/${name}`, { serverKey: 'newApi' })
 
   const { data } = useQuery<General[]>({
     queryKey: [name],
-    queryFn: () => newApi.get('')
+    queryFn: () => api.get('')
   })
 
   const { mutate } = useMutation<unknown, Error, { name: string }>({
     mutationKey: [name, 'add'],
-    mutationFn: payload => newApi.post('', payload),
+    mutationFn: payload => api.post('', payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [name] })
   })
 
@@ -117,11 +117,11 @@ function TableRow({ data, name }: TableRowProps) {
 
   const queryClient = useQueryClient()
 
-  const { api: newApi } = createApi(`/${name}`, { serverKey: 'newApi' })
+  const { api } = createApi(`/${name}`, { serverKey: 'newApi' })
 
   const { mutate } = useMutation<unknown, Error, { name: string }>({
     mutationKey: [name, 'update'],
-    mutationFn: payload => newApi.put(`/${data.id}`, payload),
+    mutationFn: payload => api.put(`/${data.id}`, payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [name] })
   })
 

@@ -8,7 +8,7 @@
   "semi": false,
   "arrowParens": "avoid",
   "importOrder": [
-    "(^next/(.*))|(^react(-dom/(.*))?$)",
+    "(^react(-dom/(.*))?$)",
     "^@mui/(.*)",
     "<THIRD_PARTY_MODULES>",
     "^@/components/(.*)",

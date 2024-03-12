@@ -4,7 +4,7 @@ import { createApi } from '@/config'
 import { General } from '@/interface'
 import { keys } from '@/keys'
 
-const { api: newApi } = createApi('/location', { serverKey: 'newApi' })
+const { api } = createApi('/location')
 
 export default {
   useRemoveVideo: (videoId: number) => {
@@ -12,7 +12,7 @@ export default {
 
     const { mutate } = useMutation<unknown, Error, { locationId: number }>({
       mutationKey: ['video', videoId, 'removeLocation'],
-      mutationFn: ({ locationId }) => newApi.delete(`/${locationId}/${videoId}`),
+      mutationFn: ({ locationId }) => api.delete(`/${locationId}/${videoId}`),
       onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId) })
     })
 
@@ -21,7 +21,7 @@ export default {
   useAll: () => {
     const query = useQuery<General[]>({
       ...keys.location.all,
-      queryFn: () => newApi.get('')
+      queryFn: () => api.get('')
     })
 
     return { data: query.data }
