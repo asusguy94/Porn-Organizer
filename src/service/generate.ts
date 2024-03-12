@@ -1,8 +1,8 @@
-import { createApi } from '@config'
+import { createApi } from '@/config'
 
-const { legacyApi } = createApi('/generate')
+const { legacyApi: newLegacyApi } = createApi('/generate', { serverKey: 'newApi' })
 
 export default {
-  metadata: () => legacyApi.post('/meta'),
-  vtt: () => legacyApi.post('/vtt')
+  metadata: () => newLegacyApi.post('/meta'),
+  vtt: () => newLegacyApi.post('/vtt')
 }

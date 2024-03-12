@@ -4,14 +4,14 @@ import { Button, Grid, Card, CardActionArea, CardContent, CardMedia, Typography 
 
 import { Flipper, Flipped } from 'react-flip-toolkit'
 
-import Link from '@components/link'
-import Ribbon, { RibbonContainer } from '@components/ribbon'
-import Spinner from '@components/spinner'
+import Link from '@/components/link'
+import Ribbon, { RibbonContainer } from '@/components/ribbon'
+import Spinner from '@/components/spinner'
 
-import { serverConfig } from '@config'
-import { StarVideo } from '@interfaces'
-import { daysToYears } from '@utils/client/date-time'
-import { getUnique } from '@utils/shared'
+import { serverConfig } from '@/config'
+import { StarVideo } from '@/interface'
+import { daysToYears } from '@/utils/client/date-time'
+import { getUnique } from '@/utils/shared'
 
 import styles from './star.module.scss'
 
@@ -99,7 +99,7 @@ type VideoProps = {
 }
 function Video({ video, isFirst, isLast, isHidden }: VideoProps) {
   const [src, setSrc] = useState('')
-  const [dataSrc, setDataSrc] = useState(`${serverConfig.legacyApi}/video/${video.id}/file`)
+  const [dataSrc, setDataSrc] = useState(`${serverConfig.newApi}/video/${video.id}/file`)
 
   const thumbnail = useRef<NodeJS.Timeout>()
 
@@ -169,7 +169,7 @@ function Video({ video, isFirst, isLast, isHidden }: VideoProps) {
           component='video'
           src={src}
           data-src={dataSrc}
-          poster={`${serverConfig.legacyApi}/video/${video.id}/thumb`}
+          poster={`${serverConfig.newApi}/video/${video.id}/thumb`}
           preload='metadata'
           muted
           onMouseEnter={handleMouseEnter}

@@ -4,17 +4,17 @@ import { FormControl, Grid, RadioGroup, SelectChangeEvent, TextField } from '@mu
 
 import ScrollToTop from 'react-scroll-to-top'
 
-import { RegularHandlerProps } from '@components/indeterminate'
-import { FilterDropdown, FilterCheckbox, isDefault } from '@components/search/filter'
-import { SortObjVideo as SortObj, defaultVideoObj as defaultObj, getSortString } from '@components/search/sort'
-import Spinner from '@components/spinner'
+import { RegularHandlerProps } from '@/components/indeterminate'
+import { FilterDropdown, FilterCheckbox, isDefault } from '@/components/search/filter'
+import { SortObjVideo as SortObj, defaultVideoObj as defaultObj, getSortString } from '@/components/search/sort'
+import Spinner from '@/components/spinner'
 
 import Videos from './videos'
 
-import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@hooks/search'
-import useFocus from '@hooks/use-focus'
-import { General } from '@interfaces'
-import { attributeService, categoryService, locationService, websiteService } from '@service'
+import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@/hooks/search'
+import useFocus from '@/hooks/use-focus'
+import { General } from '@/interface'
+import { attributeService, categoryService, locationService, websiteService } from '@/service'
 
 import styles from './search.module.scss'
 

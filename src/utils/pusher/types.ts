@@ -7,7 +7,7 @@ type ChannelEvents = {
 
 type ProgressBuffer = { progress: number; buffer?: number }
 
-export type Message = {
+type Message = {
   'new-log': { content: string }
   vtt: ProgressBuffer
   'generate-star': ProgressBuffer
@@ -20,4 +20,3 @@ type Events = {
 }
 
 export type EventsForChannel<T extends Channel> = Extract<Events[keyof Events], { name: ChannelEvents[T] }>
-export type MessageTypeForKey<K extends keyof Message> = Message[K]

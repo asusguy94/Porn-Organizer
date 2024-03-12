@@ -16,11 +16,11 @@ import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/l
 import Hls, { ErrorData } from 'hls.js'
 import { useSessionStorage } from 'usehooks-ts'
 
-import { Modal } from '@components/modal'
+import { Modal } from '@/components/modal'
 
-import { settingsConfig } from '@config'
-import { Bookmark, Video } from '@interfaces'
-import { videoService } from '@service'
+import { settingsConfig } from '@/config'
+import { Bookmark, Video } from '@/interface'
+import { videoService } from '@/service'
 
 import './vidstack.css'
 

@@ -21,21 +21,21 @@ import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextme
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { useCopyToClipboard } from 'usehooks-ts'
 
-import Dropbox from '@components/dropbox'
-import { IconWithText } from '@components/icon'
-import Image, { ImageCard } from '@components/image'
-import Link from '@components/link'
-import ModalComponent, { ModalHandler, useModal } from '@components/modal'
-import Ribbon, { RibbonContainer } from '@components/ribbon'
-import Spinner from '@components/spinner'
+import Dropbox from '@/components/dropbox'
+import { IconWithText } from '@/components/icon'
+import Image, { ImageCard } from '@/components/image'
+import Link from '@/components/link'
+import ModalComponent, { ModalHandler, useModal } from '@/components/modal'
+import Ribbon, { RibbonContainer } from '@/components/ribbon'
+import Spinner from '@/components/spinner'
 
 import StarInputForm, { InputFormData } from './input-form'
 import StarVideos from './videos'
 
-import { serverConfig, settingsConfig } from '@config'
-import { Similar, Star, StarVideo } from '@interfaces'
-import { starService } from '@service'
-import validate, { z } from '@utils/server/validation'
+import { serverConfig, settingsConfig } from '@/config'
+import { Similar, Star, StarVideo } from '@/interface'
+import { starService } from '@/service'
+import validate, { z } from '@/utils/server/validation'
 
 import styles from './star.module.scss'
 
@@ -192,7 +192,7 @@ function Sidebar({ similar }: SidebarProps) {
             <Link key={star.id} href={`/star/${star.id}`} className={styles.star}>
               <RibbonContainer component={Card}>
                 <ImageCard
-                  src={`${serverConfig.legacyApi}/star/${star.id}/image`}
+                  src={`${serverConfig.newApi}/star/${star.id}/image`}
                   width={200}
                   height={275}
                   missing={star.image === null}
@@ -273,7 +273,7 @@ function StarImageDropbox({ star, onModal }: StarImageDropboxProps) {
           <ContextMenuTrigger id='star__image'>
             <Image
               id={styles.profile}
-              src={`${serverConfig.legacyApi}/star/${star.id}/image`}
+              src={`${serverConfig.newApi}/star/${star.id}/image`}
               width={200}
               height={275}
               alt='star'

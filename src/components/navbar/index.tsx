@@ -1,7 +1,5 @@
 import Link from '../link'
 
-import { serverConfig } from '@config'
-
 import styles from './navbar.module.scss'
 
 export default function NavBar() {
@@ -21,7 +19,6 @@ export default function NavBar() {
         <NavBarItem name='Settings' path='/settings' />
         <NavBarItem name='DB Editor' path='/editor' />
         <NavBarItem name='Import Videos' path='/video/add' />
-        <NavBarItem name='DB' path={serverConfig.db} />
       </ul>
     </nav>
   )

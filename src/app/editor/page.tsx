@@ -18,11 +18,11 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import capitalize from 'capitalize'
 
-import Spinner from '@components/spinner'
+import Spinner from '@/components/spinner'
 
 import createApi from '../../config/api'
 
-import { General } from '@interfaces'
+import { General } from '@/interface'
 
 import styles from './editor.module.css'
 
@@ -46,16 +46,16 @@ function Table({ name }: TableProps) {
 
   const queryClient = useQueryClient()
 
-  const { api } = createApi(`/${name}`)
+  const { api: newApi } = createApi(`/${name}`, { serverKey: 'newApi' })
 
   const { data } = useQuery<General[]>({
     queryKey: [name],
-    queryFn: () => api.get('')
+    queryFn: () => newApi.get('')
   })
 
   const { mutate } = useMutation<unknown, Error, { name: string }>({
     mutationKey: [name, 'add'],
-    mutationFn: payload => api.post('', payload),
+    mutationFn: payload => newApi.post('', payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [name] })
   })
 
@@ -118,11 +118,11 @@ function TableRow({ data, name }: TableRowProps) {
 
   const queryClient = useQueryClient()
 
-  const { api } = createApi(`/${name}`)
+  const { api: newApi } = createApi(`/${name}`, { serverKey: 'newApi' })
 
   const { mutate } = useMutation<unknown, Error, { name: string }>({
     mutationKey: [name, 'update'],
-    mutationFn: payload => api.put(`/${data.id}`, payload),
+    mutationFn: payload => newApi.put(`/${data.id}`, payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [name] })
   })
 

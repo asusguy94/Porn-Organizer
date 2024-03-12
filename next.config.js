@@ -2,6 +2,7 @@
 module.exports = {
   reactStrictMode: false,
   output: 'standalone',
+  images: { unoptimized: true }, // prevent caching
   modularizeImports: {
     '@mui/material': {
       transform: '@mui/material/{{member}}'

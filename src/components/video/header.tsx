@@ -10,10 +10,10 @@ import { useCopyToClipboard } from 'usehooks-ts'
 import Icon, { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'
 
-import { settingsConfig } from '@config'
-import { General, Video } from '@interfaces'
-import { attributeService, locationService, videoService } from '@service'
-import { formatDate } from '@utils/shared'
+import { settingsConfig } from '@/config'
+import { General, Video } from '@/interface'
+import { attributeService, locationService, videoService } from '@/service'
+import { formatDate } from '@/utils/shared'
 
 import styles from './header.module.scss'
 
@@ -176,11 +176,39 @@ function ValidateTitle({ video, hidden, onModal }: ValidateTitleProps) {
   const [value, setValue] = useState('Validate Title')
 
   const handleClick = () => {
-    const format = (input: string) => input.toLowerCase().replace(/\s+/, '').trim()
-
     setValue('Loading...')
     videoService.getVideoInfo(video.id).then(({ data }) => {
-      if (format(data.title) === format(video.name)) {
+      const title = data.title.replace(/ - S\d{1,2}:E\d{1,2}$/, '')
+
+      const compare = (title: string, apiTitle: string): boolean => {
+        const words = title.split(' ')
+        const apiWords = apiTitle.split(' ')
+
+        if (words.length !== apiWords.length) return false
+
+        for (let i = 0; i < words.length; i++) {
+          const word = words[i]
+          const apiWord = apiWords[i]
+
+          if (word.toUpperCase() === word && word.toLowerCase() === apiWord.toLowerCase()) {
+            continue
+          }
+
+          if (apiWord.toUpperCase() === apiWord && apiWord.toLowerCase() === word.toLowerCase()) {
+            return false
+          }
+
+          if (word === apiWord) {
+            continue
+          }
+
+          return false
+        }
+
+        return true
+      }
+
+      if (compare(video.name, title)) {
         setValue('Updating...')
         videoService.validateTitle(video.id).then(() => {
           setDisabled(true)
@@ -190,7 +218,7 @@ function ValidateTitle({ video, hidden, onModal }: ValidateTitleProps) {
         onModal(
           'Validate Title',
           <>
-            <pre>{video.name}</pre> does not match <pre>{data.title}</pre>
+            <pre>{video.name}</pre> does not match <pre>{title}</pre>
             <Button
               size='small'
               variant='contained'

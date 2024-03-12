@@ -5,14 +5,14 @@ import { Button, Grid } from '@mui/material'
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 import { useWindowSize } from 'usehooks-ts'
 
-import { MediaPlayerInstance } from '@components/vidstack'
+import { MediaPlayerInstance } from '@/components/vidstack'
 
 import { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'
 
-import useCollision from '@hooks/use-collision'
-import { Bookmark, General, Video } from '@interfaces'
-import { bookmarkService } from '@service'
+import useCollision from '@/hooks/use-collision'
+import { Bookmark, General, Video } from '@/interface'
+import { bookmarkService } from '@/service'
 
 import styles from './timeline.module.css'
 

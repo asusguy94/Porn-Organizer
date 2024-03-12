@@ -4,14 +4,14 @@ import { Button, TextField } from '@mui/material'
 
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 
-import Player, { MediaPlayerInstance } from '@components/vidstack'
+import Player, { MediaPlayerInstance } from '@/components/vidstack'
 
 import { IconWithText } from '../icon'
 import { Modal, ModalHandler } from '../modal'
 
-import { serverConfig } from '@config'
-import { Bookmark, General, Video, VideoStar } from '@interfaces'
-import { videoService } from '@service'
+import { serverConfig } from '@/config'
+import { Bookmark, General, Video, VideoStar } from '@/interface'
+import { videoService } from '@/service'
 
 type VideoPlayerProps = {
   video: Video
@@ -67,11 +67,11 @@ export default function VideoPlayer({ video, categories, bookmarks, star, player
           playerRef={playerRef}
           video={video}
           bookmarks={bookmarks}
-          poster={`${serverConfig.legacyApi}/video/${video.id}/image`}
-          thumbnails={`${serverConfig.legacyApi}/video/${video.id}/vtt`}
+          poster={`${serverConfig.newApi}/video/${video.id}/image`}
+          thumbnails={`${serverConfig.newApi}/video/${video.id}/vtt`}
           src={{
-            video: `${serverConfig.legacyApi}/video/${video.id}/file`,
-            hls: `${serverConfig.legacyApi}/video/${video.id}/hls`
+            video: `${serverConfig.newApi}/video/${video.id}/file`,
+            hls: `${serverConfig.newApi}/video/${video.id}/hls`
           }}
           modal={modal.data}
         />

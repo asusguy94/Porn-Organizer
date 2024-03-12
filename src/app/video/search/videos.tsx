@@ -4,19 +4,19 @@ import { Card, CardActionArea, Grid, Typography } from '@mui/material'
 
 import { useReadLocalStorage } from 'usehooks-ts'
 
-import { ImageCard } from '@components/image'
-import Link from '@components/link'
-import Ribbon, { RibbonContainer } from '@components/ribbon'
-import { isDefault } from '@components/search/filter'
-import { defaultVideoObj as defaultObj, getVideoSort as getSort } from '@components/search/sort'
-import Spinner from '@components/spinner'
-import VGrid from '@components/virtualized/virtuoso'
+import { ImageCard } from '@/components/image'
+import Link from '@/components/link'
+import Ribbon, { RibbonContainer } from '@/components/ribbon'
+import { isDefault } from '@/components/search/filter'
+import { defaultVideoObj as defaultObj, getVideoSort as getSort } from '@/components/search/sort'
+import Spinner from '@/components/spinner'
+import VGrid from '@/components/virtualized/virtuoso'
 
-import { serverConfig } from '@config'
-import { useAllSearchParams } from '@hooks/search'
-import { LocalWebsite, VideoSearch } from '@interfaces'
-import { searchService } from '@service'
-import { daysToYears } from '@utils/client/date-time'
+import { serverConfig } from '@/config'
+import { useAllSearchParams } from '@/hooks/search'
+import { LocalWebsite, VideoSearch } from '@/interface'
+import { searchService } from '@/service'
+import { daysToYears } from '@/utils/client/date-time'
 
 import styles from './search.module.scss'
 
@@ -122,7 +122,7 @@ function VideoCard({ video }: VideoCardProps) {
       <RibbonContainer component={Card} className={styles.video}>
         <CardActionArea>
           <ImageCard
-            src={`${serverConfig.legacyApi}/video/${video.id}/image`}
+            src={`${serverConfig.newApi}/video/${video.id}/image`}
             width={290}
             height={170}
             missing={video.image === null}

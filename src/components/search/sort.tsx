@@ -1,6 +1,6 @@
 import { FormControlLabel, Radio } from '@mui/material'
 
-import { AllowString, StarSearch, VideoSearch } from '@interfaces'
+import { AllowString, StarSearch, VideoSearch } from '@/interface'
 
 const reverseChar = '-'
 function createReverse<T extends string>(sort: T) {

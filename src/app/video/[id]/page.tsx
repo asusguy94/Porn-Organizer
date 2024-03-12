@@ -7,21 +7,21 @@ import { Grid, Card, Typography, TextField } from '@mui/material'
 
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
-import Badge from '@components/badge'
-import { IconWithText } from '@components/icon'
-import { ImageCard } from '@components/image'
-import Link from '@components/link'
-import ModalComponent, { useModal, ModalHandler, Modal } from '@components/modal'
-import Ribbon, { RibbonContainer } from '@components/ribbon'
-import Spinner from '@components/spinner'
-import { Header, Player as VideoPlayer, Timeline } from '@components/video'
-import { MediaPlayerInstance } from '@components/vidstack'
+import Badge from '@/components/badge'
+import { IconWithText } from '@/components/icon'
+import { ImageCard } from '@/components/image'
+import Link from '@/components/link'
+import ModalComponent, { useModal, ModalHandler, Modal } from '@/components/modal'
+import Ribbon, { RibbonContainer } from '@/components/ribbon'
+import Spinner from '@/components/spinner'
+import { Header, Player as VideoPlayer, Timeline } from '@/components/video'
+import { MediaPlayerInstance } from '@/components/vidstack'
 
-import { serverConfig } from '@config'
-import { Video, VideoStar } from '@interfaces'
-import { categoryService, videoService } from '@service'
-import { daysToYears } from '@utils/client/date-time'
-import validate, { z } from '@utils/server/validation'
+import { serverConfig } from '@/config'
+import { Video, VideoStar } from '@/interface'
+import { categoryService, videoService } from '@/service'
+import { daysToYears } from '@/utils/client/date-time'
+import validate, { z } from '@/utils/server/validation'
 
 import styles from './video.module.css'
 
@@ -119,7 +119,7 @@ function Star({ star, video }: StarProps) {
         <Badge content={star.numVideos}>
           <ContextMenuTrigger id='star'>
             <ImageCard
-              src={`${serverConfig.legacyApi}/star/${star.id}/image`}
+              src={`${serverConfig.newApi}/star/${star.id}/image`}
               width={250}
               height={380}
               missing={star.image === null}

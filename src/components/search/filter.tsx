@@ -2,12 +2,12 @@ import { FormControl, FormControlLabel, MenuItem, Radio, RadioGroup, Select, Sel
 
 import capitalize from 'capitalize'
 
-import { RegularHandlerProps, RegularItem } from '@components/indeterminate'
+import { RegularHandlerProps, RegularItem } from '@/components/indeterminate'
 
 import { DefaultObj } from './sort'
 
-import { useSearchParam } from '@hooks/search'
-import { General } from '@interfaces'
+import { useSearchParam } from '@/hooks/search'
+import { General } from '@/interface'
 
 import styles from './filter.module.css'
 

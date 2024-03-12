@@ -1,10 +1,10 @@
-import { keys } from '@keys'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { createApi } from '@config'
-import { Bookmark, File, Video, VideoStar } from '@interfaces'
+import { createApi } from '@/config'
+import { Bookmark, File, Video, VideoStar } from '@/interface'
+import { keys } from '@/keys'
 
-const { api, legacyApi } = createApi('/video')
+const { api: newApi, legacyApi: newLegacyApi } = createApi('/video', { serverKey: 'newApi' })
 
 export default {
   useAddBookmark: (id: number) => {
@@ -12,20 +12,20 @@ export default {
 
     const { mutate } = useMutation<unknown, Error, { categoryID: number; time: number }>({
       mutationKey: ['video', id, 'bookmark', 'add'],
-      mutationFn: payload => api.post(`/${id}/bookmark`, payload),
+      mutationFn: payload => newApi.post(`/${id}/bookmark`, payload),
       onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
     })
 
     return { mutate }
   },
-  addStar: (id: number, star: string) => legacyApi.post<VideoStar>(`/${id}/star`, { name: star }),
-  removeStar: (id: number) => legacyApi.delete(`/${id}/star`),
+  addStar: (id: number, star: string) => newLegacyApi.post<VideoStar>(`/${id}/star`, { name: star }),
+  removeStar: (id: number) => newLegacyApi.delete(`/${id}/star`),
   useAddLocation: (id: number) => {
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { locationID: number }>({
       mutationKey: ['video', id, 'location', 'add'],
-      mutationFn: payload => api.post(`/${id}/location`, payload),
+      mutationFn: payload => newApi.post(`/${id}/location`, payload),
       onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id) })
     })
 
@@ -36,27 +36,27 @@ export default {
 
     const { mutate } = useMutation<unknown, Error, { attributeID: number }>({
       mutationKey: ['video', id, 'attribute', 'add'],
-      mutationFn: payload => api.post(`/${id}/attribute`, payload),
+      mutationFn: payload => newApi.post(`/${id}/attribute`, payload),
       onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id) })
     })
 
     return { mutate }
   },
-  fixDate: (id: number) => legacyApi.put(`/${id}/fix-date`),
-  renameTitle: (id: number, title: string) => legacyApi.put(`/${id}`, { title }),
+  fixDate: (id: number) => newLegacyApi.put(`/${id}/fix-date`),
+  renameTitle: (id: number, title: string) => newLegacyApi.put(`/${id}`, { title }),
   useRenameTitle: (id: number) => {
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { title: string }>({
       mutationKey: ['video', 'rename', 'title'],
-      mutationFn: payload => api.put(`/${id}`, { title: payload.title }),
+      mutationFn: payload => newApi.put(`/${id}`, { title: payload.title }),
       onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id) })
     })
 
     return { mutate }
   },
   getSlugs: (id: number) => {
-    return legacyApi.get<
+    return newLegacyApi.get<
       {
         id: string
         title: string
@@ -66,16 +66,16 @@ export default {
       }[]
     >(`/${id}/meta`)
   },
-  setSlug: (id: number, slug: string) => legacyApi.put(`/${id}`, { slug }),
-  addPlay: (id: number) => legacyApi.put(`/${id}`, { plays: 1 }),
-  delete: (id: number) => legacyApi.delete(`/${id}`),
-  removeBookmark: (id: number) => legacyApi.delete(`/${id}/bookmark`),
-  removePlays: (id: number) => legacyApi.put(`/${id}`, { plays: 0 }),
-  rename: (id: number, path: string) => legacyApi.put(`/${id}`, { path }),
-  setThumbnail: (id: number) => legacyApi.put(`/${id}`, { cover: true }),
-  validateTitle: (id: number) => legacyApi.put(`/${id}`, { validated: true }),
+  setSlug: (id: number, slug: string) => newLegacyApi.put(`/${id}`, { slug }),
+  addPlay: (id: number) => newApi.put(`/${id}`, { plays: 1 }),
+  delete: (id: number) => newLegacyApi.delete(`/${id}`),
+  removeBookmark: (id: number) => newLegacyApi.delete(`/${id}/bookmark`),
+  removePlays: (id: number) => newLegacyApi.put(`/${id}`, { plays: 0 }),
+  rename: (id: number, path: string) => newLegacyApi.put(`/${id}`, { path }),
+  setThumbnail: (id: number) => newLegacyApi.put(`/${id}`, { cover: true }),
+  validateTitle: (id: number) => newLegacyApi.put(`/${id}`, { validated: true }),
   getVideoInfo: (id: number) => {
-    return legacyApi.get<{
+    return newLegacyApi.get<{
       id: string
       title: string
       date: string
@@ -87,7 +87,7 @@ export default {
 
     const { mutate } = useMutation<unknown, Error, { videos: File[] }>({
       mutationKey: ['video', 'new', 'add'],
-      mutationFn: payload => api.post('/add', payload),
+      mutationFn: payload => newApi.post('/add', payload),
       onSuccess: () => queryClient.invalidateQueries({ ...keys.video.new })
     })
 
@@ -96,7 +96,7 @@ export default {
   useNew: () => {
     const query = useQuery<{ files: File[]; pages: number }>({
       ...keys.video.new,
-      queryFn: () => api.get('/add')
+      queryFn: () => newApi.get('/add')
     })
 
     return { data: query.data }
@@ -104,7 +104,7 @@ export default {
   useBookmarks: (id: number) => {
     const query = useQuery<Bookmark[]>({
       ...keys.video.byId(id)._ctx.bookmark,
-      queryFn: () => api.get(`/${id}/bookmark`)
+      queryFn: () => newApi.get(`/${id}/bookmark`)
     })
 
     return { data: query.data }
@@ -112,7 +112,7 @@ export default {
   useVideo: (id: number) => {
     const query = useQuery<Video>({
       ...keys.video.byId(id),
-      queryFn: () => api.get(`/${id}`)
+      queryFn: () => newApi.get(`/${id}`)
     })
 
     return { data: query.data }
@@ -120,7 +120,7 @@ export default {
   useStar: (id: number) => {
     const query = useQuery<VideoStar | null>({
       ...keys.video.byId(id)._ctx.star,
-      queryFn: () => api.get(`/${id}/star`)
+      queryFn: () => newApi.get(`/${id}/star`)
     })
 
     return { data: query.data }

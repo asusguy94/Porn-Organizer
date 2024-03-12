@@ -1,19 +1,19 @@
 import { Card, CardActionArea, Typography } from '@mui/material'
 
-import Badge from '@components/badge'
-import { ImageCard } from '@components/image'
-import Link from '@components/link'
-import Ribbon, { RibbonContainer } from '@components/ribbon'
-import { isDefault } from '@components/search/filter'
-import { defaultStarObj as defaultObj, getStarSort as getSort } from '@components/search/sort'
-import Spinner from '@components/spinner'
-import VGrid from '@components/virtualized/virtuoso'
+import Badge from '@/components/badge'
+import { ImageCard } from '@/components/image'
+import Link from '@/components/link'
+import Ribbon, { RibbonContainer } from '@/components/ribbon'
+import { isDefault } from '@/components/search/filter'
+import { defaultStarObj as defaultObj, getStarSort as getSort } from '@/components/search/sort'
+import Spinner from '@/components/spinner'
+import VGrid from '@/components/virtualized/virtuoso'
 
-import { serverConfig } from '@config'
-import { useAllSearchParams } from '@hooks/search'
-import { StarSearch as Star } from '@interfaces'
-import { searchService } from '@service'
-import { daysToYears } from '@utils/client/date-time'
+import { serverConfig } from '@/config'
+import { useAllSearchParams } from '@/hooks/search'
+import { StarSearch as Star } from '@/interface'
+import { searchService } from '@/service'
+import { daysToYears } from '@/utils/client/date-time'
 
 import styles from './search.module.scss'
 
@@ -55,7 +55,7 @@ function StarCard({ star }: StarCardProps) {
         <Badge content={star.videoCount}>
           <CardActionArea>
             <ImageCard
-              src={`${serverConfig.legacyApi}/star/${star.id}/image`}
+              src={`${serverConfig.newApi}/star/${star.id}/image`}
               width={200}
               height={275}
               missing={star.image === null}

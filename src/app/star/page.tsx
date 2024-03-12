@@ -6,22 +6,21 @@ import { Grid, TextField, Card, CardActionArea, CardContent, Button, Typography 
 
 import { useSessionStorage } from 'usehooks-ts'
 
-import { ImageCard } from '@components/image'
-import Link from '@components/link'
-import Spinner from '@components/spinner'
+import { ImageCard } from '@/components/image'
+import Link from '@/components/link'
+import Spinner from '@/components/spinner'
 
-import { serverConfig } from '@config'
-import { Missing } from '@interfaces'
-import { starService } from '@service'
-import { getUnique } from '@utils/shared'
+import { serverConfig } from '@/config'
+import { Missing } from '@/interface'
+import { starService } from '@/service'
+import { getUnique } from '@/utils/shared'
 
 export default function Stars() {
-  const [starInput, setStarInput] = useSessionStorage('starInput', '')
-
   const [input, setInput] = useState('')
   const [activeStar, setActiveStar] = useState<string>()
-
   const [index, setIndex] = useState(0)
+
+  const [starInput, setStarInput] = useSessionStorage('starInput', '')
 
   const { data } = starService.useAll()
 
@@ -34,6 +33,7 @@ export default function Stars() {
   useEffect(() => {
     if (data === undefined) return
 
+    //TODO hook runs every input change, and causes another rerender
     setActiveStar(data.stars.find(s => s.name === starInput)?.name)
   }, [data, starInput])
 
@@ -46,7 +46,7 @@ export default function Stars() {
 
     if (input.length) {
       setStarInput(input)
-      starService.add(input).finally(() => {
+      starService.add(input).then(() => {
         location.reload()
       })
     }
@@ -97,7 +97,7 @@ export default function Stars() {
                 <Card className='text-center'>
                   <CardActionArea>
                     <ImageCard
-                      src={`${serverConfig.legacyApi}/star/${star.id}/image`}
+                      src={`${serverConfig.newApi}/star/${star.id}/image`}
                       width={200}
                       height={175}
                       missing={star.image === null}

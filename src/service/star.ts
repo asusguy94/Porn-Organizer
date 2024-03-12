@@ -1,10 +1,10 @@
-import { keys } from '@keys'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { createApi } from '@config'
-import { Missing, Similar, Star, StarVideo } from '@interfaces'
+import { createApi } from '@/config'
+import { Missing, Similar, Star, StarVideo } from '@/interface'
+import { keys } from '@/keys'
 
-const { api, legacyApi } = createApi('/star')
+const { api: newApi, legacyApi: newLegacyApi } = createApi('/star', { serverKey: 'newApi' })
 
 type StarInfo = {
   breast: string[]
@@ -13,49 +13,50 @@ type StarInfo = {
 }
 
 export default {
-  add: (star: string) => legacyApi.post('/', { name: star }),
-  remove: (id: number) => legacyApi.delete(`/${id}`),
-  renameStar: (id: number, name: string) => legacyApi.put(`/${id}`, { name }),
-  setSlug: (id: number, slug: string) => legacyApi.put(`/${id}`, { slug }),
+  add: (star: string) => newLegacyApi.post('/', { name: star }),
+  remove: (id: number) => newLegacyApi.delete(`/${id}`),
+  renameStar: (id: number, name: string) => newLegacyApi.put(`/${id}`, { name }),
+  setSlug: (id: number, slug: string) => newLegacyApi.put(`/${id}`, { slug }),
   ignoreStar: <T extends { id: number; ignored: boolean }>(star: T) => {
-    return legacyApi.put<T & { autoTaggerIgnore: boolean }>(`/${star.id}`, { ignore: !star.ignored })
+    return newLegacyApi.put<T & { autoTaggerIgnore: boolean }>(`/${star.id}`, { ignore: !star.ignored })
   },
-  removeImage: (id: number) => legacyApi.delete(`/${id}/image`),
+  removeImage: (id: number) => newLegacyApi.delete(`/${id}/image`),
   useAddImage: (id: number) => {
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { url: string }>({
       mutationKey: ['star', id, 'addImage'],
-      mutationFn: payload => api.post(`/${id}/image`, payload),
+      mutationFn: payload => newApi.post(`/${id}/image`, payload),
       onSuccess: () => queryClient.invalidateQueries({ ...keys.star.byId(id) })
     })
 
     return { mutate }
   },
-  getImages: (id: number) => legacyApi.post<{ images: string[] }>(`/${id}/api/image`),
+  getImages: (id: number) => newLegacyApi.post<{ images: string[] }>(`/${id}/api/image`),
   useAddHaircolor: (id: number) => {
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { name: string }>({
       mutationKey: ['star', id, 'addHaircolor'],
-      mutationFn: payload => api.put(`/${id}/haircolor`, payload),
+      mutationFn: payload => newApi.put(`/${id}/haircolor`, payload),
       onSuccess: () => queryClient.invalidateQueries({ ...keys.star.byId(id) })
     })
 
     return { mutate }
   },
-  removeHaircolor: (id: number, name: string) => legacyApi.put(`/${id}/haircolor`, { name, remove: true }),
-  updateInfo: (id: number, label: string, value: string) =>
-    legacyApi.put<{ reload: boolean; content: string | Date | number | null; similar: Similar[] }>(`/${id}`, {
+  removeHaircolor: (id: number, name: string) => newLegacyApi.put(`/${id}/haircolor`, { name, remove: true }),
+  updateInfo: (id: number, label: string, value: string) => {
+    return newLegacyApi.put<{ reload: boolean; content: string | Date | number | null; similar: Similar[] }>(`/${id}`, {
       label,
       value
-    }),
-  resetInfo: (id: number) => legacyApi.delete(`/${id}/api`),
-  getData: (id: number) => legacyApi.post(`/${id}/api`),
+    })
+  },
+  resetInfo: (id: number) => newLegacyApi.delete(`/${id}/api`),
+  getData: (id: number) => newLegacyApi.post(`/${id}/api`),
   useInfo: () => {
     const query = useQuery<StarInfo>({
       ...keys.star.info,
-      queryFn: () => api.get('/info')
+      queryFn: () => newApi.get('/info')
     })
 
     return { data: query.data }
@@ -69,7 +70,7 @@ export default {
 
     const query = useQuery<{ stars: Star[]; missing: Missing[] }>({
       ...keys.star.all,
-      queryFn: () => api.get('')
+      queryFn: () => newApi.get('')
     })
 
     return { data: query.data }
@@ -77,7 +78,7 @@ export default {
   useVideos: (id: number) => {
     const query = useQuery<StarVideo[]>({
       ...keys.star.byId(id)._ctx.video,
-      queryFn: () => api.get(`/${id}/video`)
+      queryFn: () => newApi.get(`/${id}/video`)
     })
 
     return { data: query.data }
@@ -85,7 +86,7 @@ export default {
   useStar: (id: number) => {
     const query = useQuery<Star>({
       ...keys.star.byId(id),
-      queryFn: () => api.get(`/${id}`)
+      queryFn: () => newApi.get(`/${id}`)
     })
 
     return { data: query.data }
@@ -95,7 +96,7 @@ export default {
 
     const { mutate } = useMutation<unknown, Error, { retired: boolean }>({
       mutationKey: ['star', id, 'retired'],
-      mutationFn: payload => legacyApi.put(`/${id}`, payload),
+      mutationFn: payload => newLegacyApi.put(`/${id}`, payload),
       onSuccess: () => queryClient.invalidateQueries({ ...keys.star.byId(id) })
     })
 

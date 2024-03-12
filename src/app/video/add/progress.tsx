@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import MuiProgress from '@components/progress'
-
-import socket from '@utils/pusher/client'
-import { EventsForChannel } from '@utils/pusher/types'
+import MuiProgress from '@/components/progress'
+import socket from '@/utils/pusher/client'
+import { EventsForChannel } from '@/utils/pusher/types'
 
 //TODO extract ProgressBuffer instead of hardcoding "ffmpeg"
 type ProgressItemProps = { event: EventsForChannel<'ffmpeg'>['name']; label: string }

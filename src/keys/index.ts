@@ -1,3 +1,4 @@
+// TODO move directory to /src/service/keys
 import { mergeQueryKeys } from '@lukemorales/query-key-factory'
 
 import { attribute } from './attribute'

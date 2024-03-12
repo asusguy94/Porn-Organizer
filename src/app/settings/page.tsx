@@ -6,11 +6,11 @@ import { Button, Checkbox, FormControlLabel, Grid, List, TextField } from '@mui/
 
 import { useLocalStorage } from 'usehooks-ts'
 
-import Spinner from '@components/spinner'
+import Spinner from '@/components/spinner'
 
-import { General, LocalWebsite, SetState } from '@interfaces'
-import { websiteService } from '@service'
-import { clamp } from '@utils/shared'
+import { General, LocalWebsite, SetState } from '@/interface'
+import { websiteService } from '@/service'
+import { clamp } from '@/utils/shared'
 
 export default function SettingsPage() {
   const [rawWebsites, setRawWebsites] = useLocalStorage<LocalWebsite[]>('websites', [])

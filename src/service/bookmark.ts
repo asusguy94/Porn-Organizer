@@ -1,9 +1,9 @@
-import { keys } from '@keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { createApi } from '@config'
+import { createApi } from '@/config'
+import { keys } from '@/keys'
 
-const { api } = createApi('/bookmark')
+const { api: newApi } = createApi('/bookmark', { serverKey: 'newApi' })
 
 export default {
   useSetTime: (videoId: number) => {
@@ -11,7 +11,7 @@ export default {
 
     const { mutate } = useMutation<unknown, Error, { id: number; time: number }>({
       mutationKey: ['bookmark', 'setTime'],
-      mutationFn: ({ id, ...payload }) => api.put(`/${id}`, payload),
+      mutationFn: ({ id, ...payload }) => newApi.put(`/${id}`, payload),
       onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
     })
 
@@ -22,7 +22,7 @@ export default {
 
     const { mutate } = useMutation<unknown, Error, { id: number }>({
       mutationKey: ['bookmark', 'delete'],
-      mutationFn: ({ id }) => api.delete(`/${id}`),
+      mutationFn: ({ id }) => newApi.delete(`/${id}`),
       onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
     })
 
@@ -33,7 +33,7 @@ export default {
 
     const { mutate } = useMutation<unknown, Error, { id: number; categoryID: number }>({
       mutationKey: ['bookmark', 'setCategory'],
-      mutationFn: ({ id, ...payload }) => api.put(`/${id}`, payload),
+      mutationFn: ({ id, ...payload }) => newApi.put(`/${id}`, payload),
       onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
     })
 

@@ -4,8 +4,8 @@ import { Button, TextField, Grid, Autocomplete } from '@mui/material'
 
 import { ContextMenuTrigger, ContextMenu, ContextMenuItem } from 'rctx-contextmenu'
 
-import { IconWithText } from '@components/icon'
-import Spinner from '@components/spinner'
+import { IconWithText } from '@/components/icon'
+import Spinner from '@/components/spinner'
 
 import styles from './star.module.scss'
 

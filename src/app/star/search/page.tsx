@@ -4,15 +4,14 @@ import { FormControl, Grid, RadioGroup, SelectChangeEvent, TextField } from '@mu
 
 import ScrollToTop from 'react-scroll-to-top'
 
-import { FilterDropdown, FilterRadio, isDefault } from '@components/search/filter'
-import { SortObjStar as SortObj, defaultStarObj as defaultObj, getSortString } from '@components/search/sort'
-import Spinner from '@components/spinner'
-
 import Stars from './stars'
 
-import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@hooks/search'
-import useFocus from '@hooks/use-focus'
-import { starService, websiteService } from '@service'
+import { FilterDropdown, FilterRadio, isDefault } from '@/components/search/filter'
+import { SortObjStar as SortObj, defaultStarObj as defaultObj, getSortString } from '@/components/search/sort'
+import Spinner from '@/components/spinner'
+import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@/hooks/search'
+import useFocus from '@/hooks/use-focus'
+import { starService, websiteService } from '@/service'
 
 import styles from './search.module.scss'
 

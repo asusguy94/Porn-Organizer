@@ -15,11 +15,10 @@ import {
   Paper
 } from '@mui/material'
 
-import Spinner from '@components/spinner'
-
 import Progress from './progress'
 
-import { generateService, videoService } from '@service'
+import Spinner from '@/components/spinner'
+import { generateService, videoService } from '@/service'
 
 import styles from './add.module.css'
 

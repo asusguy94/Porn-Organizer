@@ -1,5 +1,3 @@
-import { Website } from '@prisma/client'
-
 // Common types
 export type SetState<T> = React.Dispatch<React.SetStateAction<T>>
 
@@ -16,14 +14,11 @@ export type Params<T extends string | string[]> = {
 export type AllowString<T> = T | (string & NonNullable<unknown>)
 
 // Other Types
-export type WebsiteWithSites = {
-  id: number
-  name: string
-  sites: General[]
-  videos: number
-}
-
-export type WebsiteWithCount = Website & { _count: { videos: number } }
+export type WebsiteWithCount = {
+  _count: {
+    videos: number
+  }
+} & General
 
 export type Bookmark = {
   id: number
@@ -83,28 +78,6 @@ export type LocalWebsite = {
   label: string
   count: number
   finished: boolean
-}
-
-export type Gender = 'Female' | 'Male' | null
-
-export type Extra = {
-  birthday: string | null
-  ethnicity: string | null
-  nationality: string | null
-  weight: string | null
-  height: string | null
-  cupsize: string | null
-}
-
-export type Performer = {
-  id: string
-  name: string
-  extra: Extra & {
-    gender: Gender
-    haircolor: string | null
-  }
-  image: string
-  thumbnail: string
 }
 
 export type StarSearch = {

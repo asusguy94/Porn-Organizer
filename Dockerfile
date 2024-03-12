@@ -5,10 +5,8 @@ FROM node:20-alpine3.18 AS custom_node
 FROM custom_node AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
-
-# Install dependencies based on the preferred package manager
 COPY package.json yarn.lock* ./
-RUN yarn --frozen-lockfile
+RUN yarn install --frozen-lockfile
 
 ##### BUILDER
 FROM custom_node AS builder
@@ -20,7 +18,6 @@ RUN yarn build
 
 ##### RUNNER
 FROM custom_node AS runner
-RUN apk add ffmpeg
 WORKDIR /app
 
 ENV NODE_ENV production

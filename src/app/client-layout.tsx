@@ -6,7 +6,7 @@ import { Container, CssBaseline } from '@mui/material'
 
 import { ToastContainer } from 'react-toastify'
 
-import NavBar from '@components/navbar'
+import NavBar from '@/components/navbar'
 
 import Providers from './providers'
 
@@ -26,7 +26,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <Providers>{children}</Providers>
       </Container>
 
-      <ToastContainer position='top-center' autoClose={5000} draggable={false} />
+      <ToastContainer position='top-center' autoClose={5000} />
     </>
   )
 }

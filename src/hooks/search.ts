@@ -1,8 +1,8 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
-import { DefaultObj } from '@components/search/sort'
+import { DefaultObj } from '@/components/search/sort'
 
-import { AllowString } from '@interfaces'
+import { AllowString } from '@/interface'
 
 type ParamValue<T, K extends keyof T> = T[K] extends string ? AllowString<T[K]> : never
 
@@ -11,7 +11,8 @@ export function useDynamicSearchParam<T extends DefaultObj>(defaultValue: T) {
   const router = useRouter()
   const pathname = usePathname()
 
-  const currentSearchParams = new URLSearchParams([...(searchParams?.entries() ?? [])])
+  // TODO it seems like useSearchParams() detects that pages directory exists and defaults to null
+  const currentSearchParams = new URLSearchParams(searchParams)
 
   const setParam = <K extends keyof T & string>(param: K, value: ParamValue<T, K>) => {
     if (value !== defaultValue[param]) {
@@ -33,13 +34,7 @@ export function useAllSearchParams<T extends Record<string, string>>(defaultPara
 
   const result: Record<string, string> = {}
   for (const key in defaultParams) {
-    const searchParam = searchParams?.get(key) ?? null
-
-    if (searchParam !== null) {
-      result[key] = searchParam
-    } else {
-      result[key] = defaultParams[key]
-    }
+    result[key] = searchParams.get(key) ?? defaultParams[key]
   }
 
   return result as T

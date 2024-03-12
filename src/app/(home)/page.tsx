@@ -4,13 +4,12 @@ import { Grid } from '@mui/material'
 
 import capitalize from 'capitalize'
 
-import { ResponsiveImage } from '@components/image'
-import Link from '@components/link'
-import Ribbon, { RibbonContainer } from '@components/ribbon'
-import Spinner from '@components/spinner'
-
-import { serverConfig } from '@config'
-import { homeService } from '@service'
+import { ResponsiveImage } from '@/components/image'
+import Link from '@/components/link'
+import Ribbon, { RibbonContainer } from '@/components/ribbon'
+import Spinner from '@/components/spinner'
+import { serverConfig } from '@/config'
+import { homeService } from '@/service'
 
 import classes from './home.module.css'
 
@@ -39,7 +38,7 @@ function Column({ label, cols, rows = 1 }: ColumnProps) {
               <Link href={`/video/${video.id}`}>
                 <RibbonContainer className={classes.video} style={isMissing ? { textAlign: 'center' } : {}}>
                   <ResponsiveImage
-                    src={`${serverConfig.legacyApi}/video/${video.id}/image`}
+                    src={`${serverConfig.newApi}/video/${video.id}/image`}
                     width={185}
                     height={105}
                     missing={isMissing}
