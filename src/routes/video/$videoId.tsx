@@ -2,13 +2,14 @@
 
 import { useRef } from 'react'
 
-import { Grid, Card, Typography, TextField } from '@mui/material'
+import { Grid, Card, Typography, TextField, CardMedia } from '@mui/material'
 
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
 import Badge from '@/components/badge'
 import { IconWithText } from '@/components/icon'
+import MissingImage from '@/components/image/missing'
 import ModalComponent, { useModal, ModalHandler, Modal } from '@/components/modal'
 import Ribbon, { RibbonContainer } from '@/components/ribbon'
 import Spinner from '@/components/spinner'
@@ -119,7 +120,17 @@ function Star({ star, video }: StarProps) {
       <RibbonContainer component={Card}>
         <Badge content={star.numVideos}>
           <ContextMenuTrigger id='star'>
-            <img src={`${serverConfig.newApi}/star/${star.id}/image`} alt='star' />
+            <CardMedia style={{ height: 380, textAlign: 'center' }}>
+              {star.image === null ? (
+                <MissingImage renderStyle='transform' scale={5} />
+              ) : (
+                <img
+                  src={`${serverConfig.newApi}/star/${star.id}/image`}
+                  style={{ height: '100%', width: '100%' }}
+                  alt='star'
+                />
+              )}
+            </CardMedia>
 
             <Link to='/star/$starId' params={{ starId: star.id }}>
               <Typography className='unselectable'>{star.name}</Typography>

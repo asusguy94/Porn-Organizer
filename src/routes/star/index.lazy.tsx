@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 
-import { Grid, TextField, Card, CardActionArea, CardContent, Button, Typography } from '@mui/material'
+import { Grid, TextField, Card, CardActionArea, CardContent, Button, Typography, CardMedia } from '@mui/material'
 
 import { Link, createLazyFileRoute } from '@tanstack/react-router'
 import { useSessionStorage } from 'usehooks-ts'
 
+import MissingImage from '@/components/image/missing'
 import Spinner from '@/components/spinner'
 
 import { serverConfig } from '@/config'
@@ -97,7 +98,13 @@ function Stars() {
               <Link to='/star/$starId' params={{ starId: star.id }}>
                 <Card className='text-center'>
                   <CardActionArea>
-                    <img src={`${serverConfig.newApi}/star/${star.id}/image`} alt='star' />
+                    <CardMedia style={{ height: 275, textAlign: 'center' }}>
+                      {star.image === null ? (
+                        <MissingImage renderStyle='height' scale={5} />
+                      ) : (
+                        <img src={`${serverConfig.newApi}/star/${star.id}/image`} alt='star' />
+                      )}
+                    </CardMedia>
 
                     <CardContent style={activeStar === star.name ? { backgroundColor: 'orange' } : {}}>
                       <Typography>{star.name}</Typography>
@@ -120,7 +127,9 @@ function Stars() {
                   <Typography>{star.name}</Typography>
 
                   <CardActionArea>
-                    <Link href={`/video/${star.videoId}`}>{star.videoId}</Link>
+                    <Link to='/video/$videoId' params={{ videoId: star.videoId }}>
+                      {star.videoId}
+                    </Link>
                   </CardActionArea>
                 </CardContent>
               </Card>

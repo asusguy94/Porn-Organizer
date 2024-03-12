@@ -25,6 +25,7 @@ import { useCopyToClipboard } from 'usehooks-ts'
 
 import Dropbox from '@/components/dropbox'
 import { IconWithText } from '@/components/icon'
+import MissingImage from '@/components/image/missing'
 import ModalComponent, { ModalHandler, useModal } from '@/components/modal'
 import Ribbon, { RibbonContainer } from '@/components/ribbon'
 import Spinner from '@/components/spinner'
@@ -193,7 +194,17 @@ function Sidebar({ similar }: SidebarProps) {
           {similar.map(star => (
             <Link key={star.id} to='/star/$starId' params={{ starId: star.id }} className={styles.star}>
               <RibbonContainer component={Card}>
-                <img src={`${serverConfig.newApi}/star/${star.id}/image`} style={{ width: '100%' }} alt='star' />
+                <CardMedia style={{ height: 275, textAlign: 'center' }}>
+                  {star.image === null ? (
+                    <MissingImage renderStyle='height' scale={5} />
+                  ) : (
+                    <img
+                      src={`${serverConfig.newApi}/star/${star.id}/image`}
+                      style={{ width: '100%', height: '100%' }}
+                      alt='star'
+                    />
+                  )}
+                </CardMedia>
 
                 <Typography>{star.name}</Typography>
 
@@ -457,7 +468,11 @@ function Videos({ videos }: VideosProps) {
             .sort((a, b) => Number(a.hidden) - Number(b.hidden))
             .map((video, idx) => (
               <Flipped key={video.id} flipId={video.id}>
-                <Link className={`${styles.video} ${video.hidden ? styles.hidden : ''}`} href={`/video/${video.id}`}>
+                <Link
+                  className={`${styles.video} ${video.hidden ? styles.hidden : ''}`}
+                  to='/video/$videoId'
+                  params={{ videoId: video.id }}
+                >
                   <Video
                     video={video}
                     isFirst={videos.length > 1 && idx === 0}
