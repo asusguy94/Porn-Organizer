@@ -133,7 +133,9 @@ function Star({ star, video }: StarProps) {
             </CardMedia>
 
             <Link to='/star/$starId' params={{ starId: star.id }}>
-              <Typography className='unselectable'>{star.name}</Typography>
+              <Typography className='unselectable' style={{ paddingTop: 4, paddingBottom: 4 }}>
+                {star.name}
+              </Typography>
             </Link>
 
             {star.ageInVideo > 0 && <Ribbon label={daysToYears(star.ageInVideo)} />}
