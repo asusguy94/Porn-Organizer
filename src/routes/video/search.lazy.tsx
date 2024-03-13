@@ -359,11 +359,15 @@ function VideoCard({ video }: VideoCardProps) {
     <Link to='/video/$videoId' params={{ videoId: video.id }}>
       <RibbonContainer component={Card} className={styles.video}>
         <CardActionArea>
-          <CardMedia style={{ height: 200, textAlign: 'center' }}>
+          <CardMedia style={{ height: 170, textAlign: 'center' }}>
             {video.image === null ? (
               <MissingImage renderStyle='height' scale={5} />
             ) : (
-              <img src={`${serverConfig.newApi}/video/${video.id}/image`} style={{ width: '100%' }} alt='video' />
+              <img
+                src={`${serverConfig.newApi}/video/${video.id}/image`}
+                style={{ width: '100%', height: '100%' }}
+                alt='video'
+              />
             )}
           </CardMedia>
 
