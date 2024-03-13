@@ -744,22 +744,22 @@
   resolved "https://registry.yarnpkg.com/@tanstack/history/-/history-1.15.13.tgz#544878665989e6ce07872378961fc6717d342682"
   integrity sha512-ToaeMtK5S4YaxCywAlYexc7KPFN0esjyTZ4vXzJhXEWAkro9iHgh7m/4ozPJb7oTo65WkHWX0W9GjcZbInSD8w==
 
-"@tanstack/query-core@5.27.3":
-  version "5.27.3"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.27.3.tgz#23e20fa7238884321630a6c39ca468a35748ea5c"
-  integrity sha512-1SrNjrFX8eQRQ7DF3hMUhRYzxT9lEry4Uvj2lxl819Cmlq4uWQFGjZKS6moDuZoADG9/85oDdtcHbxmYQ7+HGw==
+"@tanstack/query-core@5.27.5":
+  version "5.27.5"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.27.5.tgz#de4ede2094d490d0147e943212fcda51f09c0f69"
+  integrity sha512-HuYOo46NhzNX1SwXCmLf/Skr8B7T56cDHUN+iOhnu7+GOkUMThda64GwZpAqQzBT8TOTBQo6RQaNe0gi3Gi2fw==
 
 "@tanstack/react-query@^5":
-  version "5.27.3"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.27.3.tgz#e01769fabacf269f2ad3235adcef4f2f33e5dda0"
-  integrity sha512-a8c+lFvPdS4OR1r/p0F21Xwo6AxaJSqn/GbygzbzI+oZA6ZaUeJSs5GsazAn1x7XI/T/SDur78CuChWfMz9bhA==
+  version "5.27.5"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.27.5.tgz#2a431c28931bd821d9d96eaf7c6e59b4257ce023"
+  integrity sha512-VcuQo4CYRGsPsD8/rj9e4WnXN6eU4GKmAs0Yd9a1hLSx6DxAzRaBdrwu6P9lfjpz8bxaYkZRyb5NI+YtLipoYA==
   dependencies:
-    "@tanstack/query-core" "5.27.3"
+    "@tanstack/query-core" "5.27.5"
 
 "@tanstack/react-router@^1.19.9":
-  version "1.19.9"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-router/-/react-router-1.19.9.tgz#95c1048ecba20a07fefc9c43efc570d8e1d04fd4"
-  integrity sha512-sKg5YCbmgLjctfDLbvt/DonibguO25y+y1X115XExZJC0qbGVr92VgjBpHFV0e0ErLzvvkp5WEvViufsjkYsHg==
+  version "1.19.12"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-router/-/react-router-1.19.12.tgz#d68382a8be7a91ac2ba55c747a8cd6cd7cb823cd"
+  integrity sha512-/S2iUNc57/NULGcwO23vNqTTPWccPgfrzAJn9TuRu9hmQqcOorDQ5q8YwWfcKGb4l/G3nljKxKe43NNlTzEXJA==
   dependencies:
     "@tanstack/history" "1.15.13"
     "@tanstack/react-store" "^0.2.1"
