@@ -5,6 +5,8 @@ import { QueryClientProvider, QueryClient, QueryCache, MutationCache } from '@ta
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { toast } from 'react-toastify'
 
+import ErrorComponent from './components/error'
+import NotFoundComponent from './components/not-found'
 import { routeTree } from './routeTree.gen'
 
 const router = createRouter({ routeTree })
@@ -39,12 +41,8 @@ if (root === null) {
       <QueryClientProvider client={client}>
         <RouterProvider
           router={router}
-          defaultErrorComponent={({ error }: { error: Error }) => (
-            <div>
-              <h1>{error.message}</h1>
-              <pre>{error.stack}</pre>
-            </div>
-          )}
+          defaultErrorComponent={ErrorComponent}
+          defaultNotFoundComponent={NotFoundComponent}
         />
       </QueryClientProvider>
     </React.StrictMode>

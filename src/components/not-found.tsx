@@ -1,8 +1,6 @@
-'use client'
-
 import { Button, Grid, Typography } from '@mui/material'
 
-import Link from '@/components/link'
+import { Link } from '@tanstack/react-router'
 
 export default function NotFound() {
   return (
@@ -10,9 +8,11 @@ export default function NotFound() {
       <Typography variant='h4'>Oops!</Typography>
       <Typography variant='h6'>Seems like this page is not created yet</Typography>
 
-      <Button LinkComponent={Link} href='/' variant='contained' color='primary'>
-        Go Back
-      </Button>
+      <Link to='/'>
+        <Button variant='contained' color='primary'>
+          Go Back
+        </Button>
+      </Link>
     </Grid>
   )
 }
