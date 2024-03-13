@@ -500,6 +500,7 @@ function Video({ video, isFirst, isLast, isHidden }: VideoProps) {
 
   const thumbnail = useRef<NodeJS.Timeout>()
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const reload = async () => {
     setSrc(dataSrc)
     setDataSrc('')
@@ -537,6 +538,7 @@ function Video({ video, isFirst, isLast, isHidden }: VideoProps) {
     }, duration * 1000)
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const stopThumbnailPlayback = async (video: HTMLVideoElement) => {
     stopFrom(video)
 
