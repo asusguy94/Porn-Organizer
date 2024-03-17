@@ -1,7 +1,7 @@
 function getValueWithType<T>(label: string, defaultValue: T): T {
   try {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const value = import.meta.env[label] ?? localStorage.getItem(label)
+    const value = import.meta.env[`VITE_${label}`] ?? localStorage.getItem(label)
 
     if (value !== null) {
       try {
@@ -30,11 +30,7 @@ export default {
     }
   },
   pusher: {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    appId: import.meta.env.PUSHER_APP_ID ?? '',
     key: getValueWithType('PUSHER_KEY', ''),
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    secret: import.meta.env.PUSHER_SECRET ?? '',
     cluster: getValueWithType('PUSHER_CLUSTER', 'eu')
   }
 }
