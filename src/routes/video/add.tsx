@@ -13,7 +13,7 @@ import {
   Paper
 } from '@mui/material'
 
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 
 import MuiProgress from '@/components/progress'
 import Spinner from '@/components/spinner'
@@ -24,7 +24,7 @@ import { EventsForChannel } from '@/utils/pusher/types'
 
 import styles from './add.module.css'
 
-export const Route = createLazyFileRoute('/video/add')({
+export const Route = createFileRoute('/video/add')({
   component: AddVideoPage
 })
 

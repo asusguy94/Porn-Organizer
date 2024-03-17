@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { Button, Checkbox, FormControlLabel, Grid, List, TextField } from '@mui/material'
 
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useLocalStorage } from 'usehooks-ts'
 
 import Spinner from '@/components/spinner'
@@ -11,7 +11,7 @@ import { General, LocalWebsite, SetState } from '@/interface'
 import { websiteService } from '@/service'
 import { clamp } from '@/utils/shared'
 
-export const Route = createLazyFileRoute('/settings')({
+export const Route = createFileRoute('/settings')({
   component: SettingsPage
 })
 

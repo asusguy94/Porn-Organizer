@@ -1,6 +1,6 @@
 import { Grid } from '@mui/material'
 
-import { Link, createLazyFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import capitalize from 'capitalize'
 
 import Ribbon, { RibbonContainer } from '@/components/ribbon'
@@ -9,7 +9,7 @@ import Spinner from '@/components/spinner'
 import { serverConfig } from '@/config'
 import { homeService } from '@/service'
 
-export const Route = createLazyFileRoute('/')({
+export const Route = createFileRoute('/')({
   component: () => (
     <Grid container>
       <Column label='recent' cols={12} />

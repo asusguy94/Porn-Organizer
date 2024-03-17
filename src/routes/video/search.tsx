@@ -12,7 +12,7 @@ import {
   Typography
 } from '@mui/material'
 
-import { Link, createLazyFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import ScrollToTop from 'react-scroll-to-top'
 import { useReadLocalStorage } from 'usehooks-ts'
 
@@ -38,7 +38,7 @@ import { daysToYears } from '@/utils/client/date-time'
 
 import styles from './search.module.scss'
 
-export const Route = createLazyFileRoute('/video/search')({
+export const Route = createFileRoute('/video/search')({
   component: () => (
     <Grid container>
       <Grid item xs={2} id={styles.sidebar}>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { Grid, TextField, Card, CardActionArea, CardContent, Button, Typography, CardMedia } from '@mui/material'
 
-import { Link, createLazyFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { useSessionStorage } from 'usehooks-ts'
 
 import MissingImage from '@/components/image/missing'
@@ -13,7 +13,7 @@ import { Missing } from '@/interface'
 import { starService } from '@/service'
 import { getUnique } from '@/utils/shared'
 
-export const Route = createLazyFileRoute('/star/')({
+export const Route = createFileRoute('/star/')({
   component: Stars
 })
 

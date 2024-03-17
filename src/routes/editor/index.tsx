@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import capitalize from 'capitalize'
 
 import Spinner from '@/components/spinner'
@@ -25,7 +25,7 @@ import { General } from '@/interface'
 
 import styles from './editor.module.css'
 
-export const Route = createLazyFileRoute('/editor/')({
+export const Route = createFileRoute('/editor/')({
   component: () => (
     <Grid container>
       <Table name='attribute' />
