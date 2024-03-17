@@ -6,11 +6,6 @@ export type General = {
   name: string
 }
 
-export type StaticParams<T extends string | string[]> = Promise<Record<T extends string ? T : T[number], string>[]>
-export type Params<T extends string | string[]> = {
-  params: Record<T extends string ? T : T[number], string>
-}
-
 export type AllowString<T> = T | (string & NonNullable<unknown>)
 
 // Other Types

@@ -23,16 +23,7 @@ function getValueWithType<T>(label: string, defaultValue: T): T {
 }
 
 export default {
-  timeline: {
-    spacing: getValueWithType<number>('TIMELINE_SPACING', 0)
-  },
   maxRetiredYears: getValueWithType<number>('MAX_RETIRED_YEARS', 1),
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  THUMB_RES: parseInt(import.meta.env.THUMBNAIL_RES ?? '290'),
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  IMAGE_RES: parseInt(import.meta.env.IMAGE_RES ?? '1920'),
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  THEPORNDB_API: import.meta.env.THEPORNDB_API ?? '',
   userAction: {
     thumbnail: {
       close: getValueWithType<'reload' | 'close'>('USER_THUMB', 'reload') === 'close'
