@@ -13,7 +13,31 @@ type StarInfo = {
 }
 
 export default {
-  add: (star: string) => legacyApi.post('/', { name: star }),
+  useAddStar: () => {
+    const queryClient = useQueryClient()
+
+    type Payload = { name: string }
+    const { mutate: mutateSync, mutateAsync } = useMutation<unknown, Error, Payload>({
+      mutationKey: ['star', 'add'],
+      mutationFn: payload => api.post('/', payload)
+    })
+
+    const mutate = (payload: Payload) => {
+      mutateSync(payload, {
+        onSuccess: () => {
+          queryClient.invalidateQueries(keys.star.all)
+        }
+      })
+    }
+
+    const mutateAll = (payloads: Payload[]) => {
+      Promise.allSettled(payloads.map(payload => mutateAsync(payload))).then(() => {
+        queryClient.invalidateQueries(keys.star.all)
+      })
+    }
+
+    return { mutate, mutateAll }
+  },
   remove: (id: number) => legacyApi.delete(`/${id}`),
   renameStar: (id: number, name: string) => legacyApi.put(`/${id}`, { name }),
   setSlug: (id: number, slug: string) => legacyApi.put(`/${id}`, { slug }),

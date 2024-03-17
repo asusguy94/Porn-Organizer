@@ -25,6 +25,7 @@ function Stars() {
   const [starInput, setStarInput] = useSessionStorage('starInput', '')
 
   const { data } = starService.useAll()
+  const { mutate, mutateAll } = starService.useAddStar()
 
   useEffect(() => {
     if (data === undefined) return
@@ -48,16 +49,12 @@ function Stars() {
 
     if (input.length) {
       setStarInput(input)
-      starService.add(input).then(() => {
-        location.reload()
-      })
+      mutate({ name: input })
     }
   }
 
   const handleSubmitAll = () => {
-    Promise.allSettled(missing.map(missing => starService.add(missing.name))).finally(() => {
-      location.reload()
-    })
+    mutateAll(missing.map(missing => ({ name: missing.name })))
   }
 
   return (
