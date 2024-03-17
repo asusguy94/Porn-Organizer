@@ -1,13 +1,18 @@
 import { TanStackRouterVite } from '@tanstack/router-vite-plugin'
 import react from '@vitejs/plugin-react-swc'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
+
+function getEnv(mode: string, key: string): string | undefined {
+  const env = loadEnv(mode, process.cwd(), '')
+  return env[key]
+}
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react(), TanStackRouterVite()],
   resolve: { alias: { '@': '/src' } },
-  server: { port: 3000 },
-  preview: { port: 3000 },
+  server: { port: Number(getEnv(mode, 'PORT') ?? 3000) },
+  preview: { port: Number(getEnv(mode, 'PORT') ?? 3000) },
   build: {
     outDir: 'dist',
     emptyOutDir: true,
@@ -24,4 +29,4 @@ export default defineConfig({
       }
     }
   }
-})
+}))
