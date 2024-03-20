@@ -31,7 +31,6 @@
     "capitalize": "^2.0.4",
     "dayjs": "^1.11.7",
     "hls.js": "^1.3.5",
-    "pusher-js": "^8.3.0",
     "rctx-contextmenu": "^1.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

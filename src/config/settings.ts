@@ -28,9 +28,5 @@ export default {
     thumbnail: {
       close: getValueWithType<'reload' | 'close'>('USER_THUMB', 'reload') === 'close'
     }
-  },
-  pusher: {
-    key: getValueWithType('PUSHER_KEY', ''),
-    cluster: getValueWithType('PUSHER_CLUSTER', 'eu')
   }
 }
