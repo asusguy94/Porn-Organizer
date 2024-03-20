@@ -33,7 +33,7 @@ import Spinner from '@/components/spinner'
 import { serverConfig } from '@/config'
 import { Similar, Star, StarVideo } from '@/interface'
 import { starService } from '@/service'
-import { daysToYears, getUnique } from '@/utils'
+import { daysToYears, getUnique, retiredUtil } from '@/utils'
 
 import styles from './star.module.scss'
 
@@ -388,10 +388,7 @@ function RetiredStarStatus({ star, videos }: RetiredStarStatusProps) {
 
   if (latestVideo === undefined) return null
 
-  const currentDate = dayjs()
-  const yearDiff = currentDate.diff(latestVideo, 'year')
-
-  const shouldBeRetired = yearDiff > settingsConfig.maxRetiredYears
+  const { shouldBeRetired } = retiredUtil(latestVideo)
 
   const toggleStatus = (status: boolean) => {
     mutate({ retired: status })
