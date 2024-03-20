@@ -19,7 +19,7 @@ import { MediaPlayerInstance } from '@/components/vidstack'
 import { serverConfig } from '@/config'
 import { Video, VideoStar } from '@/interface'
 import { categoryService, videoService } from '@/service'
-import { daysToYears } from '@/utils/client/date-time'
+import { daysToYears } from '@/utils'
 
 import styles from './video.module.css'
 

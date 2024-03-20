@@ -1,40 +1,19 @@
-import { useState, useEffect } from 'react'
+import { FormControl, Grid, RadioGroup, SelectChangeEvent, TextField } from '@mui/material'
 
-import {
-  Card,
-  CardActionArea,
-  CardMedia,
-  FormControl,
-  Grid,
-  RadioGroup,
-  SelectChangeEvent,
-  TextField,
-  Typography
-} from '@mui/material'
-
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import ScrollToTop from 'react-scroll-to-top'
-import { useReadLocalStorage } from 'usehooks-ts'
 
-import MissingImage from '@/components/image/missing'
 import { RegularHandlerProps } from '@/components/indeterminate'
-import Ribbon, { RibbonContainer } from '@/components/ribbon'
 import { FilterCheckbox, FilterDropdown, isDefault } from '@/components/search/filter'
-import {
-  SortObjVideo as SortObj,
-  defaultVideoObj as defaultObj,
-  getSortString,
-  getVideoSort as getSort
-} from '@/components/search/sort'
+import { SortObjVideo as SortObj, defaultVideoObj as defaultObj, getSortString } from '@/components/search/sort'
 import Spinner from '@/components/spinner'
-import VGrid from '@/components/virtualized/virtuoso'
 
-import { serverConfig } from '@/config'
+import Videos from './-videos'
+
 import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@/hooks/search'
 import useFocus from '@/hooks/useFocus'
-import { General, LocalWebsite, VideoSearch } from '@/interface'
-import { attributeService, categoryService, locationService, searchService, websiteService } from '@/service'
-import { daysToYears } from '@/utils/client/date-time'
+import { General } from '@/interface'
+import { attributeService, categoryService, locationService, websiteService } from '@/service'
 
 import styles from './search.module.scss'
 
@@ -255,129 +234,5 @@ function Filter() {
         </>
       )}
     </>
-  )
-}
-
-function Videos() {
-  const { sort, query, attribute, category, nullCategory, location, website } = useAllSearchParams(defaultObj)
-  const { data: videos, isLoading } = searchService.useVideos()
-
-  const localWebsites = useReadLocalStorage<LocalWebsite[]>('websites')
-  const [filtered, setFiltered] = useState<VideoSearch[]>([])
-  const [data, setData] = useState<{ label: string; count: number }[]>([])
-
-  useEffect(() => {
-    if (videos === undefined) return
-
-    const map = new Map<string, number>()
-
-    const initialData = (localWebsites !== null ? [...localWebsites] : []).map(wsite => ({
-      ...wsite,
-      count: wsite.finished ? wsite.count + 1 : wsite.count
-    }))
-
-    let stop = false
-    setFiltered(
-      videos.sort(getSort('date')).filter(video => {
-        const website = initialData.find(wsite => wsite.label === video.website)
-
-        if (website !== undefined && website.count-- > 1) {
-          return true
-        }
-
-        if (video.categories.length === 0 && !stop) {
-          const isNewWebsite = map.get(video.website) === undefined
-
-          if (isNewWebsite && map.size >= 3) {
-            // 3rd website found
-            stop = true
-          }
-
-          if (!stop || !isNewWebsite) {
-            // add or increment website
-            map.set(video.website, (map.get(video.website) ?? 0) + 1)
-          }
-        }
-
-        return false
-      })
-    )
-
-    setData([...map].map(([key, value]) => ({ label: key, count: value })))
-  }, [localWebsites, videos])
-
-  if (isLoading || videos === undefined) return <Spinner />
-
-  const visible = filtered
-    .sort(getSort(sort))
-    .filter(v => v.name.toLowerCase().includes(query.toLowerCase()) || isDefault(query, defaultObj.query))
-    .filter(
-      v => category.split(',').every(cat => v.categories.includes(cat)) || isDefault(category, defaultObj.category)
-    )
-    .filter(
-      v =>
-        (nullCategory !== defaultObj.nullCategory && v.categories.length === 0) ||
-        isDefault(nullCategory, defaultObj.nullCategory)
-    )
-    .filter(
-      v => attribute.split(',').every(attr => v.attributes.includes(attr)) || isDefault(attribute, defaultObj.attribute)
-    )
-    .filter(
-      v => location.split(',').every(loc => v.locations.includes(loc)) || isDefault(location, defaultObj.location)
-    )
-    .filter(v => v.website === website || isDefault(website, defaultObj.website))
-
-  return (
-    <div id={styles.videos}>
-      <Typography variant='h5' className='text-center'>
-        <span id={styles.count}>{visible.length}</span> Videos
-      </Typography>
-
-      {data.length > 0 && (
-        <Typography variant='h6' className='text-center'>
-          {data.map((item, idx) => (
-            <span key={item.label}>
-              {idx > 0 && ' - '}
-              {item.label}: {item.count}
-            </span>
-          ))}
-        </Typography>
-      )}
-
-      <VGrid itemHeight={300} total={visible.length} renderData={idx => <VideoCard video={visible.at(idx)} />} />
-    </div>
-  )
-}
-
-type VideoCardProps = {
-  video?: VideoSearch
-}
-function VideoCard({ video }: VideoCardProps) {
-  if (video === undefined) return null
-
-  return (
-    <Link to='/video/$videoId' params={{ videoId: video.id }}>
-      <RibbonContainer component={Card} className={styles.video}>
-        <CardActionArea>
-          <CardMedia style={{ height: 170, textAlign: 'center' }}>
-            {video.image === null ? (
-              <MissingImage renderStyle='height' scale={5} />
-            ) : (
-              <img
-                src={`${serverConfig.newApi}/video/${video.id}/image`}
-                style={{ width: '100%', height: '100%' }}
-                alt='video'
-              />
-            )}
-          </CardMedia>
-
-          <Grid container justifyContent='center' className={styles.title}>
-            <Typography className='text-center'>{video.name}</Typography>
-          </Grid>
-
-          <Ribbon label={daysToYears(video.ageInVideo)} />
-        </CardActionArea>
-      </RibbonContainer>
-    </Link>
   )
 }
