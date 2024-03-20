@@ -9,7 +9,7 @@ import Spinner from '@/components/spinner'
 
 import { General, LocalWebsite, SetState } from '@/interface'
 import { websiteService } from '@/service'
-import { clamp } from '@/utils/shared'
+import { clamp } from '@/utils'
 
 export const Route = createFileRoute('/settings')({
   component: SettingsPage

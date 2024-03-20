@@ -1,7 +1,15 @@
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
+import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
 
+import { settingsConfig } from './config'
+
 dayjs.extend(utc)
+dayjs.extend(duration)
+
+export function daysToYears(days: number) {
+  return Math.floor(dayjs.duration({ days }).asYears())
+}
 
 export function getUnique<T extends object>(arr: T[], prop: keyof T): T[]
 export function getUnique<T>(arr: T[]): T[]
@@ -25,21 +33,18 @@ export function clamp(value: number, minOrMax: number, max?: number): number {
   return Math.min(Math.max(value, minOrMax), max)
 }
 
-export function printError(error: unknown) {
-  if (error instanceof Error) {
-    console.error(`Error: ${error.message}`)
-  }
-}
-
 export function formatDate(dateStr: string | Date, raw = false, addDays = 0): string {
   const date = dayjs.utc(dateStr).add(addDays, 'days')
 
   return raw ? date.format('YYYY-MM-DD') : date.format('D MMMM YYYY')
 }
 
-export function getProgress(index: number, total: number) {
-  return {
-    progress: clamp((index + 1) / (total + 1), 1),
-    buffer: clamp((index + 2) / (total + 1), 1)
-  }
+export function retiredUtil(newestDate: Date | Dayjs) {
+  const currentDate = dayjs()
+  const latestDate = dayjs(newestDate)
+
+  const yearDiff = currentDate.diff(latestDate, 'year')
+  const shouldBeRetired = yearDiff > settingsConfig.maxRetiredYears
+
+  return { yearDiff, shouldBeRetired }
 }

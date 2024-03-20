@@ -11,7 +11,7 @@ import Spinner from '@/components/spinner'
 import { serverConfig } from '@/config'
 import { Missing } from '@/interface'
 import { starService } from '@/service'
-import { getUnique } from '@/utils/shared'
+import { getUnique } from '@/utils'
 
 export const Route = createFileRoute('/star/')({
   component: Stars

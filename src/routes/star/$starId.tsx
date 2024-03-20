@@ -30,11 +30,10 @@ import ModalComponent, { ModalHandler, useModal } from '@/components/modal'
 import Ribbon, { RibbonContainer } from '@/components/ribbon'
 import Spinner from '@/components/spinner'
 
-import { serverConfig, settingsConfig } from '@/config'
+import { serverConfig } from '@/config'
 import { Similar, Star, StarVideo } from '@/interface'
 import { starService } from '@/service'
-import { daysToYears } from '@/utils/client/date-time'
-import { getUnique } from '@/utils/shared'
+import { daysToYears, getUnique } from '@/utils'
 
 import styles from './star.module.scss'
 

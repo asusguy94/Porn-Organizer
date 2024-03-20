@@ -12,7 +12,7 @@ import { ModalHandler } from '../modal'
 import { settingsConfig } from '@/config'
 import { General, Video } from '@/interface'
 import { attributeService, locationService, videoService } from '@/service'
-import { formatDate } from '@/utils/shared'
+import { formatDate } from '@/utils'
 
 import styles from './header.module.scss'
 
