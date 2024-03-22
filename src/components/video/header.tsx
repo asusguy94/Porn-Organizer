@@ -71,7 +71,7 @@ function HeaderSlug({ video, hidden = false, onModal }: HeaderSlugProps) {
     const calcCols = (images: unknown[]) => Math.min(Math.ceil(images.length / Math.floor(MAX_ROWS)), MAX_COLS)
     const calcRows = (images: unknown[]) => Math.min(images.length, MAX_ROWS)
 
-    videoService.getSlugs(video.id).then(({ data }) => {
+    videoService.getSlugs(video.id).then(data => {
       data.sort((a, b) => {
         const matchesA = [
           a.title === video.name,
@@ -176,7 +176,7 @@ function ValidateTitle({ video, hidden, onModal }: ValidateTitleProps) {
 
   const handleClick = () => {
     setValue('Loading...')
-    videoService.getVideoInfo(video.id).then(({ data }) => {
+    videoService.getVideoInfo(video.id).then(data => {
       const title = data.title.replace(/ - S\d{1,2}:E\d{1,2}$/, '')
 
       const compare = (title: string, apiTitle: string): boolean => {

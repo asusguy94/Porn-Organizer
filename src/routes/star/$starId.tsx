@@ -250,7 +250,7 @@ function StarImageDropbox({ star, onModal }: StarImageDropboxProps) {
     const calcCols = (images: string[]) => Math.min(Math.ceil(images.length / Math.floor(MAX_ROWS)), MAX_COLS)
     const calcRows = (images: string[]) => Math.min(images.length, MAX_ROWS)
 
-    starService.getImages(star.id).then(({ data: { images } }) => {
+    starService.getImages(star.id).then(({ images }) => {
       onModal(
         'Change Image',
         <ImageList cols={calcCols(images)} sx={{ margin: 0, height: (275 + GAP) * calcRows(images) }}>
@@ -274,27 +274,27 @@ function StarImageDropbox({ star, onModal }: StarImageDropboxProps) {
   return (
     <div className='d-inline-block' onDoubleClick={changeImage}>
       <RetiredWrapper retired={star.retired}>
-      {star.image !== null ? (
-        <>
-          <ContextMenuTrigger id='star__image'>
-            <img id={styles.profile} src={`${serverConfig.newApi}/star/${star.id}/image`} alt='star' />
-          </ContextMenuTrigger>
+        {star.image !== null ? (
+          <>
+            <ContextMenuTrigger id='star__image'>
+              <img id={styles.profile} src={`${serverConfig.newApi}/star/${star.id}/image`} alt='star' />
+            </ContextMenuTrigger>
 
-          <ContextMenu id='star__image'>
-            <IconWithText component={ContextMenuItem} icon='delete' text='Delete Image' onClick={removeImage} />
-          </ContextMenu>
-        </>
-      ) : (
-        <>
-          <ContextMenuTrigger id='star__dropbox'>
-            <Dropbox onDrop={addImage} />
-          </ContextMenuTrigger>
+            <ContextMenu id='star__image'>
+              <IconWithText component={ContextMenuItem} icon='delete' text='Delete Image' onClick={removeImage} />
+            </ContextMenu>
+          </>
+        ) : (
+          <>
+            <ContextMenuTrigger id='star__dropbox'>
+              <Dropbox onDrop={addImage} />
+            </ContextMenuTrigger>
 
-          <ContextMenu id='star__dropbox'>
-            <IconWithText component={ContextMenuItem} icon='delete' text='Remove Star' onClick={removeStar} />
-          </ContextMenu>
-        </>
-      )}
+            <ContextMenu id='star__dropbox'>
+              <IconWithText component={ContextMenuItem} icon='delete' text='Remove Star' onClick={removeStar} />
+            </ContextMenu>
+          </>
+        )}
       </RetiredWrapper>
     </div>
   )
