@@ -59,7 +59,11 @@ function StarCard({ star }: StarCardProps) {
               {star.image === null ? (
                 <MissingImage renderStyle='height' scale={5} />
               ) : (
-                <img src={`${serverConfig.newApi}/star/${star.id}/image`} alt='star' />
+                <img
+                  src={`${serverConfig.newApi}/star/${star.id}/image`}
+                  style={{ width: '100%', height: '100%' }}
+                  alt='star'
+                />
               )}
             </CardMedia>
 
