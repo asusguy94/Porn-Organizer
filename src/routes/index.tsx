@@ -3,6 +3,7 @@ import { Grid } from '@mui/material'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import capitalize from 'capitalize'
 
+import MissingImage from '@/components/image/missing'
 import Ribbon, { RibbonContainer } from '@/components/ribbon'
 import Spinner from '@/components/spinner'
 
@@ -39,16 +40,20 @@ function Column({ label, cols, rows = 1 }: ColumnProps) {
         {videos.map(video => (
           <Grid item xs={1} key={video.id}>
             <Link to='/video/$videoId' params={{ videoId: video.id }}>
-              <RibbonContainer>
-                <img
-                  src={`${serverConfig.newApi}/video/${video.id}/image`}
-                  alt='video'
-                  style={{
-                    width: '100%',
-                    border: '1px solid #dee2e6',
-                    borderRadius: '0.25rem'
-                  }}
-                />
+              <RibbonContainer style={{ textAlign: 'center' }}>
+                {video.image === null ? (
+                  <MissingImage />
+                ) : (
+                  <img
+                    src={`${serverConfig.newApi}/video/${video.id}/image`}
+                    alt='video'
+                    style={{
+                      width: '100%',
+                      border: '1px solid #dee2e6',
+                      borderRadius: '0.25rem'
+                    }}
+                  />
+                )}
 
                 <div
                   style={{
