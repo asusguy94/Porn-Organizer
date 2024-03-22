@@ -76,18 +76,20 @@ function AddVideoPage() {
 
 type ActionProps = {
   label: string
-  callback?: (() => void) | (() => Promise<void>)
+  callback: (() => void) | (() => Promise<void>)
   disabled?: boolean
 }
-function Action({ label, callback = undefined, disabled = false }: ActionProps) {
+function Action({ label, callback, disabled = false }: ActionProps) {
   const [isDisabled, setIsDisabled] = useState(disabled)
 
   const clickHandler = () => {
     if (!isDisabled) {
       setIsDisabled(true)
 
-      if (callback !== undefined) {
-        callback()
+      const result = callback()
+      if (result instanceof Promise) {
+        result.finally(() => setIsDisabled(false))
+      } else {
         setIsDisabled(false)
       }
     }
