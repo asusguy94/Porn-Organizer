@@ -213,6 +213,8 @@ function ValidateTitle({ video, hidden, onModal }: ValidateTitleProps) {
           setDisabled(true)
         })
       } else {
+        const allowRename = video.name.length === title.length && video.name.toLowerCase() === title.toLowerCase()
+
         setValue('Validate Title')
         onModal(
           'Validate Title',
@@ -232,6 +234,25 @@ function ValidateTitle({ video, hidden, onModal }: ValidateTitleProps) {
             >
               Override?
             </Button>
+            {allowRename && (
+              <Button
+                size='small'
+                variant='contained'
+                color='info'
+                onClick={() => {
+                  onModal()
+                  setValue('Updating...')
+                  videoService.renameTitle(video.id, title).then(() => {
+                    videoService.validateTitle(video.id).then(() => {
+                      // setDisabled(true)
+                      location.reload() // mutation should fix this
+                    })
+                  })
+                }}
+              >
+                Update Case
+              </Button>
+            )}
           </>
         )
       }
