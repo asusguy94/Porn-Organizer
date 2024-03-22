@@ -4,7 +4,7 @@ import { createApi } from '@/config'
 import { Bookmark, File, Video, VideoStar } from '@/interface'
 import { keys } from '@/keys'
 
-const { api, legacyApi } = createApi('/video')
+const { api } = createApi('/video')
 
 export default {
   useAddBookmark: (id: number) => {
@@ -18,8 +18,8 @@ export default {
 
     return { mutate }
   },
-  addStar: (id: number, star: string) => legacyApi.post<VideoStar>(`/${id}/star`, { name: star }),
-  removeStar: (id: number) => legacyApi.delete(`/${id}/star`),
+  addStar: (id: number, star: string) => api.post<VideoStar>(`/${id}/star`, { name: star }),
+  removeStar: (id: number) => api.delete(`/${id}/star`),
   useAddLocation: (id: number) => {
     const queryClient = useQueryClient()
 
@@ -42,8 +42,8 @@ export default {
 
     return { mutate }
   },
-  fixDate: (id: number) => legacyApi.put(`/${id}/fix-date`),
-  renameTitle: (id: number, title: string) => legacyApi.put(`/${id}`, { title }),
+  fixDate: (id: number) => api.put(`/${id}/fix-date`),
+  renameTitle: (id: number, title: string) => api.put(`/${id}`, { title }),
   useRenameTitle: (id: number) => {
     const queryClient = useQueryClient()
 
@@ -56,7 +56,7 @@ export default {
     return { mutate }
   },
   getSlugs: (id: number) => {
-    return legacyApi.get<
+    return api.get<
       {
         id: string
         title: string
@@ -66,16 +66,16 @@ export default {
       }[]
     >(`/${id}/meta`)
   },
-  setSlug: (id: number, slug: string) => legacyApi.put(`/${id}`, { slug }),
+  setSlug: (id: number, slug: string) => api.put(`/${id}`, { slug }),
   addPlay: (id: number) => api.put(`/${id}`, { plays: 1 }),
-  delete: (id: number) => legacyApi.delete(`/${id}`),
-  removeBookmark: (id: number) => legacyApi.delete(`/${id}/bookmark`),
-  removePlays: (id: number) => legacyApi.put(`/${id}`, { plays: 0 }),
-  rename: (id: number, path: string) => legacyApi.put(`/${id}`, { path }),
-  setThumbnail: (id: number) => legacyApi.put(`/${id}`, { cover: true }),
-  validateTitle: (id: number) => legacyApi.put(`/${id}`, { validated: true }),
+  delete: (id: number) => api.delete(`/${id}`),
+  removeBookmark: (id: number) => api.delete(`/${id}/bookmark`),
+  removePlays: (id: number) => api.put(`/${id}`, { plays: 0 }),
+  rename: (id: number, path: string) => api.put(`/${id}`, { path }),
+  setThumbnail: (id: number) => api.put(`/${id}`, { cover: true }),
+  validateTitle: (id: number) => api.put(`/${id}`, { validated: true }),
   getVideoInfo: (id: number) => {
-    return legacyApi.get<{
+    return api.get<{
       id: string
       title: string
       date: string
