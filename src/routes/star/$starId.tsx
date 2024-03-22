@@ -27,6 +27,7 @@ import Dropbox from '@/components/dropbox'
 import { IconWithText } from '@/components/icon'
 import MissingImage from '@/components/image/missing'
 import ModalComponent, { ModalHandler, useModal } from '@/components/modal'
+import RetiredWrapper from '@/components/retired'
 import Ribbon, { RibbonContainer } from '@/components/ribbon'
 import Spinner from '@/components/spinner'
 
@@ -272,6 +273,7 @@ function StarImageDropbox({ star, onModal }: StarImageDropboxProps) {
 
   return (
     <div className='d-inline-block' onDoubleClick={changeImage}>
+      <RetiredWrapper retired={star.retired}>
       {star.image !== null ? (
         <>
           <ContextMenuTrigger id='star__image'>
@@ -293,6 +295,7 @@ function StarImageDropbox({ star, onModal }: StarImageDropboxProps) {
           </ContextMenu>
         </>
       )}
+      </RetiredWrapper>
     </div>
   )
 }

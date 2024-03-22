@@ -87,6 +87,8 @@ export type StarSearch = {
   websites: string[]
   sites: string[]
   videoCount: number
+  videoDates: number[]
+  retired: boolean
 }
 
 export type VideoSearch = {
